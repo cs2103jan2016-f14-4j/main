@@ -1,49 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<GridPane alignment="center" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
-prefHeight="400.0" prefWidth="380.0" styleClass="root" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.65" 
-xmlns:fx="http://javafx.com/fxml/1" fx:controller="taskey.ui.UiController">
-
-	<TextField fx:id="input" onAction="#handleSubmitButtonAction" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="8" />
-
-	<Text fx:id="actiontarget" wrappingWidth="96.0" GridPane.columnIndex="4" />
-	<Button onAction="#handleSubmitButtonAction" prefWidth="131.0" text="Send" GridPane.columnIndex="4" GridPane.rowIndex="8" />
-	<TextArea fx:id="display" prefHeight="250.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
-
-	<stylesheets>
-		<URL value="@style.css" />
-	</stylesheets>
-
-	<columnConstraints>
-		<ColumnConstraints />
-		<ColumnConstraints percentWidth="25.0" />
-		<ColumnConstraints percentWidth="25.0" />
-		<ColumnConstraints percentWidth="25.0" />
-		<ColumnConstraints percentWidth="25.0" />
-	</columnConstraints>
-	<rowConstraints>
-		<RowConstraints />
-		<RowConstraints />
-		<RowConstraints />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-	</rowConstraints>
-	<padding>
-		<Insets left="10.0" right="15.0" />
-	</padding>
-
-</GridPane>
+<AnchorPane id="mainWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="472.0" prefWidth="564.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane layoutX="164.0" layoutY="33.0" prefHeight="362.0" prefWidth="366.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="pendingTab" text="Pending">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
+                     <children>
+                        <TextArea editable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="expiredTab" text="Expired">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextArea editable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab fx:id="completedTab" text="Completed">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextArea editable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab fx:id="actionListTab" text="Action List">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="317.0" prefWidth="366.0">
+                     <children>
+                        <TextArea editable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Label fx:id="clockLabel" layoutX="21.0" layoutY="33.0" text="4:30 PM">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+      <Label fx:id="dateLabel" layoutX="36.0" layoutY="86.0" text="October 13th 2016" />
+      <Label layoutX="60.0" layoutY="110.0" text="This week" />
+      <ListView fx:id="weekList" layoutX="36.0" layoutY="133.0" prefHeight="262.0" prefWidth="100.0" />
+      <TextField fx:id="input" layoutX="35.0" layoutY="413.0" onKeyPressed="#onKeyPressed" prefHeight="25.0" prefWidth="495.0" />
+      <Label fx:id="textPrompt" layoutX="35.0" layoutY="442.0" />
+   </children>
+</AnchorPane>

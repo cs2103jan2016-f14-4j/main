@@ -1,6 +1,8 @@
 package taskey.ui;
 
 import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,11 +18,15 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import taskey.contants.Constants;
+import taskey.constants.Constants;
+import taskey.logic.Logic;
 import taskey.parser.Parser;
 
 public class UiEventHandler {
 	
+	private final Set<KeyCode> isPressed = (Set<KeyCode>) EnumSet.noneOf(KeyCode.class);
+	private int currentTab;
+	private Tab myTabs[];
     @FXML private Tab pendingTab;
     @FXML private Tab expiredTab;
     @FXML private Tab completedTab;
@@ -29,20 +35,36 @@ public class UiEventHandler {
     @FXML private Label textPrompt;
     private TextArea currentTextArea;
     
+    void setTabReferences() {
+    	myTabs = new Tab[4];
+    	myTabs[0] = pendingTab;
+    	myTabs[1] = expiredTab;
+    	myTabs[2] = completedTab;
+    	myTabs[3] = actionListTab;
+    	currentTab = 0;
+    	setWindowContentsToTab(currentTab);
+    }
+    public void setWindowContentsToTab(int tabNo) {
+    	AnchorPane content = (AnchorPane) myTabs[tabNo].getContent();
+    	currentTextArea = (TextArea)content.getChildren().get(0);
+    }
     @FXML protected void onKeyPressed(KeyEvent event) {
     	if ( event.getCode() == KeyCode.ENTER ) {
     		
     		String line = input.getText();
     		input.clear();
-    		boolean isSuccessful = Parser.getInstance().parseInput(line);
+    		Logic.getInstance().getCommand(line);
 
-    		if ( isSuccessful ) {
+    		if ( true ) { // only temporary here, logic should update a method in UI instead
     			textPrompt.setText("Successful");
-    			// only temporary here, should be getting a list from logic instead
-    			AnchorPane content = (AnchorPane) pendingTab.getContent();
-    	        currentTextArea = (TextArea)content.getChildren().get(0);
     	        currentTextArea.appendText(line + "\n");
     		}
+    	} else if ( event.getCode() == KeyCode.TAB ) {
+    		//temporary
+    		myTabs[currentTab].setDisable(true);
+    		currentTab = (currentTab + 1)%4;
+    		//myTabs[currentTab].
+    		setWindowContentsToTab(currentTab);
     	}
     }
 }

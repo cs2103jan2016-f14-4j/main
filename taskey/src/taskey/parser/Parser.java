@@ -1,8 +1,7 @@
 package taskey.parser;
 
-import taskey.ui.UiController;
-import taskey.ui.UiEventHandler;
-import taskey.ui.UiTimeDisplay;
+import taskey.logic.Task;
+import taskey.storage.Storage;
 
 public class Parser {
 	private static Parser instance = null; 
@@ -14,10 +13,11 @@ public class Parser {
     	return instance;
     }
     
-    public boolean parseInput(String line) {
+    public boolean parseInput(Task myTask) {
     	
-    	// find out what kind of input, call logic accordingly
-    	// Logic.getInstance().do ...
+    	// find out what kind of task, is it valid
+    	// call storage for operations
+    	Storage.getInstance().writeToFile(); // or equivalent
     	return true;
     }
 }

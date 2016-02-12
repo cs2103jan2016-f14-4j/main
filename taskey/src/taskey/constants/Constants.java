@@ -1,4 +1,4 @@
-package taskey.contants;
+package taskey.constants;
 
 public class Constants {
 

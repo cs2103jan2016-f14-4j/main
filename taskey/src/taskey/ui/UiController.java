@@ -2,23 +2,18 @@ package taskey.ui;
 
 import java.io.IOException;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import taskey.contants.Constants;
+import taskey.constants.Constants;
 
-public class UiController {
+public class UiController extends Application {
 	
 	private static UiController instance = null; 
 	
 	private UiEventHandler myEventHandler;
-	private UiTimeDisplay myTimer;
 	
     public static UiController getInstance () { 
     	if ( instance == null ) {
@@ -27,7 +22,8 @@ public class UiController {
     	return instance;
     }
     
-    public void initialize(Stage primaryStage) {
+    @Override
+    public void start(Stage primaryStage) {
 		myEventHandler = new UiEventHandler();
 		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
 		myloader.setController(myEventHandler);
@@ -38,6 +34,7 @@ public class UiController {
 			System.out.println(Constants.FXML_LOAD_FAIL);
 		}
 		setUpScene(primaryStage, root);
+		updateDisplay();
     }
     
     public void setUpScene(Stage primaryStage, Parent root) {
@@ -45,11 +42,15 @@ public class UiController {
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		myTimer = new UiTimeDisplay();
-		myTimer.run();
+		myEventHandler.setTabReferences(); // must be done after loading .fxml file
     }
     
-    public void update() {
-    	// get list from logic and update ui
+    public void updateDisplay() {
+    	// call logic to get updated list of tasks
     }
+    
+
+	public static void main(String[] args) {
+		launch(args); // calls the start() method
+	}
 }

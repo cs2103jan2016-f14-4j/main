@@ -7,12 +7,14 @@ public class Task implements Comparable<Task>{
 	
 	private String taskName;
 	private String taskDetails;
+	private String taskType; //floating,event (has start and end) , work (has a deadline)
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {"","","",""};
-	//dates*[0]: startDate
-	//dates*[1]: endDate
-	//date*[2]: recurring
-	//date*[3]: ??? 
+	private boolean isRecurring = false; //set to true if it is recurring. 
+	//dates*[0]: recurring date (if recurring event) 
+	//dates*[1]: start Time (events)
+	//date*[2]: end Time (events) 
+	//date*[3]: deadline (work) 
 	//TODO: Date Array TBC 
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
@@ -20,16 +22,19 @@ public class Task implements Comparable<Task>{
 	public Task() {
 		taskName = "";
 		taskDetails = "";
+		taskType = ""; 
 	}
 	
 	public Task(String taskName) {
 		this.taskName = taskName;
 		taskDetails = "";	
+		taskType = "";
 	}
 	
 	public Task(String taskName, String taskDetails) {
 		this.taskName = taskName;
 		this.taskDetails = taskDetails;
+		taskType = ""; 
 	}
 	
 	public String getTaskName() {
@@ -48,6 +53,14 @@ public class Task implements Comparable<Task>{
 		this.taskDetails = taskDetails; 
 	}
 	
+	public String getTaskType() {
+		return taskType; 
+	}
+	
+	public void setTaskType(String taskType) {
+		this.taskType = taskType; 
+	}
+	
 	public long getStartDate() {
 		return 1; 
 	}
@@ -63,7 +76,15 @@ public class Task implements Comparable<Task>{
 	public void setEndDate() {
 		//TODO 
 	}
-
+	
+	public boolean getIsRecurring() {
+		return isRecurring; 
+	}
+	
+	public void setIsRecurring(boolean isRecurring) {
+		this.isRecurring = isRecurring; 
+	}
+	
 	@Override
 	//tasks are comparable by their time. 
 	public int compareTo(Task anotherTask) {

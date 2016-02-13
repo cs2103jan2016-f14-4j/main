@@ -14,8 +14,9 @@ public class Logic {
     }
  
     public void getCommand(String line) {
+    	Parser parser = new Parser(); 
     	// create task object from line, pass to parser
-    	Parser.getInstance().parseInput(new Task());
+    	parser.parseInput(""); //TODO 
     	// Update UI 
     	// UiController.getInstance().update();
     }

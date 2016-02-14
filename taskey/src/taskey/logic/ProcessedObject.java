@@ -35,6 +35,14 @@ public class ProcessedObject {
 	
 	
 	//CONSTRUCTORS ====================================================
+	
+	/**
+	 * Empty Constructor for testing, shouldn't be used if possible 
+	 */
+	public ProcessedObject() {
+		
+	}
+	
 	/**
 	 * Constructor for VIEW 
 	 * @param command
@@ -70,6 +78,7 @@ public class ProcessedObject {
 	//=================================================================
 	
 	//Corresponding GET/SET methods ===================================
+	
 	public String getCommand() {
 		return command;
 	}

@@ -14,6 +14,7 @@ package taskey.logic;
  * 7. UPDATE_BY_INDEX
  * 8. UPDATE_BY_NAME 
  * 9. VIEW 
+ * 10. ERROR 
  * 
  * @author Xue Hui
  *
@@ -41,6 +42,14 @@ public class ProcessedObject {
 	 */
 	public ProcessedObject() {
 		
+	}
+	
+	/**
+	 * Constructor for ERROR 
+	 * @param command
+	 */
+	public ProcessedObject(String command) {
+		this.command = command; 
 	}
 	
 	/**

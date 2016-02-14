@@ -24,7 +24,7 @@ public class Logic {
      * Attemps to execute a command specified by line. 
      */
     public int executeCommand(String line) {
-    	Parser parser = new Parser(); 
+    	/*Parser parser = new Parser(); 
     	Storage storage = new Storage();
     	Task task = parser.parseInput(line); 
     	
@@ -77,7 +77,8 @@ public class Logic {
     			
     			default:
     		}
-    	}
+    	}*/
+    	return 0;
     	// Update UI 
     	// UiController.getInstance().update();
     }

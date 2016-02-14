@@ -53,7 +53,7 @@ public class UiEventHandler {
     		
     		String line = input.getText();
     		input.clear();
-    		Logic.getInstance().getCommand(line);
+    		//Logic.getInstance().getCommand(line);
 
     		if ( true ) { // only temporary here, logic should update a method in UI instead
     			textPrompt.setText("Successful");

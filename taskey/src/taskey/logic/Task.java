@@ -91,5 +91,11 @@ public class Task implements Comparable<Task>{
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	//tasks are the same if they have the same name
+	//used for update and delete. 
+	public int equals(Task anotherTask) {
+		return 0; 
+	}
 
 }

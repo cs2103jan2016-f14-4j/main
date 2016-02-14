@@ -19,18 +19,29 @@ package taskey.logic;
  *
  */
 public class ProcessedObject {
+	/*
+	 * index is only used if command type is DELETE_BY_INDEX or UPDATE_BY_INDEX
+	 * viewType is only used if command type is VIEW. 
+	 * possible values for viewType:
+	 * 1. ALL
+	 * 2. GENERAL
+	 * 3. DEADLINE
+	 * 4. EVENTS 
+	 */
 	private String command;
 	private Task task = null; 
 	private int index = -1; 
-	//index is only used if command type is DELETE_BY_INDEX or UPDATE_BY_INDEX
+	private String viewType; 
+	
 	
 	//CONSTRUCTORS ====================================================
 	/**
 	 * Constructor for VIEW 
 	 * @param command
 	 */
-	public ProcessedObject(String command) {
+	public ProcessedObject(String command, String viewType) {
 		this.command = command; 
+		this.viewType = viewType; 
 	}
 	
 	/**
@@ -81,6 +92,14 @@ public class ProcessedObject {
 	
 	public void setIndex(int index) {
 		this.index = index; 
+	}
+	
+	public String getViewType() {
+		return viewType; 
+	}
+	
+	public void setViewType(String viewType) {
+		this.viewType = viewType; 
 	}
 
 }

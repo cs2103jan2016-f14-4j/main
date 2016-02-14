@@ -1,5 +1,7 @@
 package taskey.logic;
 
+import java.util.ArrayList;
+
 import taskey.parser.TimeConverter; 
 
 /**
@@ -31,7 +33,7 @@ public class Task implements Comparable<Task> {
 	public static final String EMPTY = ""; 
 	
 	private String taskName;
-	private String taskDetails;
+	private ArrayList<String> taskTags;
 	private String taskType; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
@@ -42,19 +44,19 @@ public class Task implements Comparable<Task> {
 	//CONSTRUCTORS ==============================================
 	public Task() {
 		taskName = "";
-		taskDetails = "";
+		taskTags = new ArrayList<String>();
 		taskType = ""; 
 	}
 	
 	public Task(String taskName) {
 		this.taskName = taskName;
-		taskDetails = "";	
+		taskTags = new ArrayList<String>();	
 		taskType = "";
 	}
 	
-	public Task(String taskName, String taskDetails) {
+	public Task(String taskName, ArrayList<String> taskTags) {
 		this.taskName = taskName;
-		this.taskDetails = taskDetails;
+		this.taskTags = taskTags;
 		taskType = ""; 
 	}
 	
@@ -68,12 +70,12 @@ public class Task implements Comparable<Task> {
 		this.taskName = taskName; 
 	}
 	
-	public String getTaskDetails() {
-		return taskDetails; 
+	public ArrayList<String> getTaskTags() {
+		return taskTags; 
 	}
 	
-	public void setTaskDetails(String taskDetails) {
-		this.taskDetails = taskDetails; 
+	public void setTaskTags(ArrayList taskTags) {
+		this.taskTags = taskTags; 
 	}
 	
 	public String getTaskType() {
@@ -210,6 +212,28 @@ public class Task implements Comparable<Task> {
 		datesEpoch[0] = NONE;
 		datesHuman[0] = EMPTY;
 		isRecurring = false; 
+	}
+	
+	/**
+	 * Add a new tag to your task 
+	 * @param tag
+	 */
+	public void addTaskTag(String tag) {
+		taskTags.add(tag); 
+	}
+	
+	/**
+	 * Remove a tag from your task 
+	 * @param tag
+	 */
+	public void removeTaskTag(String tag) {
+		for(int i = 0; i < taskTags.size(); i++) {
+			String temp = taskTags.get(i); 
+			if(tag.compareTo(temp) == 0) {
+				taskTags.remove(i); 
+				break; 
+			}
+		}
 	}
 	
 	@Override

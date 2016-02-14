@@ -8,13 +8,10 @@ import taskey.logic.ProcessedObject;
 public class Parser {
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 
+	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	
 	public enum specialDays {
 		tomorrow,today,next_week, tonight, this_weekend 
-	}
-	
-	public enum keywords {
-		every, by, on, from, to 
 	}
 	 
 	
@@ -26,6 +23,12 @@ public class Parser {
 		commandList.put("search", "search"); 
 		commandList.put("done", "done"); 
 		commandList.put("undo", "undo"); 
+		
+		keywordsList.put("every", "every");
+		keywordsList.put("by", "by");
+		keywordsList.put("on", "on");
+		keywordsList.put("from", "from");
+		keywordsList.put("to", "to");
 	}
 	
 	/**

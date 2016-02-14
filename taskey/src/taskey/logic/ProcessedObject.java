@@ -21,6 +21,7 @@ public class ProcessedObject {
 	private Task task; 
 	private int deleteIndex = -1; //only used if command is delete 
 	
+	//CONSTRUCTORS ====================================================
 	public ProcessedObject(String command, Task task) {
 		this.command = command;
 		this.task = task; 
@@ -32,6 +33,9 @@ public class ProcessedObject {
 		this.deleteIndex = deleteIndex; 
 	}
 	
+	//=================================================================
+	
+	//Corresponding GET/SET methods ===================================
 	public String getCommand() {
 		return command;
 	}

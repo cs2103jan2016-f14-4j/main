@@ -1,10 +1,13 @@
 package taskey.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import taskey.logic.ProcessedObject;
 
 public class Parser {
+	
+	private HashMap<String,String> commandList = new HashMap<String,String>(); 
 	
 	public enum specialDays {
 		tomorrow,today,next_week, tonight, this_weekend 
@@ -16,7 +19,13 @@ public class Parser {
 	 
 	
 	public Parser() {
-		//TODO 
+		commandList.put("add", "add"); 
+		commandList.put("view", "view"); 
+		commandList.put("del", "del"); 
+		commandList.put("set", "set"); 
+		commandList.put("search", "search"); 
+		commandList.put("done", "done"); 
+		commandList.put("undo", "undo"); 
 	}
 	
 	/**

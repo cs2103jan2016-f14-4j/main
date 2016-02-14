@@ -9,6 +9,10 @@ public class Parser {
 	public enum specialDays {
 		tomorrow,today,next_week, tonight, this_weekend 
 	}
+	
+	public enum keywords {
+		every, by, on, from, to 
+	}
 	 
 	
 	public Parser() {
@@ -31,7 +35,7 @@ public class Parser {
 	}
 	
 	
-	private String getCommand(String stringInput) {
+	public String getCommand(String stringInput) {
 		String[] splitString = stringInput.split(" ");
 
 		return splitString[0].toLowerCase(); 

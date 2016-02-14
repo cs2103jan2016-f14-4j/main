@@ -1,56 +1,63 @@
 package taskey.ui;
 
-import java.io.IOException;
-
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import taskey.constants.Constants;
+import javafx.scene.control.Label;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 
-public class UiController extends Application {
+public class UiController {
 	
-	private static UiController instance = null; 
-	
-	private UiEventHandler myEventHandler;
-	
-    public static UiController getInstance () { 
-    	if ( instance == null ) {
-    		instance = new UiController();
-    	}
-    	return instance;
-    }
+	private int currentTab;
+    @FXML private TabPane myTabs;
+    @FXML private TextField input;
+    @FXML private Label textPrompt;
+    private TextArea currentTextArea;
     
-    @Override
-    public void start(Stage primaryStage) {
-		myEventHandler = new UiEventHandler();
-		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
-		myloader.setController(myEventHandler);
-		Parent root = null;
-		try {
-			root = myloader.load();
-		} catch (IOException e) {
-			System.out.println(Constants.FXML_LOAD_FAIL);
-		}
-		setUpScene(primaryStage, root);
-		updateDisplay();
-    }
-    
-    public void setUpScene(Stage primaryStage, Parent root) {
-    	primaryStage.setTitle(Constants.PROGRAM_NAME);
-		primaryStage.setScene(new Scene(root));
-		primaryStage.setResizable(false);
-		primaryStage.show();
-		myEventHandler.setTabReferences(); // must be done after loading .fxml file
-    }
-    
-    public void updateDisplay() {
-    	// call logic to get updated list of tasks
-    }
-    
+    public void registerHandlersToNodes(Parent root) {
+    	input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+    						      public void handle(KeyEvent event) {
+    						    	  if ( event.getCode() == KeyCode.ENTER ) {
+    						      		String line = input.getText();
+    						      		input.clear();
+    						      		//Logic.getInstance().getCommand(line);
 
-	public static void main(String[] args) {
-		launch(args); // calls the start() method
-	}
+    						      		if ( true ) { // only temporary here, logic should update a method in UI instead
+    						      			textPrompt.setText("Successful");
+    						      	        currentTextArea.appendText(line + "\n");
+    						      		}
+    						      		event.consume();
+    						    	  }
+    						      }
+    						});
+    	
+    	// for key inputs anywhere in main window
+    	root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+		      public void handle(KeyEvent event) {
+		    	  if ( event.getCode() == KeyCode.TAB) {
+		      		currentTab = (currentTab + 1)% myTabs.getTabs().size();
+		      		setWindowContentsToTab(currentTab);
+		      		event.consume();
+		    	  }
+		      }
+		});
+    }
+    public void setTabReferences() {
+    	currentTab = 0;
+    	setWindowContentsToTab(currentTab);
+    }
+    public void setWindowContentsToTab(int tabNo) {
+    	AnchorPane content = (AnchorPane) myTabs.getTabs().get(tabNo).getContent();
+    	currentTextArea = (TextArea)content.getChildren().get(0);
+    	SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
+  		selectionModel.select(currentTab);
+  		input.requestFocus();
+    }
 }

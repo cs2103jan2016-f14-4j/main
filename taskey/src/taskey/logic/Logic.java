@@ -34,7 +34,7 @@ public class Logic {
     	Task task = po.getTask();
     	
     	//TODO: handle invalid commands
-    	
+    	/*
     	String taskName = task.getName();	
     	switch (command) {
     		case VIEW:
@@ -104,7 +104,7 @@ public class Logic {
     			//TODO
     			
     		default:
-    	}
+    	}*/
     	// Update UI 
     	// UiController.getInstance().update();
     	

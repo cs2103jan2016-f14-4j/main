@@ -32,7 +32,7 @@ public class Parser {
 		return message;  
 	}
 	
-	//TODO
+	//TODO: Double check if this will be handled by Logic or Parser. 
 	public String executeCommand(String command, String task) {
 		
 		switch(command) {
@@ -72,7 +72,7 @@ public class Parser {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public static String getTaskName(String command, String stringInput) {
+	public String getTaskName(String command, String stringInput) {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
@@ -87,10 +87,10 @@ public class Parser {
 	 * @param stringInput
 	 * @return taskName without command and date 
 	 */
-	public static String getTaskName(String command, String date, String stringInput) {
+	public String getTaskName(String command, String date, String stringInput) {
 		String task = stringInput.replaceFirst(command, "");
 		task = task.replaceFirst(date, ""); 
-		
+		//TODO: work on the logic: may not be entirely correct. 
 		return task.trim(); 
 	}
 	
@@ -108,7 +108,7 @@ public class Parser {
 	
 	
 	public static void main(String[] args) {
-		String myString = getTaskName("add","add taskey to github");
-		System.out.println(myString);
+		//String myString = getTaskName("add","add taskey to github");
+		//System.out.println(myString);
 	}
 }

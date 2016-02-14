@@ -214,7 +214,7 @@ public class Task implements Comparable<Task> {
 	
 	@Override
 	/**
-	 * tasks are comparable by their time. 
+	 * tasks are comparable by their start time. 
 	 * used for sorting in ArrayList<Task>
 	 * So that one can easily just call Collections.sort(taskList) 
 	 */

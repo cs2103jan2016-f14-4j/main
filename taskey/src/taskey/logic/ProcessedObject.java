@@ -9,28 +9,51 @@ package taskey.logic;
  * 2. ADD_DEADLINE
  * 3. ADD_EVENT
  * 4. ADD_RECURRING
- * 5. DELETE
- * 6. UPDATE
- * 7. VIEW 
+ * 5. DELETE_BY_INDEX
+ * 6. DELETE_BY_NAME 
+ * 7. UPDATE_BY_INDEX
+ * 8. UPDATE_BY_NAME 
+ * 9. VIEW 
  * 
  * @author Xue Hui
  *
  */
 public class ProcessedObject {
 	private String command;
-	private Task task; 
-	private int deleteIndex = -1; //only used if command is delete 
+	private Task task = null; 
+	private int index = -1; 
+	//index is only used if command type is DELETE_BY_INDEX or UPDATE_BY_INDEX
 	
 	//CONSTRUCTORS ====================================================
+	/**
+	 * Constructor for VIEW 
+	 * @param command
+	 */
+	public ProcessedObject(String command) {
+		this.command = command; 
+	}
+	
+	/**
+	 * Constructor for ADD_FLOATING, ADD_DEADLINE, ADD_EVENT, ADD_RECURRING,
+	 * DELETE_BY_NAME, UPDATE_BY_NAME
+	 * @param command
+	 * @param task
+	 */
 	public ProcessedObject(String command, Task task) {
 		this.command = command;
 		this.task = task; 
 	}
 	
-	public ProcessedObject(String command, Task task, int deleteIndex) {
+	/**
+	 * Constructor for DELETE_BY_INDEX, UPDATE_BY_INDEX 
+	 * @param command
+	 * @param task
+	 * @param index
+	 */
+	public ProcessedObject(String command, Task task, int index) {
 		this.command = command;
 		this.task = task; 
-		this.deleteIndex = deleteIndex; 
+		this.index = index; 
 	}
 	
 	//=================================================================
@@ -52,12 +75,12 @@ public class ProcessedObject {
 		this.task = task; 
 	}
 	
-	public int getDeleteIndex() {
-		return deleteIndex; 
+	public int getIndex() {
+		return index; 
 	}
 	
-	public void setDeleteIndex(int deleteIndex) {
-		this.deleteIndex = deleteIndex; 
+	public void setIndex(int index) {
+		this.index = index; 
 	}
 
 }

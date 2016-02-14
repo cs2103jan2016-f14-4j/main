@@ -6,7 +6,7 @@ import taskey.parser.TimeConverter;
  * Task object holds all the details of the task 
  * 
  * taskType can have the following values:
- * 1. FLOATING
+ * 1. FLOATING (date Array should be all left as NONE/EMPTY) 
  * 2. EVENT (has a start and end time)
  * 3. DEADLINE 
  * 

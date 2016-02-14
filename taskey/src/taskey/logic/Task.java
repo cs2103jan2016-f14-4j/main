@@ -18,11 +18,10 @@ public class Task implements Comparable<Task>{
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
 	private boolean isRecurring = false; //set to true if it is recurring. 
-	//dates*[0]: recurring interval (if recurring event) 
+	//dates*[0]: recurring interval (if recurring event/deadline) 
 	//dates*[1]: start Time (events)
-	//date*[2]: end Time (events) 
-	//date*[3]: deadline (work) 
-	//TODO: Date Array TBC 
+	//dates*[2]: end Time (events) 
+	//dates*[3]: deadline 
 	//idea for recurring : store the diff in time to the next recurrence in seconds?
 	private TimeConverter timeConverter = new TimeConverter(); 
 	

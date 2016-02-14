@@ -1,8 +1,8 @@
 package taskey.parser;
 
 import java.util.ArrayList;
-import taskey.logic.Task;
-import taskey.storage.Storage;
+
+import taskey.logic.ProcessedObject;
 
 public class Parser {
 	
@@ -20,43 +20,16 @@ public class Parser {
 	 * @param command: string of command keyed in by user
 	 * @return message to be displayed
 	 */
-	public String parseInput(String stringInput) {
-		String message=""; 
+	public ProcessedObject parseInput(String stringInput) {
 		String command = getCommand(stringInput); 
 		String task = getTaskName(command, stringInput);
 		ArrayList<String> dateRange = getDate(stringInput); 
 		
 		
-		message = executeCommand(command, task);
 		
-		return message;  
+		return new ProcessedObject();   
 	}
 	
-	//TODO: Double check if this will be handled by Logic or Parser. 
-	public String executeCommand(String command, String task) {
-		
-		switch(command) {
-			case "add": 
-				//add task to storage!
-				break;
-			case "del":
-				break;
-			case "edit":
-				break;
-			case "view":
-				break;
-			case "sort":
-				break;
-			case "search":
-				break; 
-			
-			default:
-				//return an error message. 		
-		
-		}
-		
-		return ""; 
-	}
 	
 	private String getCommand(String stringInput) {
 		String[] splitString = stringInput.split(" ");

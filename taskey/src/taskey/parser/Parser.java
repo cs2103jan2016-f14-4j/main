@@ -9,10 +9,7 @@ public class Parser {
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	
-	public enum specialDays {
-		tomorrow,today,next_week, tonight, this_weekend 
-	}
+	private HashMap<String,String> specialDays = new HashMap<String,String>();
 	 
 	
 	public Parser() {
@@ -29,6 +26,12 @@ public class Parser {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
+		
+		specialDays.put("tomorrow", "tomorrow"); 
+		specialDays.put("today", "today"); 
+		specialDays.put("next week", "next week"); 
+		specialDays.put("tonight", "tonight"); 
+		specialDays.put("this weekend", "this weekend"); 
 	}
 	
 	/**

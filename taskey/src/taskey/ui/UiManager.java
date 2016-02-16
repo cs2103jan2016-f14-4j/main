@@ -42,8 +42,8 @@ public class UiManager extends Application {
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		myController.setTabReferences();  // must be done after loading .fxml file
-		myController.registerHandlersToNodes(root);
+		myController.setUpNodes();  // must be done after loading .fxml file
+		myController.registerEventHandlersToNodes(root);
     }
     
     public void updateDisplay() {
@@ -51,6 +51,10 @@ public class UiManager extends Application {
     }
     
 
+    @Override
+    public void stop() {
+    	myController.cleanUp();
+    }
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
 	}

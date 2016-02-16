@@ -1,5 +1,10 @@
 package taskey.ui;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -12,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
 
 public class UiController {
 	
@@ -19,9 +25,12 @@ public class UiController {
     @FXML private TabPane myTabs;
     @FXML private TextField input;
     @FXML private Label textPrompt;
+    @FXML private Label timeLabel;
+    @FXML private Label dateLabel;
     private TextArea currentTextArea;
+    private UiClockService clockService;
     
-    public void registerHandlersToNodes(Parent root) {
+    public void registerEventHandlersToNodes(Parent root) {
     	input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
     						      public void handle(KeyEvent event) {
     						    	  if ( event.getCode() == KeyCode.ENTER ) {
@@ -49,15 +58,19 @@ public class UiController {
 		      }
 		});
     }
-    public void setTabReferences() {
+    public void setUpNodes() {
+    	clockService = new UiClockService(timeLabel,dateLabel);
+    	clockService.start();
     	currentTab = 0;
+    	input.requestFocus();
     	setWindowContentsToTab(currentTab);
-    }
+	 }
     public void setWindowContentsToTab(int tabNo) {
     	AnchorPane content = (AnchorPane) myTabs.getTabs().get(tabNo).getContent();
     	currentTextArea = (TextArea)content.getChildren().get(0);
     	SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
   		selectionModel.select(currentTab);
-  		input.requestFocus();
     }
+	public void cleanUp() {
+	}
 }

@@ -1,5 +1,6 @@
 package taskey.ui;
 
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,32 +32,8 @@ public class UiController {
     private UiClockService clockService;
     
     public void registerEventHandlersToNodes(Parent root) {
-    	input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-    						      public void handle(KeyEvent event) {
-    						    	  if ( event.getCode() == KeyCode.ENTER ) {
-    						      		String line = input.getText();
-    						      		input.clear();
-    						      		//Logic.getInstance().getCommand(line);
-
-    						      		if ( true ) { // only temporary here, logic should update a method in UI instead
-    						      			textPrompt.setText("Successful");
-    						      	        currentTextArea.appendText(line + "\n");
-    						      		}
-    						      		event.consume();
-    						    	  }
-    						      }
-    						});
-    	
-    	// for key inputs anywhere in main window
-    	root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-		      public void handle(KeyEvent event) {
-		    	  if ( event.getCode() == KeyCode.TAB) {
-		      		currentTab = (currentTab + 1)% myTabs.getTabs().size();
-		      		setWindowContentsToTab(currentTab);
-		      		event.consume();
-		    	  }
-		      }
-		});
+    	registerInputEventHandler();
+    	registerRootEventHandler(root);	
     }
     public void setUpNodes() {
     	clockService = new UiClockService(timeLabel,dateLabel);
@@ -71,6 +48,39 @@ public class UiController {
     	SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
   		selectionModel.select(currentTab);
     }
+    public void registerInputEventHandler() {
+    	input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+		      public void handle(KeyEvent event) {
+		    	  if ( event.getCode() == KeyCode.ENTER ) {
+		      		String line = input.getText();
+		      		input.clear();
+		      		//Logic.getInstance().getCommand(line);
+		      		event.consume();
+		    	  }
+		      }
+		});
+    }
+    public void registerRootEventHandler(Parent root) {
+    	// for key inputs anywhere in main window
+    	root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+		      public void handle(KeyEvent event) {
+		    	  if ( event.getCode() == KeyCode.TAB) {
+		      		currentTab = (currentTab + 1)% myTabs.getTabs().size();
+		      		setWindowContentsToTab(currentTab);
+		      		event.consume();
+		    	  }
+		      }
+		});
+    }
+	
+	public void updateNodes(ArrayList<String> myTaskList) {
+		// TODO Auto-generated method stub
+		currentTextArea.clear();
+		for ( int i = 0; i < myTaskList.size(); i++ ) {
+			currentTextArea.appendText(myTaskList.get(i)+ "\n");
+		}
+	}
+	
 	public void cleanUp() {
 	}
 }

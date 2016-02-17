@@ -1,6 +1,8 @@
 package taskey.ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -48,6 +50,11 @@ public class UiManager extends Application {
     
     public void updateDisplay() {
     	// call logic to get updated list of tasks
+    	
+    	ArrayList<String> myTaskList = new ArrayList<String>(
+    			Arrays.asList("Meet Dave at Mcdonalds", 
+    						  "Send Proposal"));
+    	myController.updateNodes(myTaskList);
     }
     
 

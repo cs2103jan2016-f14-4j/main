@@ -54,8 +54,9 @@ public class UiClockService extends ScheduledService<Void> {
 		String myTime = "";
 		int hour = cal.get(Calendar.HOUR);
 		int minute = cal.get(Calendar.MINUTE);
+		String minutePrefix = minute < 10 ? "0" : "";
 		String timeOfDay = cal.get(Calendar.AM) == 1 ? AM_SUFFIX : PM_SUFFIX; // AM or PM
-		myTime += hour + ":" + minute + " " + timeOfDay;
+		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}
 	

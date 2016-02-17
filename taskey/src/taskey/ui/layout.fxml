@@ -4,7 +4,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.StackPane?>
@@ -18,7 +17,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <TextArea editable="false" focusTraversable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ListView prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -27,7 +26,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TextArea editable="false" focusTraversable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ListView prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -36,7 +35,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TextArea editable="false" focusTraversable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ListView prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
               </content>
@@ -45,7 +44,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="317.0" prefWidth="366.0">
                      <children>
-                        <TextArea editable="false" focusTraversable="false" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ListView prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
               </content>
@@ -67,7 +66,11 @@
       </StackPane>
       <StackPane layoutX="14.0" layoutY="74.0" prefHeight="25.0" prefWidth="144.0">
          <children>
-            <Label fx:id="dateLabel" text="October 13th 2016" textAlignment="CENTER" />
+            <Label fx:id="dateLabel" text="October 13th 2016" textAlignment="CENTER">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
          </children>
       </StackPane>
    </children>

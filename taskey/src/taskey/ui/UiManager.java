@@ -51,10 +51,22 @@ public class UiManager extends Application {
     public void updateDisplay() {
     	// call logic to get updated list of tasks
     	
+    	// Temporary
     	ArrayList<String> myTaskList = new ArrayList<String>(
-    			Arrays.asList("Meet Dave at Mcdonalds", 
-    						  "Send Proposal"));
-    	myController.updateNodes(myTaskList);
+    			Arrays.asList("Meet a at Mcdonalds", 
+    						  "Meet b at Mcdonalds", 
+    						  "Meet c at Mcdonalds", 
+    						  "Meet d at Mcdonalds", 
+    						  "Meet e at Mcdonalds"));
+    	
+    	ArrayList<String> myDeadLines = new ArrayList<String>(
+    			Arrays.asList("15 Feb 2016", 
+    						  "16 Feb 2016",
+    						  "17 Feb 2016", 
+    						  "18 Feb 2016",
+    						  "19 Feb 2016"));
+    	
+    	myController.updateNodesOnTab(myTaskList,myDeadLines,0);
     }
     
 

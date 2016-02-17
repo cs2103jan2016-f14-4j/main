@@ -45,7 +45,7 @@ public class UiController {
 	public void setUpStyles() {
 		weekList.getParent().getStyleClass().add("stackpane");
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
-			myTabs.getTabs().get(i).getContent().getStyleClass().add("stackpane");
+			tabTexts.get(i).getStyleClass().add("stackpane");
 		}
 	}
 
@@ -91,7 +91,6 @@ public class UiController {
 
 		for (int i = 0; i < myTaskList.size(); i++) {
 			if (Integer.parseInt(myDeadlines.get(i).split(" ")[0]) >= clockService.getDayOfMonth()) {
-
 				String taskText = myTaskList.get(i);
 				if (taskText.length() > WORD_LIMIT_WEEKLIST) {
 					taskText = taskText.substring(0, WORD_LIMIT_WEEKLIST) + "...*";

@@ -4,5 +4,8 @@
 }
 
 .stackpane {
-    -fx-background-color: #8fbc8f;
+    -fx-background-color: white;
+    -fx-border-style: dotted;
+    -fx-border-radius: 2px;
+    -fx-padding: 7px;
 }

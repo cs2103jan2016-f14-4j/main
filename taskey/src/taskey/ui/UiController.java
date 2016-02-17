@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -72,8 +73,10 @@ public class UiController {
 		TextFlow myText = tabTexts.get(tabNo);
 		myText.getChildren().removeAll(myText.getChildren());
 		for (int i = 0; i < myTaskList.size(); i++) {
-			Text newText = new Text((i + 1) + ". " + myTaskList.get(i) + " on " + myDeadlines.get(i) + "\n\n");
-			myText.getChildren().add(newText);
+			Text newText = new Text((i + 1) + ". " + myTaskList.get(i) + " on " );
+			Text deadLine = new Text(myDeadlines.get(i) + "\n\n");
+			deadLine.setFill(Color.RED);
+			myText.getChildren().addAll(newText,deadLine);
 		}
 		if (tabNo == 0) {
 			updateWeeklyList(myTaskList, myDeadlines);

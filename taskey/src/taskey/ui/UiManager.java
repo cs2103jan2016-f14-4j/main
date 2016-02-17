@@ -15,6 +15,9 @@ public class UiManager extends Application {
 	
 	private static UiManager instance = null; 
 	
+	private static final ArrayList<String> myStyleSheets = new ArrayList<String>(
+			Arrays.asList("style.css"));
+	
 	private UiController myController;
 	private Parent root = null;
 	
@@ -41,7 +44,11 @@ public class UiManager extends Application {
     
     public void setUpScene(Stage primaryStage, Parent root) {
     	primaryStage.setTitle(Constants.PROGRAM_NAME);
-		primaryStage.setScene(new Scene(root));
+    	Scene newScene = new Scene(root);
+    	for ( int i = 0; i < myStyleSheets.size(); i ++ ) {
+    		newScene.getStylesheets().add(getClass().getResource(myStyleSheets.get(i)).toExternalForm());
+    	}
+		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 		myController.setUpNodes();  // must be done after loading .fxml file

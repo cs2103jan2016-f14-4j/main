@@ -2,3 +2,7 @@
      /*-fx-background-image: url("main.jpg");
      -fx-background-size: stretch;   */
 }
+
+.stackpane {
+    -fx-background-color: #8fbc8f;
+}

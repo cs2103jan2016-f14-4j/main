@@ -20,18 +20,27 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 public class UiController {
-	
-	private int currentTab;
+
     @FXML private TabPane myTabs;
     @FXML private TextField input;
     @FXML private Label textPrompt;
     @FXML private Label timeLabel;
     @FXML private Label dateLabel;
-    @FXML private ListView<String> weekList;
+    @FXML private TextFlow weekList;
+    
+    private int currentTab;
     private UiClockService clockService;
+    private ArrayList<ObservableList<String>> tabLists;
     
     public void registerEventHandlersToNodes(Parent root) {
     	registerInputEventHandler();
@@ -40,21 +49,63 @@ public class UiController {
     public void setUpNodes() {
     	clockService = new UiClockService(timeLabel,dateLabel);
     	clockService.start();
+    	setUpTabLists();
+    	setUpTabDisplay();
+    	weekList.getParent().getStyleClass().add("stackpane");
+	 }
+    
+    public void setUpTabLists() {
+    	tabLists = new ArrayList<ObservableList<String>>();
+    	for ( int i = 0; i < 4; i ++ ) {
+    		ListView<String> tabListView = getListView(i);
+    		tabLists.add(FXCollections.observableArrayList());
+    		tabListView.setItems(tabLists.get(i)); // link the list to the node
+    	}
+    }
+    public void setUpTabDisplay() {
     	currentTab = 0;
     	input.requestFocus();
     	setWindowContentsToTab(currentTab);
-	 }
+    }
     public void setWindowContentsToTab(int tabNo) {
-    	getListView(tabNo);
     	SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
   		selectionModel.select(currentTab);
     }
     
-    public ListView<String> getListView(int tabNo) {
+    @SuppressWarnings("unchecked") // uses preplaced ui elements inside fxml
+	public ListView<String> getListView(int tabNo) {
     	AnchorPane content = (AnchorPane) myTabs.getTabs().get(tabNo).getContent();
     	return (ListView<String>)content.getChildren().get(0);
     }
-    public void registerInputEventHandler() {
+	
+	public void updateNodesOnTab(ArrayList<String> myTaskList, ArrayList<String> myDeadlines, int tabNo) {
+		ObservableList<String> tasks = tabLists.get(tabNo); 
+		for ( int i = 0; i < myTaskList.size(); i++ ) {
+			tasks.add((i+1) + ". " + myTaskList.get(i) + " on " + myDeadlines.get(i));
+		}
+		if (tabNo == 0) {
+			updateWeeklyList(myTaskList,myDeadlines);
+		}
+	}
+	
+	public void updateWeeklyList (ArrayList<String> myTaskList, ArrayList<String> myDeadlines) {
+		/*
+		Text text1 = new Text("Big italic red text");
+	     text1.setFill(Color.RED);
+	     text1.setFont(Font.font("Helvetica", FontPosture.ITALIC, 10));
+	     Text text2 = new Text(" little bold blue text");
+	     text2.setFill(Color.BLUE);
+	     text2.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));*/
+	     
+		for ( int i = 0; i < myTaskList.size(); i ++ ) {
+			if ( Integer.parseInt(myDeadlines.get(i).split(" ")[0]) >= clockService.getDayOfMonth() ) {
+			     Text newText = new Text("- " + myTaskList.get(i) + " (" + myDeadlines.get(i) + ") \n\n");
+			     weekList.getChildren().add(newText);	  
+			}
+		}	 
+	     
+	}
+	public void registerInputEventHandler() {
     	input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 		      public void handle(KeyEvent event) {
 		    	  if ( event.getCode() == KeyCode.ENTER ) {
@@ -78,25 +129,6 @@ public class UiController {
 		      }
 		});
     }
-	
-	public void updateNodesOnTab(ArrayList<String> myTaskList, ArrayList<String> myDeadlines, int tabNo) {
-		ListView<String> targetList = getListView(tabNo);
-		ObservableList<String> tasks = FXCollections.observableArrayList(); // can be placed as a class variable for efficiency
-		for ( int i = 0; i < myTaskList.size(); i++ ) {
-			tasks.add((i+1) + ". " + myTaskList.get(i) + " at " + myDeadlines.get(i));
-		}
-		targetList.setItems(tasks);
-		if (tabNo == 0) {
-			updateWeeklyList(targetList);
-		}
-	}
-	
-	public void updateWeeklyList (ListView<String> targetList) {
-	
-		ObservableList<String> names = FXCollections.observableArrayList(
-		          "Julia", "Ian", "Sue", "Matthew", "Hannah", "Stephan", "Denise");
-		weekList.setItems(names);
-	}
 	public void cleanUp() {
 	}
 }

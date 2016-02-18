@@ -67,11 +67,11 @@ public class UiManager extends Application {
     						  "Meet e at Mcdonalds"));
     	
     	ArrayList<String> myDeadLines = new ArrayList<String>(
-    			Arrays.asList("15 Feb 2016", 
-    						  "16 Feb 2016",
-    						  "17 Feb 2016", 
+    			Arrays.asList("17 Feb 2016", 
     						  "18 Feb 2016",
-    						  "19 Feb 2016"));
+    						  "19 Feb 2016", 
+    						  "20 Feb 2016",
+    						  "21 Feb 2016"));
     	
     	myController.updateNodesOnTab(myTaskList,myDeadLines,0);
     }

@@ -13,6 +13,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -39,8 +41,8 @@ public class UiController {
 		clockService = new UiClockService(timeLabel, dateLabel);
 		clockService.start();
 		setUpTabLists();
-		setUpTabDisplay();
 		setUpStyles();
+		setUpTabDisplay();
 	}
 
 	public void setUpStyles() {
@@ -99,6 +101,7 @@ public class UiController {
 					taskText = taskText.substring(0, WORD_LIMIT_WEEKLIST) + "...*";
 				}
 				Text newText = new Text("- " + taskText + " (" + myDeadlines.get(i) + ") \n\n");
+				newText.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
 				weekList.getChildren().add(newText);
 			}
 		}

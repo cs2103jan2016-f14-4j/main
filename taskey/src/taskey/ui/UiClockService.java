@@ -20,7 +20,7 @@ public class UiClockService extends ScheduledService<Void> {
 	
 	private static final int UPDATE_INTERVAL = 1000; // in milliseconds
 	private static final String PM_SUFFIX = "PM";
-	private static final String AM_SUFFIX = "PM";
+	private static final String AM_SUFFIX = "AM";
 	
 	private Label timeLabelRef;
 	private Label dateLabelRef;
@@ -55,7 +55,8 @@ public class UiClockService extends ScheduledService<Void> {
 		int hour = cal.get(Calendar.HOUR);
 		int minute = cal.get(Calendar.MINUTE);
 		String minutePrefix = minute < 10 ? "0" : "";
-		String timeOfDay = cal.get(Calendar.AM) == 1 ? AM_SUFFIX : PM_SUFFIX; // AM or PM
+		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? PM_SUFFIX : AM_SUFFIX); // AM or PM
+		//System.out.println(cal.get(Calendar.AM) + " " + cal.get(Calendar.PM) + " " + cal.get(Calendar.AM_PM));
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}

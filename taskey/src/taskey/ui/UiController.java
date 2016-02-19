@@ -1,8 +1,11 @@
 package taskey.ui;
 
 import java.util.ArrayList;
+
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.SingleSelectionModel;
@@ -78,7 +81,13 @@ public class UiController {
 			Text newText = new Text((i + 1) + ". " + myTaskList.get(i) + " on " );
 			Text deadLine = new Text(myDeadlines.get(i) + "\n\n");
 			deadLine.setFill(Color.RED);
+			
 			myText.getChildren().addAll(newText,deadLine);
+			ObservableList<Node> text = myText.getChildren();
+			//System.out.println(Font.getFontNames());
+			for ( int j = 0; j < text.size(); j++ ) {
+				((Text)text.get(j)).setFont(Font.font("Comic Sans MS", FontWeight.SEMI_BOLD, 13));
+			}
 		}
 		if (tabNo == 0) {
 			updateWeeklyList(myTaskList, myDeadlines);

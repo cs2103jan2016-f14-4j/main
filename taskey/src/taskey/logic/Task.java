@@ -37,7 +37,7 @@ public class Task implements Comparable<Task> {
 	private String taskType; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
-	private boolean isRecurring = false; 
+	//private boolean isRecurring = false; 
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -170,16 +170,7 @@ public class Task implements Comparable<Task> {
 		datesHuman[3] = timeConverter.toHumanTime(deadline); 	
 		
 	}
-	
-	public boolean getIsRecurring() {
-		return isRecurring; 
-	}
-	
-	/*
-	public void setIsRecurring(boolean isRecurring) {
-		this.isRecurring = isRecurring; 
-	}
-	*/ 
+	 
 	
 	//NON-BASIC METHODS ==========================================
 	
@@ -192,26 +183,6 @@ public class Task implements Comparable<Task> {
 	public long[] getEventTimeEpoch() {
 		long[] eventTime = {datesEpoch[1],datesEpoch[2]}; 
 		return eventTime; 
-	}
-	
-	public String getRecurringTime() {
-		return datesHuman[0]; 
-	}
-	
-	public long getRecurringTimeEpoch() {
-		return datesEpoch[0]; 
-	}
-	
-	public void setRecurringTime(long interval) {
-		datesEpoch[0] = interval;
-		isRecurring = true; 
-		//TODO: settle the human recurring time... 
-	}
-	
-	public void removeRecurring() {
-		datesEpoch[0] = NONE;
-		datesHuman[0] = EMPTY;
-		isRecurring = false; 
 	}
 	
 	/**

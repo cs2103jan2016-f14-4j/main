@@ -267,5 +267,18 @@ public class Task implements Comparable<Task> {
 		}	
 		return -1; 
 	}
+	
+	@Override 
+	/**
+	 * For debugging 
+	 */
+	public String toString() {
+		String stringRep = ""; 
+		stringRep += taskName;
+		stringRep += ", ";
+		stringRep += taskType; 
+		
+		return stringRep; 
+	}
 
 }

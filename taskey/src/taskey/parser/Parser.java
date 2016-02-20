@@ -1,18 +1,37 @@
 package taskey.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import taskey.logic.ProcessedObject;
 
 public class Parser {
 	
-	public enum specialDays {
-		tomorrow,today,next_week, tonight, this_weekend 
-	}
+	private HashMap<String,String> commandList = new HashMap<String,String>(); 
+	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
+	private HashMap<String,String> specialDays = new HashMap<String,String>();
 	 
 	
 	public Parser() {
-		//TODO 
+		commandList.put("add", "add"); 
+		commandList.put("view", "view"); 
+		commandList.put("del", "del"); 
+		commandList.put("set", "set"); 
+		commandList.put("search", "search"); 
+		commandList.put("done", "done"); 
+		commandList.put("undo", "undo"); 
+		
+		keywordsList.put("every", "every");
+		keywordsList.put("by", "by");
+		keywordsList.put("on", "on");
+		keywordsList.put("from", "from");
+		keywordsList.put("to", "to");
+		
+		specialDays.put("tomorrow", "tomorrow"); 
+		specialDays.put("today", "today"); 
+		specialDays.put("next week", "next week"); 
+		specialDays.put("tonight", "tonight"); 
+		specialDays.put("this weekend", "this weekend"); 
 	}
 	
 	/**
@@ -31,7 +50,7 @@ public class Parser {
 	}
 	
 	
-	private String getCommand(String stringInput) {
+	public String getCommand(String stringInput) {
 		String[] splitString = stringInput.split(" ");
 
 		return splitString[0].toLowerCase(); 

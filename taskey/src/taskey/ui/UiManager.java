@@ -10,14 +10,22 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import taskey.constants.Constants;
+import taskey.logic.Task;
+import taskey.ui.UiConstants.ContentBox;
+
+/**
+ *
+ * This class is the main entry point for Taskey
+ * It also acts as the interface between the various components
+ * It is the main UI component which calls other UI sub components
+ * 
+ * @author JunWei
+ *
+ */
 
 public class UiManager extends Application {
 	
 	private static UiManager instance = null; 
-	
-	private static final ArrayList<String> myStyleSheets = new ArrayList<String>(
-			Arrays.asList("style.css"));
-	
 	private UiController myController;
 	private Parent root = null;
 	
@@ -28,6 +36,10 @@ public class UiManager extends Application {
     	return instance;
     }
     
+    /**
+     * This method loads the .fxml file and set ups the scene
+     * @param stage object which is called automatically by the javaFX plugin
+     */
     @Override
     public void start(Stage primaryStage) {
     	myController = new UiController();
@@ -39,41 +51,41 @@ public class UiManager extends Application {
 			System.out.println(Constants.FXML_LOAD_FAIL);
 		}
 		setUpScene(primaryStage, root);
-		updateDisplay();
+		updateDisplay(new ArrayList<Task>(), UiConstants.ContentBox.PENDING);
     }
     
+    /**
+     * This method adds pre-defined style sheets to the scene,
+     * setups the nodes in the scene and registers event handlers to them.
+     * @param primaryStage : Stage
+     * @param root : Parent, which is a subclass of Node
+     */
     public void setUpScene(Stage primaryStage, Parent root) {
     	primaryStage.setTitle(Constants.PROGRAM_NAME);
     	Scene newScene = new Scene(root);
-    	for ( int i = 0; i < myStyleSheets.size(); i ++ ) {
-    		newScene.getStylesheets().add(getClass().getResource(myStyleSheets.get(i)).toExternalForm());
+    	for ( int i = 0; i < UiConstants.UI_STYLE_SHEETS.size(); i ++ ) {
+    		newScene.getStylesheets().add(getClass().getResource(UiConstants.UI_STYLE_SHEETS.get(i)).toExternalForm());
     	}
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		myController.setUpNodes();  // must be done after loading .fxml file
-		myController.registerEventHandlersToNodes(root);
+		myController.setUpNodes(primaryStage, root);  // must be done after loading .fxml file
     }
     
-    public void updateDisplay() {
+    public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
     	// call logic to get updated list of tasks
     	
-    	// Temporary
-    	ArrayList<String> myTaskList = new ArrayList<String>(
-    			Arrays.asList("Meet a at Mcdonalds", 
-    						  "Meet b at Mcdonalds", 
-    						  "Meet c at Mcdonalds", 
-    						  "Meet d at Mcdonalds", 
-    						  "Meet e at Mcdonalds"));
+    	// Temporary;
+    	Task temp = new Task("No deadline");
+    	myTaskList.add(temp);
+    	temp = new Task("Task A");
+    	temp.setDeadline("23 Feb 2016 01:00:00");
+    	myTaskList.add(temp);
+    	temp = new Task("Task B");
+    	temp.setDeadline("25 Feb 2016 09:00:00");
+    	myTaskList.add(temp);
     	
-    	ArrayList<String> myDeadLines = new ArrayList<String>(
-    			Arrays.asList("17 Feb 2016", 
-    						  "18 Feb 2016",
-    						  "19 Feb 2016", 
-    						  "20 Feb 2016",
-    						  "21 Feb 2016"));
-    	
-    	myController.updateNodesOnTab(myTaskList,myDeadLines,0);
+    	myController.process(myTaskList,contentID);
     }
     
 

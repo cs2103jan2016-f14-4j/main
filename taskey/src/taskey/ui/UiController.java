@@ -1,7 +1,11 @@
 package taskey.ui;
 
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.util.ArrayList;
 
+import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,14 +20,23 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+/**
+ * This class is the main class that handles almost all of the Ui nodes
+ * Called by UI_Manager to perform operations
+ * @author JunWei
+ *
+ */
 public class UiController {
 
-	private static final int WORD_LIMIT_WEEKLIST = 10;
     @FXML private TabPane myTabs;
     @FXML private TextField input;
     @FXML private Label textPrompt;
@@ -31,6 +44,7 @@ public class UiController {
     @FXML private Label dateLabel;
     @FXML private TextFlow weekList;
     
+    private Stage stage;
     private int currentTab;
     private UiClockService clockService;
     private ArrayList<TextFlow> tabTexts; // list of references to the TextFlow objects
@@ -40,7 +54,8 @@ public class UiController {
 		registerRootEventHandler(root);
 	}
 
-	public void setUpNodes() {
+	public void setUpNodes(Stage primaryStage) {
+		stage = primaryStage; // set up reference
 		clockService = new UiClockService(timeLabel, dateLabel);
 		clockService.start();
 		setUpTabLists();
@@ -66,10 +81,10 @@ public class UiController {
 	public void setUpTabDisplay() {
 		currentTab = 0;
 		input.requestFocus();
-		setWindowContentsToTab(currentTab);
+		displayTabContents(currentTab);
     }
 
-	public void setWindowContentsToTab(int tabNo) {
+	public void displayTabContents(int tabNo) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(currentTab);
 	}
@@ -84,7 +99,6 @@ public class UiController {
 			
 			myText.getChildren().addAll(newText,deadLine);
 			ObservableList<Node> text = myText.getChildren();
-			//System.out.println(Font.getFontNames());
 			for ( int j = 0; j < text.size(); j++ ) {
 				((Text)text.get(j)).setFont(Font.font("Comic Sans MS", FontWeight.SEMI_BOLD, 13));
 			}
@@ -95,19 +109,11 @@ public class UiController {
 	}
 
 	public void updateWeeklyList(ArrayList<String> myTaskList, ArrayList<String> myDeadlines) {
-		/*
-		 * Text text1 = new Text("Big italic red text");
-		 * text1.setFill(Color.RED); text1.setFont(Font.font("Helvetica",
-		 * FontPosture.ITALIC, 10)); Text text2 = new Text(
-		 * " little bold blue text"); text2.setFill(Color.BLUE);
-		 * text2.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
-		 */
-
 		for (int i = 0; i < myTaskList.size(); i++) {
 			if (Integer.parseInt(myDeadlines.get(i).split(" ")[0]) >= clockService.getDayOfMonth()) {
 				String taskText = myTaskList.get(i);
-				if (taskText.length() > WORD_LIMIT_WEEKLIST) {
-					taskText = taskText.substring(0, WORD_LIMIT_WEEKLIST) + "...*";
+				if (taskText.length() > UiConstants.WORD_LIMIT_WEEKLIST) {
+					taskText = taskText.substring(0, UiConstants.WORD_LIMIT_WEEKLIST) + "...*";
 				}
 				Text newText = new Text("- " + taskText + " (" + myDeadlines.get(i) + ") \n\n");
 				newText.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
@@ -123,7 +129,13 @@ public class UiController {
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
+					
 					// Logic.getInstance().getCommand(line);
+					
+					AnchorPane rootPane = (AnchorPane) input.getParent();
+					Node newPopup = UiPopupFactory.getInstance().createPopup("Added " + line, rootPane, input.getLayoutX() , input.getLayoutY() + input.getPrefHeight() * 1.25f);
+					UiPopupFactory.getInstance().startFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME);
+					
 					event.consume();
 				}
 			}
@@ -137,10 +149,28 @@ public class UiController {
 				if (event.getCode() == KeyCode.TAB) {
 					currentTab = myTabs.getSelectionModel().getSelectedIndex();
 					currentTab = (currentTab + 1) % myTabs.getTabs().size();
-					setWindowContentsToTab(currentTab);
+					displayTabContents(currentTab);
 					event.consume();
 				}
 			}
+		});
+		
+		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				if (event.getCode() == KeyCode.ESCAPE) {
+					System.exit(0);
+				}
+			}
+		});
+		
+		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+					if (event.getCode() == KeyCode.Q && event.isControlDown()) {
+						if ( stage.isIconified() == false ) {
+							stage.setIconified(true);
+						} 
+					}
+				}
 		});
 	}
 

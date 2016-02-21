@@ -11,13 +11,19 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import taskey.constants.Constants;
 
+/**
+ *
+ * This class is the main entry point for Taskey
+ * It also acts as the interface between the various components
+ * It is the main UI component which calls other UI sub components
+ * 
+ * @author JunWei
+ *
+ */
+
 public class UiManager extends Application {
 	
 	private static UiManager instance = null; 
-	
-	private static final ArrayList<String> myStyleSheets = new ArrayList<String>(
-			Arrays.asList("style.css"));
-	
 	private UiController myController;
 	private Parent root = null;
 	
@@ -28,6 +34,10 @@ public class UiManager extends Application {
     	return instance;
     }
     
+    /**
+     * This method loads the .fxml file and set ups the scene
+     * @param stage object which is called automatically by the javaFX plugin
+     */
     @Override
     public void start(Stage primaryStage) {
     	myController = new UiController();
@@ -42,16 +52,22 @@ public class UiManager extends Application {
 		updateDisplay();
     }
     
+    /**
+     * This method adds pre-defined style sheets to the scene,
+     * setups the nodes in the scene and registers event handlers to them.
+     * @param primaryStage : Stage
+     * @param root : Parent, which is a subclass of Node
+     */
     public void setUpScene(Stage primaryStage, Parent root) {
     	primaryStage.setTitle(Constants.PROGRAM_NAME);
     	Scene newScene = new Scene(root);
-    	for ( int i = 0; i < myStyleSheets.size(); i ++ ) {
-    		newScene.getStylesheets().add(getClass().getResource(myStyleSheets.get(i)).toExternalForm());
+    	for ( int i = 0; i < UiConstants.UI_STYLE_SHEETS.size(); i ++ ) {
+    		newScene.getStylesheets().add(getClass().getResource(UiConstants.UI_STYLE_SHEETS.get(i)).toExternalForm());
     	}
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		myController.setUpNodes();  // must be done after loading .fxml file
+		myController.setUpNodes(primaryStage);  // must be done after loading .fxml file
 		myController.registerEventHandlersToNodes(root);
     }
     

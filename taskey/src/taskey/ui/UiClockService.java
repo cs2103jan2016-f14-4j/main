@@ -14,13 +14,12 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
+/**
+ * This class performs a background service, which updates the UI clock
+ * @author JunWei
+ *
+ */
 public class UiClockService extends ScheduledService<Void> {
-
-	private static final DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-	
-	private static final int UPDATE_INTERVAL = 1000; // in milliseconds
-	private static final String PM_SUFFIX = "PM";
-	private static final String AM_SUFFIX = "AM";
 	
 	private Label timeLabelRef;
 	private Label dateLabelRef;
@@ -29,7 +28,7 @@ public class UiClockService extends ScheduledService<Void> {
 		timeLabelRef = timeLabel;
 		dateLabelRef = dateLabel;
 		this.setDelay(new Duration(0));
-		this.setPeriod(new Duration(UPDATE_INTERVAL));
+		this.setPeriod(new Duration(UiConstants.UPDATE_INTERVAL));
 	}
 	
 	@Override
@@ -41,7 +40,7 @@ public class UiClockService extends ScheduledService<Void> {
 					@Override
 					public void run() {
 						timeLabelRef.setText(formatTime(cal));
-						dateLabelRef.setText(dateFormat.format(cal.getTime()));
+						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});
 				return null;
@@ -55,8 +54,7 @@ public class UiClockService extends ScheduledService<Void> {
 		int hour = cal.get(Calendar.HOUR);
 		int minute = cal.get(Calendar.MINUTE);
 		String minutePrefix = minute < 10 ? "0" : "";
-		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? PM_SUFFIX : AM_SUFFIX); // AM or PM
-		//System.out.println(cal.get(Calendar.AM) + " " + cal.get(Calendar.PM) + " " + cal.get(Calendar.AM_PM));
+		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? UiConstants.PM_SUFFIX : UiConstants.AM_SUFFIX); // AM or PM
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}

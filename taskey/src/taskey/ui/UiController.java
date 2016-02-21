@@ -28,6 +28,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import taskey.logic.Task;
+import taskey.ui.UiConstants.ContentBox;
 
 /**
  * This class is the main class that handles almost all of the Ui nodes
@@ -47,82 +49,54 @@ public class UiController {
     private Stage stage;
     private int currentTab;
     private UiClockService clockService;
-    private ArrayList<TextFlow> tabTexts; // list of references to the TextFlow objects
+    private UiTextFormatter myFormatter;
     
-	public void registerEventHandlersToNodes(Parent root) {
-		registerInputEventHandler();
-		registerRootEventHandler(root);
-	}
-
-	public void setUpNodes(Stage primaryStage) {
+    public UiTextFormatter getFormatter() {
+    	return myFormatter;
+    }
+	public void setUpNodes(Stage primaryStage, Parent root) {
 		stage = primaryStage; // set up reference
 		clockService = new UiClockService(timeLabel, dateLabel);
 		clockService.start();
-		setUpTabLists();
-		setUpStyles();
+		setUpContentBoxes();
 		setUpTabDisplay();
+		registerEventHandlersToNodes(root);
 	}
 
-	public void setUpStyles() {
-		weekList.getParent().getStyleClass().add("stackpane");
-		for (int i = 0; i < myTabs.getTabs().size(); i++) {
-			tabTexts.get(i).getStyleClass().add("stackpane");
-		}
-	}
-
-	public void setUpTabLists() {
-		tabTexts = new ArrayList<TextFlow>();
+	public void setUpContentBoxes() {
+		myFormatter = new UiTextFormatter(clockService);
+		myFormatter.addTextContent(weekList); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane content = (AnchorPane) myTabs.getTabs().get(i).getContent();
-			tabTexts.add((TextFlow) content.getChildren().get(0));
+			myFormatter.addTextContent((TextFlow) content.getChildren().get(0));
 		}
 	}
-
+	
 	public void setUpTabDisplay() {
 		currentTab = 0;
 		input.requestFocus();
 		displayTabContents(currentTab);
     }
 
+	public void registerEventHandlersToNodes(Parent root) {
+		registerInputEventHandler();
+		registerRootEventHandler(root);
+	}
+
 	public void displayTabContents(int tabNo) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
-		selectionModel.select(currentTab);
+		selectionModel.select(tabNo);
 	}
 
-	public void updateNodesOnTab(ArrayList<String> myTaskList, ArrayList<String> myDeadlines, int tabNo) {
-		TextFlow myText = tabTexts.get(tabNo);
-		myText.getChildren().removeAll(myText.getChildren());
-		for (int i = 0; i < myTaskList.size(); i++) {
-			Text newText = new Text((i + 1) + ". " + myTaskList.get(i) + " on " );
-			Text deadLine = new Text(myDeadlines.get(i) + "\n\n");
-			deadLine.setFill(Color.RED);
-			
-			myText.getChildren().addAll(newText,deadLine);
-			ObservableList<Node> text = myText.getChildren();
-			for ( int j = 0; j < text.size(); j++ ) {
-				((Text)text.get(j)).setFont(Font.font("Comic Sans MS", FontWeight.SEMI_BOLD, 13));
-			}
-		}
-		if (tabNo == 0) {
-			updateWeeklyList(myTaskList, myDeadlines);
-		}
+	public void process( ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+		myFormatter.updateContentBox(myTaskList, contentID);
 	}
-
-	public void updateWeeklyList(ArrayList<String> myTaskList, ArrayList<String> myDeadlines) {
-		for (int i = 0; i < myTaskList.size(); i++) {
-			if (Integer.parseInt(myDeadlines.get(i).split(" ")[0]) >= clockService.getDayOfMonth()) {
-				String taskText = myTaskList.get(i);
-				if (taskText.length() > UiConstants.WORD_LIMIT_WEEKLIST) {
-					taskText = taskText.substring(0, UiConstants.WORD_LIMIT_WEEKLIST) + "...*";
-				}
-				Text newText = new Text("- " + taskText + " (" + myDeadlines.get(i) + ") \n\n");
-				newText.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
-				weekList.getChildren().add(newText);
-			}
-		}
-
+	public void cleanUp() {
+		clockService.restart();
+		myFormatter.cleanUp();
 	}
-
+	
+	/************************************ EVENT HANDLERS *******************************************/
 	public void registerInputEventHandler() {
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
@@ -172,8 +146,5 @@ public class UiController {
 					}
 				}
 		});
-	}
-
-	public void cleanUp() {
 	}
 }

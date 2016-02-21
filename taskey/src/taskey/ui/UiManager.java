@@ -10,6 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import taskey.constants.Constants;
+import taskey.logic.Task;
+import taskey.ui.UiConstants.ContentBox;
 
 /**
  *
@@ -49,7 +51,7 @@ public class UiManager extends Application {
 			System.out.println(Constants.FXML_LOAD_FAIL);
 		}
 		setUpScene(primaryStage, root);
-		updateDisplay();
+		updateDisplay(new ArrayList<Task>(), UiConstants.ContentBox.PENDING);
     }
     
     /**
@@ -67,29 +69,23 @@ public class UiManager extends Application {
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		myController.setUpNodes(primaryStage);  // must be done after loading .fxml file
-		myController.registerEventHandlersToNodes(root);
+		myController.setUpNodes(primaryStage, root);  // must be done after loading .fxml file
     }
     
-    public void updateDisplay() {
+    public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
     	// call logic to get updated list of tasks
     	
-    	// Temporary
-    	ArrayList<String> myTaskList = new ArrayList<String>(
-    			Arrays.asList("Meet a at Mcdonalds", 
-    						  "Meet b at Mcdonalds", 
-    						  "Meet c at Mcdonalds", 
-    						  "Meet d at Mcdonalds", 
-    						  "Meet e at Mcdonalds"));
+    	// Temporary;
+    	Task temp = new Task("No deadline");
+    	myTaskList.add(temp);
+    	temp = new Task("Task A");
+    	temp.setDeadline("23 Feb 2016 01:00:00");
+    	myTaskList.add(temp);
+    	temp = new Task("Task B");
+    	temp.setDeadline("25 Feb 2016 09:00:00");
+    	myTaskList.add(temp);
     	
-    	ArrayList<String> myDeadLines = new ArrayList<String>(
-    			Arrays.asList("17 Feb 2016", 
-    						  "18 Feb 2016",
-    						  "19 Feb 2016", 
-    						  "20 Feb 2016",
-    						  "21 Feb 2016"));
-    	
-    	myController.updateNodesOnTab(myTaskList,myDeadLines,0);
+    	myController.process(myTaskList,contentID);
     }
     
 

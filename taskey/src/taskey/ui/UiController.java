@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -44,14 +45,14 @@ public class UiController {
     @FXML private Label textPrompt;
     @FXML private Label timeLabel;
     @FXML private Label dateLabel;
-    @FXML private TextFlow weekList;
+    @FXML private ScrollPane weekPane;
     
     private Stage stage;
     private int currentTab;
     private UiClockService clockService;
-    private UiTextFormatter myFormatter;
+    private UiContentFormatter myFormatter;
     
-    public UiTextFormatter getFormatter() {
+    public UiContentFormatter getFormatter() {
     	return myFormatter;
     }
 	public void setUpNodes(Stage primaryStage, Parent root) {
@@ -64,11 +65,12 @@ public class UiController {
 	}
 
 	public void setUpContentBoxes() {
-		myFormatter = new UiTextFormatter(clockService);
-		myFormatter.addTextContent(weekList); // add weekly list as first
+		myFormatter = new UiContentFormatter(clockService);
+		myFormatter.addScrollPane(weekPane); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
-			AnchorPane content = (AnchorPane) myTabs.getTabs().get(i).getContent();
-			myFormatter.addTextContent((TextFlow) content.getChildren().get(0));
+			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
+			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
+			myFormatter.addScrollPane(content);
 		}
 	}
 	

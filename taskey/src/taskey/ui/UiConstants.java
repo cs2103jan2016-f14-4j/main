@@ -24,6 +24,10 @@ public class UiConstants {
 	    }
 	}
 	
+	public enum ContentType {
+		TEXT, GRID
+	}
+	
 	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
 			Arrays.asList("style.css"));
 	

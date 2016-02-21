@@ -2,7 +2,12 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.storage.Storage;
+import taskey.ui.UiManager;
 import taskey.logic.Task;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 import taskey.logic.ProcessedObject;
 
 /**
@@ -14,7 +19,7 @@ public class Logic {
 	private Parser parser;
 	private Storage storage;
 	/** The most recent task whose command is not VIEW or UNDO */
-	private Task mostRecentTask = null;
+	private ProcessedObject mostRecentProcessedObject = null;
 	
 	//TODO: constructors
 	public Logic() {
@@ -34,11 +39,32 @@ public class Logic {
     	Task task = po.getTask();
     	
     	//TODO: handle invalid commands
-    	/*
-    	String taskName = task.getName();	
+    	
+    	String taskName = task.getTaskName();
+    	ArrayList<Task> tasksToView = new ArrayList<Task>();
     	switch (command) {
     		case VIEW:
-    			//TODO: send view request to storage
+    			String viewType = po.getViewType();
+    			switch (viewType) {
+    			    case ALL:
+    			    	//TODO: send view all request to storage
+    			    	break;
+    			    
+    			    case GENERAL:
+    			    	//TODO: send view general request to storage
+    			    	break;
+    			    
+    			    case DEADLINE:
+    			    	//TODO: send view deadline request to storage
+    			    	break;
+    			    
+    			    case EVENTS:
+    			    	//TODO: send view events request to storage
+    			    	break;
+    			    
+    			    default:
+    			}
+    			Collections.sort(tasksToView);
     			break;
     			
     		case ADD_FLOATING:
@@ -56,9 +82,9 @@ public class Logic {
     			//TODO: add event task to storage
     			break;
     				
-    		case ADD_RECURRING:
+    		/*case ADD_RECURRING:
     			//TODO: add recurring task to storage
-    			break;
+    			break;*/
     			
     		case DELETE_BY_INDEX:
     			//TODO: delete indexed task from storage
@@ -77,7 +103,7 @@ public class Logic {
     			break;
     		
     		case UNDO:
-    			String mostRecentCommand = mostRecentTask.getCommand();
+    			String mostRecentCommand = mostRecentProcessedObject.getCommand();
     			switch (mostRecentCommand) {
     				case ADD_FLOATING:
     				case ADD_DEADLINE:
@@ -104,9 +130,10 @@ public class Logic {
     			//TODO
     			
     		default:
-    	}*/
+    	}
+    	
     	// Update UI 
-    	// UiController.getInstance().update();
+    	UiManager.getInstance().updateDisplay();
     	
     	return -1; //stub
     }

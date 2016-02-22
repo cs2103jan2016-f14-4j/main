@@ -13,9 +13,6 @@ import taskey.parser.TimeConverter;
  * 2. EVENT (has a start and end time)
  * 3. DEADLINE 
  * 
- * isRecurring: set to true if event/deadline is recurring, 
- *              and set the recurring interval as well! 
- *         
  * 
  * date arrays have the following format:
  * dates*[0]: recurring interval (if recurring event/deadline) 

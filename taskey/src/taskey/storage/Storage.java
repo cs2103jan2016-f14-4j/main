@@ -39,7 +39,7 @@ public class Storage {
 			System.out.println("Example: setDirectory() failed.");
 		}
 		
-		// Example of an filename
+		// Example of an invalid filename
 		if (storageTest.setFilename(":\\?*|\"/<>") == false) {
 			System.out.println("Example: setFilename() failed.");
 		}

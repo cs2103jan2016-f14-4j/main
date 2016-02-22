@@ -11,20 +11,22 @@ import java.util.Collections;
 import taskey.logic.ProcessedObject;
 
 /**
- * //TODO: class description
+ * TODO: class description
  * 
  * @author Hubert Wong
  */
 public class Logic {
 	private Parser parser;
 	private Storage storage;
-	/** The most recent task whose command is not VIEW or UNDO */
+	private UiManager uiManager;
+	/** The most recent processed object whose command is not VIEW or UNDO */
 	private ProcessedObject mostRecentProcessedObject = null;
 	
 	//TODO: constructors
 	public Logic() {
 		parser = new Parser();
-		storage = new Storage();
+		storage = Storage.getInstance();
+		uiManager = UiManager.getInstance();
 	}
 
     /**
@@ -42,24 +44,37 @@ public class Logic {
     	
     	String taskName = task.getTaskName();
     	ArrayList<Task> tasksToView = new ArrayList<Task>();
+    	ArrayList<Task> tasksToAdd = new ArrayList<Task>();
     	switch (command) {
-    		case VIEW:
+    		case "VIEW":
     			String viewType = po.getViewType();
+    			ArrayList<Task> fullTaskList = storage.loadTasks();
     			switch (viewType) {
-    			    case ALL:
-    			    	//TODO: send view all request to storage
+    			    case "ALL":
     			    	break;
     			    
-    			    case GENERAL:
-    			    	//TODO: send view general request to storage
+    			    case "GENERAL":
+    			    	for (Task t : fullTaskList) {
+    			    		if (t.getTaskType() == "FLOATING") {
+    			    			tasksToView.add(t);
+    			    		}
+    			    	}
     			    	break;
     			    
-    			    case DEADLINE:
-    			    	//TODO: send view deadline request to storage
+    			    case "DEADLINE":
+    			    	for (Task t : fullTaskList) {
+    			    		if (t.getTaskType() == "DEADLINE") {
+    			    			tasksToView.add(t);
+    			    		}
+    			    	}
     			    	break;
     			    
-    			    case EVENTS:
-    			    	//TODO: send view events request to storage
+    			    case "EVENTS":
+    			    	for (Task t : fullTaskList) {
+    			    		if (t.getTaskType() == "EVENT") {
+    			    			tasksToView.add(t);
+    			    		}
+    			    	}		    	
     			    	break;
     			    
     			    default:
@@ -67,58 +82,72 @@ public class Logic {
     			Collections.sort(tasksToView);
     			break;
     			
-    		case ADD_FLOATING:
-    			//TODO: add floating task to storage
+    		case "ADD_FLOATING":
+    			storage.setFilename("floating tasks");
+    			tasksToAdd.add(task);
+    			storage.saveTasks(tasksToAdd);;
     			break;
     			
-    		case ADD_DEADLINE:
-    			long deadlineEpoch = task.getDeadlineEpoch();
-    			//TODO: add deadlined task to storage
+    		case "ADD_DEADLINE":
+    			storage.setFilename("deadline tasks");
+    			/*long deadlineEpoch = task.getDeadlineEpoch();*/
+    			tasksToAdd.add(task);
     			break;
     				
-    		case ADD_EVENT:
-    			long startDateEpoch = task.getStartDateEpoch();
-    			long endDateEpoch = task.getEndDateEpoch();
-    			//TODO: add event task to storage
+    		case "ADD_EVENT":
+    			/*long startDateEpoch = task.getStartDateEpoch();
+    			long endDateEpoch = task.getEndDateEpoch();*/
+    			storage.setFilename("event tasks");
+    			tasksToAdd.add(task);
     			break;
     				
     		/*case ADD_RECURRING:
     			//TODO: add recurring task to storage
     			break;*/
     			
-    		case DELETE_BY_INDEX:
+    		case "DELETE_BY_INDEX":
     			//TODO: delete indexed task from storage
     			break;
     		
-    		case DELETE_BY_NAME:
+    		case "DELETE_BY_NAME":
     			//TODO: delete named task from storage
     			break;
     		
-    		case UPDATE_BY_INDEX:
+    		case "UPDATE_BY_INDEX":
     			//TODO: update indexed task in storage
     			break;
     		
-    		case UPDATE_BY_NAME:
+    		case "UPDATE_BY_NAME":
     			//TODO: update named task in storage
     			break;
     		
-    		case UNDO:
+    		case "UNDO":
     			String mostRecentCommand = mostRecentProcessedObject.getCommand();
     			switch (mostRecentCommand) {
-    				case ADD_FLOATING:
-    				case ADD_DEADLINE:
-    				case ADD_EVENT:
-    				case ADD_RECURRING:
+    				case "ADD_FLOATING":
+    				case "ADD_DEADLINE":
+    				case "ADD_EVENT":
+    				case "ADD_RECURRING":
     					//TODO: delete most recently added task from storage
     					break;
     				
-    				case DELETE_BY_INDEX:
-    				case DELETE_BY_NAME:
-    					//TODO: add most recently deleted task to storage
+    				case "DELETE_BY_INDEX":
+    				case "DELETE_BY_NAME":
+    					Task mostRecentTask = mostRecentProcessedObject.getTask();
+    					String mostRecentTaskType = mostRecentTask.getTaskType();
+    					tasksToAdd.add(mostRecentTask);
+    					if (mostRecentTaskType == "FLOATING") {
+    						storage.setFilename("floating tasks");
+    					} else if (mostRecentTaskType == "EVENT") {
+    						storage.setFilename("event tasks");
+    					} else { //Deadline tasks
+    						storage.setFilename("deadline tasks");
+    					}
+    					storage.saveTasks(tasksToAdd);;
     					break;
     				
-    				case UPDATE_BY_INDEX:
-    				case UPDATE_BY_NAME:
+    				case "UPDATE_BY_INDEX":
+    				case "UPDATE_BY_NAME":
     					//TODO: revert most recently updated task in storage
     					break;
     				
@@ -126,14 +155,14 @@ public class Logic {
     			}
     			break;
     		
-    		case ERROR:
+    		case "ERROR":
     			//TODO
     			
     		default:
     	}
     	
     	// Update UI 
-    	UiManager.getInstance().updateDisplay();
+    	uiManager.updateDisplay(tasksToView);
     	
     	return -1; //stub
     }

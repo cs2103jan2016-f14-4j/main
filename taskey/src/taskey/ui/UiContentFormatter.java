@@ -65,21 +65,35 @@ public class UiContentFormatter {
 		}
 		return myTexts;
 	}
+	
+	public ArrayList<Text> getTextNodesFromTask(int taskNo, Task theTask) {
+		ArrayList<Text> myTexts = new ArrayList<Text>();
+		Text addedNode = new Text("["+(taskNo+1)+"]: ");
+		addedNode.setFill(Color.BLUEVIOLET);
+		myTexts.add(addedNode);
+		addedNode = new Text(theTask.getTaskName());
+		addedNode.setFill(Color.BLACK);
+		myTexts.add(addedNode);
+		if ( theTask.getDeadline() != "") {
+			addedNode = new Text(" on " + theTask.getDeadline());
+			addedNode.setFill(Color.RED);
+			myTexts.add(addedNode);
+		}
+		addedNode = new Text("\n\n");
+		myTexts.add(addedNode);
+		return myTexts;
+	}
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
 		TextFlow myText = (TextFlow) contentBoxes.get(contentID.getValue()).getContent();
 		myText.getChildren().removeAll(myText.getChildren());
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
-			String line = "<#0000FF>" + (i + 1) + ". " + "<#000000>" + theTask.getTaskName();
-			if ( theTask.getDeadline() != "") {
-				line += " on <#FF0000>" + theTask.getDeadline();
-			}
-			line += "\n\n";
-			myText.getChildren().addAll(convertStringToTextNodes(line));
+			myText.getChildren().addAll(getTextNodesFromTask(i,theTask));
+	
 			ObservableList<Node> text = myText.getChildren();
 			for ( int j = 0; j < text.size(); j++ ) {
 				((Text)text.get(j)).setFont(Font.font("Comic Sans MS", FontWeight.SEMI_BOLD, 13));
-			}
+			}	
 		}
 		if (contentID == ContentBox.PENDING) {
 			updateWeeklyList(myTaskList);

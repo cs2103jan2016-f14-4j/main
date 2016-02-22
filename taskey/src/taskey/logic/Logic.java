@@ -5,6 +5,7 @@ import taskey.storage.Storage;
 import taskey.ui.UiManager;
 import taskey.logic.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -34,8 +35,10 @@ public class Logic {
      * 
      * @param input the input string
      * @return      status code reflecting the outcome of command execution
+     * @throws IOException 
+     * @throws ClassNotFoundException 
      */
-    public int executeCommand(String input) {
+    public int executeCommand(String input) throws ClassNotFoundException, IOException {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Task task = po.getTask();
@@ -48,62 +51,15 @@ public class Logic {
     	switch (command) {
     		case "VIEW":
     			String viewType = po.getViewType();
-    			ArrayList<Task> fullTaskList = storage.loadTasks();
-    			switch (viewType) {
-    			    case "ALL":
-    			    	break;
-    			    
-    			    case "GENERAL":
-    			    	for (Task t : fullTaskList) {
-    			    		if (t.getTaskType() == "FLOATING") {
-    			    			tasksToView.add(t);
-    			    		}
-    			    	}
-    			    	break;
-    			    
-    			    case "DEADLINE":
-    			    	for (Task t : fullTaskList) {
-    			    		if (t.getTaskType() == "DEADLINE") {
-    			    			tasksToView.add(t);
-    			    		}
-    			    	}
-    			    	break;
-    			    
-    			    case "EVENTS":
-    			    	for (Task t : fullTaskList) {
-    			    		if (t.getTaskType() == "EVENT") {
-    			    			tasksToView.add(t);
-    			    		}
-    			    	}		    	
-    			    	break;
-    			    
-    			    default:
-    			}
-    			Collections.sort(tasksToView);
+    			view(viewType, tasksToView);
     			break;
     			
     		case "ADD_FLOATING":
-    			storage.setFilename("floating tasks");
-    			tasksToAdd.add(task);
-    			storage.saveTasks(tasksToAdd);;
-    			break;
-    			
     		case "ADD_DEADLINE":
-    			storage.setFilename("deadline tasks");
-    			/*long deadlineEpoch = task.getDeadlineEpoch();*/
-    			tasksToAdd.add(task);
-    			break;
-    				
+    		/*case ADD_RECURRING:*/
     		case "ADD_EVENT":
-    			/*long startDateEpoch = task.getStartDateEpoch();
-    			long endDateEpoch = task.getEndDateEpoch();*/
-    			storage.setFilename("event tasks");
-    			tasksToAdd.add(task);
+    			add(tasksToAdd, task, command);
     			break;
-    				
-    		/*case ADD_RECURRING:
-    			//TODO: add recurring task to storage
-    			break;*/
     			
     		case "DELETE_BY_INDEX":
     			//TODO: delete indexed task from storage
@@ -122,37 +78,7 @@ public class Logic {
     			break;
     		
     		case "UNDO":
-    			String mostRecentCommand = mostRecentProcessedObject.getCommand();
-    			switch (mostRecentCommand) {
-    				case "ADD_FLOATING":
-    				case "ADD_DEADLINE":
-    				case "ADD_EVENT":
-    				case "ADD_RECURRING":
-    					//TODO: delete most recently added task from storage
-    					break;
-    				
-    				case "DELETE_BY_INDEX":
-    				case "DELETE_BY_NAME":
-    					Task mostRecentTask = mostRecentProcessedObject.getTask();
-    					String mostRecentTaskType = mostRecentTask.getTaskType();
-    					tasksToAdd.add(mostRecentTask);
-    					if (mostRecentTaskType == "FLOATING") {
-    						storage.setFilename("floating tasks");
-    					} else if (mostRecentTaskType == "EVENT") {
-    						storage.setFilename("event tasks");
-    					} else { //Deadline tasks
-    						storage.setFilename("deadline tasks");
-    					}
-    					storage.saveTasks(tasksToAdd);;
-    					break;
-    				
-    				case "UPDATE_BY_INDEX":
-    				case "UPDATE_BY_NAME":
-    					//TODO: revert most recently updated task in storage
-    					break;
-    				
-    				default:
-    			}
+    			undo(tasksToAdd);
     			break;
     		
     		case "ERROR":
@@ -161,9 +87,83 @@ public class Logic {
     		default:
     	}
     	
-    	// Update UI 
-    	uiManager.updateDisplay(tasksToView);
-    	
+    	uiManager.updateDisplay();
     	return -1; //stub
     }
+    
+    //Update the list of Tasks to view from Storage.
+    private void view(String viewType, ArrayList<Task> tasksToView) throws ClassNotFoundException, IOException {
+		ArrayList<Task> fullTaskList = storage.loadTasks();
+		if (viewType == "GENERAL") {
+			for (Task t : fullTaskList) {
+	    		if (t.getTaskType() == "FLOATING") {
+	    			tasksToView.add(t);
+	    		}
+	    	}
+		} else if (viewType == "DEADLINE") {
+			for (Task t : fullTaskList) {
+	    		if (t.getTaskType() == "DEADLINE") {
+	    			tasksToView.add(t);
+	    		}
+	    	}
+		} else if (viewType == "EVENTS") {
+			for (Task t : fullTaskList) {
+	    		if (t.getTaskType() == "EVENT") {
+	    			tasksToView.add(t);
+	    		}
+	    	}		    
+		} else { //No restriction on viewType
+		}
+		
+		Collections.sort(tasksToView);
+    }
+    
+    //Add the Task to Storage.
+    private void add(ArrayList<Task> tasksToAdd, Task task, String command) throws IOException {
+    	if (command == "ADD_FLOATING") {
+    		storage.setFilename("floating tasks");
+    	} else if (command == "ADD_DEADLINE") {
+    		storage.setFilename("deadline tasks");
+    	} else { //Event tasks
+    		storage.setFilename("event tasks");
+    	}
+    	
+    	tasksToAdd.add(task);
+		storage.saveTasks(tasksToAdd);
+    }
+    
+    //Undo the most recent action, unless the action was view or undo.
+	private void undo(ArrayList<Task> tasksToAdd) throws IOException {
+		String mostRecentCommand = mostRecentProcessedObject.getCommand();
+		switch (mostRecentCommand) {
+			case "ADD_FLOATING":
+			case "ADD_DEADLINE":
+			case "ADD_EVENT":
+			case "ADD_RECURRING":
+				//TODO: delete most recently added task from storage
+				break;
+			
+			case "DELETE_BY_INDEX":
+			case "DELETE_BY_NAME":
+				Task mostRecentTask = mostRecentProcessedObject.getTask();
+				String mostRecentTaskType = mostRecentTask.getTaskType();
+				tasksToAdd.add(mostRecentTask);
+				if (mostRecentTaskType == "FLOATING") {
+					storage.setFilename("floating tasks");
+				} else if (mostRecentTaskType == "EVENT") {
+					storage.setFilename("event tasks");
+				} else { //Deadline tasks
+					storage.setFilename("deadline tasks");
+				}
+				storage.saveTasks(tasksToAdd);;
+				break;
+			
+			case "UPDATE_BY_INDEX":
+			case "UPDATE_BY_NAME":
+				//TODO: revert most recently updated task in storage
+				break;
+			
+			default:
+		}
+	}
 }

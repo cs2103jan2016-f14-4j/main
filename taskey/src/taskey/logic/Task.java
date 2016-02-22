@@ -1,5 +1,6 @@
 package taskey.logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import taskey.parser.TimeConverter; 
@@ -28,7 +29,7 @@ import taskey.parser.TimeConverter;
  *
  */
 
-public class Task implements Comparable<Task> {
+public class Task implements Comparable<Task>, Serializable {
 	public static final int NONE = -1; 
 	public static final String EMPTY = ""; 
 	

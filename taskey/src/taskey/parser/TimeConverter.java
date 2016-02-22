@@ -1,8 +1,9 @@
 package taskey.parser;
 
+import java.io.Serializable;
 import java.text.ParseException;
 
-public class TimeConverter {
+public class TimeConverter implements Serializable {
 	public static final long ONE_DAY = 86400; 
 	public static final long ONE_WEEK = 604800; 
 	

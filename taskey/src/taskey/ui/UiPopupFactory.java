@@ -30,10 +30,9 @@ public class UiPopupFactory {
 		newPopup.setLayoutX(layoutX);
 		newPopup.setLayoutY(layoutY);
 		newPopup.setText(text);
+		newPopup.getStyleClass().add("popup");
 		pane.getChildren().add(newPopup);
 		popupList.add(newPopup);
-		newPopup.setTextFill(Color.WHITE);
-		newPopup.getStyleClass().add("popup");
 		return newPopup;
 	}
 

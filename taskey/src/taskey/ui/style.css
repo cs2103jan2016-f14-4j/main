@@ -1,20 +1,26 @@
-#mainWindow {
-     /*-fx-background-image: url("main.jpg");
-     -fx-background-size: stretch;   */
+.main {
+	-fx-background-color:
+        linear-gradient(#00ccff, #002222);
 }
 
 .stackpane {
-    -fx-background-color: white;
-    -fx-border-style: dotted;
-    -fx-border-radius: 2px;
-    -fx-padding: 7px;
+    -fx-background-color: #00ccff;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-padding: 3px;
 }
 
 .popup {
-	-fx-background-color: linear-gradient(#cc33ff, #0000cc);
-    -fx-background-radius: 15px;
-	-fx-padding: 5px;
-	-fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+	-fx-padding: 2px;
+	-fx-background-color:
+        linear-gradient(#f0ff35, #a9ff00),
+        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-radius: 6, 5;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: #395306;
 }
 
-.red { -fx-fill: red; }
+.plain {
+	-fx-background-color: white;
+	-fx-padding: 2px;
+}

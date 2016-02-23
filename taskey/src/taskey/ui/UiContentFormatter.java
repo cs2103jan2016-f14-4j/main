@@ -11,6 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Pair;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 
@@ -29,7 +30,7 @@ public class UiContentFormatter {
 	public void addScrollPane(ScrollPane pane) {
 		contentBoxes.add(pane);
 		TextFlow myText = new TextFlow();
-		myText.getStyleClass().add(UiConstants.STYLE_TAB_WINDOW);
+		myText.getStyleClass().add(UiConstants.TEXT_FLOW_BACKGROUND);
 		myText.setMinHeight(pane.getHeight());
 		pane.setFitToWidth(true);
 		pane.setContent(myText); // default to TextFlow as the content
@@ -42,77 +43,28 @@ public class UiContentFormatter {
 		contentBoxes.get(contentID.getValue()).setContent(newGrid);
 	}
 	
-	public ArrayList<Text> convertStringToTextNodes(String line) {
-		ArrayList<Text> myTexts = new ArrayList<Text>();
-		String modifier = "#000000";
-		for ( int i = 0; i < line.length(); i ++ ) {
-			String myChar = String.valueOf(line.charAt(i));
-			if ( myChar.equals("<")) {
-				modifier = "";
-				i++;
-				myChar = String.valueOf(line.charAt(i));
-				while ( myChar.equals(">") == false ) {
-					modifier += myChar;	
-					i++;
-					myChar = String.valueOf(line.charAt(i));
-				}
-				i++;
-				myChar = String.valueOf(line.charAt(i));
-			}
-			Text newText = new Text(myChar);
-			newText.setFill(Color.web(modifier));
-			myTexts.add(newText);
-		}
-		return myTexts;
-	}
 	
-	public ArrayList<Text> getTextNodesFromTask(int taskNo, Task theTask) {
-		ArrayList<Text> myTexts = new ArrayList<Text>();
-		Text addedNode = new Text("["+(taskNo+1)+"]: ");
-		addedNode.setFill(Color.BLUEVIOLET);
-		myTexts.add(addedNode);
-		addedNode = new Text(theTask.getTaskName());
-		addedNode.setFill(Color.BLACK);
-		myTexts.add(addedNode);
-		if ( theTask.getDeadline() != "") {
-			addedNode = new Text(" on " + theTask.getDeadline());
-			addedNode.setFill(Color.RED);
-			myTexts.add(addedNode);
-		}
-		addedNode = new Text("\n\n");
-		myTexts.add(addedNode);
-		return myTexts;
-	}
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
 		TextFlow myText = (TextFlow) contentBoxes.get(contentID.getValue()).getContent();
 		myText.getChildren().removeAll(myText.getChildren());
+		
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
-			myText.getChildren().addAll(getTextNodesFromTask(i,theTask));
-	
-			ObservableList<Node> text = myText.getChildren();
-			for ( int j = 0; j < text.size(); j++ ) {
-				((Text)text.get(j)).setFont(Font.font("Comic Sans MS", FontWeight.SEMI_BOLD, 13));
-			}	
+			myText.getChildren().addAll(UiContentFormats.getTextNodesFromTaskPending(i,theTask));
 		}
-		if (contentID == ContentBox.PENDING) {
+		if (contentID == ContentBox.PENDING) { // update weekly list also when pending list is updated
 			updateWeeklyList(myTaskList);
 		}
 	}
 
 	public void updateWeeklyList(ArrayList<Task> myTaskList) {
-
-		TextFlow weekList = (TextFlow) contentBoxes.get(UiConstants.ContentBox.WEEKlY.getValue()).getContent();
+		TextFlow myText = (TextFlow) contentBoxes.get(UiConstants.ContentBox.WEEKlY.getValue()).getContent();
+		myText.getChildren().removeAll(myText.getChildren());
+		
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
 			if (theTask.getDeadline() == "" || Integer.parseInt(theTask.getDeadline().split(" ")[0]) >= clockService.getDayOfMonth()) {
-				String taskText = theTask.getTaskName();
-				if (taskText.length() > UiConstants.WORD_LIMIT_WEEKLIST) {
-					taskText = taskText.substring(0, UiConstants.WORD_LIMIT_WEEKLIST) + "...*";
-				}
-				Text newText = new Text("- " + taskText + " (" + theTask.getDeadline() + ")\n\n");
-				newText.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
-				weekList.getChildren().add(newText);
+				myText.getChildren().addAll(UiContentFormats.getTextNodesFromTaskWeekly(theTask));
 			}
 		}
 	}

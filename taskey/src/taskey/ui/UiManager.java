@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import taskey.constants.Constants;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
@@ -62,6 +63,7 @@ public class UiManager extends Application {
      */
     public void setUpScene(Stage primaryStage, Parent root) {
     	primaryStage.setTitle(Constants.PROGRAM_NAME);
+    	primaryStage.initStyle(StageStyle.DECORATED);
     	Scene newScene = new Scene(root);
     	for ( int i = 0; i < UiConstants.UI_STYLE_SHEETS.size(); i ++ ) {
     		newScene.getStylesheets().add(getClass().getResource(UiConstants.UI_STYLE_SHEETS.get(i)).toExternalForm());
@@ -78,29 +80,14 @@ public class UiManager extends Application {
     	// Temporary;
     	Task temp = new Task("No deadline");
     	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
+    	temp = new Task("Task A");
+    	temp.setDeadline("27 Feb 2016 01:00:00");
     	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
-    	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
-    	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
-    	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
-    	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
-    	myTaskList.add(temp);
-    	temp = new Task("Task A Task ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask ATask A");
-    	temp.setDeadline("23 Feb 2016 01:00:00");
+    	temp = new Task("Task C");
+    	temp.setDeadline("27 Feb 2016 04:00:00");
     	myTaskList.add(temp);
     	temp = new Task("Task B");
-    	temp.setDeadline("25 Feb 2016 09:00:00");
+    	temp.setDeadline("29 Feb 2016 09:00:00");
     	myTaskList.add(temp);
     	
     	myController.process(myTaskList,contentID);

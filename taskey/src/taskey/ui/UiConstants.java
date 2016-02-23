@@ -29,9 +29,9 @@ public class UiConstants {
 	}
 	
 	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
-			Arrays.asList("style.css"));
+			Arrays.asList("style.css","tabStyle.css","textStyles.css"));
 	
-	public static final String STYLE_TAB_WINDOW = "stackpane";
+	public static final String TEXT_FLOW_BACKGROUND = "plain";
 	public static final int WORD_LIMIT_WEEKLIST = 10;
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	

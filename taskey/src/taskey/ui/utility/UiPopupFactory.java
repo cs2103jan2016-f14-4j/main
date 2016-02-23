@@ -1,4 +1,4 @@
-package taskey.ui;
+package taskey.ui.utility;
 
 
 import java.util.ArrayList;
@@ -12,6 +12,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * This class creates a small label at a point, and supports the use of animations
+ * @author JunWei
+ *
+ */
 public class UiPopupFactory {
 
 	private static UiPopupFactory instance = null;

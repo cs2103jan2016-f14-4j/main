@@ -24,15 +24,15 @@ import taskey.ui.UiConstants.ContentBox;
  *
  */
 
-public class UiManager extends Application {
+public class UiMain extends Application {
 	
-	private static UiManager instance = null; 
+	private static UiMain instance = null; 
 	private UiController myController;
 	private Parent root = null;
 	
-    public static UiManager getInstance () { 
+    public static UiMain getInstance () { 
     	if ( instance == null ) {
-    		instance = new UiManager();
+    		instance = new UiMain();
     	}
     	return instance;
     }
@@ -91,6 +91,7 @@ public class UiManager extends Application {
     	myTaskList.add(temp);
     	
     	myController.process(myTaskList,contentID);
+    	
     }
     
 

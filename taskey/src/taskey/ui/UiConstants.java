@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import taskey.ui.utility.UiGridSettings;
+
 /**
  * 
  * Temporary file to be merged with Constants .java
@@ -22,16 +24,29 @@ public class UiConstants {
 	    public int getValue() {
 	        return value;
 	    }
+	    public static ContentBox fromInteger(int x) {
+	        switch(x) {
+	        case 0:
+	            return WEEKlY;
+	        case 1:
+	            return PENDING;
+	        case 2:
+	        	return EXPIRED;
+	        case 3:
+	        	return COMPLETED;
+	        case 4:
+	        	return ACTION;
+	        }
+	        return null;
+	    }
 	}
 	
-	public enum ContentType {
-		TEXT, GRID
-	}
+	public static final UiGridSettings normSettings = new UiGridSettings(10,10,10,90);
+	public static final UiGridSettings weeklySettings = new UiGridSettings(10,5,100);
 	
 	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
 			Arrays.asList("style.css","tabStyle.css","textStyles.css"));
 	
-	public static final String TEXT_FLOW_BACKGROUND = "plain";
 	public static final int WORD_LIMIT_WEEKLIST = 10;
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	

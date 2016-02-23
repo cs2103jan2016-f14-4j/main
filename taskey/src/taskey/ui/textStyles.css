@@ -1,13 +1,21 @@
 .red {
 	-fx-fill: red;
+	-fx-font: 15px Serif;
 }
 
+.white {
+	-fx-fill: white;
+	-fx-font: 15px Serif;
+	-fx-font-weight: bold;
+}
 .blue { 
 	-fx-fill: blue;
+	-fx-font: 15px Serif;
 }
 
 .black { 
 	-fx-fill: black;
+	-fx-font: 15px Serif;
 }
 
 .weekly { 

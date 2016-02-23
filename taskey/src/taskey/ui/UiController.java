@@ -31,6 +31,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.content.UiContentManager;
+import taskey.ui.utility.UiClockService;
+import taskey.ui.utility.UiPopupFactory;
 
 /**
  * This class is the main class that handles almost all of the Ui nodes
@@ -50,9 +53,9 @@ public class UiController {
     private Stage stage;
     private int currentTab;
     private UiClockService clockService;
-    private UiContentFormatter myFormatter;
+    private UiContentManager myFormatter;
     
-    public UiContentFormatter getFormatter() {
+    public UiContentManager getFormatter() {
     	return myFormatter;
     }
 	public void setUpNodes(Stage primaryStage, Parent root) {
@@ -65,12 +68,12 @@ public class UiController {
 	}
 
 	public void setUpContentBoxes() {
-		myFormatter = new UiContentFormatter(clockService);
-		myFormatter.addScrollPane(weekPane); // add weekly list as first
+		myFormatter = new UiContentManager(clockService);
+		myFormatter.addScrollPane(weekPane,ContentBox.WEEKlY); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myFormatter.addScrollPane(content);
+			myFormatter.addScrollPane(content,ContentBox.fromInteger(i+1));
 		}
 	}
 	

@@ -3,7 +3,7 @@
         linear-gradient(#00ccff, #002222);
 }
 
-.stackpane {
+.scrollpane {
     -fx-background-color: #00ccff;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
     -fx-padding: 3px;
@@ -23,4 +23,24 @@
 .plain {
 	-fx-background-color: white;
 	-fx-padding: 2px;
+}
+
+.gridRed {
+	-fx-background-color: #ff0000;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+}
+
+.gridCyan {
+	-fx-background-color: #00ccff;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+}
+
+.gridGreen {
+	-fx-background-color: #bbff00;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+}
+
+.gridYellow {
+	-fx-background-color: #ffff99;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
 }

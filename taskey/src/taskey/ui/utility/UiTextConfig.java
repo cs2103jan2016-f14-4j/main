@@ -1,14 +1,22 @@
-package taskey.ui;
+package taskey.ui.utility;
 
 import java.util.ArrayList;
 
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
+/**
+ * This class provides a way to format different styles given a string
+ * @author Junwei
+ *
+ */
 public class UiTextConfig {
 
 	ArrayList<Pair<Integer,String>> styleMarkers = new ArrayList<Pair<Integer,String>>(); // where to start certain styles
 
+	public UiTextConfig() {
+		addMarker(0,"black"); // default marker, will get overridden if there exists another marker at 0
+	}
 	public ArrayList<Text> format(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		int currentStart = styleMarkers.get(0).getKey();
@@ -44,5 +52,8 @@ public class UiTextConfig {
 	
 	public void addMarker(Integer startIndex, String style ) {
 		styleMarkers.add(new Pair<Integer,String>(startIndex,style));
+	}
+	public void removeMarkers() {
+		styleMarkers.clear();
 	}
 }

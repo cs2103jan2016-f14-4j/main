@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -19,7 +20,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="stackpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -28,7 +29,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="stackpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -37,7 +38,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="stackpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -46,7 +47,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="stackpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -73,11 +74,21 @@
             </Label>
          </children>
       </StackPane>
-      <ScrollPane fx:id="weekPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="36.0" layoutY="137.0" prefHeight="260.0" prefWidth="100.0" styleClass="stackpane" stylesheets="@style.css" vbarPolicy="NEVER" />
-      <ImageView fitHeight="33.0" fitWidth="24.0" layoutX="538.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@images/cross.png" />
-         </image>
-      </ImageView>
+      <ScrollPane fx:id="weekPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="36.0" layoutY="137.0" prefHeight="260.0" prefWidth="100.0" styleClass="scrollpane" stylesheets="@style.css" vbarPolicy="NEVER" />
+      <ToolBar layoutX="1.0" layoutY="-4.0" prefHeight="36.0" prefWidth="564.0" visible="false">
+         <items>
+            <Label text="Taskey" />
+            <ImageView fitHeight="33.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/bar.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="33.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/cross.png" />
+               </image>
+            </ImageView>
+         </items>
+      </ToolBar>
    </children>
 </AnchorPane>

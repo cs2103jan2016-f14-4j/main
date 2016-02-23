@@ -1,4 +1,4 @@
-package taskey.ui;
+package taskey.ui.utility;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +13,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
+import taskey.ui.UiConstants;
 
 /**
  * This class performs a background service, which updates the UI clock

@@ -7,8 +7,8 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.utility.UiTextConfig;
 
-public class UiWeeklyContentFormatter extends UiContentFormatter{
-	public UiWeeklyContentFormatter(GridPane _gridPane) {
+public class UiWeeklyFormatter extends UiFormatter{
+	public UiWeeklyFormatter(GridPane _gridPane) {
 		super(_gridPane);
 	}
 

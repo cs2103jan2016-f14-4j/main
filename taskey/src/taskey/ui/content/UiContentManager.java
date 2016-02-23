@@ -34,21 +34,21 @@ import taskey.ui.utility.UiGridSettings;
 public class UiContentManager {
 	private UiClockService clockService; // reference to ui clock
 	private ArrayList<ScrollPane> contentBoxes; // list of references to the ScrollPane objects
-	private ArrayList<UiContentFormatter> myFormatters; // for the grid panes
+	private ArrayList<UiFormatter> myFormatters; // for the grid panes
 	
 	public UiContentManager( UiClockService _clockService ) {
 		clockService = _clockService;
 		contentBoxes = new ArrayList<ScrollPane>();
-		myFormatters = new ArrayList<UiContentFormatter>();
+		myFormatters = new ArrayList<UiFormatter>();
 	}
 	 
 	public void addScrollPane(ScrollPane pane, ContentBox contentID) {
 		contentBoxes.add(pane);
 		pane.setFitToWidth(true);
 		if ( contentID == ContentBox.WEEKlY) {
-			myFormatters.add(new UiWeeklyContentFormatter(setUpGrid(pane, UiConstants.weeklySettings)));
+			myFormatters.add(new UiWeeklyFormatter(setUpGrid(pane, UiConstants.weeklySettings)));
 		} else {
-			myFormatters.add(new UiNormalContentFormatter(setUpGrid(pane, UiConstants.normSettings)));
+			myFormatters.add(new UiNormalFormatter(setUpGrid(pane, UiConstants.normSettings)));
 		}
 	}
 	
@@ -69,7 +69,7 @@ public class UiContentManager {
 	}
 	
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
-		UiContentFormatter myFormatter = myFormatters.get(contentID.getValue());
+		UiFormatter myFormatter = myFormatters.get(contentID.getValue());
 		myFormatter.clearGrid();
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
@@ -82,7 +82,7 @@ public class UiContentManager {
 
 	public void updateWeeklyList(ArrayList<Task> myTaskList) {
 		int contentID = ContentBox.WEEKlY.getValue();
-		UiContentFormatter myFormatter = myFormatters.get(contentID);
+		UiFormatter myFormatter = myFormatters.get(contentID);
 		myFormatter.clearGrid();
 		int currentNo = 0;
 		for (int i = 0; i < myTaskList.size(); i++) {

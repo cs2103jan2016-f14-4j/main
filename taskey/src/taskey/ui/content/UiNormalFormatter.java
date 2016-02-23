@@ -6,9 +6,9 @@ import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.utility.UiTextConfig;
 
-public class UiNormalContentFormatter extends UiContentFormatter {
+public class UiNormalFormatter extends UiFormatter {
 
-	public UiNormalContentFormatter(GridPane _gridPane) {
+	public UiNormalFormatter(GridPane _gridPane) {
 		super(_gridPane);
 	}
 

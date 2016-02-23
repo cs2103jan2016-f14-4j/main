@@ -21,11 +21,11 @@ import taskey.ui.UiConstants.ContentBox;
  * @author Junwei
  *
  */
-public abstract class UiContentFormatter {
+public abstract class UiFormatter {
 	
 	public GridPane gridPane;
 	
-	public UiContentFormatter(GridPane _gridPane) {
+	public UiFormatter(GridPane _gridPane) {
 		gridPane = _gridPane;
 	}
 	
@@ -40,7 +40,7 @@ public abstract class UiContentFormatter {
 		gridPane.add(wrapper, col, row);
 	}
 	
-	public void addStyleCellImage(String path, GridPane gridPane, int col, int row, String style) {
+	public void addStyledCellImage(String path, GridPane gridPane, int col, int row, String style) {
 		Image img = new Image(getClass().getResourceAsStream(path));
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(10);

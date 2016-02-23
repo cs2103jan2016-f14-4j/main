@@ -53,11 +53,8 @@ public class UiController {
     private Stage stage;
     private int currentTab;
     private UiClockService clockService;
-    private UiContentManager myFormatter;
-    
-    public UiContentManager getFormatter() {
-    	return myFormatter;
-    }
+    private UiContentManager myManager;
+
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		stage = primaryStage; // set up reference
 		clockService = new UiClockService(timeLabel, dateLabel);
@@ -68,12 +65,12 @@ public class UiController {
 	}
 
 	public void setUpContentBoxes() {
-		myFormatter = new UiContentManager(clockService);
-		myFormatter.addScrollPane(weekPane,ContentBox.WEEKlY); // add weekly list as first
+		myManager = new UiContentManager(clockService);
+		myManager.addScrollPane(weekPane,ContentBox.WEEKlY); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myFormatter.addScrollPane(content,ContentBox.fromInteger(i+1));
+			myManager.addScrollPane(content,ContentBox.fromInteger(i+1));
 		}
 	}
 	
@@ -94,11 +91,11 @@ public class UiController {
 	}
 
 	public void process( ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
-		myFormatter.updateContentBox(myTaskList, contentID);
+		myManager.updateContentBox(myTaskList, contentID);
 	}
 	public void cleanUp() {
 		clockService.restart();
-		myFormatter.cleanUp();
+		myManager.cleanUp();
 	}
 	
 	/************************************ EVENT HANDLERS *******************************************/

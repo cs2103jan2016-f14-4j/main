@@ -32,11 +32,13 @@
 
 .gridCyan {
 	-fx-background-color: #00ccff;
+	-fx-background-radius: 5, 5;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
 }
 
 .gridGreen {
 	-fx-background-color: #bbff00;
+	-fx-background-radius: 5, 5;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
 }
 

@@ -56,7 +56,7 @@ public class UiContentManager {
 		GridPane gridPane = new GridPane();
 		pane.setContent(gridPane);
 		//gridPane.setGridLinesVisible(true);
-		 //gridPane.setPadding(new Insets(20));
+		gridPane.setPadding(settings.getPaddings());
         gridPane.setHgap(settings.getHGap());
         gridPane.setVgap(settings.getVGap());
         ArrayList<Integer> colPercents = settings.getColPercents();

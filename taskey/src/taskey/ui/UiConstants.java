@@ -41,8 +41,8 @@ public class UiConstants {
 	    }
 	}
 	
-	public static final UiGridSettings normSettings = new UiGridSettings(10,10,10,90);
-	public static final UiGridSettings weeklySettings = new UiGridSettings(10,5,100);
+	public static final UiGridSettings normSettings = new UiGridSettings(7,7,7,10,90);
+	public static final UiGridSettings weeklySettings = new UiGridSettings(10,5,0,100);
 	
 	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
 			Arrays.asList("style.css","tabStyle.css","textStyles.css"));

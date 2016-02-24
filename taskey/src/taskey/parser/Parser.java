@@ -40,11 +40,40 @@ public class Parser {
 	 * @return message to be displayed
 	 */
 	public ProcessedObject parseInput(String stringInput) {
+		//String task; 
 		String command = getCommand(stringInput); 
-		String task = getTaskName(command, stringInput);
-		ArrayList<String> dateRange = getDate(stringInput); 
 		
-		
+		//don't need to check date, just get "task"
+		//view, delete by index, delete by name, 
+		switch(command) {
+			case "view":
+				processView(); 
+				break; 
+			case "delete":
+				// task = getTaskName(command, stringInput);
+				processDelete(); 
+				break;
+				
+				
+			//need to check date: 
+			//add floating, add deadline, add event,
+			//update by index, update by name 
+			case "add":
+				processAdd(); 
+				break;
+				
+			case "set":
+				processSet(); 
+				break;
+				
+			default:
+				//error goes here 
+				break; 
+		}
+
+ 
+		//ArrayList<String> dateRange = getDate(stringInput); 
+		//task = getTaskName(command, stringInput); 
 		
 		return new ProcessedObject();   
 	}
@@ -56,6 +85,21 @@ public class Parser {
 		return splitString[0].toLowerCase(); 
 	}
 	
+	public void processView() {
+		
+	}
+	
+	public void processDelete() {
+		
+	}
+	
+	public void processAdd() {
+		
+	}
+	
+	public void processSet() {
+		
+	}
 	
 	/**
 	 * FOR FLOATING TASK: 
@@ -94,7 +138,7 @@ public class Parser {
 	
 	//TODO: Dummy for now  
 	public ArrayList<String> getDate(String stringInput) {
-			
+		String[] splitArray = stringInput.split("on");
 		return new ArrayList<String>(); 
 	}
 	

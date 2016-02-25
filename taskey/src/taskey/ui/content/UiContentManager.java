@@ -28,12 +28,13 @@ import taskey.ui.utility.UiGridSettings;
 
 /**
  * This class acts as the interface for all content display related operations
+ * It does the main job of setting up the grids and attaching UiFormatters to them
  * @author JunWei
  *
  */
 public class UiContentManager {
 	private UiClockService clockService; // reference to ui clock
-	private ArrayList<ScrollPane> contentBoxes; // list of references to the ScrollPane objects
+	private ArrayList<ScrollPane> contentBoxes; // list of references to the ScrollPane objects, in case needed
 	private ArrayList<UiFormatter> myFormatters; // for the grid panes
 	
 	public UiContentManager( UiClockService _clockService ) {
@@ -42,13 +43,13 @@ public class UiContentManager {
 		myFormatters = new ArrayList<UiFormatter>();
 	}
 	 
-	public void addScrollPane(ScrollPane pane, ContentBox contentID) {
+	public void setUpContentBox(ScrollPane pane, ContentBox contentID) {
 		contentBoxes.add(pane);
 		pane.setFitToWidth(true);
-		if ( contentID == ContentBox.WEEKlY) {
-			myFormatters.add(new UiWeeklyFormatter(setUpGrid(pane, UiConstants.weeklySettings)));
+		if ( contentID == ContentBox.WEEKLY) {
+			myFormatters.add(new UiWeeklyFormatter(setUpGrid(pane, UiConstants.weeklySettings),clockService));
 		} else {
-			myFormatters.add(new UiNormalFormatter(setUpGrid(pane, UiConstants.normSettings)));
+			myFormatters.add(new UiNormalFormatter(setUpGrid(pane, UiConstants.normSettings),clockService));
 		}
 	}
 	
@@ -71,26 +72,10 @@ public class UiContentManager {
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
 		UiFormatter myFormatter = myFormatters.get(contentID.getValue());
 		myFormatter.clearGrid();
-		for (int i = 0; i < myTaskList.size(); i++) {
-			Task theTask = myTaskList.get(i);
-			myFormatter.format(i,theTask);
-		}
+		myFormatter.format(myTaskList);
+		
 		if (contentID == ContentBox.PENDING) { // update weekly list also when pending list is updated
-			updateWeeklyList(myTaskList);
-		}
-	}
-
-	public void updateWeeklyList(ArrayList<Task> myTaskList) {
-		int contentID = ContentBox.WEEKlY.getValue();
-		UiFormatter myFormatter = myFormatters.get(contentID);
-		myFormatter.clearGrid();
-		int currentNo = 0;
-		for (int i = 0; i < myTaskList.size(); i++) {
-			Task theTask = myTaskList.get(i);
-			if (theTask.getDeadline() == "" || Integer.parseInt(theTask.getDeadline().split(" ")[0]) >= clockService.getDayOfMonth()) {
-				myFormatter.format(currentNo,theTask);
-				currentNo++;
-			}
+			updateContentBox(myTaskList,ContentBox.WEEKLY);
 		}
 	}
 	

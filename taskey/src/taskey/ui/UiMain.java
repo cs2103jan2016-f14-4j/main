@@ -75,7 +75,7 @@ public class UiMain extends Application {
     }
     
     public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
-    	// call logic to get updated list of tasks
+    	// logic calls this method to update the lists
     	
     	// Temporary;
     	Task temp = new Task("No deadline");
@@ -90,8 +90,14 @@ public class UiMain extends Application {
     	temp.setDeadline("29 Feb 2016 09:00:00");
     	myTaskList.add(temp);
     	
+    	temp = new Task("Task C");
+    	temp.setDeadline("27 Feb 2016 04:00:00");
+    	myTaskList.add(temp);
+    	temp = new Task("Task B");
+    	temp.setDeadline("29 Feb 2016 09:00:00");
+    	myTaskList.add(temp);
+ 
     	myController.process(myTaskList,contentID);
-    	
     }
     
 

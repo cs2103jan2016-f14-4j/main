@@ -20,7 +20,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -29,7 +29,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -38,7 +38,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -47,14 +47,14 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" styleClass="scrollpane" stylesheets="@style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ScrollPane hbarPolicy="NEVER" prefHeight="333.0" prefWidth="366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </content>
             </Tab>
         </tabs>
       </TabPane>
-      <Label layoutX="60.0" layoutY="110.0" text="This week" />
+      <Label fx:id="weekLabel" layoutX="50.0" layoutY="116.0" text="This Week" />
       <TextField fx:id="input" layoutX="35.0" layoutY="413.0" prefHeight="25.0" prefWidth="495.0" />
       <StackPane layoutX="5.0" layoutY="27.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="53.0" prefWidth="162.0">
          <children>
@@ -65,7 +65,7 @@
             </Label>
          </children>
       </StackPane>
-      <StackPane layoutX="14.0" layoutY="74.0" prefHeight="25.0" prefWidth="144.0">
+      <StackPane layoutX="15.0" layoutY="80.0" prefHeight="25.0" prefWidth="144.0">
          <children>
             <Label fx:id="dateLabel" text="October 13th 2016" textAlignment="CENTER">
                <font>
@@ -74,7 +74,7 @@
             </Label>
          </children>
       </StackPane>
-      <ScrollPane fx:id="weekPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="36.0" layoutY="137.0" prefHeight="260.0" prefWidth="100.0" styleClass="scrollpane" stylesheets="@style.css" vbarPolicy="NEVER" />
+      <ScrollPane fx:id="weekPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="36.0" layoutY="137.0" prefHeight="260.0" prefWidth="100.0" vbarPolicy="NEVER" />
       <ToolBar layoutX="1.0" layoutY="-4.0" prefHeight="36.0" prefWidth="564.0" visible="false">
          <items>
             <Label text="Taskey" />

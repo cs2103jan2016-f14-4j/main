@@ -3,10 +3,16 @@
         linear-gradient(#00ccff, #002222);
 }
 
-.scrollpane {
-    -fx-background-color: #00ccff;
+/* Note: Affects all scroll panes */
+.scroll-pane {
+    -fx-background-color: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-padding: 3px;
+    -fx-padding: 2px;
+    -fx-background-radius: 5px, 5px;
+}
+
+.scroll-pane > .viewport { /* Needed to color scroll pane's view port */
+   -fx-background-color: white;
 }
 
 .popup {
@@ -14,35 +20,53 @@
 	-fx-background-color:
         linear-gradient(#f0ff35, #a9ff00),
         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
-    -fx-background-radius: 6, 5;
-    -fx-background-insets: 0, 1;
+    -fx-background-radius: 5px;
+    -fx-background-insets: 0px, 1px;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
     -fx-text-fill: #395306;
 }
 
-.plain {
-	-fx-background-color: white;
-	-fx-padding: 2px;
+.whiteBox {
+	-fx-background-color: 
+	 	linear-gradient(#f0ff35, #a9ff00),
+        radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
+    -fx-background-radius: 30px;
+    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
 
-.gridRed {
-	-fx-background-color: #ff0000;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+.numberIcon {
+	-fx-background-color: 
+        linear-gradient(#ffd65b, #f0ff35),
+        linear-gradient(#ffef84, #f0ff35),
+        linear-gradient(#ffea6a, #f0ff35),
+        linear-gradient(#ffe657 0%, #f8c202 50%, #f0ff35 100%),
+        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); /*alpha */
+    -fx-background-radius: 30px;
+    -fx-background-insets: 0px,1px,2px,3px,0px;
+    -fx-padding: 2px;
+    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
 
-.gridCyan {
-	-fx-background-color: #00ccff;
-	-fx-background-radius: 5, 5;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+#timeLabel {
+		-fx-background-color: 
+        linear-gradient(#ffe657 0%, #f8c202 50%, #f0ff35 100%),
+        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0));
+         -fx-background-radius: 15px;
 }
 
-.gridGreen {
-	-fx-background-color: #bbff00;
-	-fx-background-radius: 5, 5;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+#dateLabel {
+		-fx-background-color: 
+		 linear-gradient(#f0ff35, #a9ff00),
+         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-insets: 0px,2px;
+    -fx-padding: 2px;
+    -fx-font-weight: bold;
 }
 
-.gridYellow {
-	-fx-background-color: #ffff99;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+#weekLabel {
+	-fx-alignment: CENTER;
+    -fx-text-fill: #000000;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+	
 }

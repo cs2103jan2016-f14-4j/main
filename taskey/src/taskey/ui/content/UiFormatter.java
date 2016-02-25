@@ -14,6 +14,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.utility.UiClockService;
 
 /**
  * This class contains methods to add content to grids,
@@ -23,13 +24,15 @@ import taskey.ui.UiConstants.ContentBox;
  */
 public abstract class UiFormatter {
 	
-	public GridPane gridPane;
+	protected UiClockService clockService;
+	protected GridPane gridPane;
 	
-	public UiFormatter(GridPane _gridPane) {
+	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
 		gridPane = _gridPane;
+		clockService = _clockService;
 	}
 	
-	public void format(int taskNo, Task theTask) {
+	public void format(ArrayList<Task> myTaskList) {
 	}	
 
 	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style, TextAlignment align) {

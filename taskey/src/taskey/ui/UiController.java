@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.UiContentManager;
+import taskey.ui.utility.UiAutoCompleter;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiPopupFactory;
 
@@ -54,7 +55,8 @@ public class UiController {
     private int currentTab;
     private UiClockService clockService;
     private UiContentManager myManager;
-
+    private UiAutoCompleter myCompleter;
+    
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		stage = primaryStage; // set up reference
 		clockService = new UiClockService(timeLabel, dateLabel);
@@ -66,11 +68,11 @@ public class UiController {
 
 	public void setUpContentBoxes() {
 		myManager = new UiContentManager(clockService);
-		myManager.addScrollPane(weekPane,ContentBox.WEEKlY); // add weekly list as first
+		myManager.setUpContentBox(weekPane,ContentBox.WEEKLY); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myManager.addScrollPane(content,ContentBox.fromInteger(i+1));
+			myManager.setUpContentBox(content,ContentBox.fromInteger(i+1));
 		}
 	}
 	

@@ -16,7 +16,7 @@ import taskey.ui.utility.UiGridSettings;
 public class UiConstants {
 
 	public enum ContentBox{
-		WEEKlY(0), PENDING(1), EXPIRED(2), COMPLETED(3), ACTION(4);
+		WEEKLY(0), PENDING(1), EXPIRED(2), COMPLETED(3), ACTION(4);
 		private final int value;
 	    private ContentBox(int value) {
 	        this.value = value;
@@ -27,7 +27,7 @@ public class UiConstants {
 	    public static ContentBox fromInteger(int x) {
 	        switch(x) {
 	        case 0:
-	            return WEEKlY;
+	            return WEEKLY;
 	        case 1:
 	            return PENDING;
 	        case 2:
@@ -41,8 +41,8 @@ public class UiConstants {
 	    }
 	}
 	
-	public static final UiGridSettings normSettings = new UiGridSettings(7,7,7,10,90);
-	public static final UiGridSettings weeklySettings = new UiGridSettings(10,5,0,100);
+	public static final UiGridSettings normSettings = new UiGridSettings(7,15,7,7,93);
+	public static final UiGridSettings weeklySettings = new UiGridSettings(0,5,0,100);
 	
 	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
 			Arrays.asList("style.css","tabStyle.css","textStyles.css"));

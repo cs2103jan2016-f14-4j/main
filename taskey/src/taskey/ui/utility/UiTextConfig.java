@@ -15,7 +15,7 @@ public class UiTextConfig {
 	ArrayList<Pair<Integer,String>> styleMarkers = new ArrayList<Pair<Integer,String>>(); // where to start certain styles
 
 	public UiTextConfig() {
-		addMarker(0,"black"); // default marker, will get overridden if there exists another marker at 0
+		addMarker(0,"textBlack"); // default marker, will get overridden if there exists another marker at 0
 	}
 	public ArrayList<Text> format(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();

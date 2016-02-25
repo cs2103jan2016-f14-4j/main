@@ -3,6 +3,7 @@ package taskey.ui;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
@@ -64,6 +65,7 @@ public class UiController {
 		setUpContentBoxes();
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
+		myCompleter = new UiAutoCompleter();
 	}
 
 	public void setUpContentBoxes() {
@@ -116,6 +118,7 @@ public class UiController {
 					
 					event.consume();
 				}
+				//myCompleter.processInput(line);
 			}
 		});
 	}
@@ -150,5 +153,30 @@ public class UiController {
 					}
 				}
 		});
+		
+		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+					if (event.getCode() == KeyCode.BACK_QUOTE) {
+						setStyleSheets(UiConstants.UI_LIGHT_STYLE);
+					}
+					event.consume();
+				}
+		});
+	}
+
+	/**
+	 * Sets scene style sheets, input is assumed to be checked before calling this method
+	 * @param type : String
+	 */
+	public void setStyleSheets(ArrayList<String> styleSheets) {
+		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
+		myStyleSheets.clear();
+		try {
+			for ( int i = 0; i < styleSheets.size(); i ++ ) { // load all style sheets into list first
+	    		myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET+styleSheets.get(i)).toExternalForm());
+	    	}
+		} catch (Exception excep) { 
+			System.out.println(excep + " loading style sheets");
+		}
 	}
 }

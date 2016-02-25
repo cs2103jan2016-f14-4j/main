@@ -40,12 +40,14 @@ public class UiConstants {
 	        return null;
 	    }
 	}
+	public static final String UI_CSS_PATH_OFFSET = "css/";
+	public static final UiGridSettings GRID_SETTINGS_NORMAL = new UiGridSettings(7,15,7,7,93);
+	public static final UiGridSettings GRID_SETTINGS_WEEKLY = new UiGridSettings(0,5,0,100);
 	
-	public static final UiGridSettings normSettings = new UiGridSettings(7,15,7,7,93);
-	public static final UiGridSettings weeklySettings = new UiGridSettings(0,5,0,100);
-	
-	public static final ArrayList<String> UI_STYLE_SHEETS = new ArrayList<String>(
-			Arrays.asList("style.css","tabStyle.css","textStyles.css"));
+	public static final ArrayList<String> UI_DEFAULT_STYLE = new ArrayList<String>(
+			Arrays.asList("defaultStyle.css","defaultTab.css","defaultText.css"));
+	public static final ArrayList<String> UI_LIGHT_STYLE = new ArrayList<String>(
+			Arrays.asList("lightStyle.css"));
 	
 	public static final int WORD_LIMIT_WEEKLIST = 10;
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");

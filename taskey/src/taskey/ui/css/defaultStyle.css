@@ -1,4 +1,4 @@
-.main {
+#main {
 	-fx-background-color:
         linear-gradient(#00ccff, #002222);
 }
@@ -70,3 +70,7 @@
     -fx-font-weight: bold;
 	
 }
+
+
+
+

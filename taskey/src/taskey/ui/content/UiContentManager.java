@@ -46,10 +46,13 @@ public class UiContentManager {
 	public void setUpContentBox(ScrollPane pane, ContentBox contentID) {
 		contentBoxes.add(pane);
 		pane.setFitToWidth(true);
+		GridPane theGrid = null;
 		if ( contentID == ContentBox.WEEKLY) {
-			myFormatters.add(new UiWeeklyFormatter(setUpGrid(pane, UiConstants.weeklySettings),clockService));
+			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_WEEKLY);
+			myFormatters.add(new UiWeeklyFormatter(theGrid,clockService));
 		} else {
-			myFormatters.add(new UiNormalFormatter(setUpGrid(pane, UiConstants.normSettings),clockService));
+			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_NORMAL);
+			myFormatters.add(new UiNormalFormatter(theGrid,clockService));
 		}
 	}
 	

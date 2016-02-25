@@ -65,13 +65,12 @@ public class UiMain extends Application {
     	primaryStage.setTitle(Constants.PROGRAM_NAME);
     	primaryStage.initStyle(StageStyle.DECORATED);
     	Scene newScene = new Scene(root);
-    	for ( int i = 0; i < UiConstants.UI_STYLE_SHEETS.size(); i ++ ) {
-    		newScene.getStylesheets().add(getClass().getResource(UiConstants.UI_STYLE_SHEETS.get(i)).toExternalForm());
-    	}
+    	
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
-		primaryStage.show();
 		myController.setUpNodes(primaryStage, root);  // must be done after loading .fxml file
+		setStyleSheets(UiConstants.UI_DEFAULT_STYLE);
+		primaryStage.show();
     }
     
     public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
@@ -100,7 +99,9 @@ public class UiMain extends Application {
     	myController.process(myTaskList,contentID);
     }
     
-
+    public void setStyleSheets(ArrayList<String> styleSheets) {
+    	myController.setStyleSheets(styleSheets);
+    }
     @Override
     public void stop() {
     	myController.cleanUp();

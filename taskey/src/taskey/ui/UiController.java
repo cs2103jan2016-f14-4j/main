@@ -1,17 +1,13 @@
 package taskey.ui;
 
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SingleSelectionModel;
@@ -21,15 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.UiContentManager;
@@ -65,7 +54,7 @@ public class UiController {
 		setUpContentBoxes();
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
-		myCompleter = new UiAutoCompleter();
+		myCompleter = new UiAutoCompleter(root,input);
 	}
 
 	public void setUpContentBoxes() {
@@ -100,25 +89,41 @@ public class UiController {
 	public void cleanUp() {
 		clockService.restart();
 		myManager.cleanUp();
+		UiPopupFactory.getInstance().cleanUp();
 	}
-	
+
+	/**
+	 * Sets scene style sheets, input is assumed to be checked before calling this method
+	 * @param type : String
+	 */
+	public void setStyleSheets(ArrayList<String> styleSheets) {
+		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
+		myStyleSheets.clear();
+		try {
+			for ( int i = 0; i < styleSheets.size(); i ++ ) { // load all style sheets into list first
+	    		myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET+styleSheets.get(i)).toExternalForm());
+	    	}
+		} catch (Exception excep) { 
+			System.out.println(excep + " loading style sheets");
+		}
+	}
 	/************************************ EVENT HANDLERS *******************************************/
 	public void registerInputEventHandler() {
+		
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
+				myCompleter.updateMenu();
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
 					
 					// Logic.getInstance().getCommand(line);
+					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added " + line, input, 0, input.getHeight());
+					UiPopupFactory.getInstance().startFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME,true);
 					
-					AnchorPane rootPane = (AnchorPane) input.getParent();
-					Node newPopup = UiPopupFactory.getInstance().createPopup("Added " + line, rootPane, input.getLayoutX() , input.getLayoutY() + input.getPrefHeight() * 1.25f);
-					UiPopupFactory.getInstance().startFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME);
-					
+					myCompleter.hideMenu();
 					event.consume();
 				}
-				//myCompleter.processInput(line);
 			}
 		});
 	}
@@ -162,21 +167,5 @@ public class UiController {
 					event.consume();
 				}
 		});
-	}
-
-	/**
-	 * Sets scene style sheets, input is assumed to be checked before calling this method
-	 * @param type : String
-	 */
-	public void setStyleSheets(ArrayList<String> styleSheets) {
-		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
-		myStyleSheets.clear();
-		try {
-			for ( int i = 0; i < styleSheets.size(); i ++ ) { // load all style sheets into list first
-	    		myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET+styleSheets.get(i)).toExternalForm());
-	    	}
-		} catch (Exception excep) { 
-			System.out.println(excep + " loading style sheets");
-		}
 	}
 }

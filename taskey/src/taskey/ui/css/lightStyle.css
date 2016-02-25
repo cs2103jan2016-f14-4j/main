@@ -15,7 +15,7 @@
    -fx-background-color: white;
 }
 
-.popup {
+.prompt {
 	-fx-padding: 2px;
 	-fx-background-color:
         linear-gradient(#ffff99, #b3ffb3),

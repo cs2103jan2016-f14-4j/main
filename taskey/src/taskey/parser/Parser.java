@@ -196,10 +196,9 @@ public class Parser {
 		return processed; 
 	}
 	
-	public void processAdd(String command, String stringInput) {
+	public ProcessedObject processAdd(String command, String stringInput) {
 		long epochTime; 
-		TimeConverter timeConverter = new TimeConverter(); 
-		ProcessedObject processed;
+		ProcessedObject processed = null;
 		Task task = new Task(); 
 		String taskName = null; 
 		//simpString: basically string without the command
@@ -207,51 +206,11 @@ public class Parser {
 		
 		if (simpString.split("on").length != 1) {
 			//deadline
-			String[] inputList = simpString.split("on"); 
-			taskName = inputList[0].trim(); 
-			String rawDate = inputList[1].trim();
-			
-			if (!specialDays.containsKey(rawDate)) {
-				if (rawDate.length() == 11) {
-					//ie. format is DD MMM YYYY
-					epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
-					task.setDeadline(epochTime);
-				} else {
-					processed = processError(ERROR_DATE_FORMAT); 
-				}
-			} else {
-				//process the special day
-				epochTime = specialDays.get(rawDate);
-				task.setDeadline(epochTime);
-			}
-			
-			task.setTaskName(taskName);
-			task.setTaskType("DEADLINE");
-			processed = new ProcessedObject("ADD_DEADLINE",task);
+			processed = handleDeadlineOn(task, simpString);
 			
 		} else if (simpString.split("by").length != 1) {
 			//deadline 
-			String[] inputList = simpString.split("by");
-			taskName = inputList[0].trim(); 
-			String rawDate = inputList[1].trim(); 
-			
-			if (!specialDays.containsKey(rawDate)) {
-				if (rawDate.length() == 11) {
-					//ie. format is DD MMM YYYY
-					epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
-					task.setDeadline(epochTime);
-				} else {
-					processed = processError(ERROR_DATE_FORMAT); 
-				}
-			} else {
-				//process the special day
-				epochTime = specialDays.get(rawDate);
-				task.setDeadline(epochTime);
-			}
-			
-			task.setTaskName(taskName);
-			task.setTaskType("DEADLINE");
-			processed = new ProcessedObject("ADD_DEADLINE",task);
+			processed = handleDeadlineBy(task, simpString);
 			
 		} else if (simpString.split("from").length != 1) {
 			//event
@@ -263,13 +222,76 @@ public class Parser {
 			
 		} else {
 			//floating task 
-			taskName = simpString;
-			Task newTask = new Task(taskName); 
-			newTask.setTaskType("FLOATING");
-			processed = new ProcessedObject(command,newTask);
+			processed = handleFloating(command, simpString);
 		}
 		
-		//return processed; 
+		return processed; 
+	}
+
+	private ProcessedObject handleDeadlineBy(Task task, String simpString) {
+		long epochTime;
+		ProcessedObject processed;
+		String taskName;
+		String[] inputList = simpString.split("by");
+		taskName = inputList[0].trim(); 
+		String rawDate = inputList[1].trim(); 
+		
+		if (!specialDays.containsKey(rawDate)) {
+			if (rawDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+				task.setDeadline(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawDate);
+			task.setDeadline(epochTime);
+		}
+		
+		task.setTaskName(taskName);
+		task.setTaskType("DEADLINE");
+		processed = new ProcessedObject("ADD_DEADLINE",task);
+		return processed;
+	}
+
+	private ProcessedObject handleDeadlineOn(Task task, String simpString) {
+		long epochTime;
+		ProcessedObject processed;
+		String taskName;
+		String[] inputList = simpString.split("on"); 
+		taskName = inputList[0].trim(); 
+		String rawDate = inputList[1].trim();
+		
+		if (!specialDays.containsKey(rawDate)) {
+			if (rawDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+				task.setDeadline(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawDate);
+			task.setDeadline(epochTime);
+		}
+		
+		task.setTaskName(taskName);
+		task.setTaskType("DEADLINE");
+		processed = new ProcessedObject("ADD_DEADLINE",task);
+		return processed;
+	}
+
+	private ProcessedObject handleFloating(String command, String simpString) {
+		ProcessedObject processed;
+		String taskName;
+		taskName = simpString;
+		Task newTask = new Task(taskName); 
+		newTask.setTaskType("FLOATING");
+		processed = new ProcessedObject(command,newTask);
+		return processed;
 	}
 	
 	public void processSet(String command, String stringInput) {

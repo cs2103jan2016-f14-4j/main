@@ -78,9 +78,8 @@ public class ProcessedObject {
 	 * @param task
 	 * @param index
 	 */
-	public ProcessedObject(String command, Task task, int index) {
+	public ProcessedObject(String command, int index) {
 		this.command = command;
-		this.task = task; 
 		this.index = index; 
 	}
 	

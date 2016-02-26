@@ -35,7 +35,6 @@ public class Task implements Comparable<Task>, Serializable {
 	private String taskType; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
-	//private boolean isRecurring = false; 
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -153,7 +152,7 @@ public class Task implements Comparable<Task>, Serializable {
 	 * auto-key in the epoch time as well. 
 	 * @param deadline
 	 */
-	public void setDeadline(String  deadline) {
+	public void setDeadline(String deadline) {
 		datesHuman[3] = deadline; 
 		datesEpoch[3] = timeConverter.toEpochTime(deadline); 	
 	}

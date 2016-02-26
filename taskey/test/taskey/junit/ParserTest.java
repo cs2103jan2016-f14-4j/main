@@ -25,9 +25,11 @@ public class ParserTest {
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm by 17 feb 2016").toString());
+		
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 		//add complete essay by today 
 		//other special days: tomorrow, next week, next ___eg. friday
-		//add project meeting at 3pm on 17 Feb <- be able to handle without year!!
 		
 	}
 	

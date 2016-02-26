@@ -40,7 +40,7 @@ public class ParserTest {
 	}
 	
 	public void testDelete() {
-		//del tast name/id
+		//del test name/id
 	}
 	
 	public void testSearch() {

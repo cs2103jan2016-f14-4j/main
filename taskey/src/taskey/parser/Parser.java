@@ -13,11 +13,17 @@ public class Parser {
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
 	public static final String DONE_BY_INDEX = "DONE_BY_INDEX"; 
 	public static final String DONE_BY_NAME = "DONE_BY_NAME"; 
+	public static final String DAY_END = "23:59:59"; 
+	public static final String ERROR_DATE_FORMAT = "Wrong date format"; 
+	public static final String ERROR_VIEW_TYPE = "No such category"; 
+	public static final String ERROR_COMMAND = "No such command"; 
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 
 	private HashMap<String,String> viewList = new HashMap<String,String>();
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	private HashMap<String,String> specialDays = new HashMap<String,String>();
+	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
+	
+	private TimeConverter timeConverter = new TimeConverter(); 
 	 
 	
 	public Parser() {
@@ -40,15 +46,16 @@ public class Parser {
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
 		
-		specialDays.put("tomorrow", "tomorrow"); 
-		specialDays.put("today", "today"); 
-		specialDays.put("next sun", "next sun"); 
-		specialDays.put("next mon", "next mon"); 
-		specialDays.put("next tues", "next tues"); 
-		specialDays.put("next wed", "next wed"); 
-		specialDays.put("next thurs", "next thurs"); 
-		specialDays.put("next fri", "next fri"); 
-		specialDays.put("next sat", "next sat"); 
+		specialDays.put("tomorrow", 
+				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
+		specialDays.put("today", timeConverter.getCurrTime()); 
+		specialDays.put("next sun", new Long(1)); 
+		specialDays.put("next mon", new Long(1)); 
+		specialDays.put("next tues", new Long(1)); 
+		specialDays.put("next wed", new Long(1)); 
+		specialDays.put("next thurs", new Long(1)); 
+		specialDays.put("next fri", new Long(1)); 
+		specialDays.put("next sat", new Long(1)); 
 	}
 	
 	/**
@@ -93,7 +100,7 @@ public class Parser {
 				
 			default:
 				//error goes here
-				processed = processError(); 
+				processed = processError(ERROR_COMMAND); 
 				break; 
 		}
 
@@ -136,7 +143,7 @@ public class Parser {
 		if (viewType.compareTo("error") != 0) {
 			return new ProcessedObject(command,viewType.toUpperCase());
 		}
-		return processError(); 
+		return processError(ERROR_VIEW_TYPE); 
 	}
 	
 	/**
@@ -190,17 +197,73 @@ public class Parser {
 	}
 	
 	public void processAdd(String command, String stringInput) {
+		long epochTime; 
+		TimeConverter timeConverter = new TimeConverter(); 
 		ProcessedObject processed;
+		Task task = new Task(); 
 		String taskName = null; 
+		//simpString: basically string without the command
+		String simpString = getTaskName(command, stringInput); 
 		
-		if (stringInput.split("on").length != 1) {
-			//ie. has date
+		if (simpString.split("on").length != 1) {
+			//deadline
+			String[] inputList = simpString.split("on"); 
+			taskName = inputList[0].trim(); 
+			String rawDate = inputList[1].trim();
 			
-		} else if (stringInput.split("by").length != 1) {
-			//ie. has date 
+			if (!specialDays.containsKey(rawDate)) {
+				if (rawDate.length() == 11) {
+					//ie. format is DD MMM YYYY
+					epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+					task.setDeadline(epochTime);
+				} else {
+					processed = processError(ERROR_DATE_FORMAT); 
+				}
+			} else {
+				//process the special day
+				epochTime = specialDays.get(rawDate);
+				task.setDeadline(epochTime);
+			}
+			
+			task.setTaskName(taskName);
+			task.setTaskType("DEADLINE");
+			processed = new ProcessedObject("ADD_DEADLINE",task);
+			
+		} else if (simpString.split("by").length != 1) {
+			//deadline 
+			String[] inputList = simpString.split("by");
+			taskName = inputList[0].trim(); 
+			String rawDate = inputList[1].trim(); 
+			
+			if (!specialDays.containsKey(rawDate)) {
+				if (rawDate.length() == 11) {
+					//ie. format is DD MMM YYYY
+					epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+					task.setDeadline(epochTime);
+				} else {
+					processed = processError(ERROR_DATE_FORMAT); 
+				}
+			} else {
+				//process the special day
+				epochTime = specialDays.get(rawDate);
+				task.setDeadline(epochTime);
+			}
+			
+			task.setTaskName(taskName);
+			task.setTaskType("DEADLINE");
+			processed = new ProcessedObject("ADD_DEADLINE",task);
+			
+		} else if (simpString.split("from").length != 1) {
+			//event
+			String[] inputList = simpString.split("from");
+			String[] dateList = inputList[1].split("to"); 
+			taskName = inputList[0]; 
+			String rawStartDate = dateList[0].trim();
+			String rawEndDate = dateList[1].trim(); 
+			
 		} else {
 			//floating task 
-			taskName = getTaskName(command, stringInput);
+			taskName = simpString;
 			Task newTask = new Task(taskName); 
 			newTask.setTaskType("FLOATING");
 			processed = new ProcessedObject(command,newTask);
@@ -213,8 +276,11 @@ public class Parser {
 		
 	}
 	
-	public ProcessedObject processError() {
-		return new ProcessedObject("ERROR");
+	public ProcessedObject processError(String errorType) {
+		ProcessedObject processed = new ProcessedObject("ERROR");
+		processed.setErrorType(errorType); 
+		
+		return processed;
 	}
 	
 	/**

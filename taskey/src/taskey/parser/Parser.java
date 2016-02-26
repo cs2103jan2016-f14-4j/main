@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.logic.ProcessedObject;
+import taskey.logic.Task;
+
+
 
 public class Parser {
+	public static final String DELETE_BY_INDEX = "DELETE_BY_INDEX"; 
+	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 
+	private HashMap<String,String> viewList = new HashMap<String,String>();
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,String> specialDays = new HashMap<String,String>();
 	 
@@ -20,6 +26,11 @@ public class Parser {
 		commandList.put("search", "search"); 
 		commandList.put("done", "done"); 
 		commandList.put("undo", "undo"); 
+		
+		viewList.put("all", "all"); 
+		viewList.put("general", "general");
+		viewList.put("deadlines", "deadlines");
+		viewList.put("events", "events"); 
 		
 		keywordsList.put("every", "every");
 		keywordsList.put("by", "by");
@@ -40,34 +51,33 @@ public class Parser {
 	 * @return message to be displayed
 	 */
 	public ProcessedObject parseInput(String stringInput) {
-		//String task; 
+		ProcessedObject processed = null;  
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"
 		//view, delete by index, delete by name, 
 		switch(command) {
 			case "view":
-				processView(); 
+				processed = processView(command, stringInput); 
 				break; 
 			case "delete":
-				// task = getTaskName(command, stringInput);
-				processDelete(); 
+				processed = processDelete(command, stringInput); 
 				break;
-				
 				
 			//need to check date: 
 			//add floating, add deadline, add event,
 			//update by index, update by name 
 			case "add":
-				processAdd(); 
+				processAdd(command, stringInput); 
 				break;
 				
 			case "set":
-				processSet(); 
+				processSet(command, stringInput); 
 				break;
 				
 			default:
-				//error goes here 
+				//error goes here
+				processed = processError(); 
 				break; 
 		}
 
@@ -75,30 +85,94 @@ public class Parser {
 		//ArrayList<String> dateRange = getDate(stringInput); 
 		//task = getTaskName(command, stringInput); 
 		
-		return new ProcessedObject();   
+		return processed;   
 	}
 	
 	
+	/**
+	 * Returns command (first word) from a string that the user entered 
+	 * @param stringInput
+	 * @return command
+	 */
 	public String getCommand(String stringInput) {
 		String[] splitString = stringInput.split(" ");
-
-		return splitString[0].toLowerCase(); 
+		String command = splitString[0].toLowerCase();
+		
+		if (commandList.containsKey(command)) {
+			return command;
+		} 
+		return "error"; 
 	}
 	
-	public void processView() {
+	/**
+	 * If the command is view, process what kind of view it is:
+	 * 1. ALL
+	 * 2. GENERAL
+	 * 3. DEADLINES
+	 * 4. EVENTS 
+	 * @param command
+	 * @param stringInput
+	 * @return processedStuff
+	 */
+	public ProcessedObject processView(String command, String stringInput) {
+		String viewType = getViewType(command, stringInput);
+		
+		if (viewType.compareTo("error") != 0) {
+			return new ProcessedObject(command,viewType.toUpperCase());
+		}
+		return processError(); 
+	}
+	
+	/**
+	 * If command is delete, check if the deletion is by 
+	 * 1. NAME, or
+	 * 2. INDEX 
+	 * and return the appropriate ProcessedObject
+	 * @param command
+	 * @param stringInput
+	 * @return appropriate ProcessedObject 
+	 */
+	public ProcessedObject processDelete(String command, String stringInput) {
+		ProcessedObject processed; 
+		String taskName = getTaskName(command, stringInput);
+		
+		try {
+			int index = Integer.parseInt(taskName);
+			processed = new ProcessedObject(DELETE_BY_INDEX, index); 
+			
+		} catch (Exception e) {
+			//if the delete is not by index, then it's by task name. 
+			processed = new ProcessedObject(DELETE_BY_NAME, new Task(taskName));
+		}
+		
+		return processed; 
+	}
+	
+	public void processAdd(String command, String stringInput) {
 		
 	}
 	
-	public void processDelete() {
+	public void processSet(String command, String stringInput) {
 		
 	}
 	
-	public void processAdd() {
-		
+	public ProcessedObject processError() {
+		return new ProcessedObject("ERROR");
 	}
 	
-	public void processSet() {
+	/**
+	 * Get viewType all, general, events or deadlines, or returns error 
+	 * @param command
+	 * @param stringInput
+	 * @return string view type 
+	 */
+	public String getViewType(String command, String stringInput) {
+		String viewType = stringInput.replaceFirst(command, "").toLowerCase();
 		
+		if (viewList.containsKey(viewType)) {
+			return viewType; 
+		}
+		return "error"; 
 	}
 	
 	/**

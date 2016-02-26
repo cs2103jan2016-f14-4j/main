@@ -72,7 +72,7 @@ public class Task implements Comparable<Task>, Serializable {
 		return taskTags; 
 	}
 	
-	public void setTaskTags(ArrayList taskTags) {
+	public void setTaskTags(ArrayList<String> taskTags) {
 		this.taskTags = taskTags; 
 	}
 	

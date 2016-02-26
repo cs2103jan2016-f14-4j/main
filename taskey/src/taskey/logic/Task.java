@@ -245,6 +245,18 @@ public class Task implements Comparable<Task>, Serializable {
 		stringRep += taskName;
 		stringRep += ", ";
 		stringRep += taskType; 
+		stringRep += ", ";
+		
+		switch(taskType) {
+			case "EVENT":
+				String[] eventTime = getEventTime(); 
+				stringRep += "from " + eventTime[0];
+				stringRep += " to " + eventTime[1]; 
+				break;
+			case "DEADLINE":
+				stringRep += "due on " + getDeadline(); 
+				break; 
+		}
 		
 		return stringRep; 
 	}

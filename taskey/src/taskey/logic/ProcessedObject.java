@@ -36,9 +36,9 @@ public class ProcessedObject {
 	private String command;
 	private Task task = null; 
 	private int index = -1; 
-	private String viewType; 
-	private String errorType;
-	private String searchPhrase; 
+	private String viewType = null; 
+	private String errorType = null;
+	private String searchPhrase = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -139,5 +139,33 @@ public class ProcessedObject {
 	
 	public String getSearchPhrae() {
 		return searchPhrase; 
+	}
+	
+	public String toString() {
+		String stringRep = ""; 
+		
+		stringRep += "Command: " + command + "\n";
+		
+		if (task != null) {
+			stringRep += task.toString() + "\n"; 
+		}
+		
+		if (index != -1) {
+			stringRep += "at index: " + String.valueOf(index); 
+		}
+		
+		if (viewType != null) {
+			stringRep += "view type: " + viewType + "\n"; 
+		}
+		
+		if (errorType != null) {
+			stringRep += "error type: " + errorType + "\n"; 
+		}
+		
+		if (searchPhrase != null) {
+			stringRep += "search phrase: " + searchPhrase + "\n"; 
+		}
+		
+		return stringRep; 
 	}
 }

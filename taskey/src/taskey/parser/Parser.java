@@ -46,6 +46,7 @@ public class Parser {
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
 		
+		//TODO: put in correct times for special days. 
 		specialDays.put("tomorrow", 
 				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
 		specialDays.put("today", timeConverter.getCurrTime()); 
@@ -153,6 +154,12 @@ public class Parser {
 		return processError(ERROR_VIEW_TYPE); 
 	}
 	
+	/**
+	 * Return ProcessedObject for Search 
+	 * @param command
+	 * @param stringInput
+	 * @return
+	 */
 	public ProcessedObject processSearch(String command, String stringInput) {
 		ProcessedObject processed = new ProcessedObject(command.toUpperCase()); 
 		String searchPhrase = getTaskName(command, stringInput);
@@ -382,10 +389,16 @@ public class Parser {
 		return processed;
 	}
 	
+	//TODO 
 	public void processSet(String command, String stringInput) {
 		
 	}
 	
+	/**
+	 * Process Errors for string formatting/commands/etc... 
+	 * @param errorType
+	 * @return
+	 */
 	public ProcessedObject processError(String errorType) {
 		ProcessedObject processed = new ProcessedObject("ERROR");
 		processed.setErrorType(errorType); 
@@ -419,34 +432,6 @@ public class Parser {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
-	}
-	
-	
-	/**
-	 * FOR TASK WITH DATES:
-	 * Given a stringInput, remove the command and date from the string
-	 * @param command
-	 * @param date
-	 * @param stringInput
-	 * @return taskName without command and date 
-	 */
-	public String getTaskName(String command, String date, String stringInput) {
-		String task = stringInput.replaceFirst(command, "");
-		task = task.replaceFirst(date, ""); 
-		//TODO: work on the logic: may not be entirely correct. 
-		return task.trim(); 
-	}
-	
-	//TODO: figure out when to remove keywords from commands 
-	private String joinStringWithoutKeywords(ArrayList<String> dates) {
-		 
-		return ""; 
-	}
-	
-	//TODO: Dummy for now  
-	public ArrayList<String> getDate(String stringInput) {
-		String[] splitArray = stringInput.split("on");
-		return new ArrayList<String>(); 
 	}
 	
 	

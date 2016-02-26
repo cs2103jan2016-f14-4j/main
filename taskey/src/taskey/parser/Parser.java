@@ -81,7 +81,7 @@ public class Parser {
 			//add floating, add deadline, add event,
 			//update by index, update by name 
 			case "add":
-				processAdd(command, stringInput); 
+				processed = processAdd(command, stringInput); 
 				break;
 				
 			case "set":
@@ -89,9 +89,11 @@ public class Parser {
 				break;
 			
 			case "search":
+				processed = processSearch(command, stringInput); 
 				break;
 			
 			case "undo":
+				processed = processUndo(command); 
 				break; 
 				
 			case "done":
@@ -103,10 +105,6 @@ public class Parser {
 				processed = processError(ERROR_COMMAND); 
 				break; 
 		}
-
- 
-		//ArrayList<String> dateRange = getDate(stringInput); 
-		//task = getTaskName(command, stringInput); 
 		
 		return processed;   
 	}
@@ -128,6 +126,15 @@ public class Parser {
 	}
 	
 	/**
+	 * Return ProcessedObject for Undo 
+	 * @param command
+	 * @return
+	 */
+	public ProcessedObject processUndo(String command) {
+		return new ProcessedObject(command.toUpperCase()); 
+	}
+	
+	/**
 	 * If the command is view, process what kind of view it is:
 	 * 1. ALL
 	 * 2. GENERAL
@@ -144,6 +151,14 @@ public class Parser {
 			return new ProcessedObject(command,viewType.toUpperCase());
 		}
 		return processError(ERROR_VIEW_TYPE); 
+	}
+	
+	public ProcessedObject processSearch(String command, String stringInput) {
+		ProcessedObject processed = new ProcessedObject(command.toUpperCase()); 
+		String searchPhrase = getTaskName(command, stringInput);
+		processed.setSearchPhrase(searchPhrase);
+		
+		return processed; 
 	}
 	
 	/**
@@ -196,11 +211,18 @@ public class Parser {
 		return processed; 
 	}
 	
+	/**
+	 * If command is ADD, process and categorise into:
+	 * 1. FLOATING
+	 * 2. EVENT
+	 * 3. DEADLINE 
+	 * @param command
+	 * @param stringInput
+	 * @return appropriate ProcessedObject 
+	 */
 	public ProcessedObject processAdd(String command, String stringInput) {
-		long epochTime; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
-		String taskName = null; 
 		//simpString: basically string without the command
 		String simpString = getTaskName(command, stringInput); 
 		
@@ -220,6 +242,12 @@ public class Parser {
 		return processed; 
 	}
 
+	/**
+	 * ADD: process event 
+	 * @param task
+	 * @param simpString
+	 * @return
+	 */
 	private ProcessedObject handleEvent(Task task, String simpString) {
 		long epochTime;
 		ProcessedObject processed;
@@ -265,7 +293,13 @@ public class Parser {
 		processed = new ProcessedObject("ADD_EVENT",task);
 		return processed;
 	}
-
+	
+	/**
+	 * ADD: process deadlines with the keyword "by"
+	 * @param task
+	 * @param simpString
+	 * @return
+	 */
 	private ProcessedObject handleDeadlineBy(Task task, String simpString) {
 		long epochTime;
 		ProcessedObject processed;
@@ -295,6 +329,12 @@ public class Parser {
 		return processed;
 	}
 
+	/**
+	 * Add: Process deadlines with the keyword "on"
+	 * @param task
+	 * @param simpString
+	 * @return
+	 */
 	private ProcessedObject handleDeadlineOn(Task task, String simpString) {
 		long epochTime;
 		ProcessedObject processed;
@@ -323,7 +363,13 @@ public class Parser {
 		processed = new ProcessedObject("ADD_DEADLINE",task);
 		return processed;
 	}
-
+	
+	/**
+	 * ADD: Process floating event 
+	 * @param command
+	 * @param simpString
+	 * @return
+	 */
 	private ProcessedObject handleFloating(String command, String simpString) {
 		ProcessedObject processed;
 		String taskName;

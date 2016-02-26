@@ -74,7 +74,7 @@ public class Parser {
 			case "view":
 				processed = processView(command, stringInput); 
 				break; 
-			case "delete":
+			case "del":
 				processed = processDelete(command, stringInput); 
 				break;
 				
@@ -149,7 +149,7 @@ public class Parser {
 		String viewType = getViewType(command, stringInput);
 		
 		if (viewType.compareTo("error") != 0) {
-			return new ProcessedObject(command,viewType.toUpperCase());
+			return new ProcessedObject("VIEW",viewType.toUpperCase());
 		}
 		return processError(ERROR_VIEW_TYPE); 
 	}
@@ -261,14 +261,14 @@ public class Parser {
 		String taskName;
 		String[] inputList = simpString.split("from");
 		String[] dateList = inputList[1].split("to"); 
-		taskName = inputList[0]; 
+		taskName = inputList[0].trim(); 
 		String rawStartDate = dateList[0].trim();
 		String rawEndDate = dateList[1].trim(); 
 		
 		if (!specialDays.containsKey(rawStartDate)) {
 			if (rawStartDate.length() == 11) {
 				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawStartDate + DAY_END);
+				epochTime = timeConverter.toEpochTime(rawStartDate + " " + DAY_END);
 				task.setStartDate(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
@@ -283,7 +283,7 @@ public class Parser {
 		if (!specialDays.containsKey(rawEndDate)) {
 			if (rawEndDate.length() == 11) {
 				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawEndDate + DAY_END);
+				epochTime = timeConverter.toEpochTime(rawEndDate + " " + DAY_END);
 				task.setEndDate(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
@@ -318,7 +318,7 @@ public class Parser {
 		if (!specialDays.containsKey(rawDate)) {
 			if (rawDate.length() == 11) {
 				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+				epochTime = timeConverter.toEpochTime(rawDate + " " + DAY_END);
 				task.setDeadline(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
@@ -353,7 +353,7 @@ public class Parser {
 		if (!specialDays.containsKey(rawDate)) {
 			if (rawDate.length() == 11) {
 				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + DAY_END);
+				epochTime = timeConverter.toEpochTime(rawDate + " " + DAY_END);
 				task.setDeadline(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
@@ -384,7 +384,7 @@ public class Parser {
 		Task newTask = new Task(taskName); 
 		
 		newTask.setTaskType("FLOATING");
-		processed = new ProcessedObject(command,newTask);
+		processed = new ProcessedObject("ADD_FLOATING",newTask);
 		
 		return processed;
 	}
@@ -413,7 +413,10 @@ public class Parser {
 	 * @return string view type 
 	 */
 	public String getViewType(String command, String stringInput) {
-		String viewType = stringInput.replaceFirst(command, "").toLowerCase();
+		stringInput = stringInput.toLowerCase(); 
+		String viewType = stringInput.replaceFirst(command, "");
+		viewType = viewType.toLowerCase();
+		viewType = viewType.trim(); 
 		
 		if (viewList.containsKey(viewType)) {
 			return viewType; 

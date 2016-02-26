@@ -7,27 +7,35 @@ import org.junit.Test;
 import taskey.parser.Parser;
 
 public class ParserTest {
-
+	Parser parser = new Parser(); 
+	
 	@Test
 	public void testFloating() {
-		Parser parser = new Parser(); 
-		
 		assertEquals("add", parser.getCommand("add a string")); 
 		assertEquals("do homework", parser.getTaskName("add", "add do homework"));
 		assertEquals("add a song", parser.getTaskName("add", "add add a song"));
+		
+		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
+				parser.parseInput("add do homework").toString());
 	}
 	
+	@Test
 	public void testDeadline() {
-		//add project meeting at 3pm on/by 7 feb 2016
-		//add project meeting at 3pm on/by 7 feb
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+				parser.parseInput("add project meeting at 3pm by 17 feb 2016").toString());
 		//add complete essay by today 
 		//other special days: tomorrow, next week, next ___eg. friday
+		//add project meeting at 3pm on 17 Feb <- be able to handle without year!!
 		
 	}
 	
+	@Test
 	public void testEvents() {
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 to 20 Feb 2016 23:59:59\n",
+				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
 		//add meeting from tomorrow to 18 feb
-		
 	}
 	
 	public void testTag() {
@@ -39,22 +47,43 @@ public class ParserTest {
 		//set meeting [16 feb, 17 feb] 
 	}
 	
+	@Test
 	public void testDelete() {
-		//del test name/id
+		assertEquals("Command: DELETE_BY_INDEX\nat index: 5",
+				parser.parseInput("del 5").toString());
+		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
+				parser.parseInput("del hello world").toString());
 	}
 	
 	public void testSearch() {
 		//search #tag name
 		//search phrase
 	}
-
+	
+	@Test
 	public void testDone() {
-		//done <task name/id> 
+		assertEquals("Command: DONE_BY_INDEX\nat index: 5",
+				parser.parseInput("done 5").toString());
+		assertEquals("Command: DONE_BY_NAME\nhello world, \n",
+				parser.parseInput("done hello world").toString());
+			
 	}
 	
-	//other tasks: undo 
-	// view all
-	// view general
-	// view deadline
-	// view events
+	@Test
+	public void testUndo() {
+		assertEquals("Command: UNDO\n",parser.parseInput("undo").toString());	
+	}
+	
+	@Test 
+	public void testView() {
+		assertEquals("Command: VIEW\nview type: ALL\n",
+				parser.parseInput("view all").toString());
+		assertEquals("Command: VIEW\nview type: GENERAL\n",
+				parser.parseInput("View general").toString());
+		assertEquals("Command: VIEW\nview type: DEADLINES\n",
+				parser.parseInput("vieW deadlines").toString());
+		assertEquals("Command: VIEW\nview type: EVENTS\n",
+				parser.parseInput("view Events").toString());
+		
+	}
 }

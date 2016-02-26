@@ -30,9 +30,9 @@ public class Task implements Comparable<Task>, Serializable {
 	public static final int NONE = -1; 
 	public static final String EMPTY = ""; 
 	
-	private String taskName;
-	private ArrayList<String> taskTags;
-	private String taskType; 
+	private String taskName = null;
+	private ArrayList<String> taskTags = null;
+	private String taskType = null; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
 	
@@ -40,21 +40,16 @@ public class Task implements Comparable<Task>, Serializable {
 	
 	//CONSTRUCTORS ==============================================
 	public Task() {
-		taskName = "";
-		taskTags = new ArrayList<String>();
-		taskType = ""; 
+		
 	}
 	
 	public Task(String taskName) {
 		this.taskName = taskName;
-		taskTags = new ArrayList<String>();	
-		taskType = "";
 	}
 	
 	public Task(String taskName, ArrayList<String> taskTags) {
 		this.taskName = taskName;
 		this.taskTags = taskTags;
-		taskType = ""; 
 	}
 	
 	
@@ -187,7 +182,12 @@ public class Task implements Comparable<Task>, Serializable {
 	 * @param tag
 	 */
 	public void addTaskTag(String tag) {
-		taskTags.add(tag); 
+		if (taskTags != null) {
+			taskTags.add(tag); 
+		} else {
+			taskTags = new ArrayList<String>();
+			taskTags.add(tag); 
+		}
 	}
 	
 	/**
@@ -244,19 +244,25 @@ public class Task implements Comparable<Task>, Serializable {
 		String stringRep = ""; 
 		stringRep += taskName;
 		stringRep += ", ";
-		stringRep += taskType; 
-		stringRep += ", ";
 		
-		switch(taskType) {
-			case "EVENT":
-				String[] eventTime = getEventTime(); 
-				stringRep += "from " + eventTime[0];
-				stringRep += " to " + eventTime[1]; 
-				break;
-			case "DEADLINE":
-				stringRep += "due on " + getDeadline(); 
-				break; 
+		if (taskType != null) {
+			stringRep += taskType; 
+			stringRep += ", ";
+		
+			switch(taskType) {
+				case "EVENT":
+					String[] eventTime = getEventTime(); 
+					stringRep += "from " + eventTime[0];
+					stringRep += " to " + eventTime[1]; 
+					break;
+				case "DEADLINE":
+					stringRep += "due on " + getDeadline(); 
+					break; 
+				default:
+					break;
+			}
 		}
+		stringRep += "\n";
 		
 		return stringRep; 
 	}

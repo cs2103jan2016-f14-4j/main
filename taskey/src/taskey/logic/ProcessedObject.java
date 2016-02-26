@@ -141,13 +141,17 @@ public class ProcessedObject {
 		return searchPhrase; 
 	}
 	
+	@Override 
+	/**
+	 * For debugging
+	 */
 	public String toString() {
 		String stringRep = ""; 
 		
 		stringRep += "Command: " + command + "\n";
 		
 		if (task != null) {
-			stringRep += task.toString() + "\n"; 
+			stringRep += task.toString(); 
 		}
 		
 		if (index != -1) {

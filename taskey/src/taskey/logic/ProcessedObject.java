@@ -17,6 +17,8 @@ package taskey.logic;
  * 10. ERROR 
  * 11. DONE_BY_INDEX
  * 12. DONE_BY_NAME
+ * 13. SEARCH
+ * 14. UNDO 
  * 
  * @author Xue Hui
  *
@@ -35,7 +37,8 @@ public class ProcessedObject {
 	private Task task = null; 
 	private int index = -1; 
 	private String viewType; 
-	private String errorType; 
+	private String errorType;
+	private String searchPhrase; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -48,7 +51,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR 
+	 * Constructor for ERROR/UNDO 
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -128,5 +131,13 @@ public class ProcessedObject {
 	
 	public String getErrorType() {
 		return errorType; 
+	}
+	
+	public void setSearchPhrase(String searchPhrase) {
+		this.searchPhrase = searchPhrase; 
+	}
+	
+	public String getSearchPhrae() {
+		return searchPhrase; 
 	}
 }

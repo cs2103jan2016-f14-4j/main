@@ -26,7 +26,7 @@ public class ProcessedObject {
 	 * possible values for viewType:
 	 * 1. ALL
 	 * 2. GENERAL
-	 * 3. DEADLINE
+	 * 3. DEADLINES
 	 * 4. EVENTS 
 	 */
 	private String command;

@@ -35,6 +35,7 @@ public class ProcessedObject {
 	private Task task = null; 
 	private int index = -1; 
 	private String viewType; 
+	private String errorType; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -120,5 +121,12 @@ public class ProcessedObject {
 	public void setViewType(String viewType) {
 		this.viewType = viewType; 
 	}
-
+	
+	public void setErrorType(String errorType) {
+		this.errorType = errorType;
+	}
+	
+	public String getErrorType() {
+		return errorType; 
+	}
 }

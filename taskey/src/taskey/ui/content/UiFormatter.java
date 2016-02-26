@@ -17,32 +17,34 @@ import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.utility.UiClockService;
 
 /**
- * This class contains methods to add content to grids,
- * is extended by other classes to provide more specialized functionality
+ * This class contains methods to add content to grids, is extended by other
+ * classes to provide more specialized functionality
+ * 
  * @author Junwei
  *
  */
 public abstract class UiFormatter {
-	
+
 	protected UiClockService clockService;
 	protected GridPane gridPane;
-	
+
 	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
 		gridPane = _gridPane;
 		clockService = _clockService;
 	}
-	
-	public void format(ArrayList<Task> myTaskList) {
-	}	
 
-	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style, TextAlignment align) {
+	public void format(ArrayList<Task> myTaskList) {
+	}
+
+	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style,
+			TextAlignment align) {
 		element.setTextAlignment(align);
 		StackPane wrapper = new StackPane();
 		wrapper.getChildren().add(element);
 		wrapper.getStyleClass().add(style);
 		gridPane.add(wrapper, col, row);
 	}
-	
+
 	public void addStyledCellImage(String path, GridPane gridPane, int col, int row, String style) {
 		Image img = new Image(getClass().getResourceAsStream(path));
 		ImageView myImg = new ImageView(img);
@@ -53,16 +55,16 @@ public abstract class UiFormatter {
 		wrapper.getStyleClass().add(style);
 		gridPane.add(wrapper, col, row);
 	}
-	
-	public void clearGrid() {
+
+	public void clearGridContents() {
 		Node node = null;
-		if ( gridPane.isGridLinesVisible()) {
+		if (gridPane.isGridLinesVisible()) {
 			node = gridPane.getChildren().get(0); // retain grid lines
 		}
 		gridPane.getChildren().clear();
-		if ( gridPane.isGridLinesVisible()) {
-			gridPane.getChildren().add(0,node);
+		if (gridPane.isGridLinesVisible()) {
+			gridPane.getChildren().add(0, node);
 		}
-		
+
 	}
 }

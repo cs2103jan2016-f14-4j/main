@@ -11,25 +11,27 @@ import taskey.ui.UiConstants;
 
 /**
  * This class performs a background service, which updates the UI clock
+ * 
  * @author JunWei
  *
  */
 public class UiClockService extends ScheduledService<Void> {
-	
+
 	private Label timeLabelRef;
 	private Label dateLabelRef;
 
-	public UiClockService( Label timeLabel, Label dateLabel ) {
+	public UiClockService(Label timeLabel, Label dateLabel) {
 		timeLabelRef = timeLabel;
 		dateLabelRef = dateLabel;
 		this.setDelay(new Duration(0));
-		this.setPeriod(new Duration(UiConstants.UPDATE_INTERVAL));
+		this.setPeriod(new Duration(UiConstants.ClOCK_UPDATE_INTERVAL));
 	}
-	
+
 	@Override
 	protected Task<Void> createTask() {
-    	Task<Void> myTask = new Task<Void>() {
-			@Override public Void call () {
+		Task<Void> myTask = new Task<Void>() {
+			@Override
+			public Void call() {
 				Calendar cal = Calendar.getInstance(); // need to get a new updated instance every time
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
@@ -43,11 +45,11 @@ public class UiClockService extends ScheduledService<Void> {
 		};
 		return myTask;
 	}
-	
+
 	public String formatTime(Calendar cal) {
 		String myTime = "";
 		int hour = cal.get(Calendar.HOUR);
-		if ( cal.get(Calendar.AM_PM) == 1  && hour == 0 ){ // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm 
+		if (cal.get(Calendar.AM_PM) == 1 && hour == 0) { // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm
 			hour = 12;
 		}
 		int minute = cal.get(Calendar.MINUTE);
@@ -56,15 +58,16 @@ public class UiClockService extends ScheduledService<Void> {
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}
-	
-	
-	public int getDayOfMonth () { 
+
+	public int getDayOfMonth() {
 		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 	}
-	public int getMonthOfYear () { 
+
+	public int getMonthOfYear() {
 		return Calendar.getInstance().get(Calendar.MONTH);
 	}
-	public int getYear () { 
+
+	public int getYear() {
 		return Calendar.getInstance().get(Calendar.MONTH);
 	}
 }

@@ -26,24 +26,24 @@ public class UiDropDown {
 
 	public void createMenu(Stage primaryStage, TextField input) {
 		myInput = input; // set up reference
-		myMenu =  UiPopupFactory.getInstance().createPopupMenu(MAX_ITEMS);
+		myMenu = UiPopupFactory.getInstance().createPopupMenu(MAX_ITEMS);
 		fade = UiPopupFactory.getInstance().createFadeTransition(myMenu, 5000, 1000, 1.0, 0.0, false);
 		// create custom handler
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-					hideMenu();
-				}
+				hideMenu();
+			}
 		});
 		myWindow = primaryStage.getScene().getWindow();
 	}
-	
+
 	public void updateMenuItems(ArrayList<String> items) {
-		VBox myContent = (VBox)myMenu.getContent().get(0);
+		VBox myContent = (VBox) myMenu.getContent().get(0);
 		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
-		for ( int i = 0; i < menuItems.size(); i ++ ) {
-			StackPane myPane = (StackPane)menuItems.get(i);	
-			if ( i < items.size() ) {
+		for (int i = 0; i < menuItems.size(); i++) {
+			StackPane myPane = (StackPane) menuItems.get(i);
+			if (i < items.size()) {
 				Label text = new Label(items.get(i));
 				myPane.getChildren().clear();
 				myPane.getChildren().add(text);
@@ -53,51 +53,54 @@ public class UiDropDown {
 			}
 		}
 	}
+
 	public void hideMenu() {
 		myMenu.hide();
 		fade.stop();
 	}
-	
+
 	public void updateMenu() {
-		if ( myWindow == null || myMenu == null ) { // if not initialized yet and received input
+		if (myWindow == null || myMenu == null) { // if not initialized yet and received input
 			return;
 		}
 		String line = myInput.getText();
-		if ( line.equals("")) {
+		if (line.equals("")) {
 			hideMenu();
-		} else {	
+		} else {
 			hideMenu(); // refresh
 			displayMenu(line);
 		}
 	}
+
 	public void displayMenu(String line) {
-		double width = getWidthOfLineToTextField(line,myInput);
+		double width = getWidthOfTextFieldInput(myInput);
 		Bounds screenBounds = UiPopupFactory.getInstance().getScreenBoundsOfNode(myInput);
-		if ( myMenu.isShowing() == false ) {
+		if (myMenu.isShowing() == false) {
 			fade.getNode().setOpacity(1);
 			fade.playFromStart();
-			myMenu.show(myWindow,Math.min(screenBounds.getMinX()+myInput.getWidth(),screenBounds.getMinX() + width), 
-					           screenBounds.getMinY() + myInput.getHeight() );
+			myMenu.show(myWindow, Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width),
+					screenBounds.getMinY() + myInput.getHeight());
 		} else {
 			fade.getNode().setOpacity(1);
 			fade.playFromStart();
-			myMenu.setAnchorX(Math.min(screenBounds.getMinX()+myInput.getWidth(),screenBounds.getMinX() + width));
+			myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
 			myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight());
 		}
 	}
-	
+
 	/**
-	 * This method creates a Text object to approximate the bounds of a text field input
-	 * @param line : String
-	 * @param field : TextField
-	 * @return
+	 * This method creates a Text object to approximate the bounds of a text
+	 * field input
+	 * @param field - TextField to approximate from
+	 * @return width
 	 */
-	public static double getWidthOfLineToTextField(String line, TextField field) {
-		Text text = new Text(line);
-		text.setFont(field.getFont()); // Set the same font, so the size is the same
+	public double getWidthOfTextFieldInput(TextField field) {
+		Text text = new Text(field.getText());
+		text.setFont(field.getFont()); // Set the same font, so the size is the
+										// same
 		double width = text.getLayoutBounds().getWidth();
 		return width;
 
 	}
-	
+
 }

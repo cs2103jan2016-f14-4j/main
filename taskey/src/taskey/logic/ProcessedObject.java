@@ -15,6 +15,8 @@ package taskey.logic;
  * 8. UPDATE_BY_NAME 
  * 9. VIEW 
  * 10. ERROR 
+ * 11. DONE_BY_INDEX
+ * 12. DONE_BY_NAME
  * 
  * @author Xue Hui
  *

@@ -11,6 +11,8 @@ import taskey.logic.Task;
 public class Parser {
 	public static final String DELETE_BY_INDEX = "DELETE_BY_INDEX"; 
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
+	public static final String DONE_BY_INDEX = "DONE_BY_INDEX"; 
+	public static final String DONE_BY_NAME = "DONE_BY_NAME"; 
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 
 	private HashMap<String,String> viewList = new HashMap<String,String>();
@@ -40,9 +42,13 @@ public class Parser {
 		
 		specialDays.put("tomorrow", "tomorrow"); 
 		specialDays.put("today", "today"); 
-		specialDays.put("next week", "next week"); 
-		specialDays.put("tonight", "tonight"); 
-		specialDays.put("this weekend", "this weekend"); 
+		specialDays.put("next sun", "next sun"); 
+		specialDays.put("next mon", "next mon"); 
+		specialDays.put("next tues", "next tues"); 
+		specialDays.put("next wed", "next wed"); 
+		specialDays.put("next thurs", "next thurs"); 
+		specialDays.put("next fri", "next fri"); 
+		specialDays.put("next sat", "next sat"); 
 	}
 	
 	/**
@@ -74,6 +80,16 @@ public class Parser {
 			case "set":
 				processSet(command, stringInput); 
 				break;
+			
+			case "search":
+				break;
+			
+			case "undo":
+				break; 
+				
+			case "done":
+				processed = processDone(command, stringInput);
+				break; 
 				
 			default:
 				//error goes here
@@ -148,8 +164,49 @@ public class Parser {
 		return processed; 
 	}
 	
-	public void processAdd(String command, String stringInput) {
+	/**
+	 * If command is done, check if the done is by 
+	 * 1. NAME, or
+	 * 2. INDEX 
+	 * and return the appropriate ProcessedObject
+	 * @param command
+	 * @param stringInput
+	 * @return appropriate ProcessedObject 
+	 */
+	public ProcessedObject processDone(String command, String stringInput) {
+		ProcessedObject processed; 
+		String taskName = getTaskName(command, stringInput);
 		
+		try {
+			int index = Integer.parseInt(taskName);
+			processed = new ProcessedObject(DONE_BY_INDEX, index); 
+			
+		} catch (Exception e) {
+			//if the delete is not by index, then it's by task name. 
+			processed = new ProcessedObject(DONE_BY_NAME, new Task(taskName));
+		}
+		
+		return processed; 
+	}
+	
+	public void processAdd(String command, String stringInput) {
+		ProcessedObject processed;
+		String taskName = null; 
+		
+		if (stringInput.split("on").length != 1) {
+			//ie. has date
+			
+		} else if (stringInput.split("by").length != 1) {
+			//ie. has date 
+		} else {
+			//floating task 
+			taskName = getTaskName(command, stringInput);
+			Task newTask = new Task(taskName); 
+			newTask.setTaskType("FLOATING");
+			processed = new ProcessedObject(command,newTask);
+		}
+		
+		//return processed; 
 	}
 	
 	public void processSet(String command, String stringInput) {

@@ -270,7 +270,14 @@ public class Parser {
 				//ie. format is DD MMM YYYY
 				epochTime = timeConverter.toEpochTime(rawStartDate + " " + DAY_END);
 				task.setStartDate(epochTime);
-			} else {
+			} else if (rawStartDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(rawStartDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				task.setDeadline(epochTime); 	
+			}else {
 				processed = processError(ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -285,6 +292,13 @@ public class Parser {
 				//ie. format is DD MMM YYYY
 				epochTime = timeConverter.toEpochTime(rawEndDate + " " + DAY_END);
 				task.setEndDate(epochTime);
+			} else if (rawEndDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(rawEndDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				task.setDeadline(epochTime); 	
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
 				return processed; 
@@ -320,7 +334,14 @@ public class Parser {
 				//ie. format is DD MMM YYYY
 				epochTime = timeConverter.toEpochTime(rawDate + " " + DAY_END);
 				task.setDeadline(epochTime);
-			} else {
+			} else if (rawDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				task.setDeadline(epochTime);
+			}else {
 				processed = processError(ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -354,6 +375,13 @@ public class Parser {
 			if (rawDate.length() == 11) {
 				//ie. format is DD MMM YYYY
 				epochTime = timeConverter.toEpochTime(rawDate + " " + DAY_END);
+				task.setDeadline(epochTime);
+			} else if (rawDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
 				task.setDeadline(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
@@ -435,11 +463,5 @@ public class Parser {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
-	}
-	
-	
-	public static void main(String[] args) {
-		//String myString = getTaskName("add","add taskey to github");
-		//System.out.println(myString);
 	}
 }

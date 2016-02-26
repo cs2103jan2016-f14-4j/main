@@ -37,6 +37,8 @@ public class ParserTest {
 	public void testEvents() {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 to 20 Feb 2016 23:59:59\n",
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 to 20 Feb 2016 23:59:59\n",
+				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
 		//add meeting from tomorrow to 18 feb
 	}
 	

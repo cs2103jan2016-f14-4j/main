@@ -276,7 +276,7 @@ public class Parser {
 				int year = timeConverter.getYear(timeConverter.getCurrTime());
 				epochTime = timeConverter.toEpochTime(rawStartDate + " " + String.valueOf(year) 
 						+ " " + DAY_END);
-				task.setDeadline(epochTime); 	
+				task.setStartDate(epochTime); 
 			}else {
 				processed = processError(ERROR_DATE_FORMAT); 
 				return processed; 
@@ -298,7 +298,7 @@ public class Parser {
 				int year = timeConverter.getYear(timeConverter.getCurrTime());
 				epochTime = timeConverter.toEpochTime(rawEndDate + " " + String.valueOf(year) 
 						+ " " + DAY_END);
-				task.setDeadline(epochTime); 	
+				task.setEndDate(epochTime); 	
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
 				return processed; 

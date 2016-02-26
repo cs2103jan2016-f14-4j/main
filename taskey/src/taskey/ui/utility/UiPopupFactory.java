@@ -8,15 +8,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
-import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
 import javafx.util.Duration;
@@ -41,10 +36,10 @@ public class UiPopupFactory {
 	/**
 	 * This method creates a label at the node position with offset
 	 * Note that this offset is in screen space coordinates
-	 * @param text
-	 * @param node
-	 * @param offsetX
-	 * @param offsetY
+	 * @param text : String
+	 * @param node : Node
+	 * @param offsetX : double
+	 * @param offsetY : double
 	 * @return
 	 */
 	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY) {
@@ -77,13 +72,16 @@ public class UiPopupFactory {
         Bounds screenBounds = node.localToScreen(bounds);
         return screenBounds;
 	}
+	
 	/**
 	 * This method creates fade transitions for first content (usually the container) of the popup
-	 * @param thePopup
-	 * @param startDelay
-	 * @param totalDuration
-	 * @param deleteOnFinished
-	 * @return 
+	 * @param thePopup : Popup
+	 * @param startDelay : int
+	 * @param animDuration : int
+	 * @param fromAlpha : double
+	 * @param toAlpha : double
+	 * @param deleteOnFinished : boolean
+	 * @return FadeTransition object for custom handling
 	 */
 	public FadeTransition createFadeTransition (Popup thePopup, int startDelay, int animDuration, double fromAlpha, double toAlpha, boolean deleteOnFinished) {
 		ObservableList<Node> myList = thePopup.getContent(); // usually only the container needs to be animated

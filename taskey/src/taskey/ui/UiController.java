@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SingleSelectionModel;
@@ -22,13 +20,13 @@ import javafx.stage.Stage;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.UiContentManager;
-import taskey.ui.utility.UiDropDown;
 import taskey.ui.utility.UiClockService;
+import taskey.ui.utility.UiDropDown;
 import taskey.ui.utility.UiPopupFactory;
 
 /**
- * This class is the main class that handles almost all of the Ui nodes
- * Called by UI_Manager to perform operations
+ * This class is the main class that handles all of the Ui nodes
+ * The UiController interfaces with all the major components
  * @author JunWei
  *
  */
@@ -57,8 +55,8 @@ public class UiController {
 		myDropDown = new UiDropDown();
 	}
 	
-	// classes that need layout bounds are initialized here
-	public void updateBounds() {
+	// nodes or classes that need layout bounds are initialized here
+	public void setUpNodesWhichNeedBounds() {
 		myDropDown.createMenu(stage,input);
 	}
 
@@ -88,7 +86,7 @@ public class UiController {
 		selectionModel.select(tabNo);
 	}
 
-	public void process( ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+	public void updateDisplay( ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		myManager.updateContentBox(myTaskList, contentID);
 	}
 	public void cleanUp() {
@@ -99,7 +97,7 @@ public class UiController {
 
 	/**
 	 * Sets scene style sheets, input is assumed to be checked before calling this method
-	 * @param type : String
+	 * @param styleSheets : ArrayList<String>
 	 */
 	public void setStyleSheets(ArrayList<String> styleSheets) {
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
@@ -117,14 +115,14 @@ public class UiController {
 		
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				myDropDown.updateMenuItems(randomInput("TEST" + Math.random(), 5));
+				myDropDown.updateMenuItems(UiMain.getInstance().randomInput("TEST" + Math.random(), 5));
 				myDropDown.updateMenu();
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
 					
 					// Logic.getInstance().getCommand(line);
-					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added " + line, input, 0, input.getHeight());
+					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added Successfully", input, 0, input.getHeight());
 					UiPopupFactory.getInstance().createFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0,true).play();
 
 					event.consume();
@@ -134,10 +132,12 @@ public class UiController {
 			}
 		});
 	}
-
+	/**
+	 * This method is for key inputs anywhere in main window, NOTE THIS HAS ISSUES, not sure if scene root gets different intervals for updates and displays
+	 * Therefore anything that requires a small or instant display tweak don't put here
+	 * @param root : Parent
+	 */
 	public void registerRootEventHandler(Parent root) {
-		// for key inputs anywhere in main window, NOTE THIS HAS ISSUES, not sure if scene root gets different intervals for updates and displays
-		// Therefore anything that requires a small display tweak dont put here
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.TAB) {
@@ -156,24 +156,5 @@ public class UiController {
 				} 
 			}
 		});
-	}
-	
-	/******************************************DEBUG METHODS*********************************************/
-
-	public String doHash(String line, int offsest)
-	{
-		int encode = 7; // prime
-		String temp = line.replace("[^A-Za-z0-9]",""); // replace non alphanumeric
-		for (int i = 0; i < temp.length(); i ++  )
-			encode = encode*offsest + temp.charAt(i);
-		return String.valueOf(encode);
-	}
-	public ArrayList<String> randomInput(String line, int maxItems) {
-		int test = (int) (Math.random()*maxItems)+1;
-		ArrayList<String> tempList = new ArrayList<String>();
-		for ( int i = 0; i < test; i ++ ) {
-			tempList.add(doHash(line,5*(i+1)));
-		}
-		return tempList;
 	}
 }

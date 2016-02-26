@@ -2,24 +2,9 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
-import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
-import javafx.util.Pair;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
@@ -46,13 +31,17 @@ public class UiContentManager {
 	public void setUpContentBox(ScrollPane pane, ContentBox contentID) {
 		contentBoxes.add(pane);
 		pane.setFitToWidth(true);
-		GridPane theGrid = null;
-		if ( contentID == ContentBox.WEEKLY) {
-			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_WEEKLY);
-			myFormatters.add(new UiWeeklyFormatter(theGrid,clockService));
-		} else {
-			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_NORMAL);
-			myFormatters.add(new UiNormalFormatter(theGrid,clockService));
+		
+		GridPane theGrid = null;	
+		switch ( contentID ) {
+			case WEEKLY:
+				theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_WEEKLY);
+				myFormatters.add(new UiWeeklyFormatter(theGrid,clockService));
+				break;
+			default:
+				theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_NORMAL);
+				myFormatters.add(new UiNormalFormatter(theGrid,clockService));
+				break;
 		}
 	}
 	

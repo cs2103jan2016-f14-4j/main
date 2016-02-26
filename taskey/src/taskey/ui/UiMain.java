@@ -2,7 +2,6 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,8 +16,7 @@ import taskey.ui.UiConstants.ContentBox;
 /**
  *
  * This class is the main entry point for Taskey
- * It also acts as the interface between the various components
- * It is the main UI component which calls other UI sub components
+ * It performs the main setups for the UI
  * 
  * @author JunWei
  *
@@ -52,7 +50,6 @@ public class UiMain extends Application {
 			System.out.println(Constants.FXML_LOAD_FAIL);
 		}
 		setUpScene(primaryStage, root);
-		updateDisplay(new ArrayList<Task>(), UiConstants.ContentBox.PENDING);
     }
     
     /**
@@ -69,17 +66,28 @@ public class UiMain extends Application {
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		myController.setUpNodes(primaryStage, root);  // must be done after loading .fxml file
-		setStyleSheets(UiConstants.UI_DEFAULT_STYLE);
+		myController.setStyleSheets(UiConstants.UI_DEFAULT_STYLE);
 		primaryStage.show();	
-		myController.updateBounds(); // layout bounds of nodes are only updated on show()
+		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
+		
+		testUI();
     }
     
     public UiController getController () { 
     	return myController;
     }
-    public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
-    	// logic calls this method to update the lists
-    	
+    
+    @Override
+    public void stop() {
+    	myController.cleanUp();
+    }
+	public static void main(String[] args) {
+		launch(args); // calls the start() method
+	}
+	
+	/************************************** MY TESTING ***********************************/
+	public void testUI() {
+    	ArrayList<Task> myTaskList = new ArrayList<Task>();
     	// Temporary;
     	Task temp = new Task("No deadline");
     	myTaskList.add(temp);
@@ -100,17 +108,23 @@ public class UiMain extends Application {
     	temp.setDeadline("29 Feb 2016 09:00:00");
     	myTaskList.add(temp);
  
-    	myController.process(myTaskList,contentID);
+    	myController.updateDisplay(myTaskList,ContentBox.PENDING);
     }
-    
-    public void setStyleSheets(ArrayList<String> styleSheets) {
-    	myController.setStyleSheets(styleSheets);
-    }
-    @Override
-    public void stop() {
-    	myController.cleanUp();
-    }
-	public static void main(String[] args) {
-		launch(args); // calls the start() method
+	
+	public String doHash(String line, int offsest)
+	{
+		int encode = 7; // prime
+		String temp = line.replace("[^A-Za-z0-9]",""); // replace non alphanumeric
+		for (int i = 0; i < temp.length(); i ++  )
+			encode = encode*offsest + temp.charAt(i);
+		return String.valueOf(encode);
+	}
+	public ArrayList<String> randomInput(String line, int maxItems) {
+		int test = (int) (Math.random()*maxItems)+1;
+		ArrayList<String> tempList = new ArrayList<String>();
+		for ( int i = 0; i < test; i ++ ) {
+			tempList.add(doHash(line,5*(i+1)));
+		}
+		return tempList;
 	}
 }

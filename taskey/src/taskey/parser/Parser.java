@@ -206,21 +206,17 @@ public class Parser {
 		
 		if (simpString.split("on").length != 1) {
 			//deadline
-			processed = handleDeadlineOn(task, simpString);
-			
+			processed = handleDeadlineOn(task, simpString);	
 		} else if (simpString.split("by").length != 1) {
 			//deadline 
 			processed = handleDeadlineBy(task, simpString);
-			
 		} else if (simpString.split("from").length != 1) {
 			//event
 			processed = handleEvent(task, simpString);
-			
 		} else {
 			//floating task 
 			processed = handleFloating(command, simpString);
 		}
-		
 		return processed; 
 	}
 
@@ -241,6 +237,7 @@ public class Parser {
 				task.setStartDate(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
 			}
 		} else {
 			//process the special day
@@ -255,6 +252,7 @@ public class Parser {
 				task.setEndDate(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
 			}
 		} else {
 			//process the special day
@@ -283,6 +281,7 @@ public class Parser {
 				task.setDeadline(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
 			}
 		} else {
 			//process the special day
@@ -311,6 +310,7 @@ public class Parser {
 				task.setDeadline(epochTime);
 			} else {
 				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
 			}
 		} else {
 			//process the special day

@@ -12,6 +12,7 @@ import javafx.stage.StageStyle;
 import taskey.constants.Constants;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.UiConstants.ContentMode;
 
 /**
  *
@@ -99,7 +100,7 @@ public class UiMain extends Application {
 		temp = new Task("Task A");
 		temp.setDeadline("27 Feb 2016 01:00:00");
 		myTaskList.add(temp);
-		temp = new Task("Task C");
+		temp = new Task("AAAAAAAAAA VVVVVVVVVEEEEEEERRRRRRRRRRYYY LOOOOONG TASKKK");
 		temp.setDeadline("27 Feb 2016 04:00:00");
 		myTaskList.add(temp);
 		temp = new Task("Task B");
@@ -115,7 +116,8 @@ public class UiMain extends Application {
 
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 
-		myController.updateDisplay(myTaskList, ContentBox.ACTION);
+		myController.updateActionDisplay(myTaskList, ContentMode.HELP);
+		//myController.updateActionDisplay(myTaskList, ContentMode.LIST);
 	}
 
 	public String doHash(String line, int offsest) {

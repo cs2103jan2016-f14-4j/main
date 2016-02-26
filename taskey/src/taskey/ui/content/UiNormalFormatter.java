@@ -3,6 +3,7 @@ package taskey.ui.content;
 import java.util.ArrayList;
 
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
@@ -43,8 +44,6 @@ public class UiNormalFormatter extends UiFormatter {
 	private void addTaskName(Task theTask, int col, int row) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
-		element = new TextFlow();
-		myConfig.removeMarkers();
 		myConfig.addMarker(0, "textBlack");
 		String line = theTask.getTaskName();
 		theDate = "";
@@ -57,20 +56,18 @@ public class UiNormalFormatter extends UiFormatter {
 		}
 		element.getChildren().addAll(myConfig.format(line));
 		addStyledCellTextFlow(element, gridPane, col, row, "whiteBox", TextAlignment.LEFT);
-		col++;
 	}
 
 	private void addTaskDate(Task theTask, int col, int row) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
+		myConfig.addMarker(0, "textBlue");
 		String line;
 		if (theDate == "") {
 			line = "------";
 		} else {
 			line = theDate;
 		}
-		myConfig.removeMarkers();
-		myConfig.addMarker(0, "textBlue");
 		element.getChildren().addAll(myConfig.format(line));
 		addStyledCellTextFlow(element, gridPane, col, row, "whiteBox", TextAlignment.CENTER);
 	}

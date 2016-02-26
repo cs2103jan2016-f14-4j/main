@@ -32,7 +32,6 @@ public class UiWeeklyFormatter extends UiFormatter {
 	public void addTaskEntry(Task theTask) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
-
 		myConfig.addMarker(0, "textBlackToPurple");
 		String line = "";
 		String taskText = theTask.getTaskName();
@@ -42,10 +41,8 @@ public class UiWeeklyFormatter extends UiFormatter {
 		if (theTask.getDeadline() != "") {
 			line += "- " + taskText + " (" + theTask.getDeadline() + ")";
 		}
-
 		element.getChildren().addAll(myConfig.format(line));
 		addStyledCellTextFlow(element, gridPane, 0, numEntries, "whiteBox", TextAlignment.CENTER);
-
 	}
 
 	public boolean isWithinWeek(String deadLine) {

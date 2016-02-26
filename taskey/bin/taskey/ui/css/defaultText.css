@@ -1,6 +1,7 @@
 .textRed {
 	-fx-fill: red;
 	-fx-font: 15px Serif;	
+	-fx-font-weight: bold;
 }
 
 .textWhite {
@@ -10,6 +11,11 @@
 }
 .textBlue { 
 	-fx-fill: blue;
+	-fx-font: 15px Serif;
+	-fx-font-weight: bold;
+}
+.textGreen { 
+	-fx-fill: green;
 	-fx-font: 15px Serif;
 	-fx-font-weight: bold;
 }

@@ -44,12 +44,18 @@ public class UiConstants {
 			return null;
 		}
 	}
+	
+	// For action List
+	public enum ContentMode {
+		LIST, HELP;
+	}
 
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	public static final UiGridSettings GRID_SETTINGS_WEEKLY = new UiGridSettings(0, 10, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_PENDING = new UiGridSettings(10, 15, 7, 7, 63, 30);
-	public static final UiGridSettings GRID_SETTINGS_ACTION = new UiGridSettings(10, 15, 7, 7, 93);
-
+	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 93);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
+	
 	public static final ArrayList<String> UI_DEFAULT_STYLE = new ArrayList<String>(
 			Arrays.asList("defaultStyle.css", "defaultTab.css", "defaultText.css"));
 	public static final ArrayList<String> UI_LIGHT_STYLE = new ArrayList<String>(

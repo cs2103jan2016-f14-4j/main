@@ -8,6 +8,7 @@ import javafx.scene.layout.GridPane;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.UiConstants.ContentMode;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiGridSettings;
 
@@ -21,7 +22,7 @@ import taskey.ui.utility.UiGridSettings;
  */
 public class UiContentManager {
 	private UiClockService clockService; // reference to ui clock
-	private ArrayList<ScrollPane> contentBoxes; // list of references to the ScrollPane objects, in case
+	private ArrayList<ScrollPane> contentBoxes; // list of references to the ScrollPane objects, since .getParent() of grid returns Skin
 	private ArrayList<UiFormatter> myFormatters; // for the grid panes
 
 	public UiContentManager(UiClockService _clockService) {
@@ -41,7 +42,7 @@ public class UiContentManager {
 			myFormatters.add(new UiWeeklyFormatter(theGrid, clockService));
 			break;
 		case ACTION:
-			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_ACTION);
+			theGrid = setUpGrid(pane, UiConstants.GRID_SETTINGS_ACTION_LISTVIEW);
 			myFormatters.add(new UiActionFormatter(theGrid, clockService));
 			break;
 		default:
@@ -54,7 +55,7 @@ public class UiContentManager {
 	public GridPane setUpGrid(ScrollPane pane, UiGridSettings settings) {
 		GridPane gridPane = new GridPane();
 		pane.setContent(gridPane);
-		// gridPane.setGridLinesVisible(true);
+		//gridPane.setGridLinesVisible(true);
 		gridPane.setPadding(settings.getPaddings());
 		gridPane.setHgap(settings.getHGap());
 		gridPane.setVgap(settings.getVGap());
@@ -68,6 +69,10 @@ public class UiContentManager {
 	}
 
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
+		if ( contentID == ContentBox.ACTION ) {
+			updateActionContentBox(myTaskList, ContentMode.LIST); // redirect to appropriate method
+			return;
+		}
 		UiFormatter myFormatter = myFormatters.get(contentID.getValue());
 		myFormatter.clearGridContents();
 		myFormatter.format(myTaskList);
@@ -77,6 +82,36 @@ public class UiContentManager {
 		}
 	}
 
+	/**
+	 * Update action list to have the correct grid, then update the grid accordingly
+	 * @param myTaskList - which is the list of tasks
+	 * @param mode - Content LIST, HELP
+	 */
+	public void updateActionContentBox(ArrayList<Task> myTaskList, ContentMode mode) {
+		int arrayIndex = ContentBox.ACTION.getValue();
+		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
+		ScrollPane pane = contentBoxes.get(arrayIndex);
+		myFormatter.clearGridContents();
+		switch ( mode ) {
+			case LIST:
+				if ( myFormatter.getCurrentMode() != ContentMode.LIST ) {
+					myFormatter.setGrid(setUpGrid(pane, UiConstants.GRID_SETTINGS_ACTION_LISTVIEW));
+					myFormatter.setMode(ContentMode.LIST);
+				}
+				myFormatter.format(myTaskList);
+				break;
+			case HELP:
+				if ( myFormatter.getCurrentMode() != ContentMode.HELP ) {
+					myFormatter.setGrid(setUpGrid(pane, UiConstants.GRID_SETTINGS_ACTION_HELPVIEW));
+					myFormatter.setMode(ContentMode.HELP);
+				}
+				myFormatter.showHelp();
+				break;
+			default:
+				System.out.println("MODE NOT SPECIFIED FOR ACTION LIST");
+				break;
+		}
+	}
 	public void cleanUp() {
 		myFormatters.clear();
 		contentBoxes.clear();

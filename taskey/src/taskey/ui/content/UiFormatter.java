@@ -2,10 +2,12 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -36,13 +38,13 @@ public abstract class UiFormatter {
 	public void format(ArrayList<Task> myTaskList) {
 	}
 
-	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style,
-			TextAlignment align) {
+	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style,TextAlignment align) {
 		element.setTextAlignment(align);
 		StackPane wrapper = new StackPane();
 		wrapper.getChildren().add(element);
 		wrapper.getStyleClass().add(style);
 		gridPane.add(wrapper, col, row);
+		GridPane.setFillHeight(wrapper, false);
 	}
 
 	public void addStyledCellImage(String path, GridPane gridPane, int col, int row, String style) {
@@ -56,6 +58,12 @@ public abstract class UiFormatter {
 		gridPane.add(wrapper, col, row);
 	}
 
+	public void setGrid(GridPane newGrid) {
+		gridPane = newGrid;
+	}
+	public GridPane getGrid() {
+		return gridPane;
+	}
 	public void clearGridContents() {
 		Node node = null;
 		if (gridPane.isGridLinesVisible()) {

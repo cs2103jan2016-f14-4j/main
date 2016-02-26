@@ -19,6 +19,7 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.UiConstants.ContentMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiDropDown;
@@ -95,6 +96,12 @@ public class UiController {
 
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		myManager.updateContentBox(myTaskList, contentID);
+	}
+	
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ContentMode mode) {
+		myManager.updateActionContentBox(myTaskList,mode);
+		currentTab = myTabs.getTabs().size()-1;
+		displayTabContents(currentTab);
 	}
 
 	public void cleanUp() {

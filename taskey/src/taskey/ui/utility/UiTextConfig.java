@@ -13,12 +13,21 @@ import javafx.util.Pair;
  */
 public class UiTextConfig {
 
-	ArrayList<Pair<Integer, String>> styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
+	private ArrayList<Pair<Integer, String>> styleMarkers; 
+	private char symbol;
 
 	public UiTextConfig() {
-		addMarker(0, "textBlack"); // default marker, will get overridden if there exists another marker at 0
+		initVariables();
 	}
-
+	public UiTextConfig(String ...styles) { // for quick styling (primarily for formatting by symbol
+		initVariables();
+		addMarkers(styles);
+	}
+	public void initVariables() {
+		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
+		addMarker(0, "textBlack"); // default marker, will get overridden if there exists another marker at 0
+		symbol = '$'; // default symbol
+	}
 	public ArrayList<Text> format(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		int currentStart = styleMarkers.get(0).getKey();
@@ -47,12 +56,50 @@ public class UiTextConfig {
 			myTexts.add(newText);
 			currentStart = currentEnd;
 		}
-
+		return myTexts;
+	}
+	
+	public void setSymbol(char _symbol) {
+		symbol = _symbol;
+	}
+	/**
+	 * Using a symbol like #, etc to format, reuse markers but not using indexes
+	 * Markers are ignored in a queue-like fashion for each symbol encountered
+	 * @param symbol - #, $ etc
+	 * @param line - line to format
+	 * @return
+	 */
+	public ArrayList<Text> formatBySymbol(String line) {
+		ArrayList<Text> myTexts = new ArrayList<Text>();
+		String segment = "";
+		int styleIndex = 0;
+		String currentStyle = "";
+		for (int i = 0; i < line.length(); i++) { // not end of line yet 
+			char c = line.charAt(i);
+			if ( c != symbol ) {
+				segment += c;
+			} 
+			if ( c == symbol || i == line.length() - 1) { // hit symbol or hit end of line
+				if ( styleIndex < styleMarkers.size()) {
+					currentStyle = styleMarkers.get(styleIndex).getValue();
+					styleIndex++; // ignore previous style
+				}
+				Text newText = new Text(segment);
+				newText.getStyleClass().add(currentStyle);
+				myTexts.add(newText);
+				segment = "";
+			}
+		}
 		return myTexts;
 	}
 
 	public void addMarker(Integer startIndex, String style) {
 		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
+	}
+	public void addMarkers(String ...styles) {
+		for ( String style : styles) {
+			styleMarkers.add(new Pair<Integer, String>(0, style));
+		}
 	}
 
 	public void removeMarkers() {

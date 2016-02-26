@@ -214,11 +214,7 @@ public class Parser {
 			
 		} else if (simpString.split("from").length != 1) {
 			//event
-			String[] inputList = simpString.split("from");
-			String[] dateList = inputList[1].split("to"); 
-			taskName = inputList[0]; 
-			String rawStartDate = dateList[0].trim();
-			String rawEndDate = dateList[1].trim(); 
+			processed = handleEvent(task, simpString);
 			
 		} else {
 			//floating task 
@@ -226,6 +222,50 @@ public class Parser {
 		}
 		
 		return processed; 
+	}
+
+	private ProcessedObject handleEvent(Task task, String simpString) {
+		long epochTime;
+		ProcessedObject processed;
+		String taskName;
+		String[] inputList = simpString.split("from");
+		String[] dateList = inputList[1].split("to"); 
+		taskName = inputList[0]; 
+		String rawStartDate = dateList[0].trim();
+		String rawEndDate = dateList[1].trim(); 
+		
+		if (!specialDays.containsKey(rawStartDate)) {
+			if (rawStartDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(rawStartDate + DAY_END);
+				task.setStartDate(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawStartDate);
+			task.setStartDate(epochTime);
+		}
+		
+		if (!specialDays.containsKey(rawEndDate)) {
+			if (rawEndDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(rawEndDate + DAY_END);
+				task.setEndDate(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawEndDate);
+			task.setEndDate(epochTime);
+		}
+		
+		task.setTaskName(taskName);
+		task.setTaskType("EVENT");
+		processed = new ProcessedObject("ADD_EVENT",task);
+		return processed;
 	}
 
 	private ProcessedObject handleDeadlineBy(Task task, String simpString) {
@@ -289,8 +329,10 @@ public class Parser {
 		String taskName;
 		taskName = simpString;
 		Task newTask = new Task(taskName); 
+		
 		newTask.setTaskType("FLOATING");
 		processed = new ProcessedObject(command,newTask);
+		
 		return processed;
 	}
 	

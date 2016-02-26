@@ -70,9 +70,13 @@ public class UiMain extends Application {
 		primaryStage.setResizable(false);
 		myController.setUpNodes(primaryStage, root);  // must be done after loading .fxml file
 		setStyleSheets(UiConstants.UI_DEFAULT_STYLE);
-		primaryStage.show();
+		primaryStage.show();	
+		myController.updateBounds(); // layout bounds of nodes are only updated on show()
     }
     
+    public UiController getController () { 
+    	return myController;
+    }
     public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
     	// logic calls this method to update the lists
     	

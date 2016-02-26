@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import taskey.ui.utility.UiPopupFactory;
 
@@ -116,7 +118,22 @@ public class UiAutoCompleter {
 }
 	
 	
-	
+	VBox myContent = (VBox)myMenu.getContent().get(0);
+		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
+		//menuItems.clear();
+		for ( int i = 0; i < menuItems.size(); i ++ ) {
+			StackPane myPane = (StackPane)menuItems.get(i);
+			
+			if ( i < items.size() ) {
+				Label text = new Label(items.get(i));
+				//row.getStyleClass().add("prompt");
+				myPane.getChildren().clear();
+				myPane.getChildren().add(text);
+				myPane.setVisible(true);
+			} else {
+				myPane.setVisible(false);
+			}
+		}
 	
 	
 	

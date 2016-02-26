@@ -6,7 +6,7 @@ import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 /**
- * This class provides a way to format different styles given a string
+ * This class provides a way to configure different styles given a string
  * @author Junwei
  *
  */

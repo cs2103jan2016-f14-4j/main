@@ -53,6 +53,9 @@ public class UiClockService extends ScheduledService<Void> {
 	public String formatTime(Calendar cal) {
 		String myTime = "";
 		int hour = cal.get(Calendar.HOUR);
+		if ( cal.get(Calendar.AM_PM) == 1  && hour == 0 ){ // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm 
+			hour = 12;
+		}
 		int minute = cal.get(Calendar.MINUTE);
 		String minutePrefix = minute < 10 ? "0" : "";
 		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? UiConstants.PM_SUFFIX : UiConstants.AM_SUFFIX); // AM or PM

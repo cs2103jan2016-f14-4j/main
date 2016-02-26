@@ -12,7 +12,10 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
@@ -46,8 +49,7 @@ public class UiPopupFactory {
 	 */
 	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY) {
 		Popup newPopup = new Popup();
-		Bounds bounds = node.getBoundsInLocal();
-        Bounds screenBounds = node.localToScreen(bounds);
+        Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
 		content.setText(text);
 		content.getStyleClass().add("prompt");
@@ -57,38 +59,50 @@ public class UiPopupFactory {
 		return newPopup;
 	}
 
-	public ContextMenu createPopupMenu() {
-		ContextMenu newMenu = new ContextMenu();
-		popupList.add(newMenu);
-		return newMenu;
+	public Popup createPopupMenu(int numRows) {
+		Popup newPopup = new Popup();
+		VBox container = new VBox(); // VBox is used only for formatting purposes
+		for ( int i = 0; i < numRows; i ++ ) {
+			StackPane row = new StackPane();
+			row.getStyleClass().add("prompt");
+			container.getChildren().add(row);
+		}
+		newPopup.getContent().add(container);
+		popupList.add(newPopup);
+		return newPopup;
 	}
 	
+	public Bounds getScreenBoundsOfNode(Node node) {
+		Bounds bounds = node.getBoundsInLocal();
+        Bounds screenBounds = node.localToScreen(bounds);
+        return screenBounds;
+	}
 	/**
-	 * This method creates fade transitions for all content of the popup
+	 * This method creates fade transitions for first content (usually the container) of the popup
 	 * @param thePopup
 	 * @param startDelay
 	 * @param totalDuration
 	 * @param deleteOnFinished
+	 * @return 
 	 */
-	public void startFadeTransition (Popup thePopup, int startDelay, int totalDuration, boolean deleteOnFinished) {
-		ObservableList<Node> myList = thePopup.getContent();
-		for ( int i = 0; i < myList.size(); i ++ ) {
-			Node target = myList.get(i);
-			FadeTransition ft = new FadeTransition(Duration.millis(totalDuration),target);
-			ft.setDelay(Duration.millis(startDelay));
-			ft.setFromValue(target.getOpacity());
-			ft.setToValue(0);
-			ft.play();
-			
-			if (deleteOnFinished) {
-				ft.setOnFinished(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-							removePopupWindow(thePopup);
-						}
-				});
-			}
+	public FadeTransition createFadeTransition (Popup thePopup, int startDelay, int animDuration, double fromAlpha, double toAlpha, boolean deleteOnFinished) {
+		ObservableList<Node> myList = thePopup.getContent(); // usually only the container needs to be animated
+		Node target = myList.get(0);
+		FadeTransition ft = new FadeTransition(Duration.millis(animDuration),target);
+		ft.setDelay(Duration.millis(startDelay));
+		target.setOpacity(fromAlpha);
+		ft.setFromValue(target.getOpacity());
+		ft.setToValue(0);
+		
+		if (deleteOnFinished) {
+			ft.setOnFinished(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+						removePopupWindow(thePopup);
+					}
+			});
 		}
+		return ft;
 	}
 	
 	public void removePopupWindow(PopupWindow target ) {

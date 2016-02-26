@@ -30,32 +30,26 @@ public class Task implements Comparable<Task>, Serializable {
 	public static final int NONE = -1; 
 	public static final String EMPTY = ""; 
 	
-	private String taskName;
-	private ArrayList<String> taskTags;
-	private String taskType; 
+	private String taskName = null;
+	private ArrayList<String> taskTags = null;
+	private String taskType = null; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
-	//private boolean isRecurring = false; 
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
 	//CONSTRUCTORS ==============================================
 	public Task() {
-		taskName = "";
-		taskTags = new ArrayList<String>();
-		taskType = ""; 
+		
 	}
 	
 	public Task(String taskName) {
 		this.taskName = taskName;
-		taskTags = new ArrayList<String>();	
-		taskType = "";
 	}
 	
 	public Task(String taskName, ArrayList<String> taskTags) {
 		this.taskName = taskName;
 		this.taskTags = taskTags;
-		taskType = ""; 
 	}
 	
 	
@@ -72,7 +66,7 @@ public class Task implements Comparable<Task>, Serializable {
 		return taskTags; 
 	}
 	
-	public void setTaskTags(ArrayList taskTags) {
+	public void setTaskTags(ArrayList<String> taskTags) {
 		this.taskTags = taskTags; 
 	}
 	
@@ -153,7 +147,7 @@ public class Task implements Comparable<Task>, Serializable {
 	 * auto-key in the epoch time as well. 
 	 * @param deadline
 	 */
-	public void setDeadline(String  deadline) {
+	public void setDeadline(String deadline) {
 		datesHuman[3] = deadline; 
 		datesEpoch[3] = timeConverter.toEpochTime(deadline); 	
 	}
@@ -188,7 +182,12 @@ public class Task implements Comparable<Task>, Serializable {
 	 * @param tag
 	 */
 	public void addTaskTag(String tag) {
-		taskTags.add(tag); 
+		if (taskTags != null) {
+			taskTags.add(tag); 
+		} else {
+			taskTags = new ArrayList<String>();
+			taskTags.add(tag); 
+		}
 	}
 	
 	/**
@@ -245,7 +244,25 @@ public class Task implements Comparable<Task>, Serializable {
 		String stringRep = ""; 
 		stringRep += taskName;
 		stringRep += ", ";
-		stringRep += taskType; 
+		
+		if (taskType != null) {
+			stringRep += taskType; 
+			stringRep += ", ";
+		
+			switch(taskType) {
+				case "EVENT":
+					String[] eventTime = getEventTime(); 
+					stringRep += "from " + eventTime[0];
+					stringRep += " to " + eventTime[1]; 
+					break;
+				case "DEADLINE":
+					stringRep += "due on " + getDeadline(); 
+					break; 
+				default:
+					break;
+			}
+		}
+		stringRep += "\n";
 		
 		return stringRep; 
 	}

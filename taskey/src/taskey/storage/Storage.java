@@ -1,7 +1,13 @@
 package taskey.storage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+
 import taskey.logic.Task;
 
 /**
@@ -11,10 +17,11 @@ import taskey.logic.Task;
  */
 public class Storage {
 
+	public static final String DEFAULT_DIRECTORY = "bin\\taskey\\storage";
+	
 	private static Storage instance = null;
-	private File directory;
-	private File savefile = new File(DEFAULT_FILENAME);
-	private static final String DEFAULT_FILENAME = "TaskList Savefile";
+	private static File directory = new File(DEFAULT_DIRECTORY);
+	private static File savefile;
 	
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.  
@@ -23,44 +30,28 @@ public class Storage {
 	public static void main(String args[]) {
 		// Get the Storage singleton instance
 		Storage storageTest = Storage.getInstance();
-
-		// Can optionally set the savefile name
-		if (storageTest.setFilename("TaskList Savefile_test") == true) {
-			System.out.println("setFilename() successful.");
-		}
 		
-		// Can optionally set directory (default is the working directory)
-		if (storageTest.setDirectory("Storage directory test") == true) {
-			System.out.println("setDirectory() successful.");
-		}
-		
-		// Example of an invalid directory
-		if (storageTest.setDirectory(":\\?*|\"/<>") == false) {
-			System.out.println("Example: setDirectory() failed.");
-		}
-		
-		// Example of an invalid filename
-		if (storageTest.setFilename(":\\?*|\"/<>") == false) {
-			System.out.println("Example: setFilename() failed.");
-		}
+		// The default directory was automatically set in the getInstance() method.
+		// Can optionally set the directory again, if requested by user.
+		System.out.println("The directory is now \"" + directory.getAbsolutePath() + "\"");
 
 		// Create a simulated list of tasks
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		tasks.add(new Task("1. This is a test task"));
-		tasks.add(new Task("2. This is a test task"));
-		tasks.add(new Task("3. This is a test task"));
+		ArrayList<Task> testTaskList = new ArrayList<Task>();
+		testTaskList.add(new Task("1. This is a test task"));
+		testTaskList.add(new Task("2. This is a test task"));
+		testTaskList.add(new Task("3. This is a test task"));
 		
-		// Save the task list to file
+		// Save the task list to file, specifying the list's category
 		try {
-			storageTest.saveTasks(tasks);
+			storageTest.saveTaskList(testTaskList, "TEST_TASKLIST_CATEGORY");
 		} catch (IOException e) {
 			System.err.println("Error saving task list to file.");
 			e.printStackTrace();
 		}
 		
-		// Load the task list from file
+		// Load the task list from file, specifying the list's category
 		try {
-			ArrayList<Task> loadedTaskList = storageTest.loadTasks();
+			ArrayList<Task> loadedTaskList = storageTest.loadTaskList("TEST_TASKLIST_CATEGORY");
 			for (Task t : loadedTaskList) {
 				System.out.println(t);
 			}
@@ -70,6 +61,10 @@ public class Storage {
 		}
 	}
 	
+    /*=============*
+     * Constructor *
+     *=============*/
+	
 	/**
 	 * Logic gets Storage singleton.
 	 * @return the storage singleton instance
@@ -77,14 +72,58 @@ public class Storage {
     public static Storage getInstance() {
     	if (instance == null) {
     		instance = new Storage();
+    		instance.setDirectory(DEFAULT_DIRECTORY);
     	}
     	return instance;
     }
     
+    /*=====================*
+     * Save/load task list *
+     *=====================*/
+    
     /**
-     * Logic can set the storage directory.
-     * @return true if directory now exists and is indeed a directory
-     * @return false if directory name is invalid (previous directory remains unchanged)
+     * Logic passes a task list to Storage for saving.
+     * @param tasks The list of task objects for saving.
+     * @param taskCategory The category that the task list belongs to.
+     * 					   i.e. ALL, FLOATING, DEADLINE, EVENT, DONE, EXPIRED
+     * @throws IOException
+     */
+    public void saveTaskList(ArrayList<Task> tasks, String taskCategory) throws IOException {
+		setFilename(taskCategory);
+    	writeToFile(tasks);
+    	System.out.println("Saved.");
+    }
+    
+    /**
+     * Logic gets a task list from Storage.
+     * @param taskCategory The category of tasks that Logic wants to load.
+     * @return The task list loaded from file, specified by taskCategory.
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    public ArrayList<Task> loadTaskList(String taskCategory) throws ClassNotFoundException, IOException {
+    	setFilename(taskCategory);
+    	ArrayList<Task> tasks = readFromFile();
+    	System.out.println("Loaded.");
+    	return tasks;
+    }
+    
+    /*===========================*
+     * Public accessors/mutators *
+     *===========================*/
+    
+    /**
+     * When the user changes directory, Logic can return it as feedback.
+     * @return Absolute path of the last saved/loaded file.
+     */
+    public static String getFilePath() {
+    	return savefile.getAbsolutePath();
+    }
+    
+    /**
+     * Logic can set the storage directory, if the user requests to change it.
+     * @return True if directory now exists and is indeed a directory; 
+     * 		   false if directory name is invalid (previous directory remains unchanged).
      * @param pathname (can be a relative or absolute path)
      */
     public boolean setDirectory(String pathname) {
@@ -94,68 +133,39 @@ public class Storage {
 		}
 		
 		if (dir.isDirectory()) {
-			this.directory = dir;
-			// Need to re-set the filename after changing directory.
-			// Otherwise, the file will not be saved in the new directory.
-			setFilename(savefile.getName());
+			directory = dir;
+			if (savefile != null) {
+				// Need to re-set the file path after changing directory.
+				// Otherwise, the file will not be saved in the new directory.
+				setFilename(savefile.getName());
+			}
 			return true;
 		} else {
 			return false;
 		}
     }
     
+    /*=================*
+     * Private methods *
+     *=================*/
+    
     /**
-     * Logic can set the savefile's name.
+     * Storage will set the filename according to which tasklist is being updated, before each read/write operation.
      * @param filename
-     * @return true if the savefile's name and path has been updated
-     * @return false if the filename is invalid
+     * @return true if the savefile's name and path has been updated; false if the filename is invalid
      */
-    public boolean setFilename(String filename) {
+    private boolean setFilename(String filename) {
 		File file = new File(directory, filename);
 		
 		try {
-			System.out.println("The savefile path is now \"" + file.getCanonicalPath() + "\"");
+			file.getCanonicalPath();
 		} catch (IOException e) {
 			return false;
 		}
 		
-		this.savefile = file;
+		savefile = file;
 		return true;
     }
-    
-    /**
-     * Logic can get the file path and return it to UI as feedback when user changes directory and/or filename.
-     * @return absolute path of the savefile
-     */
-    public String getFilePath() {
-    	return savefile.getAbsolutePath();
-    }
-    
-    /**
-     * Logic passes Task list to Storage for saving.
-     * @param tasks
-     * @throws IOException 
-     */
-    public void saveTasks(ArrayList<Task> tasks) throws IOException {
-		writeToFile(tasks);
-    	System.out.println("Saved.");
-    }
-    
-    /**
-     * Logic gets Task list from Storage on startup.
-     * @return the list of tasks loaded from storage.
-     * @throws IOException 
-     * @throws ClassNotFoundException 
-     */
-    public ArrayList<Task> loadTasks() throws ClassNotFoundException, IOException {
-    	ArrayList<Task> tasks = readFromFile();
-    	System.out.println("Loaded.");
-    	return tasks;
-    }
-    
-    /* =============== *
-     * Private methods *
-     * =============== */
     
     private void writeToFile(ArrayList<Task> tasks) throws IOException {
     	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savefile));

@@ -432,6 +432,8 @@ public class Parser {
 			//if the update is not by index, then it's by task name. 
 			processed = new ProcessedObject(UPDATE_BY_NAME, new Task(taskName));
 		}
+		//to check if changing name, by checking for " "
+		//to check if changing date, by checking for [ ] 
 	}
 	
 	/**

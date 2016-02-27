@@ -151,7 +151,7 @@ public class UiController {
 
 					event.consume();
 
-					myDropDown.hideMenu();
+					myDropDown.closeMenu();
 				}
 			}
 		});

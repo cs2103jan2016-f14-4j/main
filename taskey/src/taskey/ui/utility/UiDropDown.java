@@ -37,7 +37,7 @@ public class UiDropDown {
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				hideMenu();
+				closeMenu();
 			}
 		});
 		myWindow = primaryStage.getScene().getWindow();
@@ -68,7 +68,7 @@ public class UiDropDown {
 		}
 		String line = myInput.getText();
 		if (line.equals("")) {
-			hideMenu();
+			closeMenu();
 		} else {
 			ShiftMenu(line);
 			refresh();  // fix display issues
@@ -102,18 +102,19 @@ public class UiDropDown {
 		return content.getText();
 	}
 
-	public void hideMenu() {
+	public void closeMenu() {
 		myMenu.hide();
-		fade.stop();
+		currentItemSize = 0;
 	}
-
+	
 	/**
 	 * Most of the time after switching styles or setting visibility
 	 * The popup window has some tears, probably because it renders separately from the main program
 	 * This fixes that issue, and also sets opacity full for display
 	 */
 	public void refresh() {
-		hideMenu();
+		myMenu.hide();
+		fade.stop();
 		fade.getNode().setOpacity(1);
 		fade.playFromStart();
 		myMenu.show(myWindow);

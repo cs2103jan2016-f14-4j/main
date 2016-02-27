@@ -40,6 +40,8 @@ public class Logic {
 	private UiManager uiManager;
 	//The most recent processed object whose command is not VIEW, UNDO, SEARCH or ERROR
 	private ProcessedObject mostRecentProcessedObject = null;
+	//The current view type that Ui is displaying, e.g. deadline, events
+	private String uiCurrentViewType = null;
 	//Task lists retrieved from Storage at startup 
 	private ArrayList<ArrayList<Task>> listsFromStorage = null;
 	
@@ -83,39 +85,106 @@ public class Logic {
     	String command = po.getCommand();
     	Task task = po.getTask();
     	String taskName = task.getTaskName();
-    	ArrayList<Task> tasksToView = new ArrayList<Task>();
-    	ArrayList<Task> tasksToAdd = new ArrayList<Task>();
     	int statusCode = 0;
     	switch (command) {
     		case "VIEW":
     			String viewType = po.getViewType();
-    			statusCode = view(viewType, tasksToView);
+    			statusCode = view(viewType);
     			break;
     			
     		case "ADD_FLOATING":
     		case "ADD_DEADLINE":
     		/*case ADD_RECURRING:*/
     		case "ADD_EVENT":
-    			statusCode = add(tasksToAdd, task, command);
+    			statusCode = add(task, command);
     			break;
     			
     		case "DELETE_BY_INDEX":
-    			//TODO: delete indexed task from storage
+    			int index = po.getIndex() - 1; //Convert to 0-based index
+    			if (uiCurrentViewType == "ALL") {
+    				if (index >= allCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toDelete = allCollection.get(index);
+    				String toDeleteType = toDelete.getTaskType();
+    				String toDeleteName = toDelete.getTaskName();
+    				allCollection.remove(index);
+    				storage.setFilename("all tasks");
+    				storage.saveTasks(allCollection); //What if this fails? Then we have to put back the removed
+    				                                  //task into allCollection. Either that or make a copy b4
+    				                                  //passing to Storage
+    				if (toDeleteType == "FLOATING") {
+    					floatingMap.remove(toDeleteName);
+    					storage.setFilename("floating tasks");
+        				storage.saveTasks(floatingCollection);
+    				} else if (toDeleteType == "DEADLINE") {
+    					deadlineMap.remove(toDeleteName);
+    					storage.setFilename("deadline tasks");
+        				storage.saveTasks(deadlineCollection);
+    				} else if (toDeleteType == "EVENT") {
+    					eventMap.remove(toDeleteName);
+    					storage.setFilename("event tasks");
+        				storage.saveTasks(eventCollection);
+    				}
+    			} else if (uiCurrentViewType == "FLOATING") {
+    				if (index >= floatingCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toDelete = floatingCollection.get(index);
+    				String toDeleteName = toDelete.getTaskName();
+    				floatingCollection.remove(index);
+    				storage.setFilename("floating tasks");
+    				storage.saveTasks(floatingCollection);
+    				allMap.remove(toDeleteName);
+    				storage.setFilename("all tasks");
+    				storage.saveTasks(allCollection);
+    			} else if (uiCurrentViewType == "EVENT") {
+    				if (index >= eventCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toDelete = eventCollection.get(index);
+    				String toDeleteName = toDelete.getTaskName();
+    				eventCollection.remove(index);
+    				storage.setFilename("event tasks");
+    				storage.saveTasks(eventCollection);
+    				allMap.remove(toDeleteName);
+    				storage.setFilename("all tasks");
+    				storage.saveTasks(allCollection);
+    			} else if (uiCurrentViewType == "DEADLINE") {
+    				if (index >= deadlineCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toDelete = deadlineCollection.get(index);
+    				String toDeleteName = toDelete.getTaskName();
+    				deadlineCollection.remove(index);
+    				storage.setFilename("deadline tasks");
+    				storage.saveTasks(eventCollection);
+    				allMap.remove(toDeleteName);
+    				storage.setFilename("all tasks");
+    				storage.saveTasks(allCollection);
+    			}
     			break;
     		
     		case "DELETE_BY_NAME":
     			if (allMap.containsKey(taskName)) {
     				Task toDelete = allMap.get(taskName);
-    				//TODO: ask Storage to delete task
     				String taskType = toDelete.getTaskType();
     				if (taskType == "FLOATING") {
     					floatingMap.remove(taskName);
+    					storage.setFilename("floating tasks");
+        				storage.saveTasks(floatingCollection);
     				} else if (taskType == "EVENT") {
     					eventMap.remove(taskName);
+    					storage.setFilename("event tasks");
+        				storage.saveTasks(eventCollection);
     				} else { //Deadline task
     					deadlineMap.remove(taskName);
+    					storage.setFilename("deadline tasks");
+        				storage.saveTasks(deadlineCollection);
     				}
     				allMap.remove(taskName);
+    				storage.setFilename("all tasks");
+    				storage.saveTasks(allCollection);
     			} else { //Task to delete does not exist
     				statusCode = ERROR_DELETE;
     			}
@@ -270,10 +339,11 @@ public class Logic {
     }
     
     
-    private int view(String viewType, ArrayList<Task> tasksToView) throws ClassNotFoundException, IOException {
+    private int view(String viewType) throws ClassNotFoundException, IOException {
     	int statusCode = -1; //Stub 	
     	if (allMap == null) { //HashMap not initialized at startup, must get Tasks from Storage
 			statusCode = getListsFromStorage();
+			uiCurrentViewType = "ALL";
 		} else if (viewType == "ALL") {
 			Collections.sort(allCollection);
 			//TODO: update Ui with allCollection
@@ -293,35 +363,39 @@ public class Logic {
 			Collections.sort(expiredCollection);
 			//TODO: update Ui with expiredCollection
 		}
+    	uiCurrentViewType = viewType;
     	
     	return statusCode; 
     }
     
     //Add the Task to Storage. Returns a status code representing outcome of action.
-    private int add(ArrayList<Task> tasksToAdd, Task task, String command) throws IOException {
+    private int add(Task task, String command) throws IOException {
     	if (command == "ADD_FLOATING") {
+    		floatingMap.put(task.getTaskName(), task); 
     		storage.setFilename("floating tasks");
-    		floatingMap.put(task.getTaskName(), task); //Technically should be done only after storage 
-    		                                           //add succeeded
+    		storage.saveTasks(floatingCollection);
+    		
     	} else if (command == "ADD_DEADLINE") {
-    		storage.setFilename("deadline tasks");
     		deadlineMap.put(task.getTaskName(), task);
+    		storage.setFilename("deadline tasks");
+    		storage.saveTasks(deadlineCollection);
     	} else { //Event tasks
-    		storage.setFilename("event tasks");
     		eventMap.put(task.getTaskName(), task);
+    		storage.setFilename("event tasks");
+    		storage.saveTasks(eventCollection);
     	}
-    	
-    	tasksToAdd.add(task);
-		storage.saveTasks(tasksToAdd);
+
 		allMap.put(task.getTaskName(), task);
+		storage.setFilename("all tasks");
+		storage.saveTasks(allCollection);
 		
 		return -1; //Stub
     }
     
     //Undo the most recent action that was not view, undo, search or error.
     //Returns a status code representing outcome of action.
-	private int undo(ArrayList<Task> tasksToAdd) throws IOException {
-		if (mostRecentProcessedObject == null) {
+	private int undo() throws IOException {
+		if (mostRecentProcessedObject == null) { //No undoable tasks since startup
 			return ERROR_UNDO; //Stub
 		}
 		String mostRecentCommand = mostRecentProcessedObject.getCommand();
@@ -330,45 +404,44 @@ public class Logic {
 		String mostRecentTaskName = mostRecentTask.getTaskName();
 		switch (mostRecentCommand) {
 			case "ADD_FLOATING":
-				floatingMap.remove(mostRecentTaskName); //Technically should only be done after storage has
-				                                        //successfully performed delete
+				floatingMap.remove(mostRecentTaskName); 
 				allMap.remove(mostRecentTaskName);
 				storage.setFilename("floating tasks");
-				//TODO: delete floating task from storage
+				storage.saveTasks(floatingCollection);
 				break;
 				
 			case "ADD_DEADLINE":
 				deadlineMap.remove(mostRecentTaskName);
 				allMap.remove(mostRecentTaskName);
 				storage.setFilename("deadline tasks");
-				//TODO: delete deadline task from storage
+				storage.saveTasks(deadlineCollection);
 				break;
 				
 			case "ADD_EVENT":
 				eventMap.remove(mostRecentTaskName);
 				allMap.remove(mostRecentTaskName);
 				storage.setFilename("event tasks");
-				//TODO: delete event task from storage
+				storage.saveTasks(eventCollection);
 				break;
-				
-			/*case "ADD_RECURRING":
-				break;*/
 			
 			case "DELETE_BY_INDEX":
 			case "DELETE_BY_NAME":
-				tasksToAdd.add(mostRecentTask);
 				if (mostRecentTaskType == "FLOATING") {
-					storage.setFilename("floating tasks");
 					floatingMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("floating tasks");
+					storage.saveTasks(floatingCollection);
 				} else if (mostRecentTaskType == "EVENT") {
-					storage.setFilename("event tasks");
 					eventMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("event tasks");
+					storage.saveTasks(eventCollection);
 				} else { //Deadline tasks
-					storage.setFilename("deadline tasks");
 					deadlineMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("deadline tasks");
+					storage.saveTasks(deadlineCollection);
 				}
-				storage.saveTasks(tasksToAdd);
 				allMap.put(mostRecentTaskName, mostRecentTask);
+				storage.setFilename("all tasks");
+				storage.saveTasks(allCollection);
 				break;
 			
 			case "UPDATE_BY_INDEX":
@@ -378,23 +451,34 @@ public class Logic {
 				
 			case "DONE_BY_INDEX":
 			case "DONE_BY_NAME":
-				//TODO: mark most recently "done" task as "undone" in storage
 				if (mostRecentTaskType == "FLOATING") {
 					floatingMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("floating tasks");
+					storage.saveTasks(floatingCollection);
 				} else if (mostRecentTaskType == "EVENT") {
 					eventMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("event tasks");
+					storage.saveTasks(eventCollection);
 				} else { //Deadline tasks
 					deadlineMap.put(mostRecentTaskName, mostRecentTask);
+					storage.setFilename("deadline tasks");
+					storage.saveTasks(deadlineCollection);
 				}
 				
 				doneMap.remove(mostRecentTaskName);
+				storage.setFilename("done tasks");
+				storage.saveTasks(doneCollection);
+				
 				allMap.put(mostRecentTaskName, mostRecentTask);
+				storage.setFilename("all tasks");
+				storage.saveTasks(allCollection);
+				
 				break;
 			
 			default:
 		}
 		
-		return SUCCESS_UNDO; //Stub
+		return -1; //Stub
 	}
 	
     //Returns true if the supplied command can be undone.

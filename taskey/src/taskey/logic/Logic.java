@@ -17,10 +17,26 @@ import taskey.logic.ProcessedObject;
  * @author Hubert Wong
  */
 public class Logic {
+	//List of status codes. Other components like Ui can use Logic.statusCode to access this list.
+	public static final int SUCCESS_VIEW = 1;
+	public static final int SUCCESS_ADD = 2;
+	public static final int SUCCESS_DELETE = 3;
+	public static final int SUCCESS_UPDATE = 4;
+	public static final int SUCCESS_DONE = 5;
+	public static final int SUCCESS_SEARCH = 6;
+	public static final int SUCCESS_UNDO = 7;
+	public static final int ERROR_VIEW = -1;
+	public static final int ERROR_ADD = -2;
+	public static final int ERROR_DELETE = -3;
+	public static final int ERROR_UPDATE = -4;
+	public static final int ERROR_DONE = -5;
+	public static final int ERROR_SEARCH = -6;
+	public static final int ERROR_UNDO = -7;
+	
 	private Parser parser;
 	private Storage storage;
 	private UiManager uiManager;
-	/** The most recent processed object whose command is not VIEW or UNDO */
+	/** The most recent processed object whose command is not VIEW, UNDO, SEARCH or ERROR */
 	private ProcessedObject mostRecentProcessedObject = null;
 	
 	//TODO: constructors
@@ -33,8 +49,8 @@ public class Logic {
     /**
      * Attempts to execute a command specified by the input string.
      * 
-     * @param input the input string
-     * @return      status code reflecting the outcome of command execution
+     * @param input       the input string
+     * @return statusCode status code reflecting the outcome of command execution
      * @throws IOException 
      * @throws ClassNotFoundException 
      */
@@ -42,23 +58,20 @@ public class Logic {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Task task = po.getTask();
-    	
-    	//TODO: handle invalid commands
-    	
-    	String taskName = task.getTaskName();
     	ArrayList<Task> tasksToView = new ArrayList<Task>();
     	ArrayList<Task> tasksToAdd = new ArrayList<Task>();
+    	int statusCode = 0;
     	switch (command) {
     		case "VIEW":
     			String viewType = po.getViewType();
-    			view(viewType, tasksToView);
+    			statusCode = view(viewType, tasksToView);
     			break;
     			
     		case "ADD_FLOATING":
     		case "ADD_DEADLINE":
     		/*case ADD_RECURRING:*/
     		case "ADD_EVENT":
-    			add(tasksToAdd, task, command);
+    			statusCode = add(tasksToAdd, task, command);
     			break;
     			
     		case "DELETE_BY_INDEX":
@@ -76,23 +89,54 @@ public class Logic {
     		case "UPDATE_BY_NAME":
     			//TODO: update named task in storage
     			break;
+    			
+    		case "DONE_BY_INDEX":
+    			//TODO: mark indexed task as done in storage
+    			break;
+    		
+    		case "DONE_BY_NAME":
+    			//TODO: mark named task as done in storage
+    			break;
+    			
+    		case "SEARCH":
+    			String searchPhrase = po.getSearchPhrae();
+    			//TODO: search for task in storage
+    			break;
     		
     		case "UNDO":
-    			undo(tasksToAdd);
+    			statusCode = undo(tasksToAdd);
     			break;
     		
     		case "ERROR":
-    			//TODO
+    			String errorType = po.getErrorType();
+    			switch (errorType) {
+    				case "ERROR_COMMAND":
+    					//TODO: pass message to Ui
+    					break;
+    				
+    				case "ERROR_VIEW_TYPE":
+    					//TODO: pass message to Ui
+    					break;
+    				
+    				case "ERROR_DATE_FORMAT":
+    					//TODO: pass message to Ui
+    					break;
+    				
+    				default:
+    			}
     			
     		default:
     	}
     	
+    	if (isUndoableCommand(command)) {
+    		mostRecentProcessedObject = po;
+    	}
     	uiManager.updateDisplay();
-    	return -1; //stub
+    	return statusCode; 
     }
     
-    //Update the list of Tasks to view from Storage.
-    private void view(String viewType, ArrayList<Task> tasksToView) throws ClassNotFoundException, IOException {
+    //Update the list of Tasks to view from Storage. Returns a status code representing outcome of action.
+    private int view(String viewType, ArrayList<Task> tasksToView) throws ClassNotFoundException, IOException {
 		ArrayList<Task> fullTaskList = storage.loadTasks();
 		if (viewType == "GENERAL") {
 			for (Task t : fullTaskList) {
@@ -113,13 +157,17 @@ public class Logic {
 	    		}
 	    	}		    
 		} else { //No restriction on viewType
+			for (Task t : fullTaskList) {
+				tasksToView.add(t);
+			}
 		}
 		
 		Collections.sort(tasksToView);
+		return SUCCESS_VIEW; //Stub
     }
     
-    //Add the Task to Storage.
-    private void add(ArrayList<Task> tasksToAdd, Task task, String command) throws IOException {
+    //Add the Task to Storage. Returns a status code representing outcome of action.
+    private int add(ArrayList<Task> tasksToAdd, Task task, String command) throws IOException {
     	if (command == "ADD_FLOATING") {
     		storage.setFilename("floating tasks");
     	} else if (command == "ADD_DEADLINE") {
@@ -130,10 +178,16 @@ public class Logic {
     	
     	tasksToAdd.add(task);
 		storage.saveTasks(tasksToAdd);
+		
+		return SUCCESS_ADD; //Stub
     }
     
-    //Undo the most recent action, unless the action was view or undo.
-	private void undo(ArrayList<Task> tasksToAdd) throws IOException {
+    //Undo the most recent action that was not view, undo, search or error.
+    //Returns a status code representing outcome of action.
+	private int undo(ArrayList<Task> tasksToAdd) throws IOException {
+		if (mostRecentProcessedObject == null) {
+			return ERROR_UNDO; //Stub
+		}
 		String mostRecentCommand = mostRecentProcessedObject.getCommand();
 		switch (mostRecentCommand) {
 			case "ADD_FLOATING":
@@ -162,8 +216,30 @@ public class Logic {
 			case "UPDATE_BY_NAME":
 				//TODO: revert most recently updated task in storage
 				break;
+				
+			case "DONE_BY_INDEX":
+			case "DONE_BY_NAME":
+				//TODO: mark most recently "done" task as "undone" in storage
+				break;
 			
 			default:
 		}
+		
+		return SUCCESS_UNDO; //Stub
 	}
+	
+    //Returns true if the supplied command can be undone.
+    private boolean isUndoableCommand(String command) {
+    	switch (command) {
+    		case "VIEW":
+    		case "SEARCH":
+    		case "UNDO":
+    		case "ERROR":
+    			return false;
+    		
+    		default:
+    	}
+    	
+    	return true;
+    }
 }

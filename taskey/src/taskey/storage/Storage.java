@@ -51,7 +51,7 @@ public class Storage {
 		
 		// Load the task list from file, specifying the list's category
 		try {
-			ArrayList<Task> loadedTaskList = storageTest.loadTaskList("TEST_TASKLIST_CATEGORY");
+			ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST_CATEGORY");
 			for (Task t : loadedTaskList) {
 				System.out.println(t);
 			}
@@ -101,7 +101,7 @@ public class Storage {
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    public ArrayList<Task> loadTaskList(String taskCategory) throws ClassNotFoundException, IOException {
+    public ArrayList<Task> getTaskList(String taskCategory) throws ClassNotFoundException, IOException {
     	setFilename(taskCategory);
     	ArrayList<Task> tasks = readFromFile();
     	System.out.println("Loaded.");

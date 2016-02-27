@@ -268,7 +268,7 @@ public class Logic {
     	listsFromStorage = new ArrayList<ArrayList<Task>>(6);
     	
     	//Get ALL list from Storage
-    	listsFromStorage.set(0, storage.loadTaskList("all tasks"));
+    	listsFromStorage.set(0, storage.getTaskList("all tasks"));
     	allMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(0)) {
     		allMap.put(t.getTaskName(), t);
@@ -276,7 +276,7 @@ public class Logic {
     	allCollection = (ArrayList<Task>) allMap.values();
     	
     	//Get FLOATING list from Storage
-    	listsFromStorage.set(1, storage.loadTaskList("floating tasks"));
+    	listsFromStorage.set(1, storage.getTaskList("floating tasks"));
     	floatingMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(1)) {
     		floatingMap.put(t.getTaskName(), t);
@@ -284,7 +284,7 @@ public class Logic {
     	floatingCollection = (ArrayList<Task>) floatingMap.values();
     	
     	//Get DEADLINE list from Storage
-    	listsFromStorage.set(2, storage.loadTaskList("deadline tasks"));
+    	listsFromStorage.set(2, storage.getTaskList("deadline tasks"));
     	deadlineMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(2)) {
     		deadlineMap.put(t.getTaskName(), t);
@@ -292,7 +292,7 @@ public class Logic {
     	deadlineCollection = (ArrayList<Task>) deadlineMap.values();
     	
     	//Get EVENT list from Storage
-    	listsFromStorage.set(3, storage.loadTaskList("event tasks"));
+    	listsFromStorage.set(3, storage.getTaskList("event tasks"));
     	eventMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(3)) {
     		eventMap.put(t.getTaskName(), t);
@@ -300,7 +300,7 @@ public class Logic {
     	eventCollection = (ArrayList<Task>) eventMap.values();
     	
     	//Get DONE list from Storage
-    	listsFromStorage.set(4, storage.loadTaskList("done tasks"));
+    	listsFromStorage.set(4, storage.getTaskList("done tasks"));
     	doneMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(4)) {
     		doneMap.put(t.getTaskName(), t);
@@ -308,7 +308,7 @@ public class Logic {
     	doneCollection = (ArrayList<Task>) doneMap.values();
     	
     	//Get EXPIRED list from Storage
-    	listsFromStorage.set(5, storage.loadTaskList("expired tasks"));
+    	listsFromStorage.set(5, storage.getTaskList("expired tasks"));
     	expiredMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(5)) {
     		expiredMap.put(t.getTaskName(), t);

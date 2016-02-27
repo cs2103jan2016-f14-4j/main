@@ -50,9 +50,9 @@ public class UiDefaultFormatter extends UiFormatter {
 		if (theTask.getDeadline() != "") {
 			String[] params = theTask.getDeadline().split(" ");
 			theDate = params[0] + params[1] + params[2];
-			line += " at ";
-			myConfig.addMarker(line.length(), "textRed");
-			line += params[3];
+			//line += " at ";
+			//myConfig.addMarker(line.length(), "textRed");
+			//line += params[3];
 		}
 		element.getChildren().addAll(myConfig.format(line));
 		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.LEFT);
@@ -61,11 +61,13 @@ public class UiDefaultFormatter extends UiFormatter {
 	private void addTaskDate(Task theTask, int col, int row) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, "textBlue");
+		
 		String line;
 		if (theDate == "") {
+			myConfig.addMarker(0, "textBlue");
 			line = "------";
 		} else {
+			myConfig.addMarker(0, "textRed");
 			line = theDate;
 		}
 		element.getChildren().addAll(myConfig.format(line));

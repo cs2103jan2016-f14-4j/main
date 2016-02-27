@@ -15,6 +15,10 @@ package taskey.logic;
  * 8. UPDATE_BY_NAME 
  * 9. VIEW 
  * 10. ERROR 
+ * 11. DONE_BY_INDEX
+ * 12. DONE_BY_NAME
+ * 13. SEARCH
+ * 14. UNDO 
  * 
  * @author Xue Hui
  *
@@ -26,13 +30,15 @@ public class ProcessedObject {
 	 * possible values for viewType:
 	 * 1. ALL
 	 * 2. GENERAL
-	 * 3. DEADLINE
+	 * 3. DEADLINES
 	 * 4. EVENTS 
 	 */
 	private String command;
 	private Task task = null; 
 	private int index = -1; 
-	private String viewType; 
+	private String viewType = null; 
+	private String errorType = null;
+	private String searchPhrase = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -45,7 +51,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR 
+	 * Constructor for ERROR/UNDO 
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -78,9 +84,8 @@ public class ProcessedObject {
 	 * @param task
 	 * @param index
 	 */
-	public ProcessedObject(String command, Task task, int index) {
+	public ProcessedObject(String command, int index) {
 		this.command = command;
-		this.task = task; 
 		this.index = index; 
 	}
 	
@@ -119,5 +124,52 @@ public class ProcessedObject {
 	public void setViewType(String viewType) {
 		this.viewType = viewType; 
 	}
-
+	
+	public void setErrorType(String errorType) {
+		this.errorType = errorType;
+	}
+	
+	public String getErrorType() {
+		return errorType; 
+	}
+	
+	public void setSearchPhrase(String searchPhrase) {
+		this.searchPhrase = searchPhrase; 
+	}
+	
+	public String getSearchPhrae() {
+		return searchPhrase; 
+	}
+	
+	@Override 
+	/**
+	 * For debugging
+	 */
+	public String toString() {
+		String stringRep = ""; 
+		
+		stringRep += "Command: " + command + "\n";
+		
+		if (task != null) {
+			stringRep += task.toString(); 
+		}
+		
+		if (index != -1) {
+			stringRep += "at index: " + String.valueOf(index); 
+		}
+		
+		if (viewType != null) {
+			stringRep += "view type: " + viewType + "\n"; 
+		}
+		
+		if (errorType != null) {
+			stringRep += "error type: " + errorType + "\n"; 
+		}
+		
+		if (searchPhrase != null) {
+			stringRep += "search phrase: " + searchPhrase + "\n"; 
+		}
+		
+		return stringRep; 
+	}
 }

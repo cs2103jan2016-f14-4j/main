@@ -28,11 +28,13 @@ import taskey.ui.utility.UiClockService;
 public abstract class UiFormatter {
 
 	protected UiClockService clockService;
-	protected GridPane gridPane;
-
+	protected GridPane currentGrid;
+	protected ArrayList<GridPane> myGrids;
 	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
-		gridPane = _gridPane;
+		currentGrid = _gridPane;
 		clockService = _clockService;
+		myGrids = new ArrayList<GridPane>();
+		myGrids.add(currentGrid);
 	}
 
 	public void format(ArrayList<Task> myTaskList) {
@@ -57,22 +59,27 @@ public abstract class UiFormatter {
 		wrapper.getStyleClass().add(style);
 		gridPane.add(wrapper, col, row);
 	}
-
-	public void setGrid(GridPane newGrid) {
-		gridPane = newGrid;
+	
+	public void setGrid(int index) {
+		currentGrid = myGrids.get(index);
+	}
+	public void addGrid(GridPane newGrid) {
+		myGrids.add(newGrid);
 	}
 	public GridPane getGrid() {
-		return gridPane;
+		return currentGrid;
 	}
 	public void clearGridContents() {
 		Node node = null;
-		if (gridPane.isGridLinesVisible()) {
-			node = gridPane.getChildren().get(0); // retain grid lines
+		if (currentGrid.isGridLinesVisible()) {
+			node = currentGrid.getChildren().get(0); // retain grid lines
 		}
-		gridPane.getChildren().clear();
-		if (gridPane.isGridLinesVisible()) {
-			gridPane.getChildren().add(0, node);
+		currentGrid.getChildren().clear();
+		if (currentGrid.isGridLinesVisible()) {
+			currentGrid.getChildren().add(0, node);
 		}
-
+	}
+	public void cleanUp() {
+		myGrids.clear();
 	}
 }

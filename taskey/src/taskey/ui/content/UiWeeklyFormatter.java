@@ -35,14 +35,15 @@ public class UiWeeklyFormatter extends UiFormatter {
 		myConfig.addMarker(0, "textBlackToPurple");
 		String line = "";
 		String taskText = theTask.getTaskName();
-		if (taskText.length() > UiConstants.WORD_LIMIT_WEEKLIST) {
-			line += taskText.substring(0, UiConstants.WORD_LIMIT_WEEKLIST) + "...*";
+		if (taskText.length() > UiConstants.CHAR_LIMIT_WEEKLIST) {
+			taskText = taskText.substring(0, UiConstants.CHAR_LIMIT_WEEKLIST) + "...*";
 		}
+		line += "- " + taskText;
 		if (theTask.getDeadline() != "") {
-			line += "- " + taskText + " (" + theTask.getDeadline() + ")";
+			line += " (" + theTask.getDeadline() + ")";
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, 0, numEntries, "whiteBox", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, 0, numEntries, "whiteBox", TextAlignment.CENTER);
 	}
 
 	public boolean isWithinWeek(String deadLine) {

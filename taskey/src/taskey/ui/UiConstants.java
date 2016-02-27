@@ -46,8 +46,8 @@ public class UiConstants {
 	}
 	
 	// For action List
-	public enum ContentMode {
-		LIST, HELP;
+	public enum ActionContentMode {
+		TASKLIST, HELP_MAIN, HELP_ADD, HELP_DEL;
 	}
 
 	public static final String UI_CSS_PATH_OFFSET = "css/";
@@ -61,7 +61,7 @@ public class UiConstants {
 	public static final ArrayList<String> UI_LIGHT_STYLE = new ArrayList<String>(
 			Arrays.asList("lightStyle.css"));
 
-	public static final int WORD_LIMIT_WEEKLIST = 10;
+	public static final int CHAR_LIMIT_WEEKLIST = 10;
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
 	public static final int ClOCK_UPDATE_INTERVAL = 1000; // in milliseconds

@@ -6,25 +6,46 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
-import taskey.ui.UiConstants.ContentMode;
+import taskey.ui.UiConstants.ActionContentMode;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextConfig;
 
 public class UiActionFormatter extends UiFormatter {
 
-	private ContentMode currentMode;
-	
+	private ActionContentMode currentMode;
 	public UiActionFormatter(GridPane _gridPane, UiClockService _clockService) {
 		super(_gridPane, _clockService);
-		currentMode = ContentMode.LIST; // default mode
+		currentMode = ActionContentMode.TASKLIST;
 	}
 
-	public void setMode( ContentMode mode) {
+	public void updateGrid(ActionContentMode mode) {
+		switch ( mode ) {
+			case HELP_MAIN:
+			case HELP_ADD:
+			case HELP_DEL:
+				setGrid(1);
+				break;
+			default:
+				setGrid(0);
+				break;
+		}
 		currentMode = mode;
 	}
-	public ContentMode getCurrentMode() {
-		return currentMode;
+	
+	public void updateContents(ArrayList<Task> myList) {
+		switch ( currentMode ) {
+			case HELP_MAIN: 
+				showHelp();
+				break;
+			case HELP_ADD: 
+				break;
+			case HELP_DEL: 
+				break;
+			default:
+				format(myList);
+		}
 	}
+	
 	public void format(ArrayList<Task> myTaskList) {
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
@@ -39,7 +60,7 @@ public class UiActionFormatter extends UiFormatter {
 		myConfig.addMarker(0, "textBlue");
 		String line = "" + (row + 1);
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, col, row, "numberIcon", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, "numberIcon", TextAlignment.CENTER);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
@@ -48,14 +69,15 @@ public class UiActionFormatter extends UiFormatter {
 		myConfig.addMarker(0, "textBlack");
 		String line = theTask.getTaskName();
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, col, row, "whiteBox", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.CENTER);
 	}
 
 	public void showHelp() {
 		ArrayList<UiTextConfig> lineConfigs = new ArrayList<UiTextConfig>();
 		String line = "";
 
-		// hard coded colorings, i think have to summarise the commands instead of another way, maybe just place an image
+		// hard coded colorings, i think have to summarize the commands instead or another way, maybe just place an image
+		// very inefficient too
 		lineConfigs.add(new UiTextConfig("textRed"));
 		line += "Taskey's list of $commands\n\n";
 		lineConfigs.add(new UiTextConfig("textRed","textBlue"));
@@ -122,7 +144,7 @@ public class UiActionFormatter extends UiFormatter {
 			} else {
 				currentConfig++; // go to next config
 			}
-			addStyledCellTextFlow(element, gridPane, 0, i, style, TextAlignment.LEFT);
+			addStyledCellTextFlow(element, currentGrid, 0, i, style, TextAlignment.LEFT);
 		}
 	}
 }

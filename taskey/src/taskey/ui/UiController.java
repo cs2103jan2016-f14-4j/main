@@ -19,7 +19,7 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.ContentMode;
+import taskey.ui.UiConstants.ActionContentMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiDropDown;
@@ -98,9 +98,9 @@ public class UiController {
 		myManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ContentMode mode) {
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionContentMode mode) {
 		myManager.updateActionContentBox(myTaskList,mode);
-		currentTab = myTabs.getTabs().size()-1;
+		currentTab = myTabs.getTabs().size()-1; // focus the tab
 		displayTabContents(currentTab);
 	}
 
@@ -133,15 +133,20 @@ public class UiController {
 	public void registerInputEventHandler() {
 
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				myDropDown.updateMenuItems(UiMain.getInstance().randomInput("TEST" + Math.random(), 5));
-				myDropDown.updateMenu();
+			public void handle(KeyEvent event) {	
+				if ( event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
+					myDropDown.updateMenuItems(UiMain.getInstance().randomInput("TEST" + Math.random(), 4));
+					myDropDown.updateMenu();
+				}
+				if ( event.getCode().isArrowKey()) {
+	        		  myDropDown.processArrowKey(event);
+				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
 
 					// Logic.getInstance().getCommand(line);
-					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added Successfully", input, 0,input.getHeight());
+					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added "+ myDropDown.getSelectedItem(), input, 0,input.getHeight());
 					UiPopupFactory.getInstance().createFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0, true).play();
 
 					event.consume();
@@ -150,6 +155,18 @@ public class UiController {
 				}
 			}
 		});
+	
+		// to override the default events which shift the caret / cursor position to the start and end
+		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+	          public void handle(KeyEvent event) {
+	        	  if ( event.getCode().isArrowKey()) {
+	        		  if  (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+	        			  event.consume();
+	        		  }
+	        	  }
+	          };
+	        });
+		
 	}
 
 	/**

@@ -26,6 +26,17 @@
     -fx-text-fill: #395306;
 }
 
+.prompt-select {
+	-fx-padding: 2px;
+	-fx-background-color:
+        linear-gradient(#00ccff, #00ccff),
+        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #b3ffb3 50%);
+    -fx-background-radius: 5px;
+    -fx-background-insets: 0px, 3px;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: #395306;
+}
+
 .whiteBox {
 	-fx-background-color: 
 	 	linear-gradient(#f0ff35, #a9ff00),

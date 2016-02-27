@@ -10,11 +10,11 @@ import taskey.logic.Task;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextConfig;
 
-public class UiNormalFormatter extends UiFormatter {
+public class UiDefaultFormatter extends UiFormatter {
 
 	private String theDate = ""; // temporary until the parameters are separated in task object
 	
-	public UiNormalFormatter(GridPane _gridPane, UiClockService _clockService) {
+	public UiDefaultFormatter(GridPane _gridPane, UiClockService _clockService) {
 		super(_gridPane, _clockService);
 	}
 
@@ -38,7 +38,7 @@ public class UiNormalFormatter extends UiFormatter {
 		myConfig.addMarker(0, "textBlue");
 		String line = "" + (row + 1);
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, col, row, "numberIcon", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, "numberIcon", TextAlignment.CENTER);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
@@ -55,7 +55,7 @@ public class UiNormalFormatter extends UiFormatter {
 			line += params[3];
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, col, row, "whiteBox", TextAlignment.LEFT);
+		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.LEFT);
 	}
 
 	private void addTaskDate(Task theTask, int col, int row) {
@@ -69,6 +69,6 @@ public class UiNormalFormatter extends UiFormatter {
 			line = theDate;
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, gridPane, col, row, "whiteBox", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.CENTER);
 	}
 }

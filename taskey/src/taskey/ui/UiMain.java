@@ -12,7 +12,7 @@ import javafx.stage.StageStyle;
 import taskey.constants.Constants;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.ContentMode;
+import taskey.ui.UiConstants.ActionContentMode;
 
 /**
  *
@@ -116,8 +116,8 @@ public class UiMain extends Application {
 
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 
-		myController.updateActionDisplay(myTaskList, ContentMode.HELP);
-		//myController.updateActionDisplay(myTaskList, ContentMode.LIST);
+		myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
+		//myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
 	}
 
 	public String doHash(String line, int offsest) {

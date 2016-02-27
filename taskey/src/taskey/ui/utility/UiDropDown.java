@@ -10,6 +10,8 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -18,12 +20,15 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class UiDropDown {
-	private static final int MAX_ITEMS = 5;
+	private static final int MAX_ITEMS = 4;
+	
 	private TextField myInput;
 	private Popup myMenu = null;
 	private FadeTransition fade;
 	private Window myWindow;
-
+	private int currentSelection;
+	private int currentItemSize;
+	
 	public void createMenu(Stage primaryStage, TextField input) {
 		myInput = input; // set up reference
 		myMenu = UiPopupFactory.getInstance().createPopupMenu(MAX_ITEMS);
@@ -36,6 +41,7 @@ public class UiDropDown {
 			}
 		});
 		myWindow = primaryStage.getScene().getWindow();
+		currentItemSize = 0;
 	}
 
 	public void updateMenuItems(ArrayList<String> items) {
@@ -52,13 +58,10 @@ public class UiDropDown {
 				myPane.setVisible(false);
 			}
 		}
+		currentItemSize = items.size();
+		select(0);
 	}
-
-	public void hideMenu() {
-		myMenu.hide();
-		fade.stop();
-	}
-
+	
 	public void updateMenu() {
 		if (myWindow == null || myMenu == null) { // if not initialized yet and received input
 			return;
@@ -67,25 +70,16 @@ public class UiDropDown {
 		if (line.equals("")) {
 			hideMenu();
 		} else {
-			hideMenu(); // refresh
-			displayMenu(line);
+			ShiftMenu(line);
+			refresh();  // fix display issues
 		}
 	}
 
-	public void displayMenu(String line) {
+	public void ShiftMenu(String line) {
 		double width = getWidthOfTextFieldInput(myInput);
 		Bounds screenBounds = UiPopupFactory.getInstance().getScreenBoundsOfNode(myInput);
-		if (myMenu.isShowing() == false) {
-			fade.getNode().setOpacity(1);
-			fade.playFromStart();
-			myMenu.show(myWindow, Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width),
-					screenBounds.getMinY() + myInput.getHeight());
-		} else {
-			fade.getNode().setOpacity(1);
-			fade.playFromStart();
-			myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
-			myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight());
-		}
+		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
+		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight());
 	}
 
 	/**
@@ -96,11 +90,60 @@ public class UiDropDown {
 	 */
 	public double getWidthOfTextFieldInput(TextField field) {
 		Text text = new Text(field.getText());
-		text.setFont(field.getFont()); // Set the same font, so the size is the
-										// same
+		text.setFont(field.getFont()); // Set the same font, so the size is the same
 		double width = text.getLayoutBounds().getWidth();
 		return width;
 
+	}
+	public String getSelectedItem() {
+		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
+		StackPane myPane = (StackPane) menuItems.get(currentSelection);
+		Label content = (Label)myPane.getChildren().get(0);
+		return content.getText();
+	}
+
+	public void hideMenu() {
+		myMenu.hide();
+		fade.stop();
+	}
+
+	/**
+	 * Most of the time after switching styles or setting visibility
+	 * The popup window has some tears, probably because it renders separately from the main program
+	 * This fixes that issue, and also sets opacity full for display
+	 */
+	public void refresh() {
+		hideMenu();
+		fade.getNode().setOpacity(1);
+		fade.playFromStart();
+		myMenu.show(myWindow);
+	}
+	
+	public void select(int selection) {
+		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
+		StackPane myPane;
+	
+		// remove previous
+		myPane = (StackPane) menuItems.get(currentSelection);
+		if ( myPane.getStyleClass().size() > 1) {
+			myPane.getStyleClass().remove(1);
+		}
+		
+		currentSelection = selection;
+		myPane = (StackPane) menuItems.get(currentSelection);
+		myPane.getStyleClass().add("prompt-select");
+		
+		refresh();	
+	}
+	public void processArrowKey(KeyEvent event) {
+		if ( currentItemSize == 0 ) {
+			return;
+		}
+		if ( event.getCode() == KeyCode.ENTER.DOWN) {
+			select((currentSelection + 1) % currentItemSize);
+		} else if ( event.getCode() == KeyCode.ENTER.UP) {
+			select((currentSelection - 1) < 0 ? currentItemSize - 1 : currentSelection - 1);
+		}
 	}
 
 }

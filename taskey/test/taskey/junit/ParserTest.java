@@ -57,11 +57,15 @@ public class ParserTest {
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
+		
 	}
 	
+	@Test
 	public void testSearch() {
-		//search #tag name
-		//search phrase
+		assertEquals("Command: SEARCH\nsearch phrase: hello world\n",
+				parser.parseInput("search hello world").toString());
+		assertEquals("Command: SEARCH\nsearch phrase: #mycategory\n",
+				parser.parseInput("search #mycategory").toString());
 	}
 	
 	@Test

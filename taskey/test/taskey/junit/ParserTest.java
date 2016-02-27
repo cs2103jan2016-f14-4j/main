@@ -48,7 +48,7 @@ public class ParserTest {
 	
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
-		//set meeting [16 feb, 17 feb] 
+		//set meeting(taskname/id) [16 feb, 17 feb] 
 	}
 	
 	@Test

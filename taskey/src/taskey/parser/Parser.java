@@ -13,6 +13,8 @@ public class Parser {
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
 	public static final String DONE_BY_INDEX = "DONE_BY_INDEX"; 
 	public static final String DONE_BY_NAME = "DONE_BY_NAME"; 
+	public static final String UPDATE_BY_INDEX = "UPDATE_BY_INDEX"; 
+	public static final String UPDATE_BY_NAME = "UPDATE_BY_NAME";
 	public static final String DAY_END = "23:59:59"; 
 	public static final String ERROR_DATE_FORMAT = "Wrong date format"; 
 	public static final String ERROR_VIEW_TYPE = "No such category"; 
@@ -211,7 +213,7 @@ public class Parser {
 			processed = new ProcessedObject(DONE_BY_INDEX, index); 
 			
 		} catch (Exception e) {
-			//if the delete is not by index, then it's by task name. 
+			//if the done is not by index, then it's by task name. 
 			processed = new ProcessedObject(DONE_BY_NAME, new Task(taskName));
 		}
 		
@@ -419,7 +421,17 @@ public class Parser {
 	
 	//TODO 
 	public void processSet(String command, String stringInput) {
+		ProcessedObject processed; 
+		String taskName = getTaskName(command, stringInput);
 		
+		try {
+			int index = Integer.parseInt(taskName);
+			processed = new ProcessedObject(UPDATE_BY_INDEX, index); 
+			
+		} catch (Exception e) {
+			//if the update is not by index, then it's by task name. 
+			processed = new ProcessedObject(UPDATE_BY_NAME, new Task(taskName));
+		}
 	}
 	
 	/**

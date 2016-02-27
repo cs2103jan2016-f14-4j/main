@@ -134,5 +134,30 @@ public class TimeConverter implements Serializable {
 		
 		return Integer.parseInt(day); 
 	}
+	
+	/**
+	 * converts an epoch time to date, without the hours:mins:seconds inside
+	 * @param epochTime
+	 * @return string format for date
+	 */
+	public String getDate(long epochTime) {
+		String date = new java.text.SimpleDateFormat("dd MMM yyyy").format(
+				new java.util.Date(epochTime*1000));
+		
+		return date; 
+	}
+	
+	/**
+	 * converts an epoch time to only HH:mm (hour and minute) of the day, 
+	 * without the date.
+	 * @param epochTime
+	 * @return
+	 */
+	public String getTime(long epochTime) {
+		String time = new java.text.SimpleDateFormat("HH:mm").format(
+				new java.util.Date(epochTime*1000));
+		
+		return time;
+	}
 
 }

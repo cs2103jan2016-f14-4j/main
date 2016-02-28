@@ -1,22 +1,16 @@
+/* Switchable Text styles */
+
 .textRed {
 	-fx-fill: red;
-	-fx-font: 15px Serif;	
 	-fx-font-weight: bold;
 }
 
-.textWhite {
-	-fx-fill: white;
-	-fx-font: 15px Serif;
-	-fx-font-weight: bold;
-}
 .textBlue { 
 	-fx-fill: blue;
-	-fx-font: 15px Serif;
 	-fx-font-weight: bold;
 }
 .textGreen { 
 	-fx-fill: green;
-	-fx-font: 15px Serif;
 	-fx-font-weight: bold;
 }
 

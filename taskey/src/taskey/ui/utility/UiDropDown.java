@@ -18,6 +18,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import taskey.ui.UiConstants;
 
 public class UiDropDown {
 	private static final int MAX_ITEMS = 4;
@@ -132,7 +133,7 @@ public class UiDropDown {
 		
 		currentSelection = selection;
 		myPane = (StackPane) menuItems.get(currentSelection);
-		myPane.getStyleClass().add("prompt-select");
+		myPane.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		
 		refresh();	
 	}

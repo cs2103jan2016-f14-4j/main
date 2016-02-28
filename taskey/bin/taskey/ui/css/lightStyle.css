@@ -1,8 +1,3 @@
-#main {
-	-fx-background-color:
-        linear-gradient(#ffff99, #FFFFFF);
-}
-
 /* Note: Affects all scroll panes */
 .scroll-pane {
     -fx-background-color: black;
@@ -15,6 +10,37 @@
    -fx-background-color: white;
 }
 
+/* Bound to fx:id */
+#main {
+	-fx-background-color:
+        linear-gradient(#ffff99, #FFFFFF);
+}
+
+#timeLabel {
+		-fx-background-color: 
+        linear-gradient(#ffe657 0%, #ffff99 50%, #f0ff35 100%),
+        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0));
+         -fx-background-radius: 15px;
+}
+
+#dateLabel {
+		-fx-background-color: 
+		 linear-gradient(#f0ff35, #b3ffb3),
+         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #b3ffb3 50%);
+    -fx-background-insets: 0px,2px;
+    -fx-padding: 2px;
+    -fx-font-weight: bold;
+}
+
+#weekLabel {
+	-fx-alignment: CENTER;
+    -fx-text-fill: #000000;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+	
+}
+
+/* Switchable styles */
 .prompt {
 	-fx-padding: 2px;
 	-fx-background-color:
@@ -66,93 +92,3 @@
     -fx-padding: 2px;
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
-
-#timeLabel {
-		-fx-background-color: 
-        linear-gradient(#ffe657 0%, #ffff99 50%, #f0ff35 100%),
-        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0));
-         -fx-background-radius: 15px;
-}
-
-#dateLabel {
-		-fx-background-color: 
-		 linear-gradient(#f0ff35, #b3ffb3),
-         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #b3ffb3 50%);
-    -fx-background-insets: 0px,2px;
-    -fx-padding: 2px;
-    -fx-font-weight: bold;
-}
-
-#weekLabel {
-	-fx-alignment: CENTER;
-    -fx-text-fill: #000000;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-	
-}
-
-/*Note: Affects all Tab Panes / Tabs */
-
-.tab-pane .tab-header-area .tab-header-background {
-    -fx-opacity: 0;
-}
-
-.tab-pane
-{
-    -fx-tab-min-width:73px;
-}
-
-.tab{
-    -fx-background-insets: 0 1 0 1;
-}
-
-.tab-pane .tab:selected
-{
-    -fx-background-color: #b3ffb3;
-}
-
-.tab .tab-label { 
-    -fx-alignment: CENTER;
-    -fx-text-fill: #828282;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-}
-
-.tab:selected .tab-label { 
-    -fx-alignment: CENTER;
-    -fx-text-fill: #3c3c3c;
-}
-
-.textRed {
-	-fx-fill: red;
-	-fx-font: 15px Serif;	
-	-fx-font-weight: bold;
-}
-
-.textWhite {
-	-fx-fill: white;
-	-fx-font: 15px Serif;
-	-fx-font-weight: bold;
-}
-.textBlue { 
-	-fx-fill: blue;
-	-fx-font: 15px Serif;
-	-fx-font-weight: bold;
-}
-.textGreen { 
-	-fx-fill: green;
-	-fx-font: 15px Serif;
-	-fx-font-weight: bold;
-}
-
-.textBlack { 
-	-fx-fill: black;
-	-fx-font: 15px Serif;
-}
-
-.textBlackToPurple { 
-	-fx-font: 10px Tahoma;
-    -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, black 0%, purple 50%);
-}
-
-

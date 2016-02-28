@@ -12,6 +12,8 @@ import javafx.stage.StageStyle;
 import taskey.constants.Constants;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.ui.utility.UiImageManager;
 import taskey.ui.UiConstants.ActionContentMode;
 
 /**
@@ -64,14 +66,15 @@ public class UiMain extends Application {
 	 *             
 	 */
 	public void setUpScene(Stage primaryStage, Parent root) {
+		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.DECORATED);
 		Scene newScene = new Scene(root);
-
+		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
-		myController.setStyleSheets(UiConstants.UI_DEFAULT_STYLE);
+		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
@@ -85,6 +88,7 @@ public class UiMain extends Application {
 	@Override
 	public void stop() {
 		myController.cleanUp();
+		UiImageManager.getInstance().cleanUp();
 	}
 
 	public static void main(String[] args) {

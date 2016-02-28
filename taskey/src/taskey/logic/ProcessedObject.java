@@ -41,6 +41,7 @@ public class ProcessedObject {
 	private String viewType = null; 
 	private String errorType = null;
 	private String searchPhrase = null; 
+	private String newTaskName = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -142,6 +143,14 @@ public class ProcessedObject {
 	
 	public String getSearchPhrae() {
 		return searchPhrase; 
+	}
+	
+	public void setNewTaskName(String taskName) {
+		newTaskName = taskName; 
+	}
+	
+	public String getNewTaskName() {
+		return newTaskName; 
 	}
 	
 	@Override 

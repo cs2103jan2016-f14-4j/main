@@ -242,8 +242,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public String toString() {
 		String stringRep = ""; 
-		stringRep += taskName;
-		stringRep += ", ";
+		
+		if (taskName != null) {
+			stringRep += taskName;
+			stringRep += ", ";
+		}
 		
 		if (taskType != null) {
 			stringRep += taskType; 

@@ -425,7 +425,6 @@ public class Parser {
 	public ProcessedObject processSet(String command, String stringInput) {
 		ProcessedObject processed = null; 
 		String taskName = getTaskName(command, stringInput).trim();
-		long epochTime; 
 		
 		try {
 			int index = Integer.parseInt(taskName);

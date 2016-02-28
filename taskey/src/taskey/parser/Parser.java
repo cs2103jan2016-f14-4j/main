@@ -421,7 +421,16 @@ public class Parser {
 		return processed;
 	}
 	
-	//TODO 
+	/**
+	 * If command is SET, categorise into:
+	 * 1. UPDATE_BY_INDEX_CHANGE_NAME
+	 * 2. UPDATE_BY_INDEX_CHANGE_DATE
+	 * 3. UPDATE_BY_NAME_CHANGE_NAME
+	 * 4. UPDATE_BY_NAME_CHANGE_DATE 
+	 * @param command
+	 * @param stringInput
+	 * @return appropriate ProcessedObject
+	 */
 	public ProcessedObject processSet(String command, String stringInput) {
 		ProcessedObject processed = null; 
 		String taskName = getTaskName(command, stringInput).trim();
@@ -436,6 +445,13 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * Called by processSet(). Updates based on index the user has keyed in 
+	 * @param processed
+	 * @param taskName
+	 * @param index
+	 * @return
+	 */
 	private ProcessedObject updateByIndex(ProcessedObject processed, String taskName,
 			int index) {
 		//if changing name, check for " " 
@@ -464,6 +480,12 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * Called by processSet(). Updates based on task name that user has keyed in 
+	 * @param processed
+	 * @param taskName
+	 * @return
+	 */
 	private ProcessedObject updateByName(ProcessedObject processed, String taskName) {
 		//if changing name, check for " " 
 		if (taskName.split("\"").length != 1) {
@@ -526,6 +548,12 @@ public class Parser {
 		return processed; 
 	}
 	
+	/**
+	 * Given a task index, we want to we want to change the task type to event. 
+	 * @param processed
+	 * @param newDateRaw
+	 * @return
+	 */
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
@@ -573,6 +601,13 @@ public class Parser {
 		return processed;
 	}
 	
+	/**
+	 * Given a task name, we want to change the task type to event 
+	 * @param processed
+	 * @param newDateRaw
+	 * @param newTaskName
+	 * @return
+	 */
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw,
 			String newTaskName) {
 		long epochTime; 
@@ -621,6 +656,12 @@ public class Parser {
 		return processed;
 	}
 	
+	/**
+	 * Given a task index, we want to update the task type to deadline
+	 * @param processed
+	 * @param newDateRaw
+	 * @return
+	 */
 	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		Task changedTask = new Task(); 
@@ -647,6 +688,13 @@ public class Parser {
 		return processed; 
 	}
 	
+	/**
+	 * Give a task name, we want to update the task type to deadline
+	 * @param processed
+	 * @param newDateRaw
+	 * @param newTaskName
+	 * @return
+	 */
 	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw,
 			String newTaskName) {
 		long epochTime; 
@@ -673,7 +721,12 @@ public class Parser {
 		processed.setTask(changedTask);
 		return processed; 
 	}
-
+	
+	/**
+	 * Given a task index, we want to update task type to floating
+	 * @param processed
+	 * @return
+	 */
 	private ProcessedObject updateToFloating(ProcessedObject processed) {
 		Task changedTask = new Task();
 		changedTask.setTaskType("FLOATING");
@@ -681,6 +734,12 @@ public class Parser {
 		return processed;
 	}
 	
+	/**
+	 * Given a task name, we want to update task type to floating 
+	 * @param processed
+	 * @param newTaskName
+	 * @return
+	 */
 	private ProcessedObject updateToFloating(ProcessedObject processed,
 			String newTaskName) {
 		Task changedTask = new Task(newTaskName);

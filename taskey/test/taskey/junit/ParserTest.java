@@ -21,12 +21,15 @@ public class ParserTest {
 	
 	@Test
 	public void testDeadline() {
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
+				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
+				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm by 17 feb 2016").toString());
 		
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, due on 17 Feb 2016 23:59:59\n",
+		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
+				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 		//add complete essay by today 
 		//other special days: tomorrow, next week, next ___eg. friday
@@ -35,30 +38,55 @@ public class ParserTest {
 	
 	@Test
 	public void testEvents() {
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 to 20 Feb 2016 23:59:59\n",
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
+				+ "to 20 Feb 2016 23:59:59\n",
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 to 20 Feb 2016 23:59:59\n",
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
+				+ "to 20 Feb 2016 23:59:59\n",
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
 		//add meeting from tomorrow to 18 feb
+		
 	}
 	
 	public void testTag() {
 		//eg. add lalala #lala
 	}
 	
+	@Test
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
-		//set 1 "urgent meeting"
-		//set 2 <none>
-		//set 2 <>
-		//set 2 <17 Feb>
-		//set 2 <16 feb, 17 feb> 
-		//set meeting "urgent meeting"
-		//set meeting(taskname/id) [16 feb, 17 feb] 
-		//set meeting <none>
-		//set meeting <>
-		//set meeting <17 feb>
-		//set meeting <16 Feb, 17 Feb> 
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 1",
+				parser.parseInput("set 1 \"urgent meeting\"").toString());
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 2",
+				parser.parseInput("set 2 [none]").toString());
+		assertEquals("Command: ERROR\nerror type: invalid input\n",
+				parser.parseInput("set 2 []").toString());
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, "
+				+ "due on 17 Feb 2016 23:59:59\nat index: 2",
+				parser.parseInput("set 2 [17 feb]").toString());
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
+				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
+				parser.parseInput("set 2 [16 feb, 17 Feb]").toString());
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
+				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
+				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
+		
+		
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n",
+				parser.parseInput("set meeting \"urgent meeting\"").toString());
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
+				parser.parseInput("set meeting [none]").toString());
+		assertEquals("Command: ERROR\nerror type: invalid input\n",
+				parser.parseInput("set meeting []").toString());
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, DEADLINE, "
+				+ "due on 17 Feb 2016 23:59:59\n",
+				parser.parseInput("set meeting [17 feb]").toString());
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, EVENT, "
+				+ "from 16 Feb 2016 23:59:59 to 17 Feb 2016 23:59:59\n",
+				parser.parseInput("set meeting [16 feb, 17 Feb]").toString());
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, EVENT, "
+				+ "from 16 Feb 2016 23:59:59 to 17 Feb 2016 23:59:59\n",
+				parser.parseInput("set meeting [16 feb,17 Feb]").toString());		
 	}
 	
 	@Test
@@ -67,15 +95,6 @@ public class ParserTest {
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
-		String task = "set meeting []"; 
-		System.out.println(task);
-		task = task.replace("[", "<");
-		task = task.replace("]", "");
-		System.out.println(task);
-		String[] taskParts = task.split("<"); 
-		for(int i =0; i<taskParts.length; i++) {
-			System.out.println("{" + taskParts[i] + "}");
-		}
 		
 	}
 	

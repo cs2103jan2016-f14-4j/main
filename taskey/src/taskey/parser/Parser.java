@@ -90,7 +90,7 @@ public class Parser {
 				break;
 				
 			case "set":
-				processSet(command, stringInput); 
+				processed = processSet(command, stringInput); 
 				break;
 			
 			case "search":
@@ -432,17 +432,21 @@ public class Parser {
 	 * @return appropriate ProcessedObject
 	 */
 	public ProcessedObject processSet(String command, String stringInput) {
-		ProcessedObject processed = null; 
 		String taskName = getTaskName(command, stringInput).trim();
 		
-		try {
-			int index = Integer.parseInt(taskName);
+		if (stringInput.split(" ").length > 1) {
+			String rawIndex = stringInput.split(" ")[1];
 			
-			return updateByIndex(processed, taskName, index); 
-		} catch (Exception e) {
-			//if the update is not by index, then it's by task name. 
-			return updateByName(processed, taskName); 
+			try {
+				int index = Integer.parseInt(rawIndex);
+				
+				return updateByIndex(taskName, index); 
+			} catch (Exception e) {
+				//if the update is not by index, then it's by task name. 
+				return updateByName(taskName); 
+			}
 		}
+		return processError("invalid input");
 	}
 	
 	/**
@@ -452,16 +456,23 @@ public class Parser {
 	 * @param index
 	 * @return
 	 */
-	private ProcessedObject updateByIndex(ProcessedObject processed, String taskName,
-			int index) {
+	private ProcessedObject updateByIndex(String taskName, int index) {
+		ProcessedObject processed = null; 
+		
 		//if changing name, check for " " 
 		if (taskName.split("\"").length != 1) {
 			return updateChangeName(processed, taskName, index); 
-		} else if (taskName.split("<").length != 1) {
+		} else if (taskName.split("\\[").length != 1) {
 			//if changing date, check for < >
-			processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_DATE, index); 
-			taskName = taskName.replace(">", ""); 
-			String[] taskParts = taskName.split("<"); 
+			processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_DATE, index);
+			taskName = taskName.replace("]", ""); 
+			String[] taskParts = taskName.split("\\["); 
+			
+			if (taskParts.length == 1) {
+				processed = processError("invalid input");
+				return processed; 
+			}
+			
 			String newDateRaw = taskParts[1]; 
 			
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
@@ -486,16 +497,24 @@ public class Parser {
 	 * @param taskName
 	 * @return
 	 */
-	private ProcessedObject updateByName(ProcessedObject processed, String taskName) {
+	private ProcessedObject updateByName(String taskName) {
+		ProcessedObject processed = null; 
+		
 		//if changing name, check for " " 
 		if (taskName.split("\"").length != 1) {
 			return updateChangeName(processed, taskName); 
-		} else if (taskName.split("<").length != 1) {
+		} else if (taskName.split("\\[").length != 1) {
 			//if changing date, check for < >
 			processed = new ProcessedObject(UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
-			taskName = taskName.replace(">", ""); 
-			String[] taskParts = taskName.split("<"); 
-			String oldTaskName = taskParts[1].trim(); 
+			taskName = taskName.replace("]", ""); 
+			String[] taskParts = taskName.split("\\["); 
+			String oldTaskName = taskParts[0].trim(); 
+			
+			if (taskParts.length == 1) {
+				processed = processError("invalid input");
+				return processed; 
+			}
+			
 			String newDateRaw = taskParts[1]; 
 			
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
@@ -557,8 +576,8 @@ public class Parser {
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0];
-		String endDate = dateList[1]; 
+		String startDate = dateList[0].trim();
+		String endDate = dateList[1].trim(); 
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("EVENT");
 		
@@ -612,8 +631,8 @@ public class Parser {
 			String newTaskName) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0];
-		String endDate = dateList[1]; 
+		String startDate = dateList[0].trim();
+		String endDate = dateList[1].trim(); 
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("EVENT");
 		

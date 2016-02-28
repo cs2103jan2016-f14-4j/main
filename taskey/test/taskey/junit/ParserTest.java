@@ -48,7 +48,17 @@ public class ParserTest {
 	
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
+		//set 1 "urgent meeting"
+		//set 2 <none>
+		//set 2 <>
+		//set 2 <17 Feb>
+		//set 2 <16 feb, 17 feb> 
+		//set meeting "urgent meeting"
 		//set meeting(taskname/id) [16 feb, 17 feb] 
+		//set meeting <none>
+		//set meeting <>
+		//set meeting <17 feb>
+		//set meeting <16 Feb, 17 Feb> 
 	}
 	
 	@Test
@@ -57,6 +67,15 @@ public class ParserTest {
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
+		String task = "set meeting []"; 
+		System.out.println(task);
+		task = task.replace("[", "<");
+		task = task.replace("]", "");
+		System.out.println(task);
+		String[] taskParts = task.split("<"); 
+		for(int i =0; i<taskParts.length; i++) {
+			System.out.println("{" + taskParts[i] + "}");
+		}
 		
 	}
 	

@@ -455,20 +455,67 @@ public class Parser {
 				return processed; 
 			}
 			
-			
 		} catch (Exception e) {
 			//if the update is not by index, then it's by task name. 
-			//processed = new ProcessedObject(UPDATE_BY_NAME, new Task(taskName));
+			
+			//if changing name, check for " " 
+			if (taskName.split("\"").length != 1) {
+				return updateChangeName(processed, taskName); 
+			} else if (taskName.split("<").length != 1) {
+				//if changing date, check for < >
+				processed = new ProcessedObject(UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
+				taskName = taskName.replace(">", ""); 
+				String[] taskParts = taskName.split("<"); 
+				String oldTaskName = taskParts[1].trim(); 
+				String newDateRaw = taskParts[1]; 
+				
+				if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+					//change the task to floating
+					return updateToFloating(processed, oldTaskName); 
+				} else if (newDateRaw.split(",").length == 2) {
+					//change the task to event
+					return updateToEvent(processed, newDateRaw, oldTaskName); 
+				} else {
+					// change the task to deadline
+					return updateToDeadline(processed, newDateRaw, oldTaskName);
+				}
+			} else {
+				processed = processError("Wrong format for changing task name/date");
+				return processed; 
+			}
 		}
+	}
+	
+	/**
+	 * Given a task name, we want to change that task's name 
+	 * @param processed
+	 * @param taskName
+	 * @return
+	 */
+	private ProcessedObject updateChangeName(ProcessedObject processed, String taskName) {
+		String[] taskParts = taskName.split("\"");
+		String oldName = taskParts[0].trim();  
+		String newName = taskParts[1].trim(); 
+		processed = new ProcessedObject(UPDATE_BY_NAME_CHANGE_NAME, new Task(oldName)); 
+		processed.setNewTaskName(newName);
+		
 		return processed; 
 	}
 	
+	/**
+	 * Given task index, we want to change a task name. 
+	 * @param processed
+	 * @param taskName
+	 * @param index
+	 * @return
+	 */
 	private ProcessedObject updateChangeName(ProcessedObject processed, String taskName, 
 			int index) {
-		processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_NAME, index); 
 		String[] taskParts = taskName.split("\"");
-		String newName = taskParts[1]; 
+		String newName = taskParts[1].trim(); 
+		processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_NAME); 
 		processed.setNewTaskName(newName);
+		processed.setIndex(index);
 		
 		return processed; 
 	}
@@ -479,6 +526,54 @@ public class Parser {
 		String startDate = dateList[0];
 		String endDate = dateList[1]; 
 		Task changedTask = new Task(); 
+		changedTask.setTaskType("EVENT");
+		
+		if (!specialDays.containsKey(startDate)) {
+			if (startDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(startDate + " " + DAY_END);
+				changedTask.setStartDate(epochTime);
+			} else if (startDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(startDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				changedTask.setStartDate(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
+			}
+		}
+		
+		if (!specialDays.containsKey(endDate)) {
+			if (endDate.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(endDate + " " + DAY_END);
+				changedTask.setEndDate(epochTime);
+			} else if (endDate.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(endDate + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				changedTask.setEndDate(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
+			}
+		}
+		processed.setTask(changedTask);
+		return processed;
+	}
+	
+	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw,
+			String newTaskName) {
+		long epochTime; 
+		String[] dateList = newDateRaw.split(","); 
+		String startDate = dateList[0];
+		String endDate = dateList[1]; 
+		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("EVENT");
 		
 		if (!specialDays.containsKey(startDate)) {
@@ -545,9 +640,44 @@ public class Parser {
 		processed.setTask(changedTask);
 		return processed; 
 	}
+	
+	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw,
+			String newTaskName) {
+		long epochTime; 
+		Task changedTask = new Task(newTaskName); 
+		changedTask.setTaskType("DEADLINE");
+		
+		if (!specialDays.containsKey(newDateRaw)) {
+			if (newDateRaw.length() == 11) {
+				//ie. format is DD MMM YYYY
+				epochTime = timeConverter.toEpochTime(newDateRaw + " " + DAY_END);
+				changedTask.setDeadline(epochTime);
+			} else if (newDateRaw.length() == 6) {
+				//ie. format is DD MMM
+				timeConverter.setCurrTime();
+				int year = timeConverter.getYear(timeConverter.getCurrTime());
+				epochTime = timeConverter.toEpochTime(newDateRaw + " " + String.valueOf(year) 
+						+ " " + DAY_END);
+				changedTask.setDeadline(epochTime);
+			} else {
+				processed = processError(ERROR_DATE_FORMAT); 
+				return processed; 
+			}
+		}
+		processed.setTask(changedTask);
+		return processed; 
+	}
 
 	private ProcessedObject updateToFloating(ProcessedObject processed) {
 		Task changedTask = new Task();
+		changedTask.setTaskType("FLOATING");
+		processed.setTask(changedTask);
+		return processed;
+	}
+	
+	private ProcessedObject updateToFloating(ProcessedObject processed,
+			String newTaskName) {
+		Task changedTask = new Task(newTaskName);
 		changedTask.setTaskType("FLOATING");
 		processed.setTask(changedTask);
 		return processed;

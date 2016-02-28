@@ -13,8 +13,10 @@ public class Parser {
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
 	public static final String DONE_BY_INDEX = "DONE_BY_INDEX"; 
 	public static final String DONE_BY_NAME = "DONE_BY_NAME"; 
-	public static final String UPDATE_BY_INDEX = "UPDATE_BY_INDEX"; 
-	public static final String UPDATE_BY_NAME = "UPDATE_BY_NAME";
+	public static final String UPDATE_BY_INDEX_CHANGE_NAME = "UPDATE_BY_INDEX_CHANGE_NAME"; 
+	public static final String UPDATE_BY_INDEX_CHANGE_DATE = "UPDATE_BY_INDEX_CHANGE_DATE"; 
+	public static final String UPDATE_BY_NAME_CHANGE_NAME = "UPDATE_BY_NAME_CHANGE_NAME";
+	public static final String UPDATE_BY_NAME_CHANGE_DATE = "UPDATE_BY_NAME_CHANGE_DATE";
 	public static final String DAY_END = "23:59:59"; 
 	public static final String ERROR_DATE_FORMAT = "Wrong date format"; 
 	public static final String ERROR_VIEW_TYPE = "No such category"; 
@@ -420,20 +422,73 @@ public class Parser {
 	}
 	
 	//TODO 
-	public void processSet(String command, String stringInput) {
-		ProcessedObject processed; 
-		String taskName = getTaskName(command, stringInput);
+	public ProcessedObject processSet(String command, String stringInput) {
+		ProcessedObject processed = null; 
+		String taskName = getTaskName(command, stringInput).trim();
+		long epochTime; 
 		
 		try {
 			int index = Integer.parseInt(taskName);
-			processed = new ProcessedObject(UPDATE_BY_INDEX, index); 
+			
+			//if changing name, check for " " 
+			if (taskName.split("\"").length != 1) {
+				processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_NAME, index); 
+				String[] taskParts = taskName.split("\"");
+				String newName = taskParts[1]; 
+				processed.setNewTaskName(newName);
+				
+				return processed; 
+			} else if (taskName.split("<").length != 1) {
+				//if changing date, check for < >
+				processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_DATE, index); 
+				taskName = taskName.replace(">", ""); 
+				String[] taskParts = taskName.split("<"); 
+				String newDateRaw = taskParts[1]; 
+				
+				if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+					//change the task to floating
+					Task changedTask = new Task();
+					changedTask.setTaskType("FLOATING");
+					processed.setTask(changedTask);
+					
+				} else if (newDateRaw.split(",").length == 2) {
+					//change the task to event
+				} else {
+					// change the task to deadline
+					Task changedTask = new Task(); 
+					
+					if (!specialDays.containsKey(newDateRaw)) {
+						if (newDateRaw.length() == 11) {
+							//ie. format is DD MMM YYYY
+							epochTime = timeConverter.toEpochTime(newDateRaw + " " + DAY_END);
+							changedTask.setDeadline(epochTime);
+						} else if (newDateRaw.length() == 6) {
+							//ie. format is DD MMM
+							timeConverter.setCurrTime();
+							int year = timeConverter.getYear(timeConverter.getCurrTime());
+							epochTime = timeConverter.toEpochTime(newDateRaw + " " + String.valueOf(year) 
+									+ " " + DAY_END);
+							changedTask.setDeadline(epochTime);
+						} else {
+							processed = processError(ERROR_DATE_FORMAT); 
+							return processed; 
+						}
+					}
+					processed.setTask(changedTask);
+				}
+				
+				
+			} else {
+				processed = processError("Wrong format for changing task name/date");
+				return processed; 
+			}
+			
 			
 		} catch (Exception e) {
 			//if the update is not by index, then it's by task name. 
-			processed = new ProcessedObject(UPDATE_BY_NAME, new Task(taskName));
+			//processed = new ProcessedObject(UPDATE_BY_NAME, new Task(taskName));
 		}
-		//to check if changing name, by checking for " "
-		//to check if changing date, by checking for [ ] 
+		return processed; 
 	}
 	
 	/**

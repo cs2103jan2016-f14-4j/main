@@ -65,7 +65,7 @@ public class Logic {
 	public static Logic getInstance() {
 		if (instance == null) {
     		instance = new Logic();
-    		instance.parser = Parser.getInstance();
+    		//instance.parser = Parser.getInstance();
     		instance.storage = Storage.getInstance();
     		instance.uiManager = UiManager.getInstance();
     	}

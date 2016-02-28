@@ -430,59 +430,66 @@ public class Parser {
 		try {
 			int index = Integer.parseInt(taskName);
 			
-			//if changing name, check for " " 
-			if (taskName.split("\"").length != 1) {
-				return updateChangeName(processed, taskName, index); 
-			} else if (taskName.split("<").length != 1) {
-				//if changing date, check for < >
-				processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_DATE, index); 
-				taskName = taskName.replace(">", ""); 
-				String[] taskParts = taskName.split("<"); 
-				String newDateRaw = taskParts[1]; 
-				
-				if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-					//change the task to floating
-					return updateToFloating(processed); 
-				} else if (newDateRaw.split(",").length == 2) {
-					//change the task to event
-					return updateToEvent(processed, newDateRaw); 
-				} else {
-					// change the task to deadline
-					return updateToDeadline(processed, newDateRaw);
-				}
-			} else {
-				processed = processError("Wrong format for changing task name/date");
-				return processed; 
-			}
-			
+			return updateByIndex(processed, taskName, index); 
 		} catch (Exception e) {
 			//if the update is not by index, then it's by task name. 
+			return updateByName(processed, taskName); 
+		}
+	}
+	
+	private ProcessedObject updateByIndex(ProcessedObject processed, String taskName,
+			int index) {
+		//if changing name, check for " " 
+		if (taskName.split("\"").length != 1) {
+			return updateChangeName(processed, taskName, index); 
+		} else if (taskName.split("<").length != 1) {
+			//if changing date, check for < >
+			processed = new ProcessedObject(UPDATE_BY_INDEX_CHANGE_DATE, index); 
+			taskName = taskName.replace(">", ""); 
+			String[] taskParts = taskName.split("<"); 
+			String newDateRaw = taskParts[1]; 
 			
-			//if changing name, check for " " 
-			if (taskName.split("\"").length != 1) {
-				return updateChangeName(processed, taskName); 
-			} else if (taskName.split("<").length != 1) {
-				//if changing date, check for < >
-				processed = new ProcessedObject(UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
-				taskName = taskName.replace(">", ""); 
-				String[] taskParts = taskName.split("<"); 
-				String oldTaskName = taskParts[1].trim(); 
-				String newDateRaw = taskParts[1]; 
-				
-				if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-					//change the task to floating
-					return updateToFloating(processed, oldTaskName); 
-				} else if (newDateRaw.split(",").length == 2) {
-					//change the task to event
-					return updateToEvent(processed, newDateRaw, oldTaskName); 
-				} else {
-					// change the task to deadline
-					return updateToDeadline(processed, newDateRaw, oldTaskName);
-				}
+			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+				//change the task to floating
+				return updateToFloating(processed); 
+			} else if (newDateRaw.split(",").length == 2) {
+				//change the task to event
+				return updateToEvent(processed, newDateRaw); 
 			} else {
-				processed = processError("Wrong format for changing task name/date");
-				return processed; 
+				// change the task to deadline
+				return updateToDeadline(processed, newDateRaw);
 			}
+		} else {
+			processed = processError("Wrong format for changing task name/date");
+			return processed; 
+		}
+	}
+	
+	private ProcessedObject updateByName(ProcessedObject processed, String taskName) {
+		//if changing name, check for " " 
+		if (taskName.split("\"").length != 1) {
+			return updateChangeName(processed, taskName); 
+		} else if (taskName.split("<").length != 1) {
+			//if changing date, check for < >
+			processed = new ProcessedObject(UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
+			taskName = taskName.replace(">", ""); 
+			String[] taskParts = taskName.split("<"); 
+			String oldTaskName = taskParts[1].trim(); 
+			String newDateRaw = taskParts[1]; 
+			
+			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+				//change the task to floating
+				return updateToFloating(processed, oldTaskName); 
+			} else if (newDateRaw.split(",").length == 2) {
+				//change the task to event
+				return updateToEvent(processed, newDateRaw, oldTaskName); 
+			} else {
+				// change the task to deadline
+				return updateToDeadline(processed, newDateRaw, oldTaskName);
+			}
+		} else {
+			processed = processError("Wrong format for changing task name/date");
+			return processed; 
 		}
 	}
 	

@@ -450,12 +450,58 @@ public class Parser {
 					Task changedTask = new Task();
 					changedTask.setTaskType("FLOATING");
 					processed.setTask(changedTask);
+					return processed; 
 					
 				} else if (newDateRaw.split(",").length == 2) {
 					//change the task to event
+					String[] dateList = newDateRaw.split(","); 
+					String startDate = dateList[0];
+					String endDate = dateList[1]; 
+					Task changedTask = new Task(); 
+					changedTask.setTaskType("EVENT");
+					
+					if (!specialDays.containsKey(startDate)) {
+						if (startDate.length() == 11) {
+							//ie. format is DD MMM YYYY
+							epochTime = timeConverter.toEpochTime(startDate + " " + DAY_END);
+							changedTask.setStartDate(epochTime);
+						} else if (startDate.length() == 6) {
+							//ie. format is DD MMM
+							timeConverter.setCurrTime();
+							int year = timeConverter.getYear(timeConverter.getCurrTime());
+							epochTime = timeConverter.toEpochTime(startDate + " " + String.valueOf(year) 
+									+ " " + DAY_END);
+							changedTask.setStartDate(epochTime);
+						} else {
+							processed = processError(ERROR_DATE_FORMAT); 
+							return processed; 
+						}
+					}
+					
+					if (!specialDays.containsKey(endDate)) {
+						if (endDate.length() == 11) {
+							//ie. format is DD MMM YYYY
+							epochTime = timeConverter.toEpochTime(endDate + " " + DAY_END);
+							changedTask.setEndDate(epochTime);
+						} else if (endDate.length() == 6) {
+							//ie. format is DD MMM
+							timeConverter.setCurrTime();
+							int year = timeConverter.getYear(timeConverter.getCurrTime());
+							epochTime = timeConverter.toEpochTime(endDate + " " + String.valueOf(year) 
+									+ " " + DAY_END);
+							changedTask.setEndDate(epochTime);
+						} else {
+							processed = processError(ERROR_DATE_FORMAT); 
+							return processed; 
+						}
+					}
+					processed.setTask(changedTask);
+					return processed;
+					
 				} else {
 					// change the task to deadline
 					Task changedTask = new Task(); 
+					changedTask.setTaskType("DEADLINE");
 					
 					if (!specialDays.containsKey(newDateRaw)) {
 						if (newDateRaw.length() == 11) {
@@ -475,6 +521,7 @@ public class Parser {
 						}
 					}
 					processed.setTask(changedTask);
+					return processed; 
 				}
 				
 				

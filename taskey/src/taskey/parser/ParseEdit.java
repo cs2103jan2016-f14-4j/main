@@ -6,6 +6,11 @@ import taskey.logic.ProcessedObject;
 import taskey.logic.Task;
 import taskey.constants.ParserConstants; 
 
+/**
+ * Purpose is to parse the "set" command. 
+ * @author Xue Hui
+ *
+ */
 public class ParseEdit {
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new HashMap<String,Long>();

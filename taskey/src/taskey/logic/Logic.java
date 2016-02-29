@@ -18,7 +18,7 @@ import taskey.logic.ProcessedObject;
  * @author Hubert Wong
  */
 public class Logic {
-	/* List of status codes. Other components like Ui can use Logic.statusCode to access this list. */
+	//List of status codes. Other components like Ui can use Logic.statusCode to access this list.
 	public static final int SUCCESS_VIEW = 1;
 	public static final int SUCCESS_ADD = 2;
 	public static final int SUCCESS_DELETE = 3;
@@ -39,8 +39,11 @@ public class Logic {
 	private Storage storage;
 	private UiManager uiManager;
 	
-	//The most recent processed object whose command is not VIEW, UNDO, SEARCH or ERROR
-	private ProcessedObject mostRecentProcessedObject = null;
+	//The most recent command which is not VIEW, UNDO, SEARCH or ERROR
+	private String mostRecentUndoableCommand = null;
+	
+	private Task mostRecentTask = null;
+	private Task mostRecentUpdatedTask = null; //To facilitate the reversal of updates
 	
 	//The current view type that Ui is displaying, e.g. deadline, events
 	private String uiCurrentViewType = null;
@@ -98,8 +101,6 @@ public class Logic {
     	}
     	return instance;
     }
-	
-
 	
     /**
      * Attempts to execute a command specified by the input string.
@@ -183,29 +184,17 @@ public class Logic {
     			statusCode = undo();
     			break;
     		
-    		case "ERROR":
-    			switch (errorType) {
-    				case "ERROR_COMMAND":
-    					//TODO: pass message to Ui
-    					break;
-    				
-    				case "ERROR_VIEW_TYPE":
-    					//TODO: pass message to Ui
-    					break;
-    				
-    				case "ERROR_DATE_FORMAT":
-    					//TODO: pass message to Ui
-    					break;
-    				
-    				default:
-    			}
+    		case "ERROR": //TODO
+    			statusCode = -1; //Stub
+    			break;
     			
     		default:
     	}
     	
     	if (isUndoableCommand(command)) {
-    		mostRecentProcessedObject = po;
+    		mostRecentUndoableCommand = command;
     	}
+    	
     	uiManager.updateDisplay();
     	return statusCode; 
     }
@@ -249,6 +238,7 @@ public class Logic {
 		storage.saveTaskList(floatingCollection, NAME_FLOATING_SAVE_FILE);	
 		allMap.put(taskName, task);
 		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		mostRecentTask = task;
 		
 		return -1; //Stub
     }
@@ -259,6 +249,7 @@ public class Logic {
 		storage.saveTaskList(deadlineCollection, NAME_DEADLINE_SAVE_FILE);	
 		allMap.put(taskName, task);
 		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		mostRecentTask = task;
 		
 		return -1; //Stub
     }
@@ -269,6 +260,7 @@ public class Logic {
 		storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);	
 		allMap.put(taskName, task);
 		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		mostRecentTask = task;
 		
 		return -1; //Stub
     }
@@ -276,73 +268,35 @@ public class Logic {
     //Undo the most recent action that was not view, undo, search or error.
     //Returns a status code representing outcome of action.
 	private int undo() throws IOException {
-		if (mostRecentProcessedObject == null) { //No undoable tasks since startup
-			return ERROR_UNDO; //Stub
+		if (mostRecentUndoableCommand == null) { //No undoable commands since startup
+			return -1; //Stub
 		}
-		String mostRecentCommand = mostRecentProcessedObject.getCommand();
-		Task mostRecentTask = mostRecentProcessedObject.getTask();
+
 		String mostRecentTaskType = mostRecentTask.getTaskType();
 		String mostRecentTaskName = mostRecentTask.getTaskName();
-		switch (mostRecentCommand) {
+		
+		switch (mostRecentUndoableCommand) {
 			case "ADD_FLOATING":
-				floatingMap.remove(mostRecentTaskName); 
-				storage.saveTaskList(floatingCollection, "floating tasks");
-				allMap.remove(mostRecentTaskName);
-				storage.saveTaskList(allCollection, "all tasks");
-				break;
-				
 			case "ADD_DEADLINE":
-				deadlineMap.remove(mostRecentTaskName);
-				storage.saveTaskList(deadlineCollection, "deadline tasks");
-				allMap.remove(mostRecentTaskName);
-				storage.saveTaskList(allCollection, "all tasks");
-				break;
-				
 			case "ADD_EVENT":
-				eventMap.remove(mostRecentTaskName);
-				storage.saveTaskList(eventCollection, "event tasks");
-				allMap.remove(mostRecentTaskName);
-				storage.saveTaskList(allCollection, "all tasks");
-				break;
+				return removeTaskFromMaps(mostRecentTaskName, mostRecentTaskType);
 			
 			case "DELETE_BY_INDEX":
 			case "DELETE_BY_NAME":
-				if (mostRecentTaskType == "FLOATING") {
-					floatingMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(floatingCollection, "floating tasks");
-				} else if (mostRecentTaskType == "EVENT") {
-					eventMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(eventCollection, "event tasks");
-				} else { //Deadline tasks
-					deadlineMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(deadlineCollection, "deadline tasks");
-				}
-				allMap.put(mostRecentTaskName, mostRecentTask);
-				storage.saveTaskList(allCollection, "all tasks");
-				break;
+				return putTaskInMaps(mostRecentTask, mostRecentTaskName, mostRecentTaskType);
 			
 			case "UPDATE_BY_INDEX":
 			case "UPDATE_BY_NAME":
-				//TODO: revert most recently updated task in storage
-				break;
+				String mostRecentUpdatedTaskName = mostRecentUpdatedTask.getTaskName();
+				String mostRecentUpdatedTaskType = mostRecentUpdatedTask.getTaskType();
+				removeTaskFromMaps(mostRecentUpdatedTaskName, mostRecentUpdatedTaskType);
+				return putTaskInMaps(mostRecentTask, mostRecentTaskName, mostRecentTaskType);
 				
 			case "DONE_BY_INDEX":
 			case "DONE_BY_NAME":
-				if (mostRecentTaskType == "FLOATING") {
-					floatingMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(floatingCollection, "floating tasks");
-				} else if (mostRecentTaskType == "EVENT") {
-					eventMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(eventCollection, "event tasks");
-				} else { //Deadline tasks
-					deadlineMap.put(mostRecentTaskName, mostRecentTask);
-					storage.saveTaskList(deadlineCollection, "deadline tasks");
-				}				
 				doneMap.remove(mostRecentTaskName);
-				storage.saveTaskList(doneCollection, "done tasks");				
-				allMap.put(mostRecentTaskName, mostRecentTask);
-				storage.saveTaskList(allCollection, "all tasks");				
-				break;
+				storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);		
+				return putTaskInMaps(mostRecentTask, mostRecentTaskName, mostRecentTaskType);			
 			
 			default:
 		}
@@ -361,6 +315,7 @@ public class Logic {
 		
 		String toDeleteType = toDelete.getTaskType();
 		String toDeleteName = toDelete.getTaskName();
+		mostRecentTask = toDelete;
 		
 		return removeTaskFromMaps(toDeleteName, toDeleteType);
 	}
@@ -371,6 +326,7 @@ public class Logic {
 		if (allMap.containsKey(taskName)) {
 			Task toDelete = allMap.get(taskName);
 			String taskType = toDelete.getTaskType();
+			mostRecentTask = toDelete;
 			return removeTaskFromMaps(taskName, taskType);
 		} else { //Task to delete does not exist
 			return -1; //Stub
@@ -389,7 +345,10 @@ public class Logic {
 		String toUpdateType = toUpdate.getTaskType();
 		String toUpdateName = toUpdate.getTaskName();
 		removeTaskFromMaps(toUpdateName, toUpdateType);
-		toUpdate.setTaskName(newTaskName);
+		mostRecentTask = toUpdate;
+		Task updated = new Task(toUpdate);
+		updated.setTaskName(newTaskName);
+		mostRecentUpdatedTask = updated;
 		
 		return putTaskInMaps(toUpdate, newTaskName, toUpdateType);
 	}
@@ -407,7 +366,9 @@ public class Logic {
 		String toUpdateName = toUpdate.getTaskName();
 		String newTaskType = task.getTaskType();
 		removeTaskFromMaps(toUpdateName, toUpdateType);
+		mostRecentTask = toUpdate;
 		task.setTaskName(toUpdateName);
+		mostRecentUpdatedTask = task;
 		
 		return putTaskInMaps(task, toUpdateName, newTaskType);
 	}
@@ -419,7 +380,10 @@ public class Logic {
 			Task toUpdate = allMap.get(oldTaskName);
 			String toUpdateType = toUpdate.getTaskType();
 			removeTaskFromMaps(oldTaskName, toUpdateType);
-			toUpdate.setTaskName(newTaskName);
+			mostRecentTask = toUpdate;
+			Task updated = new Task(toUpdate);
+			updated.setTaskName(newTaskName);
+			mostRecentUpdatedTask = updated;
 			return putTaskInMaps(toUpdate, newTaskName, toUpdateType);
 		} else { //Task to update does not exist
 			return -1; //Stub
@@ -434,6 +398,8 @@ public class Logic {
 			String toUpdateType = toUpdate.getTaskType();
 			String newTaskType = task.getTaskType();
 			removeTaskFromMaps(taskName, toUpdateType);
+			mostRecentTask = toUpdate;
+			mostRecentUpdatedTask = task;
 			return putTaskInMaps(task, taskName, newTaskType);
 		} else { //Task to update does not exist
 			return -1; //Stub
@@ -452,6 +418,7 @@ public class Logic {
 		String toMarkType = toMark.getTaskType();
 		String toMarkName = toMark.getTaskName();
 		removeTaskFromMaps(toMarkName, toMarkType);
+		mostRecentTask = toMark;
 		doneMap.put(toMarkName, toMark);
 		storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);
 			
@@ -466,6 +433,7 @@ public class Logic {
 			String toMarkName = toMark.getTaskName();
 			String toMarkType = toMark.getTaskType();
 			removeTaskFromMaps(taskName, toMarkType);
+			mostRecentTask = toMark;
 			doneMap.put(toMarkName, toMark);
 			storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);
 			return -1; //Stub

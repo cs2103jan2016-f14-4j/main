@@ -85,6 +85,7 @@ public class Logic {
     	String command = po.getCommand();
     	Task task = po.getTask();
     	String taskName = task.getTaskName();
+    	String newTaskName = null; //Only used for commands that change the name of a task
     	int statusCode = 0;
     	int index; //Only used for commands that specify the index of a task
     	switch (command) {
@@ -176,33 +177,250 @@ public class Logic {
     			}
     			break;
     		
-    		case "UPDATE_BY_INDEX":
-    			//TODO: update indexed task in storage
+    		case "UPDATE_BY_INDEX_CHANGE_NAME":
+    			index = po.getIndex() - 1; //Convert to 0-based index
+    			newTaskName = po.getNewTaskName();
+    			if (uiCurrentViewType == "ALL") {
+    				if (index >= allCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = allCollection.get(index);
+    				String toUpdateType = toUpdate.getTaskType();
+    				String toUpdateName = toUpdate.getTaskName();
+    				allCollection.remove(index);
+    				toUpdate.setTaskName(newTaskName);
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks"); 
+    				if (toUpdateType == "FLOATING") {
+    					floatingMap.remove(toUpdateName);
+    					floatingMap.put(newTaskName, toUpdate);
+        				storage.saveTaskList(floatingCollection, "floating tasks");
+    				} else if (toUpdateType == "DEADLINE") {
+    					deadlineMap.remove(toUpdateName);
+    					deadlineMap.put(newTaskName, toUpdate);
+        				storage.saveTaskList(deadlineCollection, "deadline tasks");
+    				} else if (toUpdateType == "EVENT") {
+    					eventMap.remove(toUpdateName);
+    					eventMap.put(newTaskName, toUpdate);
+        				storage.saveTaskList(eventCollection, "event tasks");
+    				}
+    			} else if (uiCurrentViewType == "FLOATING") {
+    				if (index >= floatingCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = floatingCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				floatingCollection.remove(index);
+    				toUpdate.setTaskName(newTaskName);
+    				floatingMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(floatingCollection, "floating tasks");
+    				allMap.remove(toUpdateName);
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
+    			} else if (uiCurrentViewType == "EVENT") {
+    				if (index >= eventCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = eventCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				eventCollection.remove(index);
+    				toUpdate.setTaskName(newTaskName);
+    				eventMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(eventCollection, "event tasks");
+    				allMap.remove(toUpdateName);
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
+    			} else if (uiCurrentViewType == "DEADLINE") {
+    				if (index >= deadlineCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = deadlineCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				deadlineCollection.remove(index);
+    				toUpdate.setTaskName(newTaskName);
+    				deadlineMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(deadlineCollection, "deadline tasks");
+    				allMap.remove(toUpdateName);
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
+    			}
+    			break;
+    			
+    		case "UPDATE_BY_INDEX_CHANGE_DATE":
+    			index = po.getIndex() - 1; //Convert to 0-based index
+    			String newTaskType = task.getTaskType();
+    			if (uiCurrentViewType == "ALL") {
+    				if (index >= allCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = allCollection.get(index);
+    				String toUpdateType = toUpdate.getTaskType();
+    				String toUpdateName = toUpdate.getTaskName();
+    				allMap.put(toUpdateName, task);
+    				storage.saveTaskList(allCollection, "all tasks"); 
+    				if (toUpdateType == "FLOATING") {
+    					if (newTaskType.equals("DEADLINE")) {
+    						floatingMap.remove(toUpdateName);
+            				storage.saveTaskList(floatingCollection, "floating tasks");
+            				deadlineMap.put(toUpdateName, task);
+            				storage.saveTaskList(deadlineCollection, "deadline tasks");
+    					} else if (newTaskType.equals("EVENT")) {
+    						floatingMap.remove(toUpdateName);
+            				storage.saveTaskList(floatingCollection, "floating tasks");
+            				eventMap.put(toUpdateName, task);
+            				storage.saveTaskList(eventCollection, "event tasks");
+    					} else { //No change in Task type
+    						floatingMap.put(toUpdateName, task);
+    						storage.saveTaskList(floatingCollection, "floating tasks");
+    					}
+    				} else if (toUpdateType == "DEADLINE") {
+    					if (newTaskType.equals("FLOATING")) {
+    						deadlineMap.remove(toUpdateName);
+            				storage.saveTaskList(deadlineCollection, "deadline tasks");
+            				floatingMap.put(toUpdateName, task);
+            				storage.saveTaskList(floatingCollection, "floating tasks");
+    					} else if (newTaskType.equals("EVENT")) {
+    						deadlineMap.remove(toUpdateName);
+            				storage.saveTaskList(deadlineCollection, "deadline tasks");
+            				eventMap.put(toUpdateName, task);
+            				storage.saveTaskList(eventCollection, "event tasks");
+    					} else { //No change in Task type
+    						deadlineMap.put(toUpdateName, task);
+    						storage.saveTaskList(deadlineCollection, "deadline tasks");
+    					}
+    				} else if (toUpdateType == "EVENT") {
+    					if (newTaskType.equals("FLOATING")) {
+    						eventMap.remove(toUpdateName);
+            				storage.saveTaskList(eventCollection, "event tasks");
+            				floatingMap.put(toUpdateName, task);
+            				storage.saveTaskList(floatingCollection, "floating tasks");
+    					} else if (newTaskType.equals("DEADLINE")) {
+    						eventMap.remove(toUpdateName);
+            				storage.saveTaskList(eventCollection, "event tasks");
+            				deadlineMap.put(toUpdateName, task);
+            				storage.saveTaskList(deadlineCollection, "deadline tasks");
+    					} else { //No change in Task type
+    						eventMap.put(toUpdateName, task);
+    						storage.saveTaskList(eventCollection, "event tasks");
+    					}
+    				}
+    			} else if (uiCurrentViewType == "FLOATING") {
+    				if (index >= floatingCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = floatingCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				allMap.put(toUpdateName, task);
+    				storage.saveTaskList(allCollection, "all tasks");
+    				if (newTaskType.equals("DEADLINE")) {
+						floatingMap.remove(toUpdateName);
+        				storage.saveTaskList(floatingCollection, "floating tasks");
+        				deadlineMap.put(toUpdateName, task);
+        				storage.saveTaskList(deadlineCollection, "deadline tasks");
+					} else if (newTaskType.equals("EVENT")) {
+						floatingMap.remove(toUpdateName);
+        				storage.saveTaskList(floatingCollection, "floating tasks");
+        				eventMap.put(toUpdateName, task);
+        				storage.saveTaskList(eventCollection, "event tasks");
+					} else { //No change in Task type
+						floatingMap.put(toUpdateName, task);
+						storage.saveTaskList(floatingCollection, "floating tasks");
+					}
+    			} else if (uiCurrentViewType == "EVENT") {
+    				if (index >= eventCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = eventCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
+    				if (newTaskType.equals("FLOATING")) {
+						eventMap.remove(toUpdateName);
+        				storage.saveTaskList(eventCollection, "event tasks");
+        				floatingMap.put(toUpdateName, task);
+        				storage.saveTaskList(floatingCollection, "floating tasks");
+					} else if (newTaskType.equals("DEADLINE")) {
+						eventMap.remove(toUpdateName);
+        				storage.saveTaskList(eventCollection, "event tasks");
+        				deadlineMap.put(toUpdateName, task);
+        				storage.saveTaskList(deadlineCollection, "deadline tasks");
+					} else { //No change in Task type
+						eventMap.put(toUpdateName, task);
+						storage.saveTaskList(eventCollection, "event tasks");
+					}
+    			} else if (uiCurrentViewType == "DEADLINE") {
+    				if (index >= deadlineCollection.size()) { //Out-of bound
+    					return -1; //Stub
+    				}
+    				Task toUpdate = deadlineCollection.get(index);
+    				String toUpdateName = toUpdate.getTaskName();
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
+    				if (newTaskType.equals("FLOATING")) {
+						deadlineMap.remove(toUpdateName);
+        				storage.saveTaskList(deadlineCollection, "deadline tasks");
+        				floatingMap.put(toUpdateName, task);
+        				storage.saveTaskList(floatingCollection, "floating tasks");
+					} else if (newTaskType.equals("EVENT")) {
+						deadlineMap.remove(toUpdateName);
+        				storage.saveTaskList(deadlineCollection, "deadline tasks");
+        				eventMap.put(toUpdateName, task);
+        				storage.saveTaskList(eventCollection, "event tasks");
+					} else { //No change in Task type
+						deadlineMap.put(toUpdateName, task);
+						storage.saveTaskList(deadlineCollection, "deadline tasks");
+					}
+    			}
     			break;
     		
-    		case "UPDATE_BY_NAME":
+    		case "UPDATE_BY_NAME_CHANGE_NAME":
+    			newTaskName = po.getNewTaskName();
     			if (allMap.containsKey(taskName)) {
     				Task toUpdate = allMap.get(taskName);
-    				//TODO: ask Storage to update task
     				String taskType = toUpdate.getTaskType();
+    				toUpdate.setTaskName(newTaskName);
+    				allMap.remove(taskName);
+    				allMap.put(newTaskName, toUpdate);
+    				storage.saveTaskList(allCollection, "all tasks");
     				if (taskType == "FLOATING") {
     					floatingMap.remove(taskName);
+    					floatingMap.put(newTaskName, toUpdate);
     					storage.saveTaskList(floatingCollection, "floating tasks");
     				} else if (taskType == "EVENT") {
     					eventMap.remove(taskName);
+    					eventMap.put(newTaskName, toUpdate);
     					storage.saveTaskList(eventCollection, "event tasks");
     				} else { //Deadline task
     					deadlineMap.remove(taskName);
+    					deadlineMap.put(newTaskName, toUpdate);
     					storage.saveTaskList(deadlineCollection, "deadline tasks");
     				}
-    				allMap.remove(taskName);
-    				storage.saveTaskList(allCollection, "all tasks");
-    				//TODO: add updated Task to relevant HashMaps
     			} else {
     				statusCode = ERROR_UPDATE;
     			}
     			break;
     			
+    		case "UPDATE_BY_NAME_CHANGE_DATE":
+    			if (allMap.containsKey(taskName)) {
+    				Task toUpdate = allMap.get(taskName);
+    				String taskType = toUpdate.getTaskType();
+    				allMap.put(taskName, task);
+    				storage.saveTaskList(allCollection, "all tasks");
+    				if (taskType == "FLOATING") {
+    					floatingMap.put(taskName, task);
+    					storage.saveTaskList(floatingCollection, "floating tasks");
+    				} else if (taskType == "EVENT") {
+    					eventMap.put(taskName, task);
+    					storage.saveTaskList(eventCollection, "event tasks");
+    				} else { //Deadline task
+    					deadlineMap.put(taskName, task);
+    					storage.saveTaskList(deadlineCollection, "deadline tasks");
+    				}
+    			} else {
+    				statusCode = ERROR_UPDATE;
+    			}
+    			break;
+    				
     		case "DONE_BY_INDEX":
     			index = po.getIndex() - 1; //Convert to 0-based index
     			Task toMarkAsDone = null;

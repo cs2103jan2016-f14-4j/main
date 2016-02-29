@@ -102,6 +102,60 @@ public class Logic {
     	return instance;
     }
 	
+	/**
+	 * Get the list of all tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of all tasks
+	 */
+	public ArrayList<Task> getAllTasks() {
+		return allCollection;
+	}
+	
+	/**
+	 * Get the list of floating tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of floating tasks
+	 */
+	public ArrayList<Task> getFloatingTasks() {
+		return floatingCollection;
+	}
+	
+	/**
+	 * Get the list of deadline tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of deadline tasks
+	 */
+	public ArrayList<Task> getDeadlineTasks() {
+		return deadlineCollection;
+	}
+	
+	/**
+	 * Get the list of event tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of event tasks
+	 */
+	public ArrayList<Task> getEventTasks() {
+		return eventCollection;
+	}
+	
+	/**
+	 * Get the list of done tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of done tasks
+	 */
+	public ArrayList<Task> getDoneTasks() {
+		return doneCollection;
+	}
+	
+	/**
+	 * Get the list of expired tasks. Note that this list may not be sorted.
+	 * 
+	 * @return list of expired tasks
+	 */
+	public ArrayList<Task> getExpiredTasks() {
+		return expiredCollection;
+	}
+	
     /**
      * Attempts to execute a command specified by the input string.
      * 
@@ -176,6 +230,7 @@ public class Logic {
     			if (t == null) { //Task not found
     				statusCode = -1; //Stub
     			} else {
+    				//TODO: update Ui with Task
     				statusCode = -1; //Stub
     			}
     			break;
@@ -446,7 +501,6 @@ public class Logic {
 	private Task search(String searchPhrase) {
 		if (allMap.containsKey(searchPhrase)) { //Only works if searchPhrase matches taskName
 			return allMap.get(searchPhrase);
-			//TODO: update Ui with Task
 		} else {
 			return null;
 		}

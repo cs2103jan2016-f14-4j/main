@@ -1,0 +1,24 @@
+/* Switchable Text styles */
+
+.textRed {
+	-fx-fill: red;
+	-fx-font-weight: bold;
+}
+
+.textBlue { 
+	-fx-fill: blue;
+	-fx-font-weight: bold;
+}
+.textGreen { 
+	-fx-fill: green;
+	-fx-font-weight: bold;
+}
+
+.textBlack { 
+	-fx-fill: black;
+}
+
+.textBlackToPurple { 
+	-fx-font: 10px Tahoma;
+    -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, black 0%, purple 50%);
+}

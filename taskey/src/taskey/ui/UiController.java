@@ -140,6 +140,7 @@ public class UiController {
 				}
 				if ( event.getCode().isArrowKey()) {
 	        		  myDropDown.processArrowKey(event);
+	        		  myManager.processArrowKey(event);
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();

@@ -3,6 +3,7 @@ package taskey.ui.utility;
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

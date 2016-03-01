@@ -120,8 +120,8 @@ public class UiMain extends Application {
 
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 
-		myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
-		//myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
+		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
+		myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
 	}
 
 	public String doHash(String line, int offsest) {

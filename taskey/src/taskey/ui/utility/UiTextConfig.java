@@ -43,7 +43,7 @@ public class UiTextConfig {
 	
 	private Text createText(String segment) {
 		Text newText = new Text(segment);
-		newText.setFont(myFont); 
+		//newText.setFont(myFont); 
 		return newText;
 	}	
 	

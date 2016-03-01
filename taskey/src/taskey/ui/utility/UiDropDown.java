@@ -141,9 +141,9 @@ public class UiDropDown {
 		if ( currentItemSize == 0 ) {
 			return;
 		}
-		if ( event.getCode() == KeyCode.ENTER.DOWN) {
+		if ( event.getCode() == KeyCode.DOWN) {
 			select((currentSelection + 1) % currentItemSize);
-		} else if ( event.getCode() == KeyCode.ENTER.UP) {
+		} else if ( event.getCode() == KeyCode.UP) {
 			select((currentSelection - 1) < 0 ? currentItemSize - 1 : currentSelection - 1);
 		}
 	}

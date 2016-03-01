@@ -2,6 +2,12 @@ package taskey.parser;
 
 import taskey.logic.ProcessedObject;
 
+/**
+ * Purpose of this class is to parse "errors" for any 
+ * wrong command formats/etc...
+ * @author Xue Hui
+ *
+ */
 public class ParseError {
 	
 	public ParseError() {

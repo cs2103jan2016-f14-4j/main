@@ -11,14 +11,16 @@ package taskey.logic;
  * 4. ADD_RECURRING
  * 5. DELETE_BY_INDEX
  * 6. DELETE_BY_NAME 
- * 7. UPDATE_BY_INDEX
- * 8. UPDATE_BY_NAME 
- * 9. VIEW 
- * 10. ERROR 
- * 11. DONE_BY_INDEX
- * 12. DONE_BY_NAME
- * 13. SEARCH
- * 14. UNDO 
+ * 7. UPDATE_BY_INDEX_CHANGE_NAME
+ * 8. UPDATE_BY_INDEX_CHANGE_DATE
+ * 9. UPDATE_BY_NAME_CHANGE_NAME
+ * 10. UPDATE_BY_NAME_CHANGE_DATE
+ * 11. VIEW 
+ * 12. ERROR 
+ * 13. DONE_BY_INDEX
+ * 14. DONE_BY_NAME
+ * 15. SEARCH
+ * 16. UNDO 
  * 
  * @author Xue Hui
  *
@@ -39,6 +41,7 @@ public class ProcessedObject {
 	private String viewType = null; 
 	private String errorType = null;
 	private String searchPhrase = null; 
+	private String newTaskName = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -51,7 +54,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR/UNDO 
+	 * Constructor for ERROR/UNDO/SEARCH 
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -69,7 +72,7 @@ public class ProcessedObject {
 	
 	/**
 	 * Constructor for ADD_FLOATING, ADD_DEADLINE, ADD_EVENT, ADD_RECURRING,
-	 * DELETE_BY_NAME, UPDATE_BY_NAME
+	 * DELETE_BY_NAME, UPDATE_BY_NAME_CHANGE_NAME, UPDATE_BY_NAME_CHANGE_DATE
 	 * @param command
 	 * @param task
 	 */
@@ -79,7 +82,8 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for DELETE_BY_INDEX, UPDATE_BY_INDEX 
+	 * Constructor for DELETE_BY_INDEX, UPDATE_BY_INDEX_CHANGE_NAME, 
+	 * UPDATE_BY_INDEX_CHANGE_DATE 
 	 * @param command
 	 * @param task
 	 * @param index
@@ -139,6 +143,14 @@ public class ProcessedObject {
 	
 	public String getSearchPhrae() {
 		return searchPhrase; 
+	}
+	
+	public void setNewTaskName(String taskName) {
+		newTaskName = taskName; 
+	}
+	
+	public String getNewTaskName() {
+		return newTaskName; 
 	}
 	
 	@Override 

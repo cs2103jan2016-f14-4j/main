@@ -1,47 +1,43 @@
-package taskey.ui;
+package taskey.ui.utility;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
+import taskey.ui.UiConstants;
 
+/**
+ * This class performs a background service, which updates the UI clock
+ * 
+ * @author JunWei
+ *
+ */
 public class UiClockService extends ScheduledService<Void> {
 
-	private static final DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-	
-	private static final int UPDATE_INTERVAL = 1000; // in milliseconds
-	private static final String PM_SUFFIX = "PM";
-	private static final String AM_SUFFIX = "AM";
-	
 	private Label timeLabelRef;
 	private Label dateLabelRef;
 
-	public UiClockService( Label timeLabel, Label dateLabel ) {
+	public UiClockService(Label timeLabel, Label dateLabel) {
 		timeLabelRef = timeLabel;
 		dateLabelRef = dateLabel;
 		this.setDelay(new Duration(0));
-		this.setPeriod(new Duration(UPDATE_INTERVAL));
+		this.setPeriod(new Duration(UiConstants.ClOCK_UPDATE_INTERVAL));
 	}
-	
+
 	@Override
 	protected Task<Void> createTask() {
-    	Task<Void> myTask = new Task<Void>() {
-			@Override public Void call () {
+		Task<Void> myTask = new Task<Void>() {
+			@Override
+			public Void call() {
 				Calendar cal = Calendar.getInstance(); // need to get a new updated instance every time
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
 					public void run() {
 						timeLabelRef.setText(formatTime(cal));
-						dateLabelRef.setText(dateFormat.format(cal.getTime()));
+						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});
 				return null;
@@ -49,26 +45,29 @@ public class UiClockService extends ScheduledService<Void> {
 		};
 		return myTask;
 	}
-	
+
 	public String formatTime(Calendar cal) {
 		String myTime = "";
 		int hour = cal.get(Calendar.HOUR);
+		if (cal.get(Calendar.AM_PM) == 1 && hour == 0) { // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm
+			hour = 12;
+		}
 		int minute = cal.get(Calendar.MINUTE);
 		String minutePrefix = minute < 10 ? "0" : "";
-		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? PM_SUFFIX : AM_SUFFIX); // AM or PM
-		//System.out.println(cal.get(Calendar.AM) + " " + cal.get(Calendar.PM) + " " + cal.get(Calendar.AM_PM));
+		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? UiConstants.PM_SUFFIX : UiConstants.AM_SUFFIX); // AM or PM
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}
-	
-	
-	public int getDayOfMonth () { 
+
+	public int getDayOfMonth() {
 		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 	}
-	public int getMonthOfYear () { 
+
+	public int getMonthOfYear() {
 		return Calendar.getInstance().get(Calendar.MONTH);
 	}
-	public int getYear () { 
+
+	public int getYear() {
 		return Calendar.getInstance().get(Calendar.MONTH);
 	}
 }

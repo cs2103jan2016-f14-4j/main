@@ -2,8 +2,10 @@ package taskey.ui.utility;
 
 import java.util.ArrayList;
 
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
+import taskey.ui.UiConstants;
 
 /**
  * This class provides a way to configure different styles given a string
@@ -15,6 +17,7 @@ public class UiTextConfig {
 
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
 	private char symbol;
+	private Font myFont; // Font is usually shared across all Text nodes in a line
 
 	public UiTextConfig() {
 		initVariables();
@@ -25,9 +28,39 @@ public class UiTextConfig {
 	}
 	public void initVariables() {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
-		addMarker(0, "textBlack"); // default marker, will get overridden if there exists another marker at 0
+		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
+		myFont = UiConstants.UI_DEFAULT_FONT; // default (overridden by styles specifying font)
 	}
+	
+	public void setFont(Font newFont) {
+		myFont = newFont;
+	}
+	
+	public void setSymbol(char _symbol) {
+		symbol = _symbol;
+	}
+	
+	private Text createText(String segment) {
+		Text newText = new Text(segment);
+		//newText.setFont(myFont); 
+		return newText;
+	}	
+	
+	public void addMarker(Integer startIndex, String style) {
+		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
+	}
+	
+	public void addMarkers(String ...styles) {
+		for ( String style : styles) {
+			styleMarkers.add(new Pair<Integer, String>(0, style));
+		}
+	}
+
+	public void removeMarkers() {
+		styleMarkers.clear();
+	}
+	
 	public ArrayList<Text> format(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		int currentStart = styleMarkers.get(0).getKey();
@@ -51,7 +84,7 @@ public class UiTextConfig {
 				currentEnd = Math.min(styleMarkers.get(i + 1).getKey(), line.length());
 			}
 			segment = line.substring(currentStart, currentEnd);
-			Text newText = new Text(segment);
+			Text newText = createText(segment);
 			newText.getStyleClass().add(currentStyle);
 			myTexts.add(newText);
 			currentStart = currentEnd;
@@ -59,9 +92,6 @@ public class UiTextConfig {
 		return myTexts;
 	}
 	
-	public void setSymbol(char _symbol) {
-		symbol = _symbol;
-	}
 	/**
 	 * Using a symbol like #, etc to format, reuse markers but not using indexes
 	 * Markers are ignored in a queue-like fashion for each symbol encountered
@@ -84,25 +114,12 @@ public class UiTextConfig {
 					currentStyle = styleMarkers.get(styleIndex).getValue();
 					styleIndex++; // ignore previous style
 				}
-				Text newText = new Text(segment);
+				Text newText = createText(segment);
 				newText.getStyleClass().add(currentStyle);
 				myTexts.add(newText);
 				segment = "";
 			}
 		}
 		return myTexts;
-	}
-
-	public void addMarker(Integer startIndex, String style) {
-		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
-	}
-	public void addMarkers(String ...styles) {
-		for ( String style : styles) {
-			styleMarkers.add(new Pair<Integer, String>(0, style));
-		}
-	}
-
-	public void removeMarkers() {
-		styleMarkers.clear();
 	}
 }

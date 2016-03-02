@@ -2,9 +2,16 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
+import javafx.animation.TranslateTransition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
@@ -107,5 +114,32 @@ public class UiContentManager {
 		myFormatters.clear();
 		contentBoxes.clear();
 	}
-
+	
+	
+	public void processArrowKey(KeyEvent event) {
+		// temporary, need to get current tab
+		int arrayIndex = ContentBox.ACTION.getValue();
+		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
+		GridPane currentGrid = myFormatter.getGrid();
+		int direction = 1;
+		if ( event.getCode() == KeyCode.RIGHT) {
+			direction = 1;		
+		} else if ( event.getCode() == KeyCode.LEFT) {
+			direction = -1;
+		} else {
+			return;
+		}
+		TranslateTransition shiftGrid = new TranslateTransition();
+		shiftGrid.setFromX(currentGrid.getLayoutX());
+		shiftGrid.setDuration(Duration.millis(1000));
+		shiftGrid.setToX(currentGrid.getLayoutX()+currentGrid.getWidth()*direction);
+		shiftGrid.setNode(currentGrid);
+		shiftGrid.play();
+		shiftGrid.setOnFinished(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				updateActionContentBox(null,ActionContentMode.HELP_MAIN);			
+			}
+		});
+	}
 }

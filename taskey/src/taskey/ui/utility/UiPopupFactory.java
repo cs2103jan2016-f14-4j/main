@@ -3,6 +3,7 @@ package taskey.ui.utility;
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
 import javafx.util.Duration;
+import taskey.ui.UiConstants;
 
 /**
  * This class creates various types of pop up windows, and supports the use of
@@ -48,7 +50,7 @@ public class UiPopupFactory {
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
 		content.setText(text);
-		content.getStyleClass().add("prompt");
+		content.getStyleClass().add(UiConstants.STYLE_PROMPT);
 		newPopup.getContent().add(content);
 		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  
 		popupList.add(newPopup);
@@ -60,7 +62,7 @@ public class UiPopupFactory {
 		VBox container = new VBox(); // VBox is used only for formatting purposes purposes
 		for (int i = 0; i < numRows; i++) {
 			StackPane row = new StackPane();
-			row.getStyleClass().add("prompt");
+			row.getStyleClass().add(UiConstants.STYLE_PROMPT);
 			container.getChildren().add(row);
 		}
 		newPopup.getContent().add(container);

@@ -4,7 +4,7 @@ import taskey.logic.ProcessedObject;
 
 /**
  * Purpose of this class is to parse the "search" command 
- * @author Nat
+ * @author Xue Hui
  *
  */
 public class ParseSearch {

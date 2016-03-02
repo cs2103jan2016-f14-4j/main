@@ -162,9 +162,8 @@ public class Logic {
      * @param input the input string
      * @return      status code reflecting the outcome of command execution
      * @throws IOException 
-     * @throws ClassNotFoundException 
      */
-    public int executeCommand(String input) throws ClassNotFoundException, IOException {
+    public int executeCommand(String input) throws IOException {
     	int statusCode = 0; //Stub
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
@@ -256,7 +255,7 @@ public class Logic {
     
     //Updates Ui with a list of Tasks sorted by date, corresponding to the view type.
     //Returns a status code representing outcome of action.
-    private int view(String viewType) throws ClassNotFoundException, IOException {
+    private int view(String viewType) throws IOException {
     	int statusCode = -1; //Stub 
     	
     	if (allMap == null) { //HashMap not initialized at startup, must get Tasks from Storage
@@ -586,7 +585,7 @@ public class Logic {
 	
 	//Get Task lists from Storage at startup and populate the HashMaps and their corresponding collections.
     //Returns a status code representing outcome of action.
-    private int getListsFromStorage() throws IOException, ClassNotFoundException {
+    private int getListsFromStorage() {
     	listsFromStorage = new ArrayList<ArrayList<Task>>(NUM_TASK_LISTS);
     	
     	//Get ALL list from Storage

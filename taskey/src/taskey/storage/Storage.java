@@ -53,6 +53,9 @@ public class Storage {
 		// Attempt to load from an empty directory (file not found)
 		storageTest.setDirectory(DEFAULT_DIRECTORY + "/foo");
 		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
+		for (Task t : loadedTaskList) {
+			System.out.println(t);
+		}
 
 		// Change back to the default directory
 		storageTest.setDirectory(DEFAULT_DIRECTORY);
@@ -93,7 +96,7 @@ public class Storage {
     public void saveTaskList(ArrayList<Task> tasks, String taskCategory) throws IOException {
 		setSavefile(taskCategory);
     	writeToFile(tasks);
-    	//TODO When exception is encountered, return/throw the last-modified list to Logic
+    	//TODO When exception is encountered during write, return/throw the last-modified list to Logic
     }
     
     /**

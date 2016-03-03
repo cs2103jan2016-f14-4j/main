@@ -79,10 +79,12 @@ public class Logic {
 		}
 		return null;
 	}
+	
 	public int executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
     	ProcessedObject po = myParser.parseInput(input);
     	
+    	// important objects
     	String command = po.getCommand();
     	Task task = po.getTask();
     	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
@@ -96,7 +98,6 @@ public class Logic {
     	System.out.println("Command: " + command);
     	
     	switch (command) {
-    		
 			case "ADD_FLOATING":
 			case "ADD_DEADLINE":
 			case "ADD_EVENT":

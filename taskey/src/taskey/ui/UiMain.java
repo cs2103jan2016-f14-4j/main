@@ -78,7 +78,7 @@ public class UiMain extends Application {
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
 		//testUI();
-		Logic.getInstance().initializeUi();
+		Logic.getInstance().initialize();
 	}
 
 	public UiController getController() {

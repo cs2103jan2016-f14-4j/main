@@ -1,11 +1,11 @@
 package taskey.parser;
 
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import taskey.constants.ParserConstants; 
+import taskey.constants.ParserConstants;
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task; 
 
 /**
  * Job of this class is to parse "add" commands. 
@@ -251,6 +251,22 @@ public class ParseAdd {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * Get tag list for a task
+	 * Assumptions: all tags must be added to the back of the userInput
+	 * @param rawInput
+	 * @return
+	 */
+	public ArrayList<String> getTagList(String rawInput) {
+		ArrayList<String> tagList = new ArrayList<String>();
+		String[] splitString = rawInput.split("#");
+		//TODO: handle case where there's no tags  
+		for (int i=1; i < splitString.length; i++) {
+			tagList.add(splitString[i].trim());
+		}
+		return new ArrayList<String>(); 
 	}
 
 }

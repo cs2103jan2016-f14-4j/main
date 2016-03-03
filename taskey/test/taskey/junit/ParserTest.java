@@ -131,5 +131,11 @@ public class ParserTest {
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
 		
+		String myString = "add test lala #lala #lalala";
+		String[] splitString = myString.split("#");
+		for (int i=0; i < splitString.length; i++) {
+			System.out.println("["+splitString[i] + "]");
+		}
+		
 	}
 }

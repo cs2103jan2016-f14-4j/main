@@ -95,6 +95,7 @@ public class Logic {
 		logicTest.floatingMap = new HashMap<String, Task>();
 		logicTest.pendingMap = new HashMap<String, Task>();
 		logicTest.addFloatingToStorage(t, "a new test task");
+		logicTest.getListsFromStorage();
 	}*/
 	
 	/**
@@ -657,8 +658,9 @@ public class Logic {
     private int getListsFromStorage() {
     	listsFromStorage = new ArrayList<ArrayList<Task>>(NUM_TASK_LISTS);
     	
+    	
     	//Get PENDING list from Storage
-    	listsFromStorage.set(INDEX_PENDING_LIST, storage.getTaskList(NAME_PENDING_SAVE_FILE));
+    	listsFromStorage.add(INDEX_PENDING_LIST, storage.getTaskList(NAME_PENDING_SAVE_FILE));
     	pendingMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_PENDING_LIST)) {
     		pendingMap.put(t.getTaskName(), t);
@@ -666,7 +668,7 @@ public class Logic {
     	pendingCollection = new ArrayList<Task>(pendingMap.values());
     	
     	//Get FLOATING list from Storage
-    	listsFromStorage.set(INDEX_FLOATING_LIST, storage.getTaskList(NAME_FLOATING_SAVE_FILE));
+    	listsFromStorage.add(INDEX_FLOATING_LIST, storage.getTaskList(NAME_FLOATING_SAVE_FILE));
     	floatingMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_FLOATING_LIST)) {
     		floatingMap.put(t.getTaskName(), t);
@@ -674,7 +676,7 @@ public class Logic {
     	floatingCollection = new ArrayList<Task>(floatingMap.values());
     	
     	//Get DEADLINE list from Storage
-    	listsFromStorage.set(INDEX_DEADLINE_LIST, storage.getTaskList(NAME_DEADLINE_SAVE_FILE));
+    	listsFromStorage.add(INDEX_DEADLINE_LIST, storage.getTaskList(NAME_DEADLINE_SAVE_FILE));
     	deadlineMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_DEADLINE_LIST)) {
     		deadlineMap.put(t.getTaskName(), t);
@@ -682,7 +684,7 @@ public class Logic {
     	deadlineCollection = new ArrayList<Task>(deadlineMap.values());
     	
     	//Get EVENT list from Storage
-    	listsFromStorage.set(INDEX_EVENT_LIST, storage.getTaskList(NAME_EVENT_SAVE_FILE));
+    	listsFromStorage.add(INDEX_EVENT_LIST, storage.getTaskList(NAME_EVENT_SAVE_FILE));
     	eventMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_EVENT_LIST)) {
     		eventMap.put(t.getTaskName(), t);
@@ -690,7 +692,7 @@ public class Logic {
     	eventCollection = new ArrayList<Task>(eventMap.values());
     	
     	//Get DONE list from Storage
-    	listsFromStorage.set(INDEX_DONE_LIST, storage.getTaskList(NAME_DONE_SAVE_FILE));
+    	listsFromStorage.add(INDEX_DONE_LIST, storage.getTaskList(NAME_DONE_SAVE_FILE));
     	doneMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_DONE_LIST)) {
     		doneMap.put(t.getTaskName(), t);
@@ -698,7 +700,7 @@ public class Logic {
     	doneCollection = new ArrayList<Task>(doneMap.values());
     	
     	//Get EXPIRED list from Storage
-    	listsFromStorage.set(INDEX_EXPIRED_LIST, storage.getTaskList(NAME_EXPIRED_SAVE_FILE));
+    	listsFromStorage.add(INDEX_EXPIRED_LIST, storage.getTaskList(NAME_EXPIRED_SAVE_FILE));
     	expiredMap = new HashMap<String, Task>();
     	for (Task t : listsFromStorage.get(INDEX_EXPIRED_LIST)) {
     		expiredMap.put(t.getTaskName(), t);

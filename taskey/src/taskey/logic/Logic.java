@@ -2,7 +2,9 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.storage.Storage;
-import taskey.ui.UiManager;
+import taskey.ui.UiMain;
+import taskey.ui.UiController;
+import taskey.ui.UiConstants;
 import taskey.logic.Task;
 
 import java.io.IOException;
@@ -37,7 +39,7 @@ public class Logic {
 	private static Logic instance = null;
 	private Parser parser;
 	private Storage storage;
-	private UiManager uiManager;
+	private UiController uiController;
 	
 	//The most recent command which is not VIEW, UNDO, SEARCH or ERROR
 	private String mostRecentUndoableCommand = null;
@@ -55,7 +57,7 @@ public class Logic {
 	private static final int NUM_TASK_LISTS = 6;
 	
 	//Indices of each Task list in listsFromStorage
-	private static final int INDEX_ALL_LIST = 0;
+	private static final int INDEX_PENDING_LIST = 0;
 	private static final int INDEX_FLOATING_LIST = 1;
 	private static final int INDEX_DEADLINE_LIST = 2;
 	private static final int INDEX_EVENT_LIST = 3;
@@ -63,7 +65,7 @@ public class Logic {
 	private static final int INDEX_EXPIRED_LIST = 5;
 	
 	//Names of save file for each Task list. Can be moved to Storage later on.
-	private static final String NAME_ALL_SAVE_FILE = "all tasks";
+	private static final String NAME_PENDING_SAVE_FILE = "pending tasks";
 	private static final String NAME_FLOATING_SAVE_FILE = "floating tasks";
 	private static final String NAME_DEADLINE_SAVE_FILE = "deadline tasks";
 	private static final String NAME_EVENT_SAVE_FILE = "event tasks";
@@ -72,7 +74,7 @@ public class Logic {
 	
 	//HashMaps containing Task data for each Task category. 
 	//The key String holds the name of Task, and the value Task is the corresponding Task object.
-	private HashMap<String, Task> allMap = null;
+	private HashMap<String, Task> pendingMap = null;
 	private HashMap<String, Task> floatingMap = null;
 	private HashMap<String, Task> deadlineMap = null;
 	private HashMap<String, Task> eventMap = null;
@@ -80,7 +82,7 @@ public class Logic {
 	private HashMap<String, Task> expiredMap = null;
 	
 	//Collections of Task objects backed by the above HashMaps 
-	private ArrayList<Task> allCollection = null; 
+	private ArrayList<Task> pendingCollection = null; 
 	private ArrayList<Task> floatingCollection = null;
 	private ArrayList<Task> deadlineCollection = null;
 	private ArrayList<Task> eventCollection = null;
@@ -97,18 +99,18 @@ public class Logic {
     		instance = new Logic();
     		//instance.parser = Parser.getInstance();
     		instance.storage = Storage.getInstance();
-    		instance.uiManager = UiManager.getInstance();
+    		instance.uiController = UiMain.getInstance().getController();
     	}
     	return instance;
     }
 	
 	/**
-	 * Get the list of all tasks. Note that this list may not be sorted.
+	 * Get the list of pending tasks. Note that this list may not be sorted.
 	 * 
-	 * @return list of all tasks
+	 * @return list of pending tasks
 	 */
-	public ArrayList<Task> getAllTasks() {
-		return allCollection;
+	public ArrayList<Task> getPendingTasks() {
+		return pendingCollection;
 	}
 	
 	/**
@@ -162,9 +164,8 @@ public class Logic {
      * @param input the input string
      * @return      status code reflecting the outcome of command execution
      * @throws IOException 
-     * @throws ClassNotFoundException 
      */
-    public int executeCommand(String input) throws ClassNotFoundException, IOException {
+    public int executeCommand(String input) throws IOException {
     	int statusCode = 0; //Stub
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
@@ -172,7 +173,7 @@ public class Logic {
     	int taskIndex = po.getIndex() - 1; //Only used for commands that specify the index of a task
     	String viewType = po.getViewType(); //Only used for view commands
     	String errorType = po.getErrorType(); //Only used for invalid commands
-    	String searchPhrase = po.getSearchPhrae(); //Only used for search commands
+    	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	String taskName = task.getTaskName();
    	
@@ -183,46 +184,70 @@ public class Logic {
     			
     		case "ADD_FLOATING":
     			statusCode = addFloatingToStorage(task, taskName);
+    			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "ADD_DEADLINE":
     			statusCode = addDeadlineToStorage(task, taskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "ADD_EVENT":
     			statusCode = addEventToStorage(task, taskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "DELETE_BY_INDEX":
     			statusCode = deleteIndexedTaskFromStorage(taskIndex);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     		
     		case "DELETE_BY_NAME":
     			statusCode = deleteNamedTaskFromStorage(taskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     		
     		case "UPDATE_BY_INDEX_CHANGE_NAME":
     			statusCode = updateIndexedTaskNameInStorage(taskIndex, newTaskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "UPDATE_BY_INDEX_CHANGE_DATE":
     			statusCode = updateIndexedTaskDateInStorage(task, taskIndex);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     		
     		case "UPDATE_BY_NAME_CHANGE_NAME":
     			statusCode = updateNamedTaskNameInStorage(taskName, newTaskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "UPDATE_BY_NAME_CHANGE_DATE":
     			statusCode = updateNamedTaskDateInStorage(task, taskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     				
     		case "DONE_BY_INDEX":
     			statusCode = markIndexedTaskAsDoneInStorage(taskIndex);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+       			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     		
     		case "DONE_BY_NAME":
     			statusCode = markNamedTaskAsDoneInStorage(taskName);
+       			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+       			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			break;
     			
     		case "SEARCH":
@@ -230,12 +255,18 @@ public class Logic {
     			if (t == null) { //Task not found
     				statusCode = -1; //Stub
     			} else {
-    				//TODO: update Ui with Task
+    				ArrayList<Task> matches = new ArrayList<Task>();
+    				matches.add(t);
+    				uiController.updateActionDisplay(matches, UiConstants.ActionContentMode.TASKLIST);
     				statusCode = -1; //Stub
     			}
     			break;
     		
     		case "UNDO":
+    			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+    			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
+    			uiController.updateDisplay(expiredCollection, UiConstants.ContentBox.EXPIRED);
+    			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
     			statusCode = undo();
     			break;
     		
@@ -250,37 +281,39 @@ public class Logic {
     		mostRecentUndoableCommand = command;
     	}
     	
-    	uiManager.updateDisplay();
     	return statusCode; 
     }
     
     //Updates Ui with a list of Tasks sorted by date, corresponding to the view type.
     //Returns a status code representing outcome of action.
-    private int view(String viewType) throws ClassNotFoundException, IOException {
+    private int view(String viewType) throws IOException {
     	int statusCode = -1; //Stub 
     	
-    	if (allMap == null) { //HashMap not initialized at startup, must get Tasks from Storage
+    	if (pendingMap == null) { //HashMap not initialized at startup, must get Tasks from Storage
 			statusCode = getListsFromStorage();
 			uiCurrentViewType = "ALL";
-			//TODO: update Ui with allCollection
+			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
+			uiController.updateDisplay(expiredCollection, UiConstants.ContentBox.EXPIRED);
+			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("ALL")) {
-			Collections.sort(allCollection);
-			//TODO: update Ui with allCollection
+			Collections.sort(pendingCollection);
+			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("GENERAL")) {
 			Collections.sort(floatingCollection);
-			//TODO: update Ui with floatingCollection
+			uiController.updateActionDisplay(floatingCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("DEADLINES")) {
 			Collections.sort(deadlineCollection);
-			//TODO: update Ui with deadlineCollection
+			uiController.updateActionDisplay(deadlineCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("EVENTS")) {
 			Collections.sort(eventCollection);
-			//TODO: update Ui with eventCollection
+			uiController.updateActionDisplay(eventCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("DONE")) {
 			Collections.sort(doneCollection);
-			//TODO: update Ui with doneCollection
+			uiController.updateActionDisplay(doneCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else { //Expired tasks
 			Collections.sort(expiredCollection);
-			//TODO: update Ui with expiredCollection
+			uiController.updateActionDisplay(expiredCollection, UiConstants.ActionContentMode.TASKLIST);
 		}
     	uiCurrentViewType = viewType;
     	
@@ -291,8 +324,8 @@ public class Logic {
     private int addFloatingToStorage(Task task, String taskName) throws IOException {
 		floatingMap.put(taskName, task); 
 		storage.saveTaskList(floatingCollection, NAME_FLOATING_SAVE_FILE);	
-		allMap.put(taskName, task);
-		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		pendingMap.put(taskName, task);
+		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
 		return -1; //Stub
@@ -302,8 +335,8 @@ public class Logic {
     private int addDeadlineToStorage(Task task, String taskName) throws IOException {
 		deadlineMap.put(taskName, task); 
 		storage.saveTaskList(deadlineCollection, NAME_DEADLINE_SAVE_FILE);	
-		allMap.put(taskName, task);
-		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		pendingMap.put(taskName, task);
+		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
 		return -1; //Stub
@@ -313,8 +346,8 @@ public class Logic {
     private int addEventToStorage(Task task, String taskName) throws IOException {
 		eventMap.put(taskName, task); 
 		storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);	
-		allMap.put(taskName, task);
-		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		pendingMap.put(taskName, task);
+		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
 		return -1; //Stub
@@ -378,8 +411,8 @@ public class Logic {
 	//Deletes the Task specified by taskName from Storage.
 	//Returns a status code reflecting outcome of command execution.
 	private int deleteNamedTaskFromStorage(String taskName) throws IOException {
-		if (allMap.containsKey(taskName)) {
-			Task toDelete = allMap.get(taskName);
+		if (pendingMap.containsKey(taskName)) {
+			Task toDelete = pendingMap.get(taskName);
 			String taskType = toDelete.getTaskType();
 			mostRecentTask = toDelete;
 			return removeTaskFromMaps(taskName, taskType);
@@ -401,7 +434,7 @@ public class Logic {
 		String toUpdateName = toUpdate.getTaskName();
 		removeTaskFromMaps(toUpdateName, toUpdateType);
 		mostRecentTask = toUpdate;
-		Task updated = new Task(toUpdate);
+		Task updated = toUpdate.getDuplicate();
 		updated.setTaskName(newTaskName);
 		mostRecentUpdatedTask = updated;
 		
@@ -431,12 +464,12 @@ public class Logic {
 	//Updates the Task specified by taskName in Storage with newTaskName.
 	//Returns a status code reflecting outcome of command execution.
 	private int updateNamedTaskNameInStorage(String oldTaskName, String newTaskName) throws IOException {
-		if (allMap.containsKey(oldTaskName)) {
-			Task toUpdate = allMap.get(oldTaskName);
+		if (pendingMap.containsKey(oldTaskName)) {
+			Task toUpdate = pendingMap.get(oldTaskName);
 			String toUpdateType = toUpdate.getTaskType();
 			removeTaskFromMaps(oldTaskName, toUpdateType);
 			mostRecentTask = toUpdate;
-			Task updated = new Task(toUpdate);
+			Task updated = toUpdate.getDuplicate();
 			updated.setTaskName(newTaskName);
 			mostRecentUpdatedTask = updated;
 			return putTaskInMaps(toUpdate, newTaskName, toUpdateType);
@@ -448,8 +481,8 @@ public class Logic {
 	//Updates the Task specified by taskName in Storage with task which contains the new date.
 	//Returns a status code reflecting outcome of command execution.
 	private int updateNamedTaskDateInStorage(Task task, String taskName) throws IOException {
-		if (allMap.containsKey(taskName)) {
-			Task toUpdate = allMap.get(taskName);
+		if (pendingMap.containsKey(taskName)) {
+			Task toUpdate = pendingMap.get(taskName);
 			String toUpdateType = toUpdate.getTaskType();
 			String newTaskType = task.getTaskType();
 			removeTaskFromMaps(taskName, toUpdateType);
@@ -483,8 +516,8 @@ public class Logic {
 	//Marks the Task specified by taskName as done in Storage.
 	//Returns a status code reflecting outcome of command execution.
 	private int markNamedTaskAsDoneInStorage(String taskName) throws IOException {
-		if (allMap.containsKey(taskName)) {
-			Task toMark= allMap.get(taskName);
+		if (pendingMap.containsKey(taskName)) {
+			Task toMark= pendingMap.get(taskName);
 			String toMarkName = toMark.getTaskName();
 			String toMarkType = toMark.getTaskType();
 			removeTaskFromMaps(taskName, toMarkType);
@@ -499,8 +532,8 @@ public class Logic {
 	
 	//Returns an existing Task whose name matches searchPhrase, or null if no matches are found.
 	private Task search(String searchPhrase) {
-		if (allMap.containsKey(searchPhrase)) { //Only works if searchPhrase matches taskName
-			return allMap.get(searchPhrase);
+		if (pendingMap.containsKey(searchPhrase)) { //Only works if searchPhrase matches taskName
+			return pendingMap.get(searchPhrase);
 		} else {
 			return null;
 		}
@@ -521,8 +554,8 @@ public class Logic {
 			storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);
 		}
 		
-		allMap.put(taskName, task);
-		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		pendingMap.put(taskName, task);
+		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		
 		return -1; //stub
 	}
@@ -543,8 +576,8 @@ public class Logic {
 			storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);
 		}
 		
-		allMap.remove(taskName);
-		storage.saveTaskList(allCollection, NAME_ALL_SAVE_FILE);
+		pendingMap.remove(taskName);
+		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		
 		return -1; //stub
 	}
@@ -556,7 +589,7 @@ public class Logic {
 		}
 		
 		if (uiCurrentViewType.equals("ALL")) {
-			return allCollection.get(taskIndex);
+			return pendingCollection.get(taskIndex);
 		} else if (uiCurrentViewType.equals("FLOATING")) {
 			return floatingCollection.get(taskIndex);
 		} else if (uiCurrentViewType.equals("DEADLINE")) {
@@ -572,7 +605,7 @@ public class Logic {
 	//Returns true if the index is out of bounds (invalid).
 	private boolean outOfBounds(int taskIndex) {
 		if (uiCurrentViewType.equals("ALL")) {
-			return (taskIndex < allCollection.size()) ? false : true;
+			return (taskIndex < pendingCollection.size()) ? false : true;
 		} else if (uiCurrentViewType.equals("FLOATING")) {
 			return (taskIndex < floatingCollection.size()) ? false : true;
 		} else if (uiCurrentViewType.equals("DEADLINE")) {
@@ -586,16 +619,16 @@ public class Logic {
 	
 	//Get Task lists from Storage at startup and populate the HashMaps and their corresponding collections.
     //Returns a status code representing outcome of action.
-    private int getListsFromStorage() throws IOException, ClassNotFoundException {
+    private int getListsFromStorage() {
     	listsFromStorage = new ArrayList<ArrayList<Task>>(NUM_TASK_LISTS);
     	
-    	//Get ALL list from Storage
-    	listsFromStorage.set(INDEX_ALL_LIST, storage.getTaskList(NAME_ALL_SAVE_FILE));
-    	allMap = new HashMap<String, Task>();
-    	for (Task t : listsFromStorage.get(INDEX_ALL_LIST)) {
-    		allMap.put(t.getTaskName(), t);
+    	//Get PENDING list from Storage
+    	listsFromStorage.set(INDEX_PENDING_LIST, storage.getTaskList(NAME_PENDING_SAVE_FILE));
+    	pendingMap = new HashMap<String, Task>();
+    	for (Task t : listsFromStorage.get(INDEX_PENDING_LIST)) {
+    		pendingMap.put(t.getTaskName(), t);
     	}
-    	allCollection = (ArrayList<Task>) allMap.values();
+    	pendingCollection = (ArrayList<Task>) pendingMap.values();
     	
     	//Get FLOATING list from Storage
     	listsFromStorage.set(INDEX_FLOATING_LIST, storage.getTaskList(NAME_FLOATING_SAVE_FILE));

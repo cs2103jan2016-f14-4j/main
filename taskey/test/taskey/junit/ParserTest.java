@@ -91,7 +91,7 @@ public class ParserTest {
 	
 	@Test
 	public void testDelete() {
-		assertEquals("Command: DELETE_BY_INDEX\nat index: 5",
+		assertEquals("Command: DELETE_BY_INDEX\nat index: 4",
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());

@@ -148,13 +148,13 @@ public class UiController {
 					String line = input.getText();
 					input.clear();
 
+					int statusCode = 0;
 					try {
-						int statusCode = Logic.getInstance().executeCommand(line);
+						statusCode = Logic.getInstance().executeCommand(line);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Added "+ myDropDown.getSelectedItem(), input, 0,input.getHeight());
+					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight());
 					UiPopupFactory.getInstance().createFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0, true).play();
 
 					event.consume();

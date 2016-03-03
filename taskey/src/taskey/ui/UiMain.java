@@ -33,9 +33,6 @@ public class UiMain extends Application {
 	private Parent root = null;
 
 	public static UiMain getInstance() {
-		if (instance == null) {
-			instance = new UiMain();
-		}
 		return instance;
 	}
 
@@ -47,6 +44,7 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		instance = this;
 		myController = new UiController();
 		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
 		myloader.setController(myController);

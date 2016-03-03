@@ -86,17 +86,10 @@ public class Logic {
     	
     	// important objects
     	String command = po.getCommand();
-    	Task task = po.getTask();
-    	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
-    	String viewType = po.getViewType(); //Only used for view commands
-    	String errorType = po.getErrorType(); //Only used for invalid commands
-    	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
-    	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
-    	String taskName = task.getTaskName();
-    
+    	Task task = po.getTask();	
+    	
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
     	System.out.println("Command: " + command);
-    	
     	switch (command) {
 			case "ADD_FLOATING":
 			case "ADD_DEADLINE":
@@ -105,6 +98,7 @@ public class Logic {
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
 			case "DELETE_BY_INDEX":
+				int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
 				targetList.remove(taskIndex);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;

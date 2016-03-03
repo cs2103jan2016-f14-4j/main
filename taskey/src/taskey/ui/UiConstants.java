@@ -17,6 +17,13 @@ import taskey.ui.utility.UiGridSettings;
  */
 public class UiConstants {
 
+	// Messages
+	public static final ArrayList<String> STATUS_MESSAGES = new ArrayList<String>(
+			Arrays.asList("dummy","View Changed Successfully", "Added Task Successfully", "Delete Task Successfully",
+						  "Updated Task Successfully", "Task marked as done", "Search returns a list of tasks",
+						  "Error changing view", "Error adding task", "Error delete task", "Error updating task",
+						  "Error marking task as done", "Error searching", "Error with undo"));
+	
 	// Content Boxes
 	public enum ContentBox {
 		WEEKLY(0), PENDING(1), EXPIRED(2), COMPLETED(3), ACTION(4);

@@ -435,7 +435,7 @@ public class Logic {
 		String toUpdateName = toUpdate.getTaskName();
 		removeTaskFromMaps(toUpdateName, toUpdateType);
 		mostRecentTask = toUpdate;
-		Task updated = new Task(toUpdate);
+		Task updated = toUpdate.getDuplicate();
 		updated.setTaskName(newTaskName);
 		mostRecentUpdatedTask = updated;
 		
@@ -470,7 +470,7 @@ public class Logic {
 			String toUpdateType = toUpdate.getTaskType();
 			removeTaskFromMaps(oldTaskName, toUpdateType);
 			mostRecentTask = toUpdate;
-			Task updated = new Task(toUpdate);
+			Task updated = toUpdate.getDuplicate();
 			updated.setTaskName(newTaskName);
 			mostRecentUpdatedTask = updated;
 			return putTaskInMaps(toUpdate, newTaskName, toUpdateType);

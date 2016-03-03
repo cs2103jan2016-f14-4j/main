@@ -167,6 +167,15 @@ public class Logic {
 		return expiredCollection;
 	}
 	
+	/** 
+	 * Updates Logic with the view type that Ui is currently in.
+	 * 
+	 * @param viewType
+	 */
+	public void updateViewType(String viewType) {
+		uiCurrentViewType = viewType;
+	}
+	
 	/**
 	 * Initializes Ui with lists of each task category.
 	 * 

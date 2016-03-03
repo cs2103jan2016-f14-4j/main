@@ -89,6 +89,14 @@ public class Logic {
 	private ArrayList<Task> doneCollection = null;
 	private ArrayList<Task> expiredCollection = null;
 	
+	/*public static void main(String[] args) throws IOException {
+		Logic logicTest = Logic.getInstance();
+		Task t = new Task("a new test task");
+		logicTest.floatingMap = new HashMap<String, Task>();
+		logicTest.pendingMap = new HashMap<String, Task>();
+		logicTest.addFloatingToStorage(t, "a new test task");
+	}*/
+	
 	/**
 	 * Gets an instance of the Logic class if an instance does not already exist.
 	 * 
@@ -97,7 +105,7 @@ public class Logic {
 	public static Logic getInstance() {
 		if (instance == null) {
     		instance = new Logic();
-    		//instance.parser = Parser.getInstance();
+    		instance.parser = new Parser();
     		instance.storage = Storage.getInstance();
     		instance.uiController = UiMain.getInstance().getController();
     	}
@@ -156,6 +164,22 @@ public class Logic {
 	 */
 	public ArrayList<Task> getExpiredTasks() {
 		return expiredCollection;
+	}
+	
+	/**
+	 * Initializes Ui with lists of each task category.
+	 * 
+	 * @return status code reflecting the outcome of command execution
+	 */
+	public int initializeUi() {
+		int statusCode = getListsFromStorage();
+		uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
+		uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
+		uiController.updateDisplay(expiredCollection, UiConstants.ContentBox.EXPIRED);
+		uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
+		uiCurrentViewType = "ALL";
+		
+		return statusCode;
 	}
 	
     /**
@@ -285,18 +309,12 @@ public class Logic {
     }
     
     //Updates Ui with a list of Tasks sorted by date, corresponding to the view type.
+    //Assumes that the collections are not null.
     //Returns a status code representing outcome of action.
     private int view(String viewType) throws IOException {
     	int statusCode = -1; //Stub 
     	
-    	if (pendingMap == null) { //HashMap not initialized at startup, must get Tasks from Storage
-			statusCode = getListsFromStorage();
-			uiCurrentViewType = "ALL";
-			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
-			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
-			uiController.updateDisplay(expiredCollection, UiConstants.ContentBox.EXPIRED);
-			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
-		} else if (viewType.equals("ALL")) {
+    	if (viewType.equals("ALL")) {
 			Collections.sort(pendingCollection);
 			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
 		} else if (viewType.equals("GENERAL")) {

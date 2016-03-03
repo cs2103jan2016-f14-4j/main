@@ -91,7 +91,7 @@ public class ParserTest {
 	
 	@Test
 	public void testDelete() {
-		assertEquals("Command: DELETE_BY_INDEX\nat index: 5",
+		assertEquals("Command: DELETE_BY_INDEX\nat index: 4",
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
@@ -130,6 +130,12 @@ public class ParserTest {
 				parser.parseInput("vieW deadlines").toString());
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
+		
+		String myString = "add test lala #lala #lalala";
+		String[] splitString = myString.split("#");
+		for (int i=0; i < splitString.length; i++) {
+			System.out.println("["+splitString[i] + "]");
+		}
 		
 	}
 }

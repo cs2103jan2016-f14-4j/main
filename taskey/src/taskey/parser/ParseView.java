@@ -13,6 +13,7 @@ import taskey.constants.ParserConstants;
  */
 public class ParseView {
 	private HashMap<String,String> viewList = new HashMap<String,String>();
+	private HashMap<String,String> userDefinedList = new HashMap<String,String>(); 
 	private ParseError parseError = new ParseError(); 
 	
 	public ParseView() {
@@ -42,7 +43,9 @@ public class ParseView {
 	}
 	
 	/**
-	 * Get viewType all, general, events or deadlines, or returns error 
+	 * Get viewType all, general, events or deadlines, or
+	 * gets a user defined viewtype (based on their current list of available tags)
+	 * or returns error 
 	 * @param command
 	 * @param stringInput
 	 * @return string view type 
@@ -55,8 +58,18 @@ public class ParseView {
 		
 		if (viewList.containsKey(viewType)) {
 			return viewType; 
+		} else if (userDefinedList.containsKey(viewType)) {
+			return viewType; 
 		}
 		return "error"; 
+	}
+	
+	/**
+	 * This allows the user to create user defined categories according to their tags. 
+	 * @param tag
+	 */
+	public void addUserDefinedView(String tag) {
+		userDefinedList.put(tag, tag);
 	}
 
 }

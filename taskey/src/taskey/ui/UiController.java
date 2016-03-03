@@ -94,6 +94,20 @@ public class UiController {
 	public void displayTabContents(int tabNo) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(tabNo);
+		switch ( tabNo ) {
+			case 0:
+				Logic.getInstance().updateViewType("ALL");
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			default: 
+				System.out.println("Not setting view type");
+				break;
+		}
 	}
 
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {

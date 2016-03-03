@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
+import taskey.logic.Logic;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
@@ -78,7 +79,8 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
-		testUI();
+		//testUI();
+		Logic.getInstance().initializeUi();
 	}
 
 	public UiController getController() {

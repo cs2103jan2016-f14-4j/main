@@ -35,7 +35,7 @@ public class ParseDelete {
 		
 		try {
 			int index = Integer.parseInt(taskName);
-			processed = new ProcessedObject(ParserConstants.DELETE_BY_INDEX, index); 
+			processed = new ProcessedObject(ParserConstants.DELETE_BY_INDEX, index-1); 
 			
 		} catch (Exception e) {
 			//if the delete is not by index, then it's by task name. 

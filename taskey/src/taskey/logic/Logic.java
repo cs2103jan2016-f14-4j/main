@@ -204,7 +204,7 @@ public class Logic {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Task task = po.getTask();
-    	int taskIndex = po.getIndex() - 1; //Only used for commands that specify the index of a task
+    	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
     	String viewType = po.getViewType(); //Only used for view commands
     	String errorType = po.getErrorType(); //Only used for invalid commands
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands

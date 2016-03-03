@@ -263,11 +263,11 @@ public class Logic {
     			break;
     		
     		case "UNDO":
+    			statusCode = undo();
     			uiController.updateDisplay(pendingCollection, UiConstants.ContentBox.PENDING);
     			uiController.updateDisplay(doneCollection, UiConstants.ContentBox.COMPLETED);
     			uiController.updateDisplay(expiredCollection, UiConstants.ContentBox.EXPIRED);
     			uiController.updateActionDisplay(pendingCollection, UiConstants.ActionContentMode.TASKLIST);
-    			statusCode = undo();
     			break;
     		
     		case "ERROR": //TODO
@@ -323,8 +323,10 @@ public class Logic {
     //Add the floating Task to Storage. Returns a status code representing outcome of action.
     private int addFloatingToStorage(Task task, String taskName) throws IOException {
 		floatingMap.put(taskName, task); 
+		floatingCollection = new ArrayList<Task>(floatingMap.values());
 		storage.saveTaskList(floatingCollection, NAME_FLOATING_SAVE_FILE);	
 		pendingMap.put(taskName, task);
+		pendingCollection = new ArrayList<Task>(pendingMap.values());
 		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
@@ -334,8 +336,10 @@ public class Logic {
     //Add the deadline Task to Storage. Returns a status code representing outcome of action.
     private int addDeadlineToStorage(Task task, String taskName) throws IOException {
 		deadlineMap.put(taskName, task); 
+		deadlineCollection = new ArrayList<Task>(deadlineMap.values());
 		storage.saveTaskList(deadlineCollection, NAME_DEADLINE_SAVE_FILE);	
 		pendingMap.put(taskName, task);
+		pendingCollection = new ArrayList<Task>(pendingMap.values());
 		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
@@ -345,8 +349,10 @@ public class Logic {
   //Add the event Task to Storage. Returns a status code representing outcome of action.
     private int addEventToStorage(Task task, String taskName) throws IOException {
 		eventMap.put(taskName, task); 
+		eventCollection = new ArrayList<Task>(eventMap.values());
 		storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);	
 		pendingMap.put(taskName, task);
+		pendingCollection = new ArrayList<Task>(pendingMap.values());
 		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		mostRecentTask = task;
 		
@@ -383,6 +389,7 @@ public class Logic {
 			case "DONE_BY_INDEX":
 			case "DONE_BY_NAME":
 				doneMap.remove(mostRecentTaskName);
+				doneCollection = new ArrayList<Task>(doneMap.values());
 				storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);		
 				return putTaskInMaps(mostRecentTask, mostRecentTaskName, mostRecentTaskType);			
 			
@@ -508,6 +515,7 @@ public class Logic {
 		removeTaskFromMaps(toMarkName, toMarkType);
 		mostRecentTask = toMark;
 		doneMap.put(toMarkName, toMark);
+		doneCollection = new ArrayList<Task>(doneMap.values());
 		storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);
 			
 		return -1; //Stub
@@ -523,6 +531,7 @@ public class Logic {
 			removeTaskFromMaps(taskName, toMarkType);
 			mostRecentTask = toMark;
 			doneMap.put(toMarkName, toMark);
+			doneCollection = new ArrayList<Task>(doneMap.values());
 			storage.saveTaskList(doneCollection, NAME_DONE_SAVE_FILE);
 			return -1; //Stub
 		} else { //Task name does not exist
@@ -545,16 +554,20 @@ public class Logic {
 	private int putTaskInMaps(Task task, String taskName, String taskType) throws IOException {
 		if (taskType.equals("FLOATING")) {
 			floatingMap.put(taskName, task);
+			floatingCollection = new ArrayList<Task>(floatingMap.values());
 			storage.saveTaskList(floatingCollection, NAME_FLOATING_SAVE_FILE);
 		} else if (taskType.equals("DEADLINE")) {
 			deadlineMap.put(taskName, task);
+			deadlineCollection = new ArrayList<Task>(deadlineMap.values());
 			storage.saveTaskList(deadlineCollection, NAME_DEADLINE_SAVE_FILE);
 		} else if (taskType.equals("EVENT")) {
 			eventMap.put(taskName, task);
+			eventCollection = new ArrayList<Task>(eventMap.values());
 			storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);
 		}
 		
 		pendingMap.put(taskName, task);
+		pendingCollection = new ArrayList<Task>(pendingMap.values());
 		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		
 		return -1; //stub
@@ -567,16 +580,20 @@ public class Logic {
 	private int removeTaskFromMaps(String taskName, String taskType) throws IOException {
 		if (taskType.equals("FLOATING")) {
 			floatingMap.remove(taskName);
+			floatingCollection = new ArrayList<Task>(floatingMap.values());
 			storage.saveTaskList(floatingCollection, NAME_FLOATING_SAVE_FILE);
 		} else if (taskType.equals("DEADLINE")) {
 			deadlineMap.remove(taskName);
+			deadlineCollection = new ArrayList<Task>(deadlineMap.values());
 			storage.saveTaskList(deadlineCollection, NAME_DEADLINE_SAVE_FILE);
 		} else if (taskType.equals("EVENT")) {
 			eventMap.remove(taskName);
+			eventCollection = new ArrayList<Task>(eventMap.values());
 			storage.saveTaskList(eventCollection, NAME_EVENT_SAVE_FILE);
 		}
 		
 		pendingMap.remove(taskName);
+		pendingCollection = new ArrayList<Task>(pendingMap.values());
 		storage.saveTaskList(pendingCollection, NAME_PENDING_SAVE_FILE);
 		
 		return -1; //stub
@@ -628,7 +645,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_PENDING_LIST)) {
     		pendingMap.put(t.getTaskName(), t);
     	}
-    	pendingCollection = (ArrayList<Task>) pendingMap.values();
+    	pendingCollection = new ArrayList<Task>(pendingMap.values());
     	
     	//Get FLOATING list from Storage
     	listsFromStorage.set(INDEX_FLOATING_LIST, storage.getTaskList(NAME_FLOATING_SAVE_FILE));
@@ -636,7 +653,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_FLOATING_LIST)) {
     		floatingMap.put(t.getTaskName(), t);
     	}
-    	floatingCollection = (ArrayList<Task>) floatingMap.values();
+    	floatingCollection = new ArrayList<Task>(floatingMap.values());
     	
     	//Get DEADLINE list from Storage
     	listsFromStorage.set(INDEX_DEADLINE_LIST, storage.getTaskList(NAME_DEADLINE_SAVE_FILE));
@@ -644,7 +661,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_DEADLINE_LIST)) {
     		deadlineMap.put(t.getTaskName(), t);
     	}
-    	deadlineCollection = (ArrayList<Task>) deadlineMap.values();
+    	deadlineCollection = new ArrayList<Task>(deadlineMap.values());
     	
     	//Get EVENT list from Storage
     	listsFromStorage.set(INDEX_EVENT_LIST, storage.getTaskList(NAME_EVENT_SAVE_FILE));
@@ -652,7 +669,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_EVENT_LIST)) {
     		eventMap.put(t.getTaskName(), t);
     	}
-    	eventCollection = (ArrayList<Task>) eventMap.values();
+    	eventCollection = new ArrayList<Task>(eventMap.values());
     	
     	//Get DONE list from Storage
     	listsFromStorage.set(INDEX_DONE_LIST, storage.getTaskList(NAME_DONE_SAVE_FILE));
@@ -660,7 +677,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_DONE_LIST)) {
     		doneMap.put(t.getTaskName(), t);
     	}
-    	doneCollection = (ArrayList<Task>) doneMap.values();
+    	doneCollection = new ArrayList<Task>(doneMap.values());
     	
     	//Get EXPIRED list from Storage
     	listsFromStorage.set(INDEX_EXPIRED_LIST, storage.getTaskList(NAME_EXPIRED_SAVE_FILE));
@@ -668,7 +685,7 @@ public class Logic {
     	for (Task t : listsFromStorage.get(INDEX_EXPIRED_LIST)) {
     		expiredMap.put(t.getTaskName(), t);
     	}
-    	expiredCollection = (ArrayList<Task>) expiredMap.values();
+    	expiredCollection = new ArrayList<Task>(expiredMap.values());
     	
     	return -1; //Stub
     }

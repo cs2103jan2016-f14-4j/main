@@ -36,7 +36,7 @@ public class UiClockService extends ScheduledService<Void> {
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
 					public void run() {
-						timeLabelRef.setText(formatTime(cal));
+						//timeLabelRef.setText(formatTime(cal));
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});

@@ -17,7 +17,6 @@ public class UiTextConfig {
 
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
 	private char symbol;
-	private Font myFont; // Font is usually shared across all Text nodes in a line
 
 	public UiTextConfig() {
 		initVariables();
@@ -30,11 +29,6 @@ public class UiTextConfig {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
-		myFont = UiConstants.UI_DEFAULT_FONT; // default (overridden by styles specifying font)
-	}
-	
-	public void setFont(Font newFont) {
-		myFont = newFont;
 	}
 	
 	public void setSymbol(char _symbol) {
@@ -43,7 +37,6 @@ public class UiTextConfig {
 	
 	private Text createText(String segment) {
 		Text newText = new Text(segment);
-		//newText.setFont(myFont); 
 		return newText;
 	}	
 	

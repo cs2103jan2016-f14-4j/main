@@ -68,7 +68,7 @@ public class UiMain extends Application {
 	public void setUpScene(Stage primaryStage, Parent root) {
 		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
-		primaryStage.initStyle(StageStyle.DECORATED);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
 		Scene newScene = new Scene(root);
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);

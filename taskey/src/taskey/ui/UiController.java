@@ -39,13 +39,9 @@ public class UiController {
 	@FXML
 	private TextField input;
 	@FXML
-	private Label textPrompt;
-	@FXML
-	private Label timeLabel;
-	@FXML
 	private Label dateLabel;
 	@FXML
-	private ScrollPane weekPane;
+	private ScrollPane categoryPane;
 
 	private Stage stage;
 	private int currentTab;
@@ -55,7 +51,7 @@ public class UiController {
 
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		stage = primaryStage; // set up reference
-		clockService = new UiClockService(timeLabel, dateLabel);
+		clockService = new UiClockService(null, dateLabel);
 		clockService.start();
 		setUpContentBoxes();
 		setUpTabDisplay();
@@ -70,11 +66,11 @@ public class UiController {
 
 	public void setUpContentBoxes() {
 		myManager = new UiContentManager(clockService);
-		myManager.setUpContentBox(weekPane, ContentBox.WEEKLY); // add weekly list as first
+		//myManager.setCategory
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myManager.setUpContentBox(content, ContentBox.fromInteger(i + 1));
+			myManager.setUpContentBox(content, ContentBox.fromInteger(i));
 		}
 	}
 

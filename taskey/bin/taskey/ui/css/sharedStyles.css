@@ -19,6 +19,6 @@
 }
 
 .textBlackToPurple { 
-	-fx-font: 10px Tahoma;
+	-fx-font: 15px Tahoma;
     -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, black 0%, purple 50%);
 }

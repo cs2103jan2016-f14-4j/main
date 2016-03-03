@@ -204,41 +204,6 @@ public class Task implements Comparable<Task>, Serializable {
 		}
 	}
 	
-	/**
-	 * Get a duplicate of this task object at a different address 
-	 * @return duplicate of this task object at a different address
-	 */
-	public Task getDuplicate() {
-		Task duplicate = new Task();
-		
-		if (taskName != null) {
-			duplicate.setTaskName(taskName);
-		}
-		
-		if (taskTags != null) {
-			duplicate.setTaskTags(taskTags);
-		}
-		
-		if (taskType != null) {
-			duplicate.setTaskType(this.getTaskType());
-			
-			switch(taskType) {
-				case "FLOATING":
-					//nothing else to add. 
-					break;
-				case "DEADLINE":
-					duplicate.setDeadline(this.getDeadlineEpoch());
-					break;
-				case "EVENT":
-					duplicate.setStartDate(this.getStartDateEpoch());
-					duplicate.setEndDate(this.getEndDateEpoch());
-					break; 
-			}
-		}
-		
-		return duplicate; 
-	}
-	
 	@Override
 	/**
 	 * tasks are comparable by their start time. 

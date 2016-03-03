@@ -19,7 +19,7 @@ public class UiConstants {
 
 	// Content Boxes
 	public enum ContentBox {
-		WEEKLY(0), PENDING(1), EXPIRED(2), COMPLETED(3), ACTION(4);
+		WEEKLY(0), PENDING(1), EXPIRED(2), ACTION(3);
 		private final int value;
 
 		private ContentBox(int value) {
@@ -39,8 +39,6 @@ public class UiConstants {
 			case 2:
 				return EXPIRED;
 			case 3:
-				return COMPLETED;
-			case 4:
 				return ACTION;
 			}
 			return null;
@@ -87,7 +85,7 @@ public class UiConstants {
 	
 	// Others
 	public static final int CHAR_LIMIT_WEEKLIST = 10;
-	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
+	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("EE: d MMMMM");
 
 	public static final int ClOCK_UPDATE_INTERVAL = 1000; // in milliseconds
 	public static final String PM_SUFFIX = "PM";

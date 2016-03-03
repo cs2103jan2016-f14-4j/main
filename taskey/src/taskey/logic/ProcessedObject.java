@@ -141,7 +141,7 @@ public class ProcessedObject {
 		this.searchPhrase = searchPhrase; 
 	}
 	
-	public String getSearchPhrase() {
+	public String getSearchPhrae() {
 		return searchPhrase; 
 	}
 	

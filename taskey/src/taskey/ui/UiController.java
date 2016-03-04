@@ -71,7 +71,7 @@ public class UiController {
 		myDropDown.createMenu(stage, input);
 	}
 
-	public void setUpContentBoxes() {
+	private void setUpContentBoxes() {
 		myManager = new UiContentManager(clockService);
 		myManager.setUpContentBox(weekPane, ContentBox.WEEKLY); // add weekly list as first
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
@@ -81,13 +81,13 @@ public class UiController {
 		}
 	}
 
-	public void setUpTabDisplay() {
+	private void setUpTabDisplay() {
 		currentTab = 0;
 		input.requestFocus();
 		displayTabContents(currentTab);
 	}
 
-	public void registerEventHandlersToNodes(Parent root) {
+	private void registerEventHandlersToNodes(Parent root) {
 		registerInputEventHandler();
 		registerRootEventHandler(root);
 	}
@@ -105,7 +105,7 @@ public class UiController {
 	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionContentMode mode) {
 		myManager.updateActionContentBox(myTaskList,mode);
 		currentTab = myTabs.getTabs().size()-1; // focus the tab
-		displayTabContents(currentTab);
+		//displayTabContents(currentTab);
 	}
 
 	public void cleanUp() {
@@ -134,7 +134,7 @@ public class UiController {
 	}
 
 	/************************************ EVENT HANDLERS  *******************************************/
-	public void registerInputEventHandler() {
+	private void registerInputEventHandler() {
 
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
@@ -184,7 +184,7 @@ public class UiController {
 	 * 
 	 * @param root - root object of scene
 	 */
-	public void registerRootEventHandler(Parent root) {
+	private void registerRootEventHandler(Parent root) {
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.TAB) {

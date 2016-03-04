@@ -62,7 +62,7 @@ public class UiContentManager {
 		contentBoxes.add(pane);
 	}
 
-	public GridPane setUpGrid(UiGridSettings settings) {
+	private GridPane setUpGrid(UiGridSettings settings) {
 		GridPane gridPane = new GridPane();
 		//gridPane.setGridLinesVisible(true);
 		gridPane.setPadding(settings.getPaddings());

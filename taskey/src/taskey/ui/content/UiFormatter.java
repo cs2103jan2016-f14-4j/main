@@ -40,7 +40,7 @@ public abstract class UiFormatter {
 	public void format(ArrayList<Task> myTaskList) {
 	}
 
-	public void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style,TextAlignment align) {
+	protected void addStyledCellTextFlow(TextFlow element, GridPane gridPane, int col, int row, String style,TextAlignment align) {
 		element.setTextAlignment(align);
 		StackPane wrapper = new StackPane();
 		wrapper.getChildren().add(element);
@@ -49,7 +49,7 @@ public abstract class UiFormatter {
 		GridPane.setFillHeight(wrapper, false);
 	}
 
-	public void addStyledCellImage(String path, GridPane gridPane, int col, int row, String style) {
+	protected void addStyledCellImage(String path, GridPane gridPane, int col, int row, String style) {
 		Image img = new Image(getClass().getResourceAsStream(path));
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(10);

@@ -29,7 +29,7 @@ public class UiWeeklyFormatter extends UiFormatter {
 		}
 	}
 
-	public void addTaskEntry(Task theTask) {
+	private void addTaskEntry(Task theTask) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
@@ -46,7 +46,7 @@ public class UiWeeklyFormatter extends UiFormatter {
 		addStyledCellTextFlow(element, currentGrid, 0, numEntries, UiConstants.STYLE_WHITE_BOX, TextAlignment.CENTER);
 	}
 
-	public boolean isWithinWeek(String deadLine) {
+	private boolean isWithinWeek(String deadLine) {
 		if (deadLine.length() == 0  || Integer.parseInt(deadLine.split(" ")[0]) - clockService.getDayOfMonth() <= 7) {
 			return true;
 		} else {

@@ -72,7 +72,6 @@ public class UiConstants {
 	public static final String UI_IMAGE_PATH_OFFSET = "../images/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	
-	public static final Font UI_DEFAULT_FONT = new Font("Serif",13);
 	// Use of TextFlow for text, setting style of textflow only affects the container
 	// every Text node has to have its own style (with other options besides Color)
 	public static final String STYLE_TEXT_RED = "textRed";

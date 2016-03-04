@@ -78,7 +78,7 @@ public class UiActionFormatter extends UiFormatter {
 		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.CENTER);
 	}
 
-	public void showHelp() {
+	private void showHelp() {
 		ArrayList<UiTextConfig> lineConfigs = new ArrayList<UiTextConfig>();
 		String line = "";
 
@@ -137,7 +137,7 @@ public class UiActionFormatter extends UiFormatter {
 	}
 
 
-	public void formatHelp(String passage, ArrayList<UiTextConfig> lineConfigs) {
+	private void formatHelp(String passage, ArrayList<UiTextConfig> lineConfigs) {
 		String [] text = passage.split("\n");
 		int currentConfig = 0;
 		for ( int i = 0; i < text.length; i ++ ) {

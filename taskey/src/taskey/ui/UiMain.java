@@ -17,30 +17,38 @@ import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.UiConstants.ActionContentMode;
 
+// TODO: Auto-generated Javadoc
 /**
- *
  * This class is the main entry point for Taskey It performs the main setups for
- * the UI
- * 
- * @author JunWei
+ * the UI.
  *
+ * @author JunWei
  */
 
 public class UiMain extends Application {
 
+	/** The instance. */
 	private static UiMain instance = null;
+	
+	/** The my controller. */
 	private UiController myController;
+	
+	/** The root. */
 	private Parent root = null;
 
+	/**
+	 * Gets the single instance of UiMain.
+	 *
+	 * @return single instance of UiMain
+	 */
 	public static UiMain getInstance() {
 		return instance;
 	}
 
 	/**
 	 * This method loads the .fxml file and set ups the scene
-	 * 
-	 * @param stage object which is called automatically by the javaFX plugin
-	 *            
+	 *
+	 * @param primaryStage the primary stage
 	 */
 	@Override
 	public void start(Stage primaryStage) {
@@ -64,7 +72,7 @@ public class UiMain extends Application {
 	 * @param root which is obtained after loading the .fxml file
 	 *             
 	 */
-	public void setUpScene(Stage primaryStage, Parent root) {
+	private void setUpScene(Stage primaryStage, Parent root) {
 		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.DECORATED);
@@ -81,22 +89,37 @@ public class UiMain extends Application {
 		Logic.getInstance().initialize();
 	}
 
+	/**
+	 * Gets the controller.
+	 *
+	 * @return the controller
+	 */
 	public UiController getController() {
 		return myController;
 	}
 
+	/**
+	 * This method is overridden from Application to handle clean ups.
+	 */
 	@Override
 	public void stop() {
 		myController.cleanUp();
 		UiImageManager.getInstance().cleanUp();
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
 	}
 
-	/************************************** MY TESTING ***********************************/
-	public void testUI() {
+	/**
+	 * ************************************ MY TESTING **********************************.
+	 */
+	private void testUI() {
 		ArrayList<Task> myTaskList = new ArrayList<Task>();
 		// Temporary;
 		Task temp = new Task("General Task");
@@ -124,6 +147,13 @@ public class UiMain extends Application {
 		myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
 	}
 
+	/**
+	 * Do hash.
+	 *
+	 * @param line the line
+	 * @param offsest the offsest
+	 * @return the string
+	 */
 	public String doHash(String line, int offsest) {
 		int encode = 7; // prime
 		String temp = line.replace("[^A-Za-z0-9]", ""); // replace non-alphanumeric
@@ -132,6 +162,13 @@ public class UiMain extends Application {
 		return String.valueOf(encode);
 	}
 
+	/**
+	 * Random input.
+	 *
+	 * @param line the line
+	 * @param maxItems the max items
+	 * @return the array list
+	 */
 	public ArrayList<String> randomInput(String line, int maxItems) {
 		int test = (int) (Math.random() * maxItems) + 1;
 		ArrayList<String> tempList = new ArrayList<String>();

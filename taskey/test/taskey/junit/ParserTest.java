@@ -52,8 +52,22 @@ public class ParserTest {
 		
 	}
 	
+	@Test
 	public void testTag() {
-		//eg. add lalala #lala
+		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
+				parser.parseInput("add meeting #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: empty add\n",
+				parser.parseInput("add  ").toString());
+		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016 23:59:59\n"
+				+ "tags: sua, serious, \n",
+				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+				parser.parseInput("add meeting on 17 Fbr #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 23:59:59 "
+				+ "to 18 Feb 2016 23:59:59\ntags: sua, serious, \n",
+				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
 	}
 	
 	@Test
@@ -134,9 +148,5 @@ public class ParserTest {
 				parser.parseInput("vieW deadlines").toString());
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
-		
-		System.out.println(parser.parseInput("add meeting #sua #serious"));
-		System.out.println(parser.parseInput("add meeting on 17 Feb #sua #serious"));
-		System.out.println(parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious"));
 	}
 }

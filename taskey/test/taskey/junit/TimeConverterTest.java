@@ -20,11 +20,11 @@ public class TimeConverterTest {
 			assertFalse(timeConverter.isSameDay(timeConverter.getCurrTime(),
 					timeConverter.toEpochTime("11 Feb 2016 23:00:00")));
 			
-			System.out.println(timeConverter.toEpochTime("11 Feb 2016"));
-			System.out.println(timeConverter.toEpochTime("11 Feb"));
-			System.out.println(timeConverter.toEpochTime("1 Feb 2016"));
-			System.out.println(timeConverter.toEpochTime("1 Feb"));
-			System.out.println(timeConverter.toHumanTime(1454342399));
+			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb 2016"));
+			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb"));
+			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb 2016"));
+			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb"));
+			assertEquals("01 Feb 2016 23:59:59",timeConverter.toHumanTime(1454342399));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

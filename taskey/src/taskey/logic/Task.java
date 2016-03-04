@@ -1,6 +1,7 @@
 package taskey.logic;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import taskey.parser.TimeConverter; 
@@ -109,7 +110,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setStartDate(String startDate) {
 		datesHuman[1] = startDate; 
-		datesEpoch[1] = timeConverter.toEpochTime(startDate); 	
+		try {
+			datesEpoch[1] = timeConverter.toEpochTime(startDate);
+		} catch (ParseException error) {
+			//do nothing
+		}
 	}
 	
 	/**
@@ -129,7 +134,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setEndDate(String endDate) {
 		datesHuman[2] = endDate; 
-		datesEpoch[2] = timeConverter.toEpochTime(endDate); 	
+		try {
+			datesEpoch[2] = timeConverter.toEpochTime(endDate); 
+		} catch (ParseException error) {
+			
+		}
 	}
 	
 	/**
@@ -149,7 +158,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setDeadline(String deadline) {
 		datesHuman[3] = deadline; 
-		datesEpoch[3] = timeConverter.toEpochTime(deadline); 	
+		try {
+			datesEpoch[3] = timeConverter.toEpochTime(deadline); 
+		} catch (ParseException error) {
+			
+		}
 	}
 	
 	/**
@@ -307,6 +320,7 @@ public class Task implements Comparable<Task>, Serializable {
 		stringRep += "\n";
 		
 		if (taskTags != null) { 
+			stringRep += "tags: ";
 			for(int i  =0; i < taskTags.size(); i++) {
 				stringRep += taskTags.get(i) + ", "; 
 			}

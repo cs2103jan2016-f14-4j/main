@@ -69,6 +69,12 @@ public class ParseAdd {
 			//floating task 
 			processed = handleFloating(command, simpString);
 		}
+		
+		//process tags now: if there are tags, add it in.
+		if (simpString.split("#").length != 1) {
+			ArrayList<String> tags = getTagList(simpString); 
+			processed.getTask().setTaskTags(tags);
+		}
 		return processed; 
 	}
 
@@ -82,7 +88,8 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("from");
+		String[] removeTagList = simpString.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 
 		String rawStartDate = dateList[0].trim();
@@ -148,7 +155,8 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("by");
+		String[] removeTagList = simpString.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("by");
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim(); 
 		
@@ -190,7 +198,8 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("on"); 
+		String[] removeTagList = simpString.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("on"); 
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim();
 		
@@ -230,8 +239,7 @@ public class ParseAdd {
 	 */
 	private ProcessedObject handleFloating(String command, String simpString) {
 		ProcessedObject processed;
-		String taskName;
-		taskName = simpString;
+		String taskName = simpString.split("#")[0].trim();
 		Task newTask = new Task(taskName); 
 		
 		newTask.setTaskType("FLOATING");
@@ -262,11 +270,10 @@ public class ParseAdd {
 	public ArrayList<String> getTagList(String rawInput) {
 		ArrayList<String> tagList = new ArrayList<String>();
 		String[] splitString = rawInput.split("#");
-		//TODO: handle case where there's no tags  
 		for (int i=1; i < splitString.length; i++) {
 			tagList.add(splitString[i].trim());
 		}
-		return new ArrayList<String>(); 
+		return tagList; 
 	}
 
 }

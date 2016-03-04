@@ -156,6 +156,13 @@ public class Logic {
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
 				
+			case "UPDATE_BY_NAME_CHANGE_DATE":
+				toUpdate = getTaskByName(targetList, task.getTaskName()); 
+				targetList.remove(toUpdate);
+				targetList.add(task);
+				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				break;
+				
 			case "UNDO":
 				break;
 			default:

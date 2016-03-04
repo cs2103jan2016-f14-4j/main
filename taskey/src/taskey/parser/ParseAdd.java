@@ -1,5 +1,6 @@
 package taskey.parser;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -65,11 +66,19 @@ public class ParseAdd {
 		} else if (simpString.split("from").length != 1) {
 			//event
 			processed = handleEvent(task, simpString);
+		} else if (simpString.compareTo("") == 0) {
+			//empty add
+			processed = parseError.processError("empty add");
+			return processed; 
 		} else {
 			//floating task 
 			processed = handleFloating(command, simpString);
 		}
 		
+		//if there's error, don't continue to process tags
+		if (processed.getCommand().compareTo("ERROR") == 0) {
+			return processed;
+		}
 		//process tags now: if there are tags, add it in.
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
@@ -96,18 +105,10 @@ public class ParseAdd {
 		String rawEndDate = dateList[1].trim(); 
 		
 		if (!specialDays.containsKey(rawStartDate)) {
-			if (rawStartDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawStartDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
-			} else if (rawStartDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawStartDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setStartDate(epochTime); 
-			}else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -118,18 +119,10 @@ public class ParseAdd {
 		}
 		
 		if (!specialDays.containsKey(rawEndDate)) {
-			if (rawEndDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawEndDate + " " + ParserConstants.DAY_END);
-				task.setEndDate(epochTime);
-			} else if (rawEndDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawEndDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -161,18 +154,10 @@ public class ParseAdd {
 		String rawDate = inputList[1].trim(); 
 		
 		if (!specialDays.containsKey(rawDate)) {
-			if (rawDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
-			} else if (rawDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setDeadline(epochTime);
-			}else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -204,18 +189,10 @@ public class ParseAdd {
 		String rawDate = inputList[1].trim();
 		
 		if (!specialDays.containsKey(rawDate)) {
-			if (rawDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawDate);
 				task.setDeadline(epochTime);
-			} else if (rawDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setDeadline(epochTime);
-			} else {
+			} catch (Exception error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}

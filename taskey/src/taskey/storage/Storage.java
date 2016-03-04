@@ -13,35 +13,35 @@ import com.google.gson.reflect.TypeToken;
 import taskey.logic.Task;
 
 /**
- * 
+ *
  * @author Dylan
  *
  */
 public class Storage {
 	public static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
-	
+
 	private static Storage instance = null;
-	private static File directory = new File(DEFAULT_DIRECTORY);
-	private static File savefile;
-	
+	private File directory = new File(DEFAULT_DIRECTORY);
+	private File savefile;
+
 	/**
-	 * For testing of the Storage class. This is how Logic will interface with Storage.  
+	 * For testing of the Storage class. This is how Logic will interface with Storage.
 	 * @param args
 	 */
 	public static void main(String args[]) {
 		// Get the Storage singleton instance
 		Storage storageTest = Storage.getInstance();
-		
+
 		// The default directory was automatically set in the getInstance() method.
 		// Can optionally set the directory again, if requested by user.
-		System.out.println(getDirectory());
+		System.out.println(storageTest.getDirectory());
 
 		// Create a simulated list of tasks
 		ArrayList<Task> testTaskList = new ArrayList<Task>();
 		testTaskList.add(new Task("1. This is a test task"));
 		testTaskList.add(new Task("2. This is a test task"));
 		testTaskList.add(new Task("3. This is a test task"));
-		
+
 		// Save the task list to file, specifying the list's name
 		try {
 			storageTest.saveTaskList(testTaskList, "TEST_TASKLIST");
@@ -49,7 +49,7 @@ public class Storage {
 			System.err.println("Error saving task list to file.");
 			e.printStackTrace();
 		}
-		
+
 		// Attempt to load from an empty directory (file not found)
 		storageTest.setDirectory(DEFAULT_DIRECTORY + "/foo");
 		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
@@ -64,11 +64,11 @@ public class Storage {
 			System.out.println(t);
 		}
 	}
-	
+
     /*=============*
      * Constructor *
      *=============*/
-	
+
 	/**
 	 * Returns the single instance of storage.
 	 * Also sets the default directory after creating the storage singleton.
@@ -81,11 +81,11 @@ public class Storage {
     	}
     	return instance;
     }
-    
+
     /*=====================*
      * Save/load task list *
      *=====================*/
-    
+
     /**
      * Logic passes a task list to Storage for saving.
      * @param tasks The list of task objects for saving.
@@ -98,7 +98,7 @@ public class Storage {
     	writeToFile(tasks);
     	//TODO When exception is encountered during write, return/throw the last-modified list to Logic
     }
-    
+
     /**
      * Logic gets a task list from Storage.
      * @param taskCategory The category of tasks that Logic wants to load.
@@ -116,22 +116,22 @@ public class Storage {
 		}
     	return tasks;
     }
-    
+
     /*===========================*
      * Public accessors/mutators *
      *===========================*/
-    
+
     /**
      * When the user changes directory, Logic can return it as feedback.
      * @return Absolute path of the last saved/loaded file.
      */
-    public static String getDirectory() {
+    public String getDirectory() {
     	return directory.getAbsolutePath();
     }
-    
+
     /**
      * Logic can set the storage directory, if the user requests to change it.
-     * @return True if directory now exists and is indeed a directory; 
+     * @return True if directory now exists and is indeed a directory;
      * 		   false if directory name is invalid (previous directory remains unchanged).
      * @param pathname (can be a relative or absolute path)
      */
@@ -140,7 +140,7 @@ public class Storage {
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
-		
+
 		if (dir.isDirectory()) {
 			directory = dir;
 			if (savefile != null) { //check for when setDirectory is called before setSavefile
@@ -151,11 +151,11 @@ public class Storage {
 			return false;
 		}
     }
-    
+
     /*=================*
      * Private methods *
      *=================*/
-    
+
     /**
      * Storage will set the filename according to which tasklist is being updated, before each read/write operation.
      * @param filename
@@ -163,17 +163,17 @@ public class Storage {
      */
     private boolean setSavefile(String filename) {
 		File file = new File(directory, filename);
-		
+
 		try {
 			file.getCanonicalPath();
 		} catch (IOException e) {
 			return false;
 		}
-		
+
 		savefile = file;
 		return true;
     }
-    
+
     /**
      * Writes tasks to JSON file.
      * @param ArrayList<Task> tasks
@@ -191,7 +191,7 @@ public class Storage {
     	oos.close();
     	*/
     }
-    
+
     /**
      * Reads tasks from JSON file.
      * @return ArrayList<Task> tasks

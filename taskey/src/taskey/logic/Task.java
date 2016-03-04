@@ -202,6 +202,10 @@ public class Task implements Comparable<Task>, Serializable {
 				break; 
 			}
 		}
+		//if empty, remove the arraylist 
+		if (taskTags.isEmpty()) {
+			taskTags = null; 
+		}
 	}
 	
 	/**
@@ -301,6 +305,13 @@ public class Task implements Comparable<Task>, Serializable {
 			}
 		}
 		stringRep += "\n";
+		
+		if (taskTags != null) { 
+			for(int i  =0; i < taskTags.size(); i++) {
+				stringRep += taskTags.get(i) + ", "; 
+			}
+			stringRep += "\n";
+		}
 		
 		return stringRep; 
 	}

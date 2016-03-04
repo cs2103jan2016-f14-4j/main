@@ -108,10 +108,12 @@ public class Logic {
 				Collections.sort(targetList); //Right now doesn't seem to do anything
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
+				
 			case "DELETE_BY_INDEX":
 				targetList.remove(taskIndex);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
+				
 			case "DELETE_BY_NAME":
 				targetList.remove(getTaskByName(targetList, task.getTaskName()));
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -125,6 +127,7 @@ public class Logic {
 				doneList.add(done);
 				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
+				
 			case "DONE_BY_NAME":
 				done = getTaskByName(targetList, task.getTaskName());
 				targetList.remove(done);
@@ -137,6 +140,13 @@ public class Logic {
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 				toUpdate = targetList.get(taskIndex - 1); //Temporary fix
 				toUpdate.setTaskName(newTaskName);
+				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				break;
+				
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				toUpdate = targetList.remove(taskIndex - 1); //Temporary fix
+				task.setTaskName(toUpdate.getTaskName());
+				targetList.add(task);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
 				

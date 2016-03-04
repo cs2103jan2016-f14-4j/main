@@ -26,7 +26,7 @@ import taskey.logic.ProcessedObject;
 
 public class Logic {
 	
-	private static final ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList("PENDING","COMPLETED","EXPIRED"));
+	private static final ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList("PENDING","EXPIRED","COMPLETED"));
 	private static Parser myParser;
 	private static Logic instance = null;
 	
@@ -92,7 +92,7 @@ public class Logic {
     	String errorType = po.getErrorType(); //Only used for invalid commands
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
-    	String taskName = task.getTaskName();
+    	//String taskName = task.getTaskName();
     
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
     	System.out.println("Command: " + command);
@@ -102,6 +102,7 @@ public class Logic {
 			case "ADD_DEADLINE":
 			case "ADD_EVENT":
 				targetList.add(task);
+				Collections.sort(targetList); //Right now doesn't seem to do anything
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
 			case "DELETE_BY_INDEX":
@@ -111,6 +112,15 @@ public class Logic {
 			case "DELETE_BY_NAME":
 				targetList.remove(getTaskByName(targetList, task.getTaskName()));
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				break;
+				
+			case "DONE_BY_INDEX":
+				//System.out.println(taskIndex);
+				Task done = targetList.remove(taskIndex - 1); //Temporary fix 
+				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				ArrayList<Task> doneList = myLists.get(ListsID.COMPLETED.getValue());
+				doneList.add(done);
+				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
 			
 			case "UNDO":
@@ -126,7 +136,7 @@ public class Logic {
 	}
 	
 	public void saveAllTasks() {
-		try{
+		try {
 			for ( int i = 0; i < fileNames.size(); i ++ ) {
 				Storage.getInstance().saveTaskList(myLists.get(i), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");

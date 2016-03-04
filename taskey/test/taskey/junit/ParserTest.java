@@ -1,9 +1,13 @@
 package taskey.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
 
 import org.junit.Test;
 
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task;
 import taskey.parser.Parser;
 
 public class ParserTest {
@@ -131,11 +135,8 @@ public class ParserTest {
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
 		
-		String myString = "add test lala #lala #lalala";
-		String[] splitString = myString.split("#");
-		for (int i=0; i < splitString.length; i++) {
-			System.out.println("["+splitString[i] + "]");
-		}
-		
+		System.out.println(parser.parseInput("add meeting #sua #serious"));
+		System.out.println(parser.parseInput("add meeting on 17 Feb #sua #serious"));
+		System.out.println(parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious"));
 	}
 }

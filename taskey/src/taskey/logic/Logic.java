@@ -93,6 +93,8 @@ public class Logic {
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	//String taskName = task.getTaskName();
+    	Task done;
+    	ArrayList<Task> doneList;
     
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
     	System.out.println("Command: " + command);
@@ -116,13 +118,21 @@ public class Logic {
 				
 			case "DONE_BY_INDEX":
 				//System.out.println(taskIndex);
-				Task done = targetList.remove(taskIndex - 1); //Temporary fix 
+				done = targetList.remove(taskIndex - 1); //Temporary fix 
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				ArrayList<Task> doneList = myLists.get(ListsID.COMPLETED.getValue());
+				doneList = myLists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
 				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
-			
+			case "DONE_BY_NAME":
+				done = getTaskByName(targetList, task.getTaskName());
+				targetList.remove(done);
+				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				doneList = myLists.get(ListsID.COMPLETED.getValue());
+				doneList.add(done);
+				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+				break;
+				
 			case "UNDO":
 				break;
 			default:

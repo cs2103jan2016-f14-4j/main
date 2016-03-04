@@ -94,6 +94,7 @@ public class Logic {
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	//String taskName = task.getTaskName();
     	Task done;
+    	Task toUpdate;
     	ArrayList<Task> doneList;
     
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -131,6 +132,12 @@ public class Logic {
 				doneList = myLists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
 				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+				break;
+				
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+				toUpdate = targetList.get(taskIndex - 1); //Temporary fix
+				toUpdate.setTaskName(newTaskName);
+				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				break;
 				
 			case "UNDO":

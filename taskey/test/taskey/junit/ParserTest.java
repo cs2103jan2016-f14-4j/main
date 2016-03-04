@@ -35,7 +35,10 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
 				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
-		//add complete essay by today 
+		System.out.println(parser.parseInput("add complete essay by today")); 
+		System.out.println(parser.parseInput("add complete essay by tomorrow")); 
+		System.out.println(parser.parseInput("add complete essay by this Wed"));
+		System.out.println(parser.parseInput("add complete essay by next Wed"));
 		//other special days: tomorrow, next week, next ___eg. friday
 		
 	}

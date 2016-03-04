@@ -1,5 +1,6 @@
 package taskey.parser;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -12,14 +13,23 @@ import taskey.constants.ParserConstants;
  *
  */
 public class SpecialDaysConverter {
+	long currTime = -1;
 	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
 	public SpecialDaysConverter() { 
-		specialDays.put("tomorrow", 
-					timeConverter.getCurrTime() + ParserConstants.ONE_DAY); 
-		specialDays.put("today", timeConverter.getCurrTime()); 
-		
+		try {
+			String dateToday = timeConverter.getDate(timeConverter.getCurrTime());
+			currTime = timeConverter.toEpochTime(dateToday); 
+			 
+			specialDays.put("tomorrow", 
+					currTime + ParserConstants.ONE_DAY); 
+			specialDays.put("today", currTime);
+			
+			processDayOfTheWeek(); 
+		} catch (ParseException e) {
+			//do nothing
+		} 
 	}
 	
 	/**
@@ -35,13 +45,12 @@ public class SpecialDaysConverter {
 	 * so that Parser can process human defined date formats like next friday
 	 */
 	public void processDayOfTheWeek() {
-		long currTime = timeConverter.getCurrTime(); 
 		Calendar cal = Calendar.getInstance();
 		cal.set(timeConverter.getYear(currTime),
 				timeConverter.getMonth(currTime)-1,
 				timeConverter.getDay(currTime));
 		int day = cal.get(cal.DAY_OF_WEEK); 
-		System.out.println("Day is "+ day);
+		//System.out.println("Day is "+ day);
 		
 		switch (day) {
 			case 1: //sun

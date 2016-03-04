@@ -89,8 +89,8 @@ public class ParseAdd {
 		String[] inputList = removeTagList[0].trim().split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 
-		String rawStartDate = dateList[0].trim();
-		String rawEndDate = dateList[1].trim(); 
+		String rawStartDate = dateList[0].trim().toLowerCase();
+		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
 		if (!specialDays.containsKey(rawStartDate)) {
 			try {
@@ -139,7 +139,7 @@ public class ParseAdd {
 		String[] removeTagList = simpString.split("#"); 
 		String[] inputList = removeTagList[0].trim().split("by");
 		taskName = inputList[0].trim(); 
-		String rawDate = inputList[1].trim(); 
+		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		if (!specialDays.containsKey(rawDate)) {
 			try {
@@ -174,7 +174,7 @@ public class ParseAdd {
 		String[] removeTagList = simpString.split("#"); 
 		String[] inputList = removeTagList[0].trim().split("on"); 
 		taskName = inputList[0].trim(); 
-		String rawDate = inputList[1].trim();
+		String rawDate = inputList[1].trim().toLowerCase();
 		
 		if (!specialDays.containsKey(rawDate)) {
 			try {

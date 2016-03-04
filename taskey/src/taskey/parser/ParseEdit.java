@@ -14,7 +14,7 @@ import taskey.logic.Task;
  */
 public class ParseEdit {
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
+	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -26,18 +26,6 @@ public class ParseEdit {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		//TODO: put in correct times for special days. 
-		specialDays.put("tomorrow", 
-				timeConverter.getCurrTime() + ParserConstants.ONE_DAY); 
-		specialDays.put("today", timeConverter.getCurrTime()); 
-		specialDays.put("next sun", new Long(1)); 
-		specialDays.put("next mon", new Long(1)); 
-		specialDays.put("next tues", new Long(1)); 
-		specialDays.put("next wed", new Long(1)); 
-		specialDays.put("next thurs", new Long(1)); 
-		specialDays.put("next fri", new Long(1)); 
-		specialDays.put("next sat", new Long(1)); 	
 	}
 	
 	/**
@@ -195,8 +183,8 @@ public class ParseEdit {
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0].trim();
-		String endDate = dateList[1].trim(); 
+		String startDate = dateList[0].trim().toLowerCase();
+		String endDate = dateList[1].trim().toLowerCase(); 
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("EVENT");
 		
@@ -234,8 +222,8 @@ public class ParseEdit {
 			String newTaskName) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0].trim();
-		String endDate = dateList[1].trim(); 
+		String startDate = dateList[0].trim().toLowerCase();
+		String endDate = dateList[1].trim().toLowerCase(); 
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("EVENT");
 		
@@ -273,9 +261,9 @@ public class ParseEdit {
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw)) {
+		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
 			try {
-				epochTime = timeConverter.toEpochTime(newDateRaw);
+				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
 			} catch (ParseException error){
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
@@ -299,9 +287,9 @@ public class ParseEdit {
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw)) {
+		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
 			try {
-				epochTime = timeConverter.toEpochTime(newDateRaw);
+				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
 			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 

@@ -85,7 +85,9 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] removeTagList = simpString.split("#"); 
+		String simpString2 = simpString.replace("today", "2day"); 
+		simpString2 = simpString2.replace("tomorrow", "tmr"); 
+		String[] removeTagList = simpString2.split("#"); 
 		String[] inputList = removeTagList[0].trim().split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 

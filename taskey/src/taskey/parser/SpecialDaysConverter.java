@@ -23,7 +23,10 @@ public class SpecialDaysConverter {
 			currTime = timeConverter.toEpochTime(dateToday); 
 			 
 			specialDays.put("tomorrow", 
+					currTime + ParserConstants.ONE_DAY);
+			specialDays.put("tmr", 
 					currTime + ParserConstants.ONE_DAY); 
+			specialDays.put("2day", currTime);
 			specialDays.put("today", currTime);
 			
 			processDayOfTheWeek(); 

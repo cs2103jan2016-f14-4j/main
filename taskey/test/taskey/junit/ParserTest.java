@@ -36,7 +36,7 @@ public class ParserTest {
 				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 		System.out.println(parser.parseInput("add complete essay by today")); 
-		System.out.println(parser.parseInput("add complete essay by tomorrow")); 
+		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
 		System.out.println(parser.parseInput("add complete essay by next Wed"));
 		//other special days: tomorrow, next week, next ___eg. friday
@@ -51,6 +51,10 @@ public class ParserTest {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
 				+ "to 20 Feb 2016 23:59:59\n",
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
+		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 		//add meeting from tomorrow to 18 feb
 		
 	}

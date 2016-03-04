@@ -15,7 +15,7 @@ import taskey.logic.Task;
  */
 public class ParseAdd { 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
+	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -27,18 +27,6 @@ public class ParseAdd {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		//TODO: put in correct times for special days. 
-		specialDays.put("tomorrow", 
-				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
-		specialDays.put("today", timeConverter.getCurrTime()); 
-		specialDays.put("next sun", new Long(1)); 
-		specialDays.put("next mon", new Long(1)); 
-		specialDays.put("next tues", new Long(1)); 
-		specialDays.put("next wed", new Long(1)); 
-		specialDays.put("next thurs", new Long(1)); 
-		specialDays.put("next fri", new Long(1)); 
-		specialDays.put("next sat", new Long(1)); 
 		
 	}
 	

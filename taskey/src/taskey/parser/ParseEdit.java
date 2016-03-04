@@ -29,7 +29,7 @@ public class ParseEdit {
 		
 		//TODO: put in correct times for special days. 
 		specialDays.put("tomorrow", 
-				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
+				timeConverter.getCurrTime() + ParserConstants.ONE_DAY); 
 		specialDays.put("today", timeConverter.getCurrTime()); 
 		specialDays.put("next sun", new Long(1)); 
 		specialDays.put("next mon", new Long(1)); 

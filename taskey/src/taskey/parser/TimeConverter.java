@@ -2,12 +2,11 @@ package taskey.parser;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
 public class TimeConverter implements Serializable {
-	public static final long ONE_DAY = 86400; 
-	public static final long ONE_WEEK = 604800; 
 	
 	//store curr time in seconds 
 	private long currTime = System.currentTimeMillis()/1000;
@@ -177,5 +176,21 @@ public class TimeConverter implements Serializable {
 		
 		return time;
 	}
-
+	
+	/**
+	 * Get human format day of the week.
+	 * eg. mon, tues... 
+	 * @return
+	 */
+	public String getDayOfTheWeek() {
+		//first day of the week starts from Sunday 
+		String[] days = {"SUN","MON","TUE","WED","THU","FRI","SAT"}; 
+		Calendar cal = Calendar.getInstance();
+		cal.set(getYear(currTime),
+				getMonth(currTime)-1,
+				getDay(currTime));
+		int day = cal.get(cal.DAY_OF_WEEK); 
+		
+		return days[day-1]; 
+	}
 }

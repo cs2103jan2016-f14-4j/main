@@ -10,6 +10,10 @@ public class UserTagDatabase {
 		//initialise the database of tags. 
 	}
 	
+	public void loadDatabase() {
+		//load the file. 
+	}
+	
 	/**
 	 * Add a new tag to the userTagDatabase
 	 * @param tag

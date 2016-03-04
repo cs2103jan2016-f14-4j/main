@@ -3,6 +3,8 @@ package taskey.parser;
 import java.io.Serializable;
 import java.text.ParseException;
 
+import taskey.constants.ParserConstants;
+
 public class TimeConverter implements Serializable {
 	public static final long ONE_DAY = 86400; 
 	public static final long ONE_WEEK = 604800; 
@@ -43,10 +45,17 @@ public class TimeConverter implements Serializable {
 					date).getTime() / 1000;
 			return epochTime; 
 		} catch (ParseException e) {
-			System.out.println(e); 
-			return -1; 
+			try {
+				long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy").parse(
+						date).getTime() / 1000;
+				return epochTime; 
+			} catch (ParseException e2) {
+				System.out.println(e); 
+				return -1; 
+			}
 		}	
 	}
+	
 	
 	/**
 	 * Convert an epoch time to human readable time. 
@@ -158,6 +167,37 @@ public class TimeConverter implements Serializable {
 				new java.util.Date(epochTime*1000));
 		
 		return time;
+	}
+	
+	/**
+	 * Convert a user-input date into a suitable format for the 
+	 * Parser to store the date. 
+	 * @param rawDate
+	 * @return
+	 * @throws Error
+	 */
+	public long parseDateFormat(String rawDate) throws Error {
+		Long epochTime = null; 
+		
+		if (rawDate.length() == 11) {
+			//ie. format is DD MMM YYYY
+			epochTime = toEpochTime(rawDate + " " + ParserConstants.DAY_END);
+		} else if (rawDate.length() == 6) {
+			//ie. format is DD MMM
+			setCurrTime();
+			int year = getYear(getCurrTime());
+			epochTime = toEpochTime(rawDate + " " + String.valueOf(year) 
+					+ " " + ParserConstants.DAY_END);
+		} else if (rawDate.length() == 10) {
+			//ie. date format is D MMM YYYY
+		} else if (rawDate.length() == 5) {
+			//ie. date format is D MMM 
+			
+		} else {
+			throw new Error(); 
+		}
+		
+		return epochTime; 
 	}
 
 }

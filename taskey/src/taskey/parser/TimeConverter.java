@@ -39,19 +39,28 @@ public class TimeConverter implements Serializable {
 	 * @param date: String in the format: dd MMM yyyy HH:mm:ss
 	 * @return date in Epoch Time. 
 	 */
-	public long toEpochTime(String date) { 
+	public long toEpochTime(String date) throws ParseException { 
 		try {
 			long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
 					date).getTime() / 1000;
 			return epochTime; 
 		} catch (ParseException e) {
 			try {
-				long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy").parse(
-						date).getTime() / 1000;
+				//date came in dd MMM yyyy
+				String date2 = date + " " + ParserConstants.DAY_END; 
+				long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
+						date2).getTime() / 1000;
 				return epochTime; 
 			} catch (ParseException e2) {
-				System.out.println(e); 
-				return -1; 
+				try {
+					String date3 = date + " 2016 " + ParserConstants.DAY_END; 
+					long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
+							date3).getTime() / 1000;
+					return epochTime; 
+				} catch (ParseException e3) {
+					System.out.println(e3); 
+					throw e3; 
+				}
 			}
 		}	
 	}
@@ -167,37 +176,6 @@ public class TimeConverter implements Serializable {
 				new java.util.Date(epochTime*1000));
 		
 		return time;
-	}
-	
-	/**
-	 * Convert a user-input date into a suitable format for the 
-	 * Parser to store the date. 
-	 * @param rawDate
-	 * @return
-	 * @throws Error
-	 */
-	public long parseDateFormat(String rawDate) throws Error {
-		Long epochTime = null; 
-		
-		if (rawDate.length() == 11) {
-			//ie. format is DD MMM YYYY
-			epochTime = toEpochTime(rawDate + " " + ParserConstants.DAY_END);
-		} else if (rawDate.length() == 6) {
-			//ie. format is DD MMM
-			setCurrTime();
-			int year = getYear(getCurrTime());
-			epochTime = toEpochTime(rawDate + " " + String.valueOf(year) 
-					+ " " + ParserConstants.DAY_END);
-		} else if (rawDate.length() == 10) {
-			//ie. date format is D MMM YYYY
-		} else if (rawDate.length() == 5) {
-			//ie. date format is D MMM 
-			
-		} else {
-			throw new Error(); 
-		}
-		
-		return epochTime; 
 	}
 
 }

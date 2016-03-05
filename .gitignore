@@ -1,2 +1,3 @@
 *.class
+javadoc
 taskey/bin/taskey/parser/Parser.class

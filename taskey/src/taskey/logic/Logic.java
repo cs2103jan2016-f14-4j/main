@@ -226,6 +226,9 @@ public class Logic {
 		if (viewType.equals("GENERAL")) {
 			uiController.updateActionDisplay(lists.get(ListID.GENERAL.getValue()), ActionListMode.TASKLIST);
 			uiController.displayTabContents(ContentBox.ACTION.getValue());
+		} else if (viewType.equals("DEADLINES")) {
+			uiController.updateActionDisplay(lists.get(ListID.DEADLINE.getValue()), ActionListMode.TASKLIST);
+			uiController.displayTabContents(ContentBox.ACTION.getValue());
 		}
 		
 		return 0; //Stub

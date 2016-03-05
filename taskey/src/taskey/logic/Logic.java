@@ -4,16 +4,12 @@ import taskey.parser.Parser;
 import taskey.storage.Storage;
 import taskey.ui.UiMain;
 import taskey.ui.UiController;
-import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-
 import taskey.logic.LogicConstants.ListsID;
 import taskey.logic.ProcessedObject;
 
@@ -22,47 +18,58 @@ import taskey.logic.ProcessedObject;
  * 
  * @author Hubert Wong
  */
-
-
 public class Logic {
-	
-	private static final ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList("PENDING","EXPIRED","COMPLETED"));
-	private static Parser myParser;
 	private static Logic instance = null;
+	private static Parser parser;
+	private static UiController uiController;
+	private static ArrayList<String> fileNames;
+	private static ArrayList<ArrayList<Task>> lists;
+	public static final int numTabs = 2;
 	
-	private ArrayList<ArrayList<Task>> myLists = new ArrayList<ArrayList<Task>>();
+	/** Get the Logic singleton */
 	public static Logic getInstance() {
 		if ( instance == null ) {
 			instance = new Logic();
 		}
 		return instance;
 	}
-
+	
+	/** Initializes the Logic singleton and updates Ui with the lists from Storage. */
 	public void initialize() {
-		myParser = new Parser();
-		for ( int i = 0; i < fileNames.size(); i++ ) {
-			ArrayList<Task> theList = Storage.getInstance().getTaskList(fileNames.get(i));
-			myLists.add(theList);
-			//System.out.println(theList.size());
-			UiMain.getInstance().getController().updateDisplay(theList, ContentBox.fromInteger(i+1));
+		instance = Logic.getInstance();
+		parser = new Parser();
+		uiController = UiMain.getInstance().getController();
+		fileNames = new ArrayList<String>(Arrays.asList("PENDING", "EXPIRED", "COMPLETED", "GENERAL", "DEADLINE", 
+                										"EVENT"));
+		lists = new ArrayList<ArrayList<Task>>();
+		
+		for (int i = 0; i < numTabs; i++) {
+			ArrayList<Task> list = Storage.getInstance().getTaskList(fileNames.get(i));
+			lists.add(list);
+			uiController.updateDisplay(list, ContentBox.fromInteger(i + 1));
 		}
-		myLists.add(new ArrayList<Task>()); // for action list exclusively
+		
+		//TODO: update the categories "THIS_WEEK", "COMPLETED", "GENERAL", "DEADLINE", "EVENT"
+		ArrayList<String> categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", 
+				                                                             "Completed"));
+		ArrayList<Integer> categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0));
+		uiController.updateCategoryDisplay(categoryList, categorySizes);
 	}
 	
-	public ArrayList<Task> getListFromContentBox( ContentBox currentContent ) {
+	public ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
 		ArrayList<Task> targetList = null;
-		switch ( currentContent ) {
+		switch (currentContent) {
 			case PENDING:
-				targetList = myLists.get(ListsID.PENDING.getValue());
+				targetList = lists.get(ListsID.PENDING.getValue());
 				break;
 			case EXPIRED:
-				targetList = myLists.get(ListsID.EXPIRED.getValue());
+				targetList = lists.get(ListsID.EXPIRED.getValue());
 				break;
 			//case COMPLETED:
 			//	targetList = myLists.get(ListsID.COMPLETED.getValue());
 			//	break;
 			case ACTION:
-				targetList = myLists.get(ListsID.ACTION.getValue());
+				targetList = lists.get(ListsID.ACTION.getValue());
 				break;
 			default:
 				System.out.println("ContentBox invalid");
@@ -82,7 +89,7 @@ public class Logic {
 	
 	public int executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
-    	ProcessedObject po = myParser.parseInput(input);
+    	ProcessedObject po = parser.parseInput(input);
     	
     	// important objects
     	String command = po.getCommand();
@@ -123,7 +130,7 @@ public class Logic {
 				//System.out.println(taskIndex);
 				done = targetList.remove(taskIndex - 1); //Temporary fix 
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				doneList = myLists.get(ListsID.COMPLETED.getValue());
+				doneList = lists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
 			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
@@ -132,7 +139,7 @@ public class Logic {
 				done = getTaskByName(targetList, task.getTaskName());
 				targetList.remove(done);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				doneList = myLists.get(ListsID.COMPLETED.getValue());
+				doneList = lists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
 			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
@@ -178,7 +185,7 @@ public class Logic {
 	public void saveAllTasks() {
 		try {
 			for ( int i = 0; i < fileNames.size(); i ++ ) {
-				Storage.getInstance().saveTaskList(myLists.get(i), fileNames.get(i));
+				Storage.getInstance().saveTaskList(lists.get(i), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}
 		} catch ( Exception e ) {

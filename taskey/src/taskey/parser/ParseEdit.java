@@ -1,10 +1,11 @@
 package taskey.parser;
 
+import java.text.ParseException;
 import java.util.HashMap;
 
+import taskey.constants.ParserConstants;
 import taskey.logic.ProcessedObject;
-import taskey.logic.Task;
-import taskey.constants.ParserConstants; 
+import taskey.logic.Task; 
 
 /**
  * Purpose is to parse the "set" command. 
@@ -13,7 +14,7 @@ import taskey.constants.ParserConstants;
  */
 public class ParseEdit {
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
+	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -25,18 +26,6 @@ public class ParseEdit {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		//TODO: put in correct times for special days. 
-		specialDays.put("tomorrow", 
-				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
-		specialDays.put("today", timeConverter.getCurrTime()); 
-		specialDays.put("next sun", new Long(1)); 
-		specialDays.put("next mon", new Long(1)); 
-		specialDays.put("next tues", new Long(1)); 
-		specialDays.put("next wed", new Long(1)); 
-		specialDays.put("next thurs", new Long(1)); 
-		specialDays.put("next fri", new Long(1)); 
-		specialDays.put("next sat", new Long(1)); 	
 	}
 	
 	/**
@@ -194,42 +183,26 @@ public class ParseEdit {
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0].trim();
-		String endDate = dateList[1].trim(); 
+		String startDate = dateList[0].trim().toLowerCase();
+		String endDate = dateList[1].trim().toLowerCase(); 
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("EVENT");
 		
 		if (!specialDays.containsKey(startDate)) {
-			if (startDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(startDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
-			} else if (startDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(startDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setStartDate(epochTime);
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		}
 		
 		if (!specialDays.containsKey(endDate)) {
-			if (endDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(endDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
-			} else if (endDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(endDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setEndDate(epochTime);
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -249,42 +222,26 @@ public class ParseEdit {
 			String newTaskName) {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0].trim();
-		String endDate = dateList[1].trim(); 
+		String startDate = dateList[0].trim().toLowerCase();
+		String endDate = dateList[1].trim().toLowerCase(); 
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("EVENT");
 		
 		if (!specialDays.containsKey(startDate)) {
-			if (startDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(startDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
-			} else if (startDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(startDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setStartDate(epochTime);
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		}
 		
 		if (!specialDays.containsKey(endDate)) {
-			if (endDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(endDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
-			} else if (endDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(endDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setEndDate(epochTime);
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -304,19 +261,11 @@ public class ParseEdit {
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw)) {
-			if (newDateRaw.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(newDateRaw + " " + ParserConstants.DAY_END);
+		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
+			try {
+				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
-			} else if (newDateRaw.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(newDateRaw + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setDeadline(epochTime);
-			} else {
+			} catch (ParseException error){
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -338,19 +287,11 @@ public class ParseEdit {
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw)) {
-			if (newDateRaw.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(newDateRaw + " " + ParserConstants.DAY_END);
+		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
+			try {
+				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
-			} else if (newDateRaw.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(newDateRaw + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				changedTask.setDeadline(epochTime);
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}

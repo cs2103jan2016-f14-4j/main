@@ -35,7 +35,7 @@ public class ProcessedObject {
 	 * 3. DEADLINES
 	 * 4. EVENTS 
 	 */
-	private String command;
+	private String command = null;
 	private Task task = null; 
 	private int index = -1; 
 	private String viewType = null; 

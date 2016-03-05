@@ -1,11 +1,12 @@
 package taskey.parser;
 
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task;
-
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import taskey.constants.ParserConstants; 
+import taskey.constants.ParserConstants;
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task; 
 
 /**
  * Job of this class is to parse "add" commands. 
@@ -14,7 +15,7 @@ import taskey.constants.ParserConstants;
  */
 public class ParseAdd { 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
-	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
+	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -26,18 +27,6 @@ public class ParseAdd {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		//TODO: put in correct times for special days. 
-		specialDays.put("tomorrow", 
-				timeConverter.getCurrTime() + TimeConverter.ONE_DAY); 
-		specialDays.put("today", timeConverter.getCurrTime()); 
-		specialDays.put("next sun", new Long(1)); 
-		specialDays.put("next mon", new Long(1)); 
-		specialDays.put("next tues", new Long(1)); 
-		specialDays.put("next wed", new Long(1)); 
-		specialDays.put("next thurs", new Long(1)); 
-		specialDays.put("next fri", new Long(1)); 
-		specialDays.put("next sat", new Long(1)); 
 		
 	}
 	
@@ -65,9 +54,23 @@ public class ParseAdd {
 		} else if (simpString.split("from").length != 1) {
 			//event
 			processed = handleEvent(task, simpString);
+		} else if (simpString.compareTo("") == 0) {
+			//empty add
+			processed = parseError.processError("empty add");
+			return processed; 
 		} else {
 			//floating task 
 			processed = handleFloating(command, simpString);
+		}
+		
+		//if there's error, don't continue to process tags
+		if (processed.getCommand().compareTo("ERROR") == 0) {
+			return processed;
+		}
+		//process tags now: if there are tags, add it in.
+		if (simpString.split("#").length != 1) {
+			ArrayList<String> tags = getTagList(simpString); 
+			processed.getTask().setTaskTags(tags);
 		}
 		return processed; 
 	}
@@ -82,25 +85,20 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("from");
+		String simpString2 = simpString.replace("today", "2day"); 
+		simpString2 = simpString2.replace("tomorrow", "tmr"); 
+		String[] removeTagList = simpString2.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 
-		String rawStartDate = dateList[0].trim();
-		String rawEndDate = dateList[1].trim(); 
+		String rawStartDate = dateList[0].trim().toLowerCase();
+		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
 		if (!specialDays.containsKey(rawStartDate)) {
-			if (rawStartDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawStartDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
-			} else if (rawStartDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawStartDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setStartDate(epochTime); 
-			}else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -111,18 +109,10 @@ public class ParseAdd {
 		}
 		
 		if (!specialDays.containsKey(rawEndDate)) {
-			if (rawEndDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawEndDate + " " + ParserConstants.DAY_END);
-				task.setEndDate(epochTime);
-			} else if (rawEndDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawEndDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
-			} else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -148,23 +138,16 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("by");
+		String[] removeTagList = simpString.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("by");
 		taskName = inputList[0].trim(); 
-		String rawDate = inputList[1].trim(); 
+		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		if (!specialDays.containsKey(rawDate)) {
-			if (rawDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
-			} else if (rawDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setDeadline(epochTime);
-			}else {
+			} catch (ParseException error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -190,23 +173,16 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] inputList = simpString.split("on"); 
+		String[] removeTagList = simpString.split("#"); 
+		String[] inputList = removeTagList[0].trim().split("on"); 
 		taskName = inputList[0].trim(); 
-		String rawDate = inputList[1].trim();
+		String rawDate = inputList[1].trim().toLowerCase();
 		
 		if (!specialDays.containsKey(rawDate)) {
-			if (rawDate.length() == 11) {
-				//ie. format is DD MMM YYYY
-				epochTime = timeConverter.toEpochTime(rawDate + " " + ParserConstants.DAY_END);
+			try {
+				epochTime = timeConverter.toEpochTime(rawDate);
 				task.setDeadline(epochTime);
-			} else if (rawDate.length() == 6) {
-				//ie. format is DD MMM
-				timeConverter.setCurrTime();
-				int year = timeConverter.getYear(timeConverter.getCurrTime());
-				epochTime = timeConverter.toEpochTime(rawDate + " " + String.valueOf(year) 
-						+ " " + ParserConstants.DAY_END);
-				task.setDeadline(epochTime);
-			} else {
+			} catch (Exception error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -230,8 +206,7 @@ public class ParseAdd {
 	 */
 	private ProcessedObject handleFloating(String command, String simpString) {
 		ProcessedObject processed;
-		String taskName;
-		taskName = simpString;
+		String taskName = simpString.split("#")[0].trim();
 		Task newTask = new Task(taskName); 
 		
 		newTask.setTaskType("FLOATING");
@@ -251,6 +226,21 @@ public class ParseAdd {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * Get tag list for a task
+	 * Assumptions: all tags must be added to the back of the userInput
+	 * @param rawInput
+	 * @return
+	 */
+	public ArrayList<String> getTagList(String rawInput) {
+		ArrayList<String> tagList = new ArrayList<String>();
+		String[] splitString = rawInput.split("#");
+		for (int i=1; i < splitString.length; i++) {
+			tagList.add(splitString[i].trim());
+		}
+		return tagList; 
 	}
 
 }

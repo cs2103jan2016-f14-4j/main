@@ -48,7 +48,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK);
 		String line = theTask.getTaskName();
 		theDate = "";
-		if (theTask.getDeadline() != "") {
+		if (theTask.getDeadline().length() != 0 ) {
 			String[] params = theTask.getDeadline().split(" ");
 			theDate = params[0] + params[1] + params[2];
 		}
@@ -61,7 +61,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		TextFlow element = new TextFlow();
 		
 		String line;
-		if (theDate == "") {
+		if (theDate.length() == 0) {
 			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 			line = "------";
 		} else {

@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
+import taskey.logic.Logic;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
@@ -32,9 +33,6 @@ public class UiMain extends Application {
 	private Parent root = null;
 
 	public static UiMain getInstance() {
-		if (instance == null) {
-			instance = new UiMain();
-		}
 		return instance;
 	}
 
@@ -46,6 +44,7 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		instance = this;
 		myController = new UiController();
 		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
 		myloader.setController(myController);
@@ -78,7 +77,8 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
-		testUI();
+		//testUI();
+		Logic.getInstance().initialize();
 	}
 
 	public UiController getController() {

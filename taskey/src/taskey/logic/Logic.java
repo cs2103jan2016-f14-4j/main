@@ -141,15 +141,15 @@ public class Logic {
     	
     	switch (command) {
 			case "ADD_FLOATING":
-				addFloating(task);
+				statusCode = addFloating(task);
 				break;
 				
 			case "ADD_DEADLINE":
-				addDeadline(task);
+				statusCode = addDeadline(task);
 				break;
 				
 			case "ADD_EVENT":
-				addEvent(task);
+				statusCode = addEvent(task);
 				break;
 				
 			case "DELETE_BY_INDEX":
@@ -283,22 +283,34 @@ public class Logic {
 		return 0; //Stub
 	}
 	
-	//Updates Ui with a new floating task.
-	private void addFloating(Task task) {
+	//Updates Ui with a new floating task. Returns a status code reflecting outcome of command execution.
+	private int addFloating(Task task) {
 		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
 		ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
 		pendingList.add(task);
 		floatingList.add(task);
 		categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
 	}
 	
-	//Updates Ui with a new deadline task.
-	private void addDeadline(Task task) {
+	//Updates Ui with a new deadline task. Returns a status code reflecting outcome of command execution.
+	private int addDeadline(Task task) {
 		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
 		ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
 		pendingList.add(task);
 		deadlineList.add(task);
 		
@@ -311,12 +323,19 @@ public class Logic {
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
 	}
 	
-	//Updates Ui with a new event task.
-	private void addEvent(Task task) {
+	//Updates Ui with a new event task. Returns a status code reflecting outcome of command execution.
+	private int addEvent(Task task) {
 		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
 		ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
 		pendingList.add(task);
 		eventList.add(task);
 		
@@ -329,6 +348,8 @@ public class Logic {
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
 	}
 	
 	//Sorts targetList and updates the Ui tab corresponding to currentContent with the sorted list.

@@ -51,6 +51,7 @@ public class UiController {
 
 	private Stage stage;
 	private int currentTab;
+	private ContentBox currentContent;
 	private UiClockService clockService;
 	private UiContentManager myManager;
 	private UiDropDown myDropDown;
@@ -94,6 +95,7 @@ public class UiController {
 	public void displayTabContents(int tabNo) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(tabNo);
+		currentContent = ContentBox.fromInteger(tabNo+1);
 	}
 
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
@@ -149,11 +151,8 @@ public class UiController {
 					input.clear();
 
 					int statusCode = 0;
-					try {
-						statusCode = Logic.getInstance().executeCommand(line);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					statusCode = Logic.getInstance().executeCommand(currentContent,line);
+					
 					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight());
 					UiPopupFactory.getInstance().createFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0, true).play();
 

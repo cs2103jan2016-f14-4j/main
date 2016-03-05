@@ -1,9 +1,13 @@
 package taskey.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
 
 import org.junit.Test;
 
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task;
 import taskey.parser.Parser;
 
 public class ParserTest {
@@ -31,7 +35,10 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
 				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
-		//add complete essay by today 
+		System.out.println(parser.parseInput("add complete essay by today")); 
+		System.out.println(parser.parseInput("add complete essay by tmr")); 
+		System.out.println(parser.parseInput("add complete essay by this Wed"));
+		System.out.println(parser.parseInput("add complete essay by next Wed"));
 		//other special days: tomorrow, next week, next ___eg. friday
 		
 	}
@@ -44,12 +51,30 @@ public class ParserTest {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
 				+ "to 20 Feb 2016 23:59:59\n",
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
+		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 		//add meeting from tomorrow to 18 feb
 		
 	}
 	
+	@Test
 	public void testTag() {
-		//eg. add lalala #lala
+		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
+				parser.parseInput("add meeting #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: empty add\n",
+				parser.parseInput("add  ").toString());
+		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016 23:59:59\n"
+				+ "tags: sua, serious, \n",
+				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+				parser.parseInput("add meeting on 17 Fbr #sua #serious").toString());
+		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 23:59:59 "
+				+ "to 18 Feb 2016 23:59:59\ntags: sua, serious, \n",
+				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
 	}
 	
 	@Test
@@ -130,12 +155,5 @@ public class ParserTest {
 				parser.parseInput("vieW deadlines").toString());
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
-		
-		String myString = "add test lala #lala #lalala";
-		String[] splitString = myString.split("#");
-		for (int i=0; i < splitString.length; i++) {
-			System.out.println("["+splitString[i] + "]");
-		}
-		
 	}
 }

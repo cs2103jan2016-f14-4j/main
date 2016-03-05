@@ -39,7 +39,7 @@ public class UiWeeklyFormatter extends UiFormatter {
 			taskText = taskText.substring(0, UiConstants.CHAR_LIMIT_WEEKLIST) + "...*";
 		}
 		line += "- " + taskText;
-		if (theTask.getDeadline() != "") {
+		if (theTask.getDeadline().length() != 0 ) {
 			line += " (" + theTask.getDeadline() + ")";
 		}
 		element.getChildren().addAll(myConfig.format(line));
@@ -47,7 +47,7 @@ public class UiWeeklyFormatter extends UiFormatter {
 	}
 
 	public boolean isWithinWeek(String deadLine) {
-		if (deadLine == "" || Integer.parseInt(deadLine.split(" ")[0]) - clockService.getDayOfMonth() <= 7) {
+		if (deadLine.length() == 0  || Integer.parseInt(deadLine.split(" ")[0]) - clockService.getDayOfMonth() <= 7) {
 			return true;
 		} else {
 			return false;

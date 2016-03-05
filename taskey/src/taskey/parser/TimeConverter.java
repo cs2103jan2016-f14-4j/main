@@ -2,10 +2,11 @@ package taskey.parser;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Calendar;
+
+import taskey.constants.ParserConstants;
 
 public class TimeConverter implements Serializable {
-	public static final long ONE_DAY = 86400; 
-	public static final long ONE_WEEK = 604800; 
 	
 	//store curr time in seconds 
 	private long currTime = System.currentTimeMillis()/1000;
@@ -37,16 +38,32 @@ public class TimeConverter implements Serializable {
 	 * @param date: String in the format: dd MMM yyyy HH:mm:ss
 	 * @return date in Epoch Time. 
 	 */
-	public long toEpochTime(String date) { 
+	public long toEpochTime(String date) throws ParseException { 
 		try {
 			long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
 					date).getTime() / 1000;
 			return epochTime; 
 		} catch (ParseException e) {
-			System.out.println(e); 
-			return -1; 
+			try {
+				//date came in dd MMM yyyy
+				String date2 = date + " " + ParserConstants.DAY_END; 
+				long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
+						date2).getTime() / 1000;
+				return epochTime; 
+			} catch (ParseException e2) {
+				try {
+					String date3 = date + " 2016 " + ParserConstants.DAY_END; 
+					long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
+							date3).getTime() / 1000;
+					return epochTime; 
+				} catch (ParseException e3) {
+					System.out.println(e3); 
+					throw e3; 
+				}
+			}
 		}	
 	}
+	
 	
 	/**
 	 * Convert an epoch time to human readable time. 
@@ -159,5 +176,21 @@ public class TimeConverter implements Serializable {
 		
 		return time;
 	}
-
+	
+	/**
+	 * Get human format day of the week.
+	 * eg. mon, tues... 
+	 * @return
+	 */
+	public String getDayOfTheWeek() {
+		//first day of the week starts from Sunday 
+		String[] days = {"SUN","MON","TUE","WED","THU","FRI","SAT"}; 
+		Calendar cal = Calendar.getInstance();
+		cal.set(getYear(currTime),
+				getMonth(currTime)-1,
+				getDay(currTime));
+		int day = cal.get(cal.DAY_OF_WEEK); 
+		
+		return days[day-1]; 
+	}
 }

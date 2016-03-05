@@ -5,6 +5,7 @@ import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 import taskey.ui.UiMain;
 import taskey.ui.UiController;
+import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
@@ -160,6 +161,10 @@ public class Logic {
 				statusCode = deleteByName(currentContent, task.getTaskName(), targetList);
 				break;
 				
+			case "VIEW":
+				statusCode = view(viewType); 
+				break;
+				
 			case "DONE_BY_INDEX":
 				//System.out.println(taskIndex);
 				done = targetList.remove(taskIndex - 1); //Temporary fix 
@@ -214,6 +219,16 @@ public class Logic {
 		saveAllTasks();
 		
 		return statusCode; 
+	}
+
+	//View the type of task specified by viewType.
+	private int view(String viewType) {
+		if (viewType.equals("GENERAL")) {
+			uiController.updateActionDisplay(lists.get(ListID.GENERAL.getValue()), ActionListMode.TASKLIST);
+			uiController.displayTabContents(ContentBox.ACTION.getValue());
+		}
+		
+		return 0; //Stub
 	}
 	
 	//Removes an indexed task from the Ui tab specified by currentContent.

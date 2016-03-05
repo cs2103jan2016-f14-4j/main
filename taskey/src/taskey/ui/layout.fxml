@@ -42,7 +42,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-            <Tab text="ACTION LIST">
+            <Tab text="ACTION">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="323.0" prefWidth="324.0">
                      <children>

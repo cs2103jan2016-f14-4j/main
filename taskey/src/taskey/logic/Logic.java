@@ -165,7 +165,11 @@ public class Logic {
 				statusCode = view(viewType); 
 				break;
 				
-			case "DONE_BY_INDEX":
+			case "SEARCH":
+				statusCode = search(searchPhrase);
+				break;
+				
+			/*case "DONE_BY_INDEX":
 				//System.out.println(taskIndex);
 				done = targetList.remove(taskIndex - 1); //Temporary fix 
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -210,7 +214,8 @@ public class Logic {
 				break;
 				
 			case "UNDO":
-				break;
+				break; */
+				
 			default:
 				statusCode = -1; //Stub
 				break;
@@ -300,6 +305,23 @@ public class Logic {
 		uiController.updateDisplay(targetList, currentContent);
 		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
+	}
+	
+	//Search for all tasks that contain searchPhrase. searchPhrase is not case sensitive.
+	private int search(String searchPhrase) {
+		ArrayList<Task> matches = new ArrayList<Task>();
+		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		
+		for (Task t : pendingList) {
+			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
+				matches.add(t);
+			}
+		}
+		
+		uiController.updateActionDisplay(matches, ActionListMode.TASKLIST);
+		uiController.displayTabContents(ContentBox.ACTION.getValue());
 		
 		return 0; //Stub
 	}

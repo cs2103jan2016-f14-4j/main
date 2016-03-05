@@ -1,6 +1,7 @@
 package taskey.logic;
 
 import taskey.parser.Parser;
+import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 import taskey.ui.UiMain;
 import taskey.ui.UiController;
@@ -24,6 +25,7 @@ import taskey.logic.ProcessedObject;
 public class Logic {
 	private static Logic instance = null;
 	private Parser parser;
+	private TimeConverter timeConverter;
 	private UiController uiController;
 	private ArrayList<String> fileNames;
 	private ArrayList<ArrayList<Task>> lists;
@@ -43,10 +45,13 @@ public class Logic {
 	public void initialize() {
 		instance = Logic.getInstance();
 		parser = new Parser();
+		timeConverter = new TimeConverter();
 		uiController = UiMain.getInstance().getController();
 		fileNames = new ArrayList<String>(Arrays.asList("PENDING", "EXPIRED", "GENERAL", "DEADLINE", "EVENT",
 				                                        "COMPLETED"));
 		lists = new ArrayList<ArrayList<Task>>();
+		ArrayList<Task> thisWeek = new ArrayList<Task>();
+		lists.add(thisWeek);
 		
 		for (int i = 0; i < fileNames.size(); i++) {
 			ArrayList<Task> list = Storage.getInstance().getTaskList(fileNames.get(i));
@@ -57,7 +62,15 @@ public class Logic {
 			}
 		}
 		
-		//TODO: update the "THIS_WEEK" tab
+		//Update THIS_WEEK tab
+		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		for (Task t : pendingList) {
+			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+				thisWeek.add(t);
+			}
+		}
+		uiController.updateDisplay(thisWeek, ContentBox.THIS_WEEK);
+		
 		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
 		categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
 															 lists.get(ListID.DEADLINE.getValue()).size(),
@@ -131,6 +144,7 @@ public class Logic {
 				break;
 				
 			case "ADD_DEADLINE":
+				addDeadline(task);
 				break;
 				
 			case "ADD_EVENT":
@@ -211,12 +225,18 @@ public class Logic {
 		targetList.remove(taskIndex);
 		
 		if (taskType.equals("FLOATING")) {
-			lists.get(ListID.GENERAL.getValue()).remove(t);
-			int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
-			categorySizes.set(CategoryID.GENERAL.getValue(), currentSize - 1);
+			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
+			floatingList.remove(t);
+			categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
+		} else if (taskType.equals("DEADLINE")) {
+			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
+			deadlineList.remove(t);
+			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
+			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
+		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
 		
 		return 0; //Stub
@@ -234,12 +254,18 @@ public class Logic {
 		targetList.remove(t);
 		
 		if (taskType.equals("FLOATING")) {
-			lists.get(ListID.GENERAL.getValue()).remove(t);
-			int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
-			categorySizes.set(CategoryID.GENERAL.getValue(), currentSize - 1);
+			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
+			floatingList.remove(t);
+			categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
+		} else if (taskType.equals("DEADLINE")) {
+			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
+			deadlineList.remove(t);
+			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
+			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
+		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
 		
 		return 0; //Stub
@@ -251,10 +277,27 @@ public class Logic {
 		ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
 		pendingList.add(task);
 		floatingList.add(task);
-		int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
-		categorySizes.set(CategoryID.GENERAL.getValue(), currentSize + 1);
+		categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
-		uiController.displayTabContents(ContentBox.PENDING.getValue());
+		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+	}
+	
+	//Updates Ui with a new deadline task.
+	private void addDeadline(Task task) {
+		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
+		pendingList.add(task);
+		deadlineList.add(task);
+		
+		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+			lists.get(ListID.THIS_WEEK.getValue()).add(task);
+			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
+		}
+		
+		categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
+		updateUiContentDisplay(pendingList, ContentBox.PENDING);
+		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
 	}
 	
@@ -268,7 +311,7 @@ public class Logic {
 	private void saveAllTasks() {
 		try {
 			for (int i = 0; i < fileNames.size(); i++) {
-				Storage.getInstance().saveTaskList(lists.get(i), fileNames.get(i));
+				Storage.getInstance().saveTaskList(lists.get(i + 1), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}
 		} catch (Exception e) {

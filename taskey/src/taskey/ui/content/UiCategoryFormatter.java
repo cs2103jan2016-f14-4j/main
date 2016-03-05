@@ -30,19 +30,20 @@ public class UiCategoryFormatter extends UiFormatter {
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
 			// add bullet
-			createStyledCell(0, i,"", currentGrid);
+			//createStyledCell(0, i,"", currentGrid);
 			addCircleToCell(0,i,createBullet(BULLET_RADIUS,Color.YELLOW),currentGrid);
+			
 			
 			// add tag name
 			TextFlow element = new TextFlow();
 			element.getChildren().addAll(myConfig.format(myCategoryList.get(i)));
-			createStyledCell(1,i,"",currentGrid);
+			//createStyledCell(1,i,"",currentGrid);
 			addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
 			element = new TextFlow();
-			element.getChildren().addAll(myConfig.format("[" + categoryNums.get(i) + "]"));
-			createStyledCell(2,i,"",currentGrid);
+			element.getChildren().addAll(myConfig.format(""+ categoryNums.get(i) ));
+			//createStyledCell(2,i,"",currentGrid);
 			addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
 		}
 	}

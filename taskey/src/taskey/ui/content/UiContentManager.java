@@ -66,7 +66,7 @@ public class UiContentManager {
 
 	private GridPane setUpGrid(UiGridSettings settings) {
 		GridPane gridPane = new GridPane();
-		//gridPane.setGridLinesVisible(true);
+		gridPane.setGridLinesVisible(true);
 		gridPane.setPadding(settings.getPaddings());
 		gridPane.setHgap(settings.getHGap());
 		gridPane.setVgap(settings.getVGap());
@@ -112,11 +112,13 @@ public class UiContentManager {
 	public void updateCategoryContentBox(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums) {
 		int arrayIndex = ContentBox.CATEGORY.getValue();
 		UiCategoryFormatter myFormatter = (UiCategoryFormatter) myFormatters.get(arrayIndex);
-		myFormatter.clearGridContents();
+		//myFormatter.clearGridContents();
 		myFormatter.updateCategories(myCategoryList,categoryNums);
+		//ScrollPane pane = contentBoxes.get(arrayIndex);
+		//pane.setFitToWidth(true);
 	}
 
-	public void cleanUp() {
+	public void cleanUp() 		{
 		for ( int i = 0; i < myFormatters.size(); i ++ ) {
 			myFormatters.get(i).cleanUp();
 		}

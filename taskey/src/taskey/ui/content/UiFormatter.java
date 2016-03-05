@@ -114,7 +114,7 @@ public abstract class UiFormatter {
 		return imageWrapper;
 	}
 	
-	// Does not stretch with cell size
+	// Such that the stackpane does not stretch with cell size
 	protected StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
 		StackPane pane = new StackPane();
 		pane.getStyleClass().add(paneStyle);

@@ -39,8 +39,6 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
 		System.out.println(parser.parseInput("add complete essay by next Wed"));
-		//other special days: tomorrow, next week, next ___eg. friday
-		
 	}
 	
 	@Test
@@ -54,9 +52,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
-		//add meeting from tomorrow to 18 feb
-		
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));		
 	}
 	
 	@Test

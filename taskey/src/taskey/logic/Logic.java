@@ -65,7 +65,8 @@ public class Logic {
 		//Update THIS_WEEK tab
 		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
 		for (Task t : pendingList) {
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime()) ||
+				timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 				thisWeek.add(t);
 			}
 		}
@@ -148,6 +149,7 @@ public class Logic {
 				break;
 				
 			case "ADD_EVENT":
+				addEvent(task);
 				break;
 				
 			case "DELETE_BY_INDEX":
@@ -233,6 +235,11 @@ public class Logic {
 			deadlineList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
 			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
+		} else if (taskType.equals("EVENT")) {
+			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
+			eventList.remove(t);
+			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
+			categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
@@ -262,6 +269,11 @@ public class Logic {
 			deadlineList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
 			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
+		} else if (taskType.equals("EVENT")) {
+			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
+			eventList.remove(t);
+			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
+			categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
@@ -296,6 +308,24 @@ public class Logic {
 		}
 		
 		categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
+		updateUiContentDisplay(pendingList, ContentBox.PENDING);
+		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+	}
+	
+	//Updates Ui with a new event task.
+	private void addEvent(Task task) {
+		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
+		pendingList.add(task);
+		eventList.add(task);
+		
+		if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
+			lists.get(ListID.THIS_WEEK.getValue()).add(task);
+			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
+		}
+		
+		categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);

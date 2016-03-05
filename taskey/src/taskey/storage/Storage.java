@@ -17,9 +17,10 @@ import taskey.logic.Task;
  */
 public class Storage {
 	static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
+	static final String CONFIG_FILENAME = "Taskey_Storage_config_file";
 
 	private static Storage instance = null;
-	private File directory = new File(DEFAULT_DIRECTORY);
+	private File directory;
 	private File savefile; //pointer to the current file under operation
 
 	/**
@@ -33,8 +34,9 @@ public class Storage {
 
 		// Can optionally set the directory again, if requested by user.
 		// Examples of invalid paths in Windows
-		System.out.println(storageTest.setDirectory("CON"));
-		System.out.println(storageTest.setDirectory("foo|bar"));
+		//System.out.println(storageTest.setDirectory("CON"));
+		//System.out.println(storageTest.setDirectory("foo|bar"));
+		//storageTest.setDirectory(DEFAULT_DIRECTORY + "\\fubar");
 
 		// Initial load
 		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
@@ -73,7 +75,9 @@ public class Storage {
     public static Storage getInstance() {
     	if (instance == null) {
     		instance = new Storage();
-    		instance.setDirectory(DEFAULT_DIRECTORY);
+    		if (instance.loadDirectory() == false) {
+        		instance.setDirectory(DEFAULT_DIRECTORY);
+    		}
     	}
     	return instance;
     }
@@ -93,9 +97,10 @@ public class Storage {
     	setSavefile(filename);
     	ArrayList<Task> tasks;
 		try {
-			tasks = readFromFile();
-			System.out.println("<Loaded> " + savefile.getAbsolutePath());
+			tasks = readFromFile( new TypeToken<ArrayList<Task>>(){} );
+			System.out.println("<Loaded> " + savefile.getPath());
 		} catch (FileNotFoundException e) {
+			//System.out.println(e.getMessage());
 			tasks = new ArrayList<Task>();
 		}
     	return tasks;
@@ -106,11 +111,11 @@ public class Storage {
      * @return ArrayList of Task objects generated from the JSON file.
      * @throws FileNotFoundException
      */
-    private ArrayList<Task> readFromFile() throws FileNotFoundException {
+    private <T> T readFromFile(TypeToken<T> typeToken) throws FileNotFoundException {
     	Gson gson = new Gson();
     	FileReader reader = new FileReader(savefile);
-		ArrayList<Task> tasks = gson.fromJson(reader, new TypeToken<ArrayList<Task>>(){}.getType());
-		return tasks;
+		T object = gson.fromJson(reader, typeToken.getType());
+		return object;
     }
 
     /*================*
@@ -132,13 +137,13 @@ public class Storage {
     }
 
     /**
-     * Private method. Writes tasks to JSON file.
-     * @param tasks ArrayList of Task objects to be written as a JSON file.
+     * Private method. Writes an Object to JSON file.
+     * @param object to be written as a JSON file.
      * @throws IOException
      */
-    private void writeToFile(ArrayList<Task> tasks) throws IOException {
+    private <T> void writeToFile(T object) throws IOException {
     	Gson gson = new Gson();
-    	String json = gson.toJson(tasks);
+    	String json = gson.toJson(object);
     	FileWriter writer = new FileWriter(savefile);
     	writer.write(json);
     	writer.close();
@@ -154,7 +159,7 @@ public class Storage {
      * @return Absolute path of the default or user-set directory.
      */
     public String getDirectory() {
-    	return directory.getAbsolutePath();
+    	return directory.getPath();
     }
 
     /**
@@ -173,10 +178,41 @@ public class Storage {
 		if (dir.isDirectory()) {
 			directory = dir;
 			System.out.println("<Storage directory set> " + getDirectory());
+	    	if (!pathname.equals(DEFAULT_DIRECTORY)) {
+	    		saveDirectory();
+	    	}
 			return true;
 		} else {
 			return false;
 		}
+    }
+
+    /**
+     * Private method. Saves the current directory to file.
+     * @return true if save was succesful; false otherwise.
+     */
+    private boolean saveDirectory() {
+    	savefile = new File(System.getProperty("user.dir"), CONFIG_FILENAME);
+    	try {
+    		writeToFile(directory);
+    		System.out.println("<Storage directory saved>");
+    		return true;
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
+
+    private boolean loadDirectory() {
+    	savefile = new File(System.getProperty("user.dir"), CONFIG_FILENAME);
+    	try {
+    		directory = readFromFile( new TypeToken<File>(){} );
+    		System.out.println("<Storage directory loaded>");
+    		return true;
+    	} catch (FileNotFoundException e) {
+    		System.out.println(e.getMessage());
+    		return false;
+    	}
     }
 
     /**

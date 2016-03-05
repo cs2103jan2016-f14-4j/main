@@ -1,12 +1,11 @@
 package taskey.parser;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
-public class TimeConverter implements Serializable {
+public class TimeConverter {
 	
 	//store curr time in seconds 
 	private long currTime = System.currentTimeMillis()/1000;

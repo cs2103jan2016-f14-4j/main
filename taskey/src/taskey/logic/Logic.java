@@ -126,7 +126,7 @@ public class Logic {
     	
     	switch (command) {
 			case "ADD_FLOATING":
-				addFloating(currentContent, task, targetList);
+				addFloating(task);
 				break;
 				
 			case "ADD_DEADLINE":
@@ -223,13 +223,15 @@ public class Logic {
 	}
 	
 	//Updates Ui with a new floating task.
-	private void addFloating(ContentBox currentContent, Task task, ArrayList<Task> targetList) {
+	private void addFloating(Task task) {
+		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
 		ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
+		pendingList.add(task);
 		floatingList.add(task);
-		targetList.add(task);
-		updateUiContentDisplay(targetList, currentContent);
 		int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
 		categorySizes.set(CategoryID.GENERAL.getValue(), currentSize + 1);
+		updateUiContentDisplay(pendingList, ContentBox.PENDING);
+		uiController.displayTabContents(ContentBox.PENDING.getValue());
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
 	}
 	

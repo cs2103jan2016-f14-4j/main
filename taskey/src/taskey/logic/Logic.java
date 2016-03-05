@@ -244,6 +244,10 @@ public class Logic {
 	
 	//Removes an indexed task from the Ui tab specified by currentContent.
 	private int deleteByIndex(ContentBox currentContent, int taskIndex, ArrayList<Task> targetList) {
+		if (!currentContent.equals(ContentBox.PENDING)) { //Delete command only allowed in pending tab
+			return -1; //Stub
+		}
+		
 		if (taskIndex >= targetList.size()) { //Out of bounds
 			return -1; //Stub
 		}
@@ -277,6 +281,10 @@ public class Logic {
 	
 	//Removes an named task from the Ui tab specified by currentContent.
 	private int deleteByName(ContentBox currentContent, String taskName, ArrayList<Task> targetList) {
+		if (!currentContent.equals(ContentBox.PENDING)) { //Delete command only allowed in pending tab
+			return -1; //Stub
+		}
+		
 		Task t = getTaskByName(targetList, taskName);
 		
 		if (t == null) { //Named task does not exist in the list

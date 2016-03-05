@@ -88,13 +88,15 @@ public class Logic {
 		return targetList;
 	}
 	
-	public Task getTaskByName(ArrayList<Task> targetList, String name ) {
+	//Returns the first Task whose name matches the given name, or null otherwise.
+	private Task getTaskByName(ArrayList<Task> targetList, String name ) {
 		for ( int i = 0; i < targetList.size(); i ++ ) {
 			Task theTask = targetList.get(i);
 			if ( theTask.getTaskName().equals(name)) {
 				return theTask;
 			}
 		}
+		
 		return null;
 	}
 	
@@ -116,7 +118,6 @@ public class Logic {
     	String errorType = po.getErrorType(); //Only used for invalid commands
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
-    	//String taskName = task.getTaskName();
     	Task done;
     	Task toUpdate;
     	ArrayList<Task> doneList;
@@ -140,8 +141,7 @@ public class Logic {
 				break;
 				
 			case "DELETE_BY_NAME":
-				targetList.remove(getTaskByName(targetList, task.getTaskName()));
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				statusCode = deleteByName(currentContent, task.getTaskName(), targetList);
 				break;
 				
 			case "DONE_BY_INDEX":
@@ -209,6 +209,29 @@ public class Logic {
 		Task t = targetList.get(taskIndex);
 		String taskType = t.getTaskType();
 		targetList.remove(taskIndex);
+		
+		if (taskType.equals("FLOATING")) {
+			lists.get(ListID.GENERAL.getValue()).remove(t);
+			int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
+			categorySizes.set(CategoryID.GENERAL.getValue(), currentSize - 1);
+		}
+		
+		uiController.updateDisplay(targetList, currentContent);
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
+	}
+	
+	//Removes an named task from the Ui tab specified by currentContent.
+	private int deleteByName(ContentBox currentContent, String taskName, ArrayList<Task> targetList) {
+		Task t = getTaskByName(targetList, taskName);
+		
+		if (t == null) { //Named task does not exist in the list
+			return -1; //Stub
+		}
+		
+		String taskType = t.getTaskType();
+		targetList.remove(t);
 		
 		if (taskType.equals("FLOATING")) {
 			lists.get(ListID.GENERAL.getValue()).remove(t);

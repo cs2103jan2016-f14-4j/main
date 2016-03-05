@@ -6,25 +6,26 @@ import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.ActionContentMode;
+import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextConfig;
 
 public class UiActionFormatter extends UiFormatter {
 
-	private ActionContentMode currentMode;
+	private ActionListMode currentMode;
 	public UiActionFormatter(GridPane _gridPane, UiClockService _clockService) {
 		super(_gridPane, _clockService);
-		currentMode = ActionContentMode.TASKLIST;
+		currentMode = ActionListMode.TASKLIST;
 	}
 
-	public void updateGrid(ActionContentMode mode) {
+	public void updateGrid(ActionListMode mode) {
 		switch ( mode ) {
 			case HELP_MAIN:
 			case HELP_ADD:
@@ -66,7 +67,9 @@ public class UiActionFormatter extends UiFormatter {
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (row + 1);
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_NUMBER_ICON, TextAlignment.CENTER);
+		
+		createStyledCell(col, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
+		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
@@ -75,7 +78,7 @@ public class UiActionFormatter extends UiFormatter {
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK);
 		String line = theTask.getTaskName();
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.CENTER);
+		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 
 	private void showHelp() {
@@ -150,7 +153,8 @@ public class UiActionFormatter extends UiFormatter {
 			} else {
 				currentConfig++; // go to next config
 			}
-			addStyledCellTextFlow(element, currentGrid, 0, i, style, TextAlignment.LEFT);
+			createStyledCell(0, i,style, currentGrid);
+			addTextFlowToCell(0, i, element,TextAlignment.LEFT, currentGrid);
 		}
 	}
 }

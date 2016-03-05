@@ -2,6 +2,7 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +16,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionContentMode;
+import taskey.ui.UiConstants.ActionListMode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -75,7 +76,7 @@ public class UiMain extends Application {
 	private void setUpScene(Stage primaryStage, Parent root) {
 		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
-		primaryStage.initStyle(StageStyle.DECORATED);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
 		Scene newScene = new Scene(root);
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
@@ -85,8 +86,8 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
-		//testUI();
 		Logic.getInstance().initialize();
+		//testUI();
 	}
 
 	/**
@@ -124,27 +125,17 @@ public class UiMain extends Application {
 		// Temporary;
 		Task temp = new Task("General Task");
 		myTaskList.add(temp);
-		temp = new Task("Task A");
-		temp.setDeadline("27 Feb 2016 01:00:00");
-		myTaskList.add(temp);
-		temp = new Task("AAAAAAAAAA VVVVVVVVVEEEEEEERRRRRRRRRRYYY LOOOOONG TASKKK");
-		temp.setDeadline("27 Feb 2016 04:00:00");
-		myTaskList.add(temp);
-		temp = new Task("Task B");
-		temp.setDeadline("29 Feb 2016 09:00:00");
-		myTaskList.add(temp);
-
-		temp = new Task("Task C");
-		temp.setDeadline("27 Feb 2016 04:00:00");
-		myTaskList.add(temp);
-		temp = new Task("Task B");
-		temp.setDeadline("29 Feb 2016 09:00:00");
-		myTaskList.add(temp);
 
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
-
+		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
-		myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
+		//myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
+		
+		ArrayList<String> myCategoryList = new ArrayList<String>(
+				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
+		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
+				Arrays.asList(1,22,3,14,0,6));
+		myController.updateCategoryDisplay(myCategoryList, categoryNums);
 	}
 
 	/**

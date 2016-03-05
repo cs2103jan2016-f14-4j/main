@@ -72,6 +72,7 @@ public class UiTextConfig {
 			}
 			segment = line.substring(currentStart, currentEnd);
 			Text newText = new Text(segment);
+			newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 			newText.getStyleClass().add(currentStyle);
 			myTexts.add(newText);
 			currentStart = currentEnd;
@@ -102,6 +103,7 @@ public class UiTextConfig {
 					styleIndex++; // ignore previous style
 				}
 				Text newText = new Text(segment);
+				newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 				newText.getStyleClass().add(currentStyle);
 				myTexts.add(newText);
 				segment = "";

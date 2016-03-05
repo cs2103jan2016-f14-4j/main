@@ -39,7 +39,8 @@ public class UiDefaultFormatter extends UiFormatter {
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (row + 1);
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_NUMBER_ICON, TextAlignment.CENTER);
+		createStyledCell(col, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
+		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
@@ -53,7 +54,7 @@ public class UiDefaultFormatter extends UiFormatter {
 			theDate = params[0] + params[1] + params[2];
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.LEFT);
+		addTextFlowToCell(col, row, element,TextAlignment.LEFT, currentGrid);
 	}
 
 	private void addTaskDate(Task theTask, int col, int row) {
@@ -69,6 +70,6 @@ public class UiDefaultFormatter extends UiFormatter {
 			line = theDate;
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.CENTER);
+		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 }

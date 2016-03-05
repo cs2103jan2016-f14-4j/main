@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
@@ -15,8 +15,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
+import taskey.ui.content.UiFormatter;
 import taskey.ui.utility.UiClockService;
-import taskey.ui.utility.UiTextConfig;
+import taskey.ui.utility.UiTextBuilder;
 
 public class UiCategoryFormatter extends UiFormatter {
 	public static final int BULLET_RADIUS = 5;
@@ -25,29 +26,30 @@ public class UiCategoryFormatter extends UiFormatter {
 		super(_gridPane, _clockService);
 	}
 
-	public void updateCategories(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums) {
-		UiTextConfig myConfig = new UiTextConfig();
+	public void updateCategories(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		UiTextBuilder myConfig = new UiTextBuilder();
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
 			// add bullet
 			//createStyledCell(0, i,"", currentGrid);
-			addCircleToCell(0,i,createBullet(BULLET_RADIUS,Color.YELLOW),currentGrid);
+			addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
 			
 			
 			// add tag name
 			TextFlow element = new TextFlow();
-			element.getChildren().addAll(myConfig.format(myCategoryList.get(i)));
+			element.getChildren().addAll(myConfig.build(myCategoryList.get(i)));
 			//createStyledCell(1,i,"",currentGrid);
 			addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
 			element = new TextFlow();
-			element.getChildren().addAll(myConfig.format(""+ categoryNums.get(i) ));
+			element.getChildren().addAll(myConfig.build(""+ categoryNums.get(i) ));
 			//createStyledCell(2,i,"",currentGrid);
 			addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
 		}
 	}
 	private Circle createBullet(int radius, Color theCenter) {
+		assert(theCenter != null);
 		Circle myCircle = new Circle(radius);
 		Stop[] stops = new Stop[] { new Stop(0, Color.BLACK), new Stop(0.25f, theCenter),new Stop(0.75f, theCenter), new Stop(1, Color.BLACK)};
 		LinearGradient myGradiant = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);

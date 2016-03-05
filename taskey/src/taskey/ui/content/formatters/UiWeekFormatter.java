@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
@@ -12,9 +12,10 @@ import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.ui.content.UiFormatter;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiTextConfig;
+import taskey.ui.utility.UiTextBuilder;
 
 public class UiWeekFormatter extends UiFormatter {
 	
@@ -23,16 +24,16 @@ public class UiWeekFormatter extends UiFormatter {
 	}
 
 	public void format(ArrayList<Task> myTaskList) {
-		//numEntries = 0;
+		assert(myTaskList != null);
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
 			addTaskEntry(theTask, i);
-			//numEntries++;
 		}
 	}
 
 	private void addTaskEntry(Task theTask, int row) {
-		UiTextConfig myConfig = new UiTextConfig();
+		assert(theTask != null);
+		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
@@ -46,11 +47,11 @@ public class UiWeekFormatter extends UiFormatter {
 		}
 		line += "\n\n";
 		line += "TAGS: ";
-		element.getChildren().addAll(myConfig.format(line));
+		element.getChildren().addAll(myConfig.build(line));
 		addTextFlowToCell(0, row, element,TextAlignment.LEFT, currentGrid);
 		
 		element = new TextFlow();
-		element.getChildren().addAll(myConfig.format("ID: -1"));
+		element.getChildren().addAll(myConfig.build("ID: -1"));
 		
 		StackPane ID_Wrapper = createStackPaneInCell(0, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
 		ID_Wrapper.getChildren().add(element);
@@ -63,19 +64,4 @@ public class UiWeekFormatter extends UiFormatter {
 		GridPane.setHalignment(ImageWrapper, HPos.CENTER);
 		ImageWrapper.setTranslateX(50);
 	}
-
-	/*// Logic implements
-	private boolean isWithinWeek(String deadLine) {
-		if (deadLine.length() == 0 ) {
-			return true;
-		} else {
-			// Need to refine
-			int date = Integer.parseInt(deadLine.split(" ")[0]);
-			if ( Math.abs(date - clockService.getDayOfMonth()) <= 7) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}*/
 }

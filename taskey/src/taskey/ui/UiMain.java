@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
@@ -43,6 +44,7 @@ public class UiMain extends Application {
 	 * @return single instance of UiMain
 	 */
 	public static UiMain getInstance() {
+		assert(instance != null);
 		return instance;
 	}
 
@@ -96,6 +98,7 @@ public class UiMain extends Application {
 	 * @return the controller
 	 */
 	public UiController getController() {
+		assert(myController != null);
 		return myController;
 	}
 
@@ -135,7 +138,9 @@ public class UiMain extends Application {
 				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
 		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
 				Arrays.asList(1,22,3,14,0,6));
-		myController.updateCategoryDisplay(myCategoryList, categoryNums);
+		ArrayList<Color> categoryColors = new ArrayList<Color>(
+				Arrays.asList(Color.RED,Color.RED,Color.RED,Color.RED,Color.RED,Color.YELLOW));
+		myController.updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);
 	}
 
 	/**

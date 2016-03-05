@@ -11,16 +11,18 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.logic.Task;
+import taskey.parser.UserTagDatabase;
 
 /**
  * @author Dylan
  */
 public class Storage {
-	static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
-	static final String CONFIG_FILENAME = "Taskey_Storage last used directory";
-
 	private static Storage instance = null;
 	private File directory;
+
+	static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
+	static final String FILENAME_CONFIG = "Taskey_Storage last used directory";
+	static final String FILENAME_TAGS = "user tags";
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
@@ -28,32 +30,41 @@ public class Storage {
 	 */
 	public static void main(String args[]) {
 		// Get the Storage singleton instance
-		// The default directory was automatically set in the getInstance() method.
+		// The default or last-used directory is automatically set in the getInstance() method.
 		Storage storageTest = Storage.getInstance();
 
 		// Can optionally set the directory again, if requested by user.
 		//storageTest.setDirectory(DEFAULT_DIRECTORY + "\\fubar");
 
-		// Initial load
-		System.out.println("\nInitial load");
+		// Initialize - tasklist
+		System.out.println("\nInitial load ======================================");
 		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
 		for (Task t : loadedTaskList) {
 			System.out.println(t);
 		}
 
-		// Create a simulated list of tasks and save it to file
+		// Initialize - tags
+		UserTagDatabase loadedTags = storageTest.loadTags();
+		System.out.print("" + loadedTags.hasTag("foo") + loadedTags.hasTag("bar") + loadedTags.hasTag("foobar"));
+
+		// Load after save - tasklist
+		System.out.println("\n\nLoad after save ===================================");
 		ArrayList<Task> testTaskList = new ArrayList<Task>();
 		testTaskList.add(new Task("1. This is a test task"));
 		testTaskList.add(new Task("2. This is a test task"));
 		testTaskList.add(new Task("3. This is a test task"));
 		storageTest.saveTaskList(testTaskList, "TEST_TASKLIST");
-
-		// Load after save
-		System.out.println("\nLoad after save");
 		loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
 		for (Task t : loadedTaskList) {
 			System.out.println(t);
 		}
+
+		// Load after save - tags
+		UserTagDatabase tags = new UserTagDatabase();
+		tags.addTag("foo"); tags.addTag("bar"); tags.addTag("foobar");
+		storageTest.saveTags(tags);
+		loadedTags = storageTest.loadTags();
+		System.out.print("" + loadedTags.hasTag("foo") + loadedTags.hasTag("bar") + loadedTags.hasTag("foobar"));
 	}
 
     /*=============*
@@ -219,7 +230,7 @@ public class Storage {
      * @return true if save was succesful; false otherwise.
      */
     private boolean saveDirectory() {
-    	File config = new File(CONFIG_FILENAME);
+    	File config = new File(FILENAME_CONFIG);
     	try {
     		writeToFile(config, directory, new TypeToken<File>() {});
     		System.out.println("{Storage directory saved}");
@@ -235,7 +246,7 @@ public class Storage {
      * @return true if the directory was successfully loaded; false otherwise.
      */
     private boolean loadDirectory() {
-    	File config = new File(CONFIG_FILENAME);
+    	File config = new File(FILENAME_CONFIG);
     	try {
     		directory = readFromFile(config, new TypeToken<File>() {});
     		System.out.println("{Storage directory loaded} " + directory.getPath());
@@ -244,5 +255,62 @@ public class Storage {
     		System.out.println("{Storage config file not found; setting default directory}");
     		return false;
     	}
+    }
+
+    /*================*
+     * Save/load tags *
+     *================*/
+
+    /**
+     * Saves the given UserTagDatabase object to JSON file.
+     * Auxiliary method.
+     * @param tags the UserTagDatabase
+     * @return true if successful; false otherwise.
+     */
+    public boolean saveTags(UserTagDatabase tags) {
+    	return saveTags(tags, FILENAME_TAGS);
+    }
+
+    /**
+     * Saves the given UserTagDatabase object to a JSON file with the specified filename.
+     * This method is provided in case Logic/Parser wants to specify the filename.
+     * @param tags the UserTagDatabase
+     * @param filename name of the file to be saved
+     * @return true if successful; false otherwise.
+     */
+    public boolean saveTags(UserTagDatabase tags, String filename) {
+    	File file = new File(directory, filename);
+    	try {
+    		writeToFile(file, tags, new TypeToken<UserTagDatabase>() {});
+    		return true;
+    	} catch (IOException e) {
+    		return false;
+    	}
+    }
+
+    /**
+     * Returns the UserTagDatabase read from JSON file.
+     * Auxiliary method.
+     * @return UserTagDatabase
+     */
+    public UserTagDatabase loadTags() {
+    	return loadTags(FILENAME_TAGS);
+    }
+
+    /**
+     * Returns the UserTagDatabase read from the JSON file specified by filename.
+     * This method is provided in case Logic/Parser wants to specify the filename.
+     * @param filename name of the JSON file
+     * @return the UserTagDatabase read from file; or an empty UserTagDatabase if file was not found.
+     */
+    public UserTagDatabase loadTags(String filename) {
+    	File file = new File(directory, filename);
+    	UserTagDatabase tags;
+    	try {
+    		tags = readFromFile(file, new TypeToken<UserTagDatabase>() {});
+    	} catch (FileNotFoundException e) {
+    		tags = new UserTagDatabase();
+    	}
+    	return tags;
     }
 }

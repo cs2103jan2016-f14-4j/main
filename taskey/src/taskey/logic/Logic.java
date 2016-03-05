@@ -57,7 +57,7 @@ public class Logic {
 			}
 		}
 		
-		//TODO: update the categories "THIS_WEEK", "COMPLETED", "GENERAL", "DEADLINE", "EVENT"
+		//TODO: update the "THIS_WEEK" tab
 		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
 		categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
 															 lists.get(ListID.DEADLINE.getValue()).size(),
@@ -100,6 +100,7 @@ public class Logic {
 	
 	/** 
 	 * Executes the user supplied command.
+	 * 
 	 * @param currentContent specifies the current tab that user is in.
 	 * @param input			 the input String entered by the user
 	 * @return               status code representing outcome of command execution
@@ -135,8 +136,7 @@ public class Logic {
 				break;
 				
 			case "DELETE_BY_INDEX":
-				targetList.remove(taskIndex);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+				statusCode = deleteByIndex(currentContent, taskIndex, targetList);
 				break;
 				
 			case "DELETE_BY_NAME":
@@ -200,6 +200,28 @@ public class Logic {
 		return statusCode; 
 	}
 	
+	//Removes an indexed task from the Ui tab specified by currentContent.
+	private int deleteByIndex(ContentBox currentContent, int taskIndex, ArrayList<Task> targetList) {
+		if (taskIndex >= targetList.size()) { //Out of bounds
+			return -1; //Stub
+		}
+		
+		Task t = targetList.get(taskIndex);
+		String taskType = t.getTaskType();
+		targetList.remove(taskIndex);
+		
+		if (taskType.equals("FLOATING")) {
+			lists.get(ListID.GENERAL.getValue()).remove(t);
+			int currentSize = categorySizes.get(CategoryID.GENERAL.getValue());
+			categorySizes.set(CategoryID.GENERAL.getValue(), currentSize - 1);
+		}
+		
+		uiController.updateDisplay(targetList, currentContent);
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0; //Stub
+	}
+	
 	//Updates Ui with a new floating task.
 	private void addFloating(ContentBox currentContent, Task task, ArrayList<Task> targetList) {
 		ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
@@ -220,7 +242,7 @@ public class Logic {
 	//Save all task lists to Storage.
 	private void saveAllTasks() {
 		try {
-			for (int i = 0; i < fileNames.size(); i++ ) {
+			for (int i = 0; i < fileNames.size(); i++) {
 				Storage.getInstance().saveTaskList(lists.get(i), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}

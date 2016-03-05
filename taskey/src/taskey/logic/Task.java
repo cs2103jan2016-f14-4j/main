@@ -279,13 +279,16 @@ public class Task implements Comparable<Task>, Serializable {
 	 * tasks are the same if they have the same name
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
-	 * @return 0 if they have the same name, else return -1 
+	 * @return true if they have the same name, else return false 
 	 */
-	public int equals(Task anotherTask) {
-		if (taskName.compareTo(anotherTask.getTaskName()) == 0) {
-			return 0; 
-		}	
-		return -1; 
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Task)) {
+		    return false;
+		  }
+		
+		Task other = (Task) obj;
+		
+		return taskName.equals(other.getTaskName()); 
 	}
 	
 	@Override 

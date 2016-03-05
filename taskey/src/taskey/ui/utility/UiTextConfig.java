@@ -17,8 +17,7 @@ public class UiTextConfig {
 
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
 	private char symbol;
-	private Font myFont; // Font is usually shared across all Text nodes in a line
-
+	
 	public UiTextConfig() {
 		initVariables();
 	}
@@ -30,22 +29,10 @@ public class UiTextConfig {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
-		myFont = UiConstants.UI_DEFAULT_FONT; // default (overridden by styles specifying font)
 	}
-	
-	public void setFont(Font newFont) {
-		myFont = newFont;
-	}
-	
 	public void setSymbol(char _symbol) {
 		symbol = _symbol;
 	}
-	
-	private Text createText(String segment) {
-		Text newText = new Text(segment);
-		//newText.setFont(myFont); 
-		return newText;
-	}	
 	
 	public void addMarker(Integer startIndex, String style) {
 		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
@@ -84,7 +71,8 @@ public class UiTextConfig {
 				currentEnd = Math.min(styleMarkers.get(i + 1).getKey(), line.length());
 			}
 			segment = line.substring(currentStart, currentEnd);
-			Text newText = createText(segment);
+			Text newText = new Text(segment);
+			newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 			newText.getStyleClass().add(currentStyle);
 			myTexts.add(newText);
 			currentStart = currentEnd;
@@ -114,7 +102,8 @@ public class UiTextConfig {
 					currentStyle = styleMarkers.get(styleIndex).getValue();
 					styleIndex++; // ignore previous style
 				}
-				Text newText = createText(segment);
+				Text newText = new Text(segment);
+				newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 				newText.getStyleClass().add(currentStyle);
 				myTexts.add(newText);
 				segment = "";

@@ -27,6 +27,12 @@ public class UiImageManager {
 	public void loadImages() {
 		myImageContainer.put(IMAGE_ID.WINDOW_ICON, 
 				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "windowIcon.png")));
+		myImageContainer.put(IMAGE_ID.CROSS_DEFAULT, 
+				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossDefault.png")));
+		myImageContainer.put(IMAGE_ID.CROSS_SELECT, 
+				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossSelect.png")));
+		myImageContainer.put(IMAGE_ID.INBOX, 
+				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
 	}
 	
 	public Image getImage(IMAGE_ID id) {

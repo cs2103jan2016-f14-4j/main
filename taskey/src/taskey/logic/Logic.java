@@ -58,9 +58,9 @@ public class Logic {
 			case EXPIRED:
 				targetList = myLists.get(ListsID.EXPIRED.getValue());
 				break;
-			case COMPLETED:
-				targetList = myLists.get(ListsID.COMPLETED.getValue());
-				break;
+			//case COMPLETED:
+			//	targetList = myLists.get(ListsID.COMPLETED.getValue());
+			//	break;
 			case ACTION:
 				targetList = myLists.get(ListsID.ACTION.getValue());
 				break;
@@ -125,7 +125,7 @@ public class Logic {
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				doneList = myLists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
-				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
 				
 			case "DONE_BY_NAME":
@@ -134,7 +134,7 @@ public class Logic {
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
 				doneList = myLists.get(ListsID.COMPLETED.getValue());
 				doneList.add(done);
-				UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
 				break;
 				
 			case "UPDATE_BY_INDEX_CHANGE_NAME":

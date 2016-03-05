@@ -26,7 +26,7 @@ public class UiConstants {
 	
 	// Content Boxes
 	public enum ContentBox {
-		WEEKLY(0), PENDING(1), EXPIRED(2), COMPLETED(3), ACTION(4);
+		THIS_WEEK(0), PENDING(1), EXPIRED(2), ACTION(3), CATEGORY(4);
 		private final int value;
 
 		private ContentBox(int value) {
@@ -40,41 +40,43 @@ public class UiConstants {
 		public static ContentBox fromInteger(int x) {
 			switch (x) {
 			case 0:
-				return WEEKLY;
+				return THIS_WEEK;
 			case 1:
 				return PENDING;
 			case 2:
 				return EXPIRED;
 			case 3:
-				return COMPLETED;
-			case 4:
 				return ACTION;
+			case 4:
+				return CATEGORY;
 			}
 			return null;
 		}
 	}
 	
 	public enum IMAGE_ID {
-		WINDOW_ICON;
+		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, INBOX;
 	}
 	
 	// For action List
-	public enum ActionContentMode {
+	public enum ActionListMode {
 		TASKLIST, HELP_MAIN, HELP_ADD, HELP_DEL;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_WEEKLY = new UiGridSettings(0, 10, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(0, 10, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_THIS_WEEK = new UiGridSettings(0, 10, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_PENDING = new UiGridSettings(10, 15, 7, 7, 63, 30);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 93);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
 
 	// Resources 
 	public static final String UI_IMAGE_PATH_OFFSET = "../images/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	
-	public static final Font UI_DEFAULT_FONT = new Font("Serif",13);
 	// Use of TextFlow for text, setting style of textflow only affects the container
 	// every Text node has to have its own style (with other options besides Color)
+	public static final String STYLE_TEXT_ALL = "textAll";
 	public static final String STYLE_TEXT_RED = "textRed";
 	public static final String STYLE_TEXT_BLACK = "textBlack";
 	public static final String STYLE_TEXT_BLUE = "textBlue";
@@ -88,9 +90,9 @@ public class UiConstants {
 	public static final String STYLE_PROMPT_SELECTED = "prompt-select";
 
 	public static final ArrayList<String> STYLE_UI_DEFAULT = new ArrayList<String>(
-			Arrays.asList("defaultStyle.css", "defaultTab.css", "sharedStyles.css"));
+			Arrays.asList("sharedStyles.css", "defaultStyle.css", "defaultTab.css" ));
 	public static final ArrayList<String> STYLE_UI_LIGHT = new ArrayList<String>(
-			Arrays.asList("lightStyle.css", "lightTab.css", "sharedStyles.css"));
+			Arrays.asList("sharedStyles.css", "lightStyle.css", "lightTab.css" ));
 	
 	// Others
 	public static final int CHAR_LIMIT_WEEKLIST = 10;

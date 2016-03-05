@@ -36,7 +36,7 @@ public class UiClockService extends ScheduledService<Void> {
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
 					public void run() {
-						timeLabelRef.setText(formatTime(cal));
+						//timeLabelRef.setText(formatTime(cal)); (Time will not be in the program for now)
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});
@@ -46,7 +46,7 @@ public class UiClockService extends ScheduledService<Void> {
 		return myTask;
 	}
 
-	public String formatTime(Calendar cal) {
+	private String formatTime(Calendar cal) {
 		String myTime = "";
 		int hour = cal.get(Calendar.HOUR);
 		if (cal.get(Calendar.AM_PM) == 1 && hour == 0) { // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm

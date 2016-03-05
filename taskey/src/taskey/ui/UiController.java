@@ -13,17 +13,23 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.ActionContentMode;
+import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiDropDown;
+import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupFactory;
 import taskey.logic.Logic;
 
@@ -41,24 +47,26 @@ public class UiController {
 	@FXML
 	private TextField input;
 	@FXML
-	private Label textPrompt;
-	@FXML
-	private Label timeLabel;
-	@FXML
 	private Label dateLabel;
 	@FXML
-	private ScrollPane weekPane;
-
+	private StackPane dragBar;
+	@FXML
+	private ScrollPane categoryPane;
+	@FXML
+	private ImageView crossButton;
+	
+	private int mouseX, mouseY;
 	private Stage stage;
+	
+	private UiClockService clockService;
+	private UiDropDown myDropDown;
+	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
-	private UiClockService clockService;
-	private UiContentManager myManager;
-	private UiDropDown myDropDown;
-
+	
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		stage = primaryStage; // set up reference
-		clockService = new UiClockService(timeLabel, dateLabel);
+		clockService = new UiClockService(null, dateLabel);
 		clockService.start();
 		setUpContentBoxes();
 		setUpTabDisplay();
@@ -71,46 +79,52 @@ public class UiController {
 		myDropDown.createMenu(stage, input);
 	}
 
-	public void setUpContentBoxes() {
-		myManager = new UiContentManager(clockService);
-		myManager.setUpContentBox(weekPane, ContentBox.WEEKLY); // add weekly list as first
+	private void setUpContentBoxes() {
+		myContentManager = new UiContentManager(clockService);
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myManager.setUpContentBox(content, ContentBox.fromInteger(i + 1));
+			myContentManager.setUpContentBox(content, ContentBox.fromInteger(i));
 		}
+		myContentManager.setUpContentBox(categoryPane,ContentBox.CATEGORY);
 	}
 
-	public void setUpTabDisplay() {
+	private void setUpTabDisplay() {
 		currentTab = 0;
-		input.requestFocus();
+	//	input.requestFocus();
 		displayTabContents(currentTab);
 	}
 
-	public void registerEventHandlersToNodes(Parent root) {
+	private void registerEventHandlersToNodes(Parent root) {
 		registerInputEventHandler();
 		registerRootEventHandler(root);
+		registerDragHandler();
+		registerButtonHandlers();
 	}
 
 	public void displayTabContents(int tabNo) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(tabNo);
-		currentContent = ContentBox.fromInteger(tabNo+1);
+		currentContent = ContentBox.fromInteger(tabNo);
 	}
 
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
-		myManager.updateContentBox(myTaskList, contentID);
+		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionContentMode mode) {
-		myManager.updateActionContentBox(myTaskList,mode);
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+		myContentManager.updateActionContentBox(myTaskList,mode);
 		currentTab = myTabs.getTabs().size()-1; // focus the tab
-		displayTabContents(currentTab);
+		//displayTabContents(currentTab);
+	}
+	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums) {
+		// TODO Auto-generated method stub
+		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums);
 	}
 
 	public void cleanUp() {
 		clockService.restart();
-		myManager.cleanUp();
+		myContentManager.cleanUp();
 		UiPopupFactory.getInstance().cleanUp();
 	}
 
@@ -118,8 +132,7 @@ public class UiController {
 	 * Sets scene style sheets, input is assumed to be checked before calling
 	 * this method
 	 * 
-	 * @param styleSheets - style sheets to use for the display
-	 *            : ArrayList<String>
+	 * @param styleSheets - style sheets to use for the display as an Array List
 	 */
 	public void setStyleSheets(ArrayList<String> styleSheets) {
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
@@ -134,7 +147,7 @@ public class UiController {
 	}
 
 	/************************************ EVENT HANDLERS  *******************************************/
-	public void registerInputEventHandler() {
+	private void registerInputEventHandler() {
 
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
@@ -144,7 +157,7 @@ public class UiController {
 				}
 				if ( event.getCode().isArrowKey()) {
 	        		  myDropDown.processArrowKey(event);
-	        		  myManager.processArrowKey(event);
+	        		  myContentManager.processArrowKey(event);
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
@@ -172,8 +185,7 @@ public class UiController {
 	        		  }
 	        	  }
 	          };
-	        });
-		
+	        });	
 	}
 
 	/**
@@ -184,7 +196,7 @@ public class UiController {
 	 * 
 	 * @param root - root object of scene
 	 */
-	public void registerRootEventHandler(Parent root) {
+	private void registerRootEventHandler(Parent root) {
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.TAB) {
@@ -200,6 +212,42 @@ public class UiController {
 					}
 				} else if (event.getCode() == KeyCode.BACK_QUOTE) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
+				}
+			}
+		});
+
+	}
+	
+	private void registerDragHandler() {
+		dragBar.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+			    // record X,Y differences
+				mouseX = (int) (stage.getX() - mouseEvent.getScreenX());
+				mouseY = (int) (stage.getY() - mouseEvent.getScreenY());
+		  }
+		});
+		dragBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			  @Override public void handle(MouseEvent mouseEvent) {
+			  	stage.setX(mouseEvent.getScreenX() + mouseX);
+			    stage.setY(mouseEvent.getScreenY() + mouseY);
+			  }
+		});
+	}
+	
+	private void registerButtonHandlers() {
+		crossButton.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_SELECT));
+		  }
+		});
+		
+		crossButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				// 1st level intersect
+				if ( mouseEvent.getPickResult().getIntersectedNode() == crossButton) {
+					System.exit(0);
+				} else {
+					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
 				}
 			}
 		});

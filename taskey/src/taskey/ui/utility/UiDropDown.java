@@ -76,7 +76,7 @@ public class UiDropDown {
 		}
 	}
 
-	public void ShiftMenu(String line) {
+	private void ShiftMenu(String line) {
 		double width = getWidthOfTextFieldInput(myInput);
 		Bounds screenBounds = UiPopupFactory.getInstance().getScreenBoundsOfNode(myInput);
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
@@ -89,7 +89,7 @@ public class UiDropDown {
 	 * @param field - TextField to approximate from
 	 * @return width
 	 */
-	public double getWidthOfTextFieldInput(TextField field) {
+	private double getWidthOfTextFieldInput(TextField field) {
 		Text text = new Text(field.getText());
 		text.setFont(field.getFont()); // Set the same font, so the size is the same
 		double width = text.getLayoutBounds().getWidth();
@@ -113,7 +113,7 @@ public class UiDropDown {
 	 * The popup window has some tears, probably because it renders separately from the main program
 	 * This fixes that issue, and also sets opacity full for display
 	 */
-	public void refresh() {
+	private void refresh() {
 		myMenu.hide();
 		fade.stop();
 		fade.getNode().setOpacity(1);
@@ -121,7 +121,7 @@ public class UiDropDown {
 		myMenu.show(myWindow);
 	}
 	
-	public void select(int selection) {
+	private void select(int selection) {
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		StackPane myPane;
 	

@@ -13,13 +13,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
-import taskey.logic.Task;
+import taskey.logic.Task;	
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
-import taskey.ui.content.formatters.UiWeekFormatter;
 import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiGridSettings;
@@ -48,12 +47,6 @@ public class UiContentManager {
 		assert(pane != null);
 		UiFormatter myFormatter;
 		switch (contentID) {
-		case THIS_WEEK:
-			myFormatter = new UiWeekFormatter(setUpGrid(UiConstants.GRID_SETTINGS_THIS_WEEK),clockService);	
-			break;
-		case PENDING:
-			myFormatter = new UiDefaultFormatter(setUpGrid(UiConstants.GRID_SETTINGS_PENDING), clockService);
-			break;
 		case ACTION:
 			myFormatter = new UiActionFormatter(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_LISTVIEW),clockService);
 			myFormatter.addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELPVIEW)); // additional grid

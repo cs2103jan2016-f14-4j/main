@@ -2,19 +2,22 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
+import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.utility.UiClockService;
+import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
-
-	private String theDate = ""; // temporary until the parameters are separated in task object
 	
 	public UiDefaultFormatter(GridPane _gridPane, UiClockService _clockService) {
 		super(_gridPane, _clockService);
@@ -25,56 +28,50 @@ public class UiDefaultFormatter extends UiFormatter {
 		assert(myTaskList != null);
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
-			theDate = "";
-			// Add Task number
-			addTaskID(theTask, 0, i);
-			// Add Task Name / Time
-			addTaskName(theTask, 1, i);
-			// Add Task Date
-			addTaskDate(theTask, 2, i);
+			addTaskDescription(theTask,  i);
+			addTaskID(theTask, i);	
+			addImage(theTask,  i);
 		}
 	}
 
-	private void addTaskID(Task theTask, int col, int row) {
+	private void addTaskDescription(Task theTask, int row) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
-		String line = "" + (row + 1);
-		element.getChildren().addAll(myConfig.build(line));
-		createStyledCell(col, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
-		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
-	}
-
-	private void addTaskName(Task theTask, int col, int row) {
-		assert(theTask != null);
-		UiTextBuilder myConfig = new UiTextBuilder();
-		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK);
-		String line = theTask.getTaskName();
-		theDate = "";
+		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		String line = "";
+		line += "NAME: "; 
+		line += theTask.getTaskName() + "\n";
+		line += "DUE: ";
 		if (theTask.getDeadline().length() != 0 ) {
-			String[] params = theTask.getDeadline().split(" ");
-			theDate = params[0] + params[1] + params[2];
+			line += " (" + theTask.getDeadline() + ")";
+		} else {
+			line += "---------";
 		}
+		line += "\n\n";
+		line += "TAGS: ";
 		element.getChildren().addAll(myConfig.build(line));
-		addTextFlowToCell(col, row, element,TextAlignment.LEFT, currentGrid);
+		addTextFlowToCell(0, row, element,TextAlignment.LEFT, currentGrid);
 	}
-
-	private void addTaskDate(Task theTask, int col, int row) {
+	
+	private void addTaskID(Task theTask, int row) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
+		element = new TextFlow();
+		element.getChildren().addAll(myConfig.build("ID: -1"));
 		
-		String line;
-		if (theDate.length() == 0) {
-			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
-			line = "------";
-		} else {
-			myConfig.addMarker(0, UiConstants.STYLE_TEXT_RED);
-			line = theDate;
-		}
-		element.getChildren().addAll(myConfig.build(line));
-		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
+		StackPane ID_Wrapper = createStackPaneInCell(0, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
+		ID_Wrapper.getChildren().add(element);
+		GridPane.setValignment(ID_Wrapper, VPos.TOP);
+		GridPane.setHalignment(ID_Wrapper, HPos.RIGHT);
+	}
+	
+	private void addImage(Task theTask, int row) { 
+		StackPane ImageWrapper = addImageToCell(0,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
+				30,30,currentGrid);
+		GridPane.setValignment(ImageWrapper, VPos.CENTER);
+		GridPane.setHalignment(ImageWrapper, HPos.CENTER);
+		ImageWrapper.setTranslateX(50);
 	}
 }

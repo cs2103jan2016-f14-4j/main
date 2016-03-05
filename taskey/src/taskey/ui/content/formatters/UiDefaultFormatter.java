@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
@@ -8,8 +8,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
+import taskey.ui.content.UiFormatter;
 import taskey.ui.utility.UiClockService;
-import taskey.ui.utility.UiTextConfig;
+import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
 
@@ -21,6 +22,7 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
+		assert(myTaskList != null);
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
 			theDate = "";
@@ -34,17 +36,19 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 
 	private void addTaskID(Task theTask, int col, int row) {
-		UiTextConfig myConfig = new UiTextConfig();
+		assert(theTask != null);
+		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (row + 1);
-		element.getChildren().addAll(myConfig.format(line));
+		element.getChildren().addAll(myConfig.build(line));
 		createStyledCell(col, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
 		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
-		UiTextConfig myConfig = new UiTextConfig();
+		assert(theTask != null);
+		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK);
 		String line = theTask.getTaskName();
@@ -53,12 +57,13 @@ public class UiDefaultFormatter extends UiFormatter {
 			String[] params = theTask.getDeadline().split(" ");
 			theDate = params[0] + params[1] + params[2];
 		}
-		element.getChildren().addAll(myConfig.format(line));
+		element.getChildren().addAll(myConfig.build(line));
 		addTextFlowToCell(col, row, element,TextAlignment.LEFT, currentGrid);
 	}
 
 	private void addTaskDate(Task theTask, int col, int row) {
-		UiTextConfig myConfig = new UiTextConfig();
+		assert(theTask != null);
+		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		
 		String line;
@@ -69,7 +74,7 @@ public class UiDefaultFormatter extends UiFormatter {
 			myConfig.addMarker(0, UiConstants.STYLE_TEXT_RED);
 			line = theDate;
 		}
-		element.getChildren().addAll(myConfig.format(line));
+		element.getChildren().addAll(myConfig.build(line));
 		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 }

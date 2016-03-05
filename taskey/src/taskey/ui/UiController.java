@@ -3,7 +3,9 @@ package taskey.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -19,6 +21,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -27,10 +30,10 @@ import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.content.UiContentManager;
+import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiClockService;
-import taskey.ui.utility.UiDropDown;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiPopupFactory;
+import taskey.ui.utility.UiPopupManager;
 import taskey.logic.Logic;
 
 /**
@@ -65,6 +68,8 @@ public class UiController {
 	private ContentBox currentContent;
 	
 	public void setUpNodes(Stage primaryStage, Parent root) {
+		assert(primaryStage != null);
+		assert(root != null);
 		stage = primaryStage; // set up reference
 		clockService = new UiClockService(null, dateLabel);
 		clockService.start();
@@ -76,10 +81,12 @@ public class UiController {
 
 	// nodes or classes that need layout bounds are initialized here
 	public void setUpNodesWhichNeedBounds() {
+		assert(myDropDown != null);
 		myDropDown.createMenu(stage, input);
 	}
 
 	private void setUpContentBoxes() {
+		assert(myTabs != null);
 		myContentManager = new UiContentManager(clockService);
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
@@ -103,29 +110,33 @@ public class UiController {
 	}
 
 	public void displayTabContents(int tabNo) {
+		assert(tabNo >= 0 && tabNo < myTabs.getTabs().size());
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(tabNo);
 		currentContent = ContentBox.fromInteger(tabNo);
 	}
 
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
 	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 		currentTab = myTabs.getTabs().size()-1; // focus the tab
 		//displayTabContents(currentTab);
 	}
-	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums) {
-		// TODO Auto-generated method stub
-		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums);
+	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		assert(myCategoryList != null);
+		assert(categoryNums != null);
+		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums,categoryColors);
 	}
 
 	public void cleanUp() {
 		clockService.restart();
 		myContentManager.cleanUp();
-		UiPopupFactory.getInstance().cleanUp();
+		UiPopupManager.getInstance().cleanUp();
 	}
 
 	/**
@@ -135,6 +146,7 @@ public class UiController {
 	 * @param styleSheets - style sheets to use for the display as an Array List
 	 */
 	public void setStyleSheets(ArrayList<String> styleSheets) {
+		assert(styleSheets != null);
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
 		myStyleSheets.clear();
 		try {
@@ -148,7 +160,7 @@ public class UiController {
 
 	/************************************ EVENT HANDLERS  *******************************************/
 	private void registerInputEventHandler() {
-
+		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
 				if ( event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
@@ -164,11 +176,9 @@ public class UiController {
 					input.clear();
 
 					int statusCode = 0;
-					statusCode = Logic.getInstance().executeCommand(currentContent,line);
+					//statusCode = Logic.getInstance().executeCommand(currentContent,line);
 					
-					Popup newPopup = UiPopupFactory.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight());
-					UiPopupFactory.getInstance().createFadeTransition(newPopup, 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0, true).play();
-
+					UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
 					event.consume();
 
 					myDropDown.closeMenu();
@@ -219,6 +229,7 @@ public class UiController {
 	}
 	
 	private void registerDragHandler() {
+		assert(dragBar != null);
 		dragBar.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 			    // record X,Y differences
@@ -235,6 +246,7 @@ public class UiController {
 	}
 	
 	private void registerButtonHandlers() {
+		assert(crossButton != null);
 		crossButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 				crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_SELECT));

@@ -21,6 +21,7 @@ public class UiClockService extends ScheduledService<Void> {
 	private Label dateLabelRef;
 
 	public UiClockService(Label timeLabel, Label dateLabel) {
+		assert(dateLabel != null);
 		timeLabelRef = timeLabel;
 		dateLabelRef = dateLabel;
 		this.setDelay(new Duration(0));

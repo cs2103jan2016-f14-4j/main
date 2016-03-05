@@ -10,7 +10,7 @@ import taskey.ui.utility.UiGridSettings;
 
 /**
  * 
- * Temporary file to be merged with Constants .java
+ * Temporary file to be merged with Constants package
  * 
  * @author JunWei
  *

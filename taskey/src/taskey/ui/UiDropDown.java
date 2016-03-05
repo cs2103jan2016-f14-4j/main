@@ -1,4 +1,4 @@
-package taskey.ui.utility;
+package taskey.ui;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import taskey.ui.UiConstants;
+import taskey.ui.utility.UiAnimationManager;
+import taskey.ui.utility.UiPopupManager;
 
 public class UiDropDown {
 	private static final int MAX_ITEMS = 4;
@@ -31,9 +32,11 @@ public class UiDropDown {
 	private int currentItemSize;
 	
 	public void createMenu(Stage primaryStage, TextField input) {
+		assert(input != null);
+		assert(primaryStage != null);
 		myInput = input; // set up reference
-		myMenu = UiPopupFactory.getInstance().createPopupMenu(MAX_ITEMS);
-		fade = UiPopupFactory.getInstance().createFadeTransition(myMenu, 5000, 1000, 1.0, 0.0, false);
+		myMenu = UiPopupManager.getInstance().createPopupMenu(MAX_ITEMS);
+		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 5000, 1000, 1.0, 0.0);
 		// create custom handler
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
@@ -46,6 +49,7 @@ public class UiDropDown {
 	}
 
 	public void updateMenuItems(ArrayList<String> items) {
+		assert(items != null);
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
 		for (int i = 0; i < menuItems.size(); i++) {
@@ -71,14 +75,15 @@ public class UiDropDown {
 		if (line.equals("")) {
 			closeMenu();
 		} else {
-			ShiftMenu(line);
+			ShiftMenu();
 			refresh();  // fix display issues
 		}
 	}
 
-	private void ShiftMenu(String line) {
+	private void ShiftMenu() {
+		assert(myInput != null);
 		double width = getWidthOfTextFieldInput(myInput);
-		Bounds screenBounds = UiPopupFactory.getInstance().getScreenBoundsOfNode(myInput);
+		Bounds screenBounds = UiPopupManager.getInstance().getScreenBoundsOfNode(myInput);
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
 		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight());
 	}
@@ -90,6 +95,7 @@ public class UiDropDown {
 	 * @return width
 	 */
 	private double getWidthOfTextFieldInput(TextField field) {
+		assert(field != null);
 		Text text = new Text(field.getText());
 		text.setFont(field.getFont()); // Set the same font, so the size is the same
 		double width = text.getLayoutBounds().getWidth();
@@ -97,6 +103,7 @@ public class UiDropDown {
 
 	}
 	public String getSelectedItem() {
+		assert(myMenu.getContent().get(0) != null);
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		StackPane myPane = (StackPane) menuItems.get(currentSelection);
 		Label content = (Label)myPane.getChildren().get(0);
@@ -104,6 +111,7 @@ public class UiDropDown {
 	}
 
 	public void closeMenu() {
+		assert(myMenu != null);
 		myMenu.hide();
 		currentItemSize = 0;
 	}
@@ -114,6 +122,8 @@ public class UiDropDown {
 	 * This fixes that issue, and also sets opacity full for display
 	 */
 	private void refresh() {
+		assert(myMenu != null);
+		assert(fade != null);
 		myMenu.hide();
 		fade.stop();
 		fade.getNode().setOpacity(1);
@@ -122,6 +132,8 @@ public class UiDropDown {
 	}
 	
 	private void select(int selection) {
+		assert(selection >= 0 && selection < MAX_ITEMS);
+		assert(myMenu.getContent().get(0) != null);
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		StackPane myPane;
 	
@@ -138,6 +150,7 @@ public class UiDropDown {
 		refresh();	
 	}
 	public void processArrowKey(KeyEvent event) {
+		assert(event != null);
 		if ( currentItemSize == 0 ) {
 			return;
 		}

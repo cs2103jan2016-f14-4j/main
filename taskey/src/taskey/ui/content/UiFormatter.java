@@ -44,15 +44,19 @@ public abstract class UiFormatter {
 	}
 	
 	public void setGrid(int index) {
+		assert(index >= 0 && index < myGrids.size());
 		currentGrid = myGrids.get(index);
 	}
 	public void addGrid(GridPane newGrid) {
+		assert(newGrid != null);
 		myGrids.add(newGrid);
 	}
 	public GridPane getGrid() {
+		assert(currentGrid != null);
 		return currentGrid;
 	}
 	public void clearGridContents() {
+		assert(currentGrid != null);
 		Node node = null;
 		if (currentGrid.isGridLinesVisible()) {
 			node = currentGrid.getChildren().get(0); // retain grid lines
@@ -69,6 +73,7 @@ public abstract class UiFormatter {
 	}
 	
 	protected StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
+		assert(gridPane != null);
 		StackPane styledCell = new StackPane();
 		styledCell.getStyleClass().add(cellStyle);
 		gridPane.add(styledCell, col, row);
@@ -76,6 +81,7 @@ public abstract class UiFormatter {
 	}
 	
 	protected StackPane getWrapperAtCell(int col, int row, GridPane gridPane ) {
+		assert(gridPane != null);
 		Node theNode = null;
 		ObservableList<Node> childrens = gridPane.getChildren();
 		for(int i = 0; i < childrens.size(); i ++ ) {
@@ -95,17 +101,21 @@ public abstract class UiFormatter {
 		return (StackPane)theNode;
 	}
 	protected void addTextFlowToCell(int col, int row, TextFlow textFlow, TextAlignment align, GridPane gridPane ) {
+		assert(gridPane != null);
+		assert(textFlow != null);
 		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		cellWrapper.getChildren().add(textFlow);
 		textFlow.setTextAlignment(align);	
 	}
 	protected void addCircleToCell(int col, int row, Circle circle, GridPane gridPane) {
+		assert(gridPane != null);
 		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		cellWrapper.getChildren().add(circle);
 	}
 	
 	// Wraps image to be placed anywhere in cell
 	protected StackPane addImageToCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
+		assert(gridPane != null);
 		StackPane imageWrapper = createStackPaneInCell(col,row,"",gridPane);
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(width);
@@ -116,6 +126,7 @@ public abstract class UiFormatter {
 	
 	// Such that the stackpane does not stretch with cell size
 	protected StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
+		assert(gridPane != null);
 		StackPane pane = new StackPane();
 		pane.getStyleClass().add(paneStyle);
 		GridPane.setFillHeight(pane, false);

@@ -21,7 +21,7 @@ public class Storage {
 	private File directory;
 
 	static final String DEFAULT_DIRECTORY = "Taskey savefiles";
-	static final String FILENAME_CONFIG = "[Taskey_config] last-used directory";
+	static final String FILENAME_CONFIG = "last-used directory.taskey_config";
 	static final String FILENAME_TAGS = "TAGS";
 
 	/**

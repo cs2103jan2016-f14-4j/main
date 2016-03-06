@@ -64,8 +64,6 @@ public class UiConstants {
 	}
 
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(0, 10, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_THIS_WEEK = new UiGridSettings(0, 10, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_PENDING = new UiGridSettings(10, 15, 7, 7, 63, 30);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 93);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);

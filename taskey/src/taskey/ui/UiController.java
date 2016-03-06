@@ -130,6 +130,7 @@ public class UiController {
 	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);
+		assert(categoryColors != null);
 		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums,categoryColors);
 	}
 

@@ -1,20 +1,14 @@
 package taskey.parser;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import taskey.logic.Task;
 
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 

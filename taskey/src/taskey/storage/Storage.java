@@ -83,7 +83,7 @@ public class Storage {
     		if (instance.loadDirectory() == false) {
         		instance.setDirectory(DEFAULT_DIRECTORY);
     		} else {
-    			instance.setDirectory(instance.directory.getPath());
+    			instance.setDirectory(instance.directory.getPath()); //need to explicitly set directory after loading it
     		}
     	}
     	return instance;
@@ -192,7 +192,7 @@ public class Storage {
 		if (dir.isDirectory()) {
 			boolean shouldSave = isNewDirectory(dir);
 			directory = dir;
-			System.out.println("{Storage directory set} " + getDirectory());
+			System.out.println("{Storage directory set} " + getDirectory()); //debug info
 			if (shouldSave) {
 	    		saveDirectory();
 	    	}
@@ -209,7 +209,7 @@ public class Storage {
      * @return true if dir is a new directory; false otherwise.
      */
     private boolean isNewDirectory(File dir) {
-    	// Disregard dir if it is the default directory
+    	// Disregard dir if it's the default directory
     	if (!dir.getAbsolutePath().equals( new File(DEFAULT_DIRECTORY).getAbsolutePath() )) {
     		// If directory hasn't been set
     		if (directory == null) {
@@ -235,7 +235,7 @@ public class Storage {
     	File config = new File(FILENAME_CONFIG);
     	try {
     		writeToFile(config, directory, new TypeToken<File>() {});
-    		System.out.println("{Storage directory saved}");
+    		System.out.println("{Storage directory saved}"); //debug info
     		return true;
     	} catch (IOException e) {
     		e.printStackTrace();
@@ -251,10 +251,10 @@ public class Storage {
     	File config = new File(FILENAME_CONFIG);
     	try {
     		directory = readFromFile(config, new TypeToken<File>() {});
-    		System.out.println("{Storage directory loaded}");
+    		System.out.println("{Storage directory loaded}"); //debug info
     		return true;
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Storage config file not found; setting default directory}");
+    		System.out.println("{Storage config file not found; setting default directory}"); //debug info
     		return false;
     	}
     }
@@ -284,14 +284,17 @@ public class Storage {
     	File file = new File(directory, filename);
     	try {
     		writeToFile(file, tags, new TypeToken<UserTagDatabase>() {});
+    		System.out.println("{UserTagDatabase saved}"); //debug info
     		return true;
     	} catch (IOException e) {
+    		e.printStackTrace();
     		return false;
     	}
     }
 
     /**
      * Returns the UserTagDatabase read from JSON file.
+     * An empty UserTagDatabase is returned if file was not found.
      * Auxiliary method.
      * @return UserTagDatabase
      */
@@ -302,7 +305,7 @@ public class Storage {
     /**
      * Returns the UserTagDatabase read from the JSON file specified by filename.
      * This method is provided in case Logic/Parser wants to specify the filename.
-     * @param filename name of the JSON file
+     * @param filename name of the JSON file to be read
      * @return the UserTagDatabase read from file; or an empty UserTagDatabase if file was not found.
      */
     public UserTagDatabase loadTags(String filename) {
@@ -310,7 +313,9 @@ public class Storage {
     	UserTagDatabase tags;
     	try {
     		tags = readFromFile(file, new TypeToken<UserTagDatabase>() {});
+    		System.out.println("{UserTagDatabase loaded}"); //debug info
     	} catch (FileNotFoundException e) {
+    		System.out.println("{UserTagDatabase file not found}"); //debug info
     		tags = new UserTagDatabase();
     	}
     	return tags;

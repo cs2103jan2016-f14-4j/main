@@ -6,12 +6,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.logic.Task;
-import taskey.parser.UserTagDatabase;
 
 /**
  * @author Dylan
@@ -20,9 +20,9 @@ public class Storage {
 	private static Storage instance = null;
 	private File directory;
 
-	static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
-	static final String FILENAME_CONFIG = "Taskey_Storage last used directory";
-	static final String FILENAME_TAGS = "user tags";
+	static final String DEFAULT_DIRECTORY = "Taskey savefiles";
+	static final String FILENAME_CONFIG = "[Taskey_config] last-used directory";
+	static final String FILENAME_TAGS = "TAGS";
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
@@ -43,9 +43,9 @@ public class Storage {
 			System.out.println(t);
 		}
 
-		// Initialize - tags
-		UserTagDatabase loadedTags = storageTest.loadTags();
-		System.out.print("" + loadedTags.hasTag("foo") + loadedTags.hasTag("bar") + loadedTags.hasTag("foobar"));
+		// Initialize - tags hashmap
+		HashMap<String, Integer> loadedTags = storageTest.loadTags();
+		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 
 		// Load after save - tasklist
 		System.out.println("\n\nLoad after save ===================================");
@@ -59,12 +59,12 @@ public class Storage {
 			System.out.println(t);
 		}
 
-		// Load after save - tags
-		UserTagDatabase tags = new UserTagDatabase();
-		tags.addTag("foo"); tags.addTag("bar"); tags.addTag("foobar");
+		// Load after save - tags hashmap
+		HashMap<String, Integer> tags = new HashMap<String, Integer>();
+		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
 		storageTest.saveTags(tags);
 		loadedTags = storageTest.loadTags();
-		System.out.print("" + loadedTags.hasTag("foo") + loadedTags.hasTag("bar") + loadedTags.hasTag("foobar"));
+		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 	}
 
     /*=============*
@@ -123,7 +123,7 @@ public class Storage {
     private <T> T readFromFile(File file, TypeToken<T> typeToken) throws FileNotFoundException {
     	FileReader reader = new FileReader(file);
     	Gson gson = new Gson();
-		T object = gson.fromJson(reader, typeToken.getType());
+		T object = gson.fromJson(reader, typeToken.getType()); //TODO Handle type safety
 		return object;
     }
 
@@ -173,7 +173,7 @@ public class Storage {
      * @return Absolute path of the default or user-set directory.
      */
     public String getDirectory() {
-    	return directory.getPath();
+    	return directory.getAbsolutePath();
     }
 
     /**
@@ -264,27 +264,14 @@ public class Storage {
      *================*/
 
     /**
-     * Saves the given UserTagDatabase object to JSON file.
-     * Auxiliary method.
-     * @param tags the UserTagDatabase
+     * Saves the given HashMap containing user-defined tags to JSON file.
+     * @param tags HashMap that maps the tag strings to their corresponding multiplicities
      * @return true if successful; false otherwise.
      */
-    public boolean saveTags(UserTagDatabase tags) {
-    	return saveTags(tags, FILENAME_TAGS);
-    }
-
-    /**
-     * Saves the given UserTagDatabase object to a JSON file with the specified filename.
-     * This method is provided in case Logic/Parser wants to specify the filename.
-     * @param tags the UserTagDatabase
-     * @param filename name of the file to be saved
-     * @return true if successful; false otherwise.
-     */
-    public boolean saveTags(UserTagDatabase tags, String filename) {
-    	File file = new File(directory, filename);
+    public boolean saveTags(HashMap<String, Integer> tags) {
+    	File file = new File(directory, FILENAME_TAGS);
     	try {
-    		writeToFile(file, tags, new TypeToken<UserTagDatabase>() {});
-    		System.out.println("{UserTagDatabase saved}"); //debug info
+    		writeToFile(file, tags, new TypeToken<HashMap<String, Integer>>() {});
     		return true;
     	} catch (IOException e) {
     		e.printStackTrace();
@@ -293,30 +280,19 @@ public class Storage {
     }
 
     /**
-     * Returns the UserTagDatabase read from JSON file.
-     * An empty UserTagDatabase is returned if file was not found.
-     * Auxiliary method.
-     * @return UserTagDatabase
+     * Returns the HashMap containing user-defined tags read from JSON file.
+     * An empty HashMap is returned if the tags file was not found.
+     * @return the HashMap read from file, or an empty HashMap if the file was not found.
      */
-    public UserTagDatabase loadTags() {
-    	return loadTags(FILENAME_TAGS);
-    }
-
-    /**
-     * Returns the UserTagDatabase read from the JSON file specified by filename.
-     * This method is provided in case Logic/Parser wants to specify the filename.
-     * @param filename name of the JSON file to be read
-     * @return the UserTagDatabase read from file; or an empty UserTagDatabase if file was not found.
-     */
-    public UserTagDatabase loadTags(String filename) {
-    	File file = new File(directory, filename);
-    	UserTagDatabase tags;
+    public HashMap<String, Integer> loadTags() {
+    	File file = new File(directory, FILENAME_TAGS);
+    	HashMap<String, Integer> tags;
     	try {
-    		tags = readFromFile(file, new TypeToken<UserTagDatabase>() {});
-    		System.out.println("{UserTagDatabase loaded}"); //debug info
+    		tags = readFromFile(file, new TypeToken<HashMap<String, Integer>>() {});
+    		System.out.println("{UserTagDatabase loaded} " + FILENAME_TAGS); //debug info
     	} catch (FileNotFoundException e) {
-    		System.out.println("{UserTagDatabase file not found}"); //debug info
-    		tags = new UserTagDatabase();
+    		System.out.println("{UserTagDatabase not found} " + FILENAME_TAGS); //debug info
+    		tags = new HashMap<String, Integer>();
     	}
     	return tags;
     }

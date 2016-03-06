@@ -1,5 +1,10 @@
 package taskey.constants;
 
+/**
+ * Constants for usage by the Parser package
+ * @author Xue Hui
+ *
+ */
 public class ParserConstants {
 	public static final String DELETE_BY_INDEX = "DELETE_BY_INDEX"; 
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
@@ -9,6 +14,7 @@ public class ParserConstants {
 	public static final String UPDATE_BY_INDEX_CHANGE_DATE = "UPDATE_BY_INDEX_CHANGE_DATE"; 
 	public static final String UPDATE_BY_NAME_CHANGE_NAME = "UPDATE_BY_NAME_CHANGE_NAME";
 	public static final String UPDATE_BY_NAME_CHANGE_DATE = "UPDATE_BY_NAME_CHANGE_DATE";
+	public static final String NEW_FILE_LOC = "CHANGE_FILE_LOC"; 
 	
 	/* Errors */ 
 	public static final String ERROR_DATE_FORMAT = "Wrong date format"; 

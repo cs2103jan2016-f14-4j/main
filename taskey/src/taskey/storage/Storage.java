@@ -13,200 +13,215 @@ import com.google.gson.reflect.TypeToken;
 import taskey.logic.Task;
 
 /**
- * 
  * @author Dylan
- *
  */
 public class Storage {
-	public static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
-	
+	static final String DEFAULT_DIRECTORY = "bin" + File.separator + "taskey" + File.separator + "storage";
+	static final String CONFIG_FILENAME = "Taskey_Storage_config_file";
+
 	private static Storage instance = null;
-	private static File directory = new File(DEFAULT_DIRECTORY);
-	private static File savefile;
-	
+	private File directory;
+	private File savefile; //pointer to the current file under operation
+
 	/**
-	 * For testing of the Storage class. This is how Logic will interface with Storage.  
+	 * For testing of the Storage class. This is how Logic will interface with Storage.
 	 * @param args
 	 */
 	public static void main(String args[]) {
 		// Get the Storage singleton instance
-		Storage storageTest = Storage.getInstance();
-		
 		// The default directory was automatically set in the getInstance() method.
-		// Can optionally set the directory again, if requested by user.
-		System.out.println(getDirectory());
+		Storage storageTest = Storage.getInstance();
 
-		// Create a simulated list of tasks
+		// Can optionally set the directory again, if requested by user.
+		// Examples of invalid paths in Windows
+		//System.out.println(storageTest.setDirectory("CON"));
+		//System.out.println(storageTest.setDirectory("foo|bar"));
+		//storageTest.setDirectory(DEFAULT_DIRECTORY + "\\fubar");
+
+		// Initial load
+		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
+		for (Task t : loadedTaskList) {
+			System.out.println(t);
+		}
+
+		// Create a simulated list of tasks and save it to file
 		ArrayList<Task> testTaskList = new ArrayList<Task>();
 		testTaskList.add(new Task("1. This is a test task"));
 		testTaskList.add(new Task("2. This is a test task"));
 		testTaskList.add(new Task("3. This is a test task"));
-		
-		// Save the task list to file, specifying the list's name
 		try {
 			storageTest.saveTaskList(testTaskList, "TEST_TASKLIST");
 		} catch (IOException e) {
 			System.err.println("Error saving task list to file.");
 			e.printStackTrace();
 		}
-		
-		// Attempt to load from an empty directory (file not found)
-		storageTest.setDirectory(DEFAULT_DIRECTORY + "/foo");
-		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
-		for (Task t : loadedTaskList) {
-			System.out.println(t);
-		}
 
-		// Change back to the default directory
-		storageTest.setDirectory(DEFAULT_DIRECTORY);
+		// Load after save
 		loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
 		for (Task t : loadedTaskList) {
 			System.out.println(t);
 		}
 	}
-	
+
     /*=============*
      * Constructor *
      *=============*/
-	
+
 	/**
-	 * Returns the single instance of storage.
-	 * Also sets the default directory after creating the storage singleton.
-	 * @return storage singleton
+	 * Returns the Storage singleton.
+	 * Also sets the default directory after Storage is newly instantiated.
+	 * @return The storage singleton.
 	 */
     public static Storage getInstance() {
     	if (instance == null) {
     		instance = new Storage();
-    		instance.setDirectory(DEFAULT_DIRECTORY);
+    		if (instance.loadDirectory() == false) {
+        		instance.setDirectory(DEFAULT_DIRECTORY);
+    		}
     	}
     	return instance;
     }
-    
-    /*=====================*
-     * Save/load task list *
-     *=====================*/
-    
+
+    /*================*
+     * Load task list *
+     *================*/
+
     /**
-     * Logic passes a task list to Storage for saving.
-     * @param tasks The list of task objects for saving.
-     * @param taskCategory The category that the task list belongs to.
-     * 					   i.e. ALL, FLOATING, DEADLINE, EVENT, DONE, EXPIRED
-     * @throws IOException
+     * Returns an ArrayList of Task objects read from the file specified by the given filename String.
+     * An empty ArrayList is returned if the file was not found.
+     * This method is invoked by Logic.
+     * @param filename name of the file to be read
+     * @return The task list loaded from file; or an empty list if the file does not exist.
      */
-    public void saveTaskList(ArrayList<Task> tasks, String taskCategory) throws IOException {
-		setSavefile(taskCategory);
-    	writeToFile(tasks);
-    	//TODO When exception is encountered during write, return/throw the last-modified list to Logic
-    }
-    
-    /**
-     * Logic gets a task list from Storage.
-     * @param taskCategory The category of tasks that Logic wants to load.
-     * @return The task list loaded from file, specified by taskCategory;
-     * 			an empty list is returned if file is not found.
-     */
-    public ArrayList<Task> getTaskList(String taskCategory) {
-    	setSavefile(taskCategory);
+    public ArrayList<Task> getTaskList(String filename) {
+    	setSavefile(filename);
     	ArrayList<Task> tasks;
 		try {
-			tasks = readFromFile();
+			tasks = readFromFile( new TypeToken<ArrayList<Task>>(){} );
+			System.out.println("<Loaded> " + savefile.getPath());
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			//System.out.println(e.getMessage());
 			tasks = new ArrayList<Task>();
 		}
     	return tasks;
     }
-    
-    /*===========================*
-     * Public accessors/mutators *
-     *===========================*/
-    
+
     /**
-     * When the user changes directory, Logic can return it as feedback.
-     * @return Absolute path of the last saved/loaded file.
+     * Private method. Reads tasks from JSON file.
+     * @return ArrayList of Task objects generated from the JSON file.
+     * @throws FileNotFoundException
      */
-    public static String getDirectory() {
-    	return directory.getAbsolutePath();
+    private <T> T readFromFile(TypeToken<T> typeToken) throws FileNotFoundException {
+    	Gson gson = new Gson();
+    	FileReader reader = new FileReader(savefile);
+		T object = gson.fromJson(reader, typeToken.getType());
+		return object;
     }
-    
+
+    /*================*
+     * Save task list *
+     *================*/
+
     /**
-     * Logic can set the storage directory, if the user requests to change it.
-     * @return True if directory now exists and is indeed a directory; 
-     * 		   false if directory name is invalid (previous directory remains unchanged).
-     * @param pathname (can be a relative or absolute path)
+     * Saves an ArrayList of Task objects to the file specified by the given filename String.
+     * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
+     * This method is invoked by Logic.
+     * @param tasks list of Task objects for saving
+     * @param filename name the file will be saved as
+     * @throws IOException
+     */
+    public void saveTaskList(ArrayList<Task> tasks, String filename) throws IOException {
+		setSavefile(filename);
+    	writeToFile(tasks);
+    	//TODO When exception is encountered during write-after-modified, return/throw the last-modified list to Logic
+    }
+
+    /**
+     * Private method. Writes an Object to JSON file.
+     * @param object to be written as a JSON file.
+     * @throws IOException
+     */
+    private <T> void writeToFile(T object) throws IOException {
+    	Gson gson = new Gson();
+    	String json = gson.toJson(object);
+    	FileWriter writer = new FileWriter(savefile);
+    	writer.write(json);
+    	writer.close();
+    }
+
+    /*=============*
+     * Directories *
+     *=============*/
+
+    /**
+     * Returns the current storage directory.
+     * When the user asks to change directory, Logic can return it as feedback.
+     * @return Absolute path of the default or user-set directory.
+     */
+    public String getDirectory() {
+    	return directory.getPath();
+    }
+
+    /**
+     * Sets the storage directory given by the pathname string.
+     * This method is invoked by Logic, should the end user request to change it.
+     * @return True if the directory already exists or was just created;
+     * 		   false if directory name is invalid (directory remains unchanged).
+     * @param pathname can be a relative or absolute path
      */
     public boolean setDirectory(String pathname) {
     	File dir = new File(pathname);
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
-		
+
 		if (dir.isDirectory()) {
 			directory = dir;
-			if (savefile != null) { //check for when setDirectory is called before setSavefile
-				setSavefile(savefile.getName()); //need to update savefile after changing directory
-			}
+			System.out.println("<Storage directory set> " + getDirectory());
+	    	if (!pathname.equals(DEFAULT_DIRECTORY)) {
+	    		saveDirectory();
+	    	}
 			return true;
 		} else {
 			return false;
 		}
     }
-    
-    /*=================*
-     * Private methods *
-     *=================*/
-    
+
     /**
-     * Storage will set the filename according to which tasklist is being updated, before each read/write operation.
-     * @param filename
-     * @return true if the savefile's name and path has been updated; false if the filename is invalid
+     * Private method. Saves the current directory to file.
+     * @return true if save was succesful; false otherwise.
      */
-    private boolean setSavefile(String filename) {
+    private boolean saveDirectory() {
+    	savefile = new File(System.getProperty("user.dir"), CONFIG_FILENAME);
+    	try {
+    		writeToFile(directory);
+    		System.out.println("<Storage directory saved>");
+    		return true;
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
+
+    private boolean loadDirectory() {
+    	savefile = new File(System.getProperty("user.dir"), CONFIG_FILENAME);
+    	try {
+    		directory = readFromFile( new TypeToken<File>(){} );
+    		System.out.println("<Storage directory loaded>");
+    		return true;
+    	} catch (FileNotFoundException e) {
+    		System.out.println(e.getMessage());
+    		return false;
+    	}
+    }
+
+    /**
+     * Private helper method invoked by the saveTaskList and getTaskList methods.
+     * Before each save/load operation, Storage will set savefile to point to the current tasklist file.
+     * @param filename the tasklist file to be saved/loaded
+     */
+    private void setSavefile(String filename) {
 		File file = new File(directory, filename);
-		
-		try {
-			file.getCanonicalPath();
-		} catch (IOException e) {
-			return false;
-		}
-		
 		savefile = file;
-		return true;
-    }
-    
-    /**
-     * Writes tasks to JSON file.
-     * @param ArrayList<Task> tasks
-     * @throws IOException
-     */
-    private void writeToFile(ArrayList<Task> tasks) throws IOException {
-    	Gson gson = new Gson();
-    	String json = gson.toJson(tasks);
-    	FileWriter writer = new FileWriter(savefile);
-    	writer.write(json);
-    	writer.close();
-    	/*
-    	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savefile));
-    	oos.writeObject(tasks);
-    	oos.close();
-    	*/
-    }
-    
-    /**
-     * Reads tasks from JSON file.
-     * @return ArrayList<Task> tasks
-     * @throws FileNotFoundException
-     */
-    private ArrayList<Task> readFromFile() throws FileNotFoundException {
-    	Gson gson = new Gson();
-    	FileReader reader = new FileReader(savefile);
-		ArrayList<Task> tasks = gson.fromJson(reader, new TypeToken<ArrayList<Task>>(){}.getType());
-    	return tasks;
-    	/*
-    	ObjectInputStream ois = new ObjectInputStream(new FileInputStream(savefile));
-    	@SuppressWarnings("unchecked")
-		ArrayList<Task> tasks = (ArrayList<Task>) ois.readObject();
-    	ois.close();
-    	*/
     }
 }

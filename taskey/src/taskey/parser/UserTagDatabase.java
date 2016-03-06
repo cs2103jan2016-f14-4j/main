@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import taskey.logic.Task;
 
@@ -20,21 +25,6 @@ public class UserTagDatabase {
 	public UserTagDatabase() {
 		//initialise the database of tags. 
 		loadDatabase(); 
-	}
-	
-	private void loadDatabase() {
-		//load the file. 
-		ObjectInputStream ois;
-		try {
-			ois = new ObjectInputStream(new FileInputStream(savefile));
-			@SuppressWarnings("unchecked")
-			ArrayList<String> userTagsTemp = (ArrayList<String>) ois.readObject();
-	    	this.userTags = userTagsTemp; 
-	    	ois.close();
-		} catch (Exception e) {
-			//if no database, do nothing.
-			//file will be created later. 
-		} 
 	}
 	
 	/**
@@ -74,33 +64,73 @@ public class UserTagDatabase {
 		return false; 
 	}
 	
+	
+	/*
+	 * LOAD DATABASE  
+	 */
+	
 	/**
+	 * Load database of userTags into program
+	 */
+	private void loadDatabase() {
+		//load the file. 
+		try {
+			userTags = readFromFile( new TypeToken<ArrayList<String>>(){} );
+			//System.out.println("<Loaded> " + savefile.getPath());
+		} catch (Exception e) {
+			//do nothing
+		}
+	}
+	
+	/**
+     * Private method. Reads tasks from JSON file.
+     * @return ArrayList of Task objects generated from the JSON file.
+     * @throws FileNotFoundException
+     */
+    private <T> T readFromFile(TypeToken<T> typeToken) throws FileNotFoundException {
+    	Gson gson = new Gson();
+    	FileReader reader = new FileReader(savefile);
+		T object = gson.fromJson(reader, typeToken.getType());
+		return object;
+    }
+    
+    
+    /*
+     * SAVE DATABASE
+     */
+    
+    /**
 	 * Called when the program quits, so that the entire tag list 
 	 * can be written to file.  
 	 * @return true if saved successfully. 
 	 */
 	public boolean saveTagDatabase() {
-		ObjectOutputStream oos;
 		try {
-			oos = new ObjectOutputStream(new FileOutputStream(savefile));
-			oos.writeObject(userTags);
-	    	oos.close();
+			writeToFile(userTags);
 			return true; 
-		} catch (Exception e) {
-			if (!savefile.exists()) {
-				try {
-					savefile.createNewFile();
-					oos = new ObjectOutputStream(new FileOutputStream(savefile));
-					oos.writeObject(userTags);
-			    	oos.close();
-				} catch (IOException e1) {
-					//else do nothing
-				} 
-			}
-			return true; 
+		} catch (IOException e) {
+			return false; 
 		}
 	}
-	
+    
+	/**
+     * Private method. Writes an Object to JSON file.
+     * @param object to be written as a JSON file.
+     * @throws IOException
+     */
+    private <T> void writeToFile(T object) throws IOException {
+    	Gson gson = new Gson();
+    	String json = gson.toJson(object);
+    	FileWriter writer = new FileWriter(savefile);
+    	writer.write(json);
+    	writer.close();
+    }
+  
+    
+    /*
+     * FOR DEBUGGING
+     */
+    
 	@Override
 	public String toString() {
 		String stringRep = "";
@@ -115,7 +145,7 @@ public class UserTagDatabase {
 	public static void main(String[] args) {
 		UserTagDatabase db = new UserTagDatabase(); 
 		db.addTag("hello");
-		db.addTag("newworld");
+		db.addTag("mufy");
 		System.out.println(db);
 		db.saveTagDatabase(); 
 	}

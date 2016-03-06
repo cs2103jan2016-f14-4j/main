@@ -5,7 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,7 +24,7 @@ public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
 	private static final String DEFAULT_FILENAME = "user_tag_db";
 	private File savefile = new File(DEFAULT_FILENAME);
-	ArrayList<String> userTags = new ArrayList<String>(); 
+	HashMap<String,Integer> userTags = new HashMap<String,Integer>(); 
 	
 	public UserTagDatabase() {
 		//initialise the database of tags. 
@@ -33,20 +36,29 @@ public class UserTagDatabase {
 	 * @param tag
 	 */
 	public void addTag(String tag) {
-		if (!userTags.contains(tag)) {
-			userTags.add(tag); 
+		if (!userTags.containsKey(tag)) {
+			userTags.put(tag,new Integer(1)); 
+		} else {
+			int temp = userTags.get(tag) + 1; 
+			userTags.put(tag, temp); 
 		}
 	}
 	
 	/**
 	 * Remove a tag from the userTag Database.
-	 * Called when tasks with all these tags no longer exist
+	 * Called when tasks with all these tags are deleted 
 	 * @param tag
 	 * @return true if successfully removed
 	 */
 	public boolean removeTag(String tag) {
-		if (userTags.contains(tag)) {
-			userTags.remove(tag); 
+		if (userTags.containsKey(tag)) {
+			int temp = userTags.get(tag) - 1;
+			if (temp <= 0) {
+				userTags.remove(tag); 
+			} else {
+				//there are still tasks with that tag
+				userTags.put(tag, temp); 
+			}
 			return true; 
 		}
 		return false;
@@ -58,7 +70,7 @@ public class UserTagDatabase {
 	 * @return true if the tag exists in database
 	 */
 	public boolean hasTag(String tag) {
-		if (userTags.contains(tag)) {
+		if (userTags.containsKey(tag)) {
 			return true;
 		}
 		
@@ -70,7 +82,7 @@ public class UserTagDatabase {
 	 * it can be displayed by the UI 
 	 * @return
 	 */
-	public ArrayList<String> getTagList() {
+	public HashMap<String,Integer> getTagList() {
 		return userTags; 
 	}
 	
@@ -85,7 +97,7 @@ public class UserTagDatabase {
 	private void loadDatabase() {
 		//load the file. 
 		try {
-			userTags = readFromFile( new TypeToken<ArrayList<String>>(){} );
+			userTags = readFromFile(new TypeToken<HashMap<String,Integer>>(){});
 			//System.out.println("<Loaded> " + savefile.getPath());
 		} catch (Exception e) {
 			//do nothing
@@ -145,10 +157,22 @@ public class UserTagDatabase {
 	public String toString() {
 		String stringRep = "";
 		if (!userTags.isEmpty()) {
-			for(int i = 0; i < userTags.size(); i++) {
-				stringRep += userTags.get(i) + ","; 
+			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
+			
+			while(itKeys.hasNext()) {
+				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
+				stringRep += pair.getKey() + ","; 
 			}
 		}
 		return stringRep; 
 	}
+	
+	/*
+	public static void main(String[] args) {
+		UserTagDatabase db = new UserTagDatabase(); 
+		db.addTag("hello");
+		db.addTag("monkey");
+		System.out.println(db);
+		db.saveTagDatabase(); 
+	} */ 
 }

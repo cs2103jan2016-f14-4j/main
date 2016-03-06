@@ -5,7 +5,7 @@ package taskey.storage;
  * Currently only used in History.java
  * @author Dylan
  */
-public enum FilenameEnum {
+public enum FileType {
 	// Task lists
     PENDING		("PENDING.taskey"),
     EXPIRED		("EXPIRED.taskey"),
@@ -19,7 +19,7 @@ public enum FilenameEnum {
 
     private final String filename;
 
-    FilenameEnum(String filename) {
+    FileType(String filename) {
         this.filename = filename;
     }
 
@@ -28,7 +28,7 @@ public enum FilenameEnum {
      * @param filename string
      * @return the corresponding enum type
      */
-    public static FilenameEnum getType(String filename) {
+    public static FileType getType(String filename) {
     	switch (filename) {
     		case "PENDING":
     			return PENDING;
@@ -50,6 +50,9 @@ public enum FilenameEnum {
     }
 
     public String getFilename() {
+    	if (filename == null) {
+    		return "";
+    	}
     	return filename;
     }
 }

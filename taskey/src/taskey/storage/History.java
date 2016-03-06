@@ -1,6 +1,7 @@
 package taskey.storage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import taskey.logic.Task;
 
@@ -16,58 +17,40 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
-	private ArrayList<Task> lastModifiedTasklist_PENDING;
-	private ArrayList<Task> lastModifiedTasklist_EXPIRED;
-	private ArrayList<Task> lastModifiedTasklist_GENERAL;
-	private ArrayList<Task> lastModifiedTasklist_DEADLINE;
-	private ArrayList<Task> lastModifiedTasklist_EVENT;
-	private ArrayList<Task> lastModifiedTasklist_COMPLETED;
+	private HashMap<FileType, ArrayList<Task>> lastSavedTasklists;
 
 	public History() {
+		lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();
 	}
 
-	void set(String filename, ArrayList<Task> tasklist) {
-		FilenameEnum tasklistCategory = FilenameEnum.getType(filename);
-    	switch (tasklistCategory) {
-			case PENDING:
-				lastModifiedTasklist_PENDING = tasklist;
-				break;
-			case EXPIRED:
-				lastModifiedTasklist_EXPIRED = tasklist;
-				break;
-			case GENERAL:
-				lastModifiedTasklist_GENERAL = tasklist;
-				break;
-			case DEADLINE:
-				lastModifiedTasklist_DEADLINE = tasklist;
-				break;
-			case EVENT:
-				lastModifiedTasklist_EVENT = tasklist;
-				break;
-			case COMPLETED:
-				lastModifiedTasklist_COMPLETED = tasklist;
-				break;
-			default:
-    	}
+	/**
+	 * Sets History to map the category specified by filename to tasklist.
+	 * If the filename does not correspond to any type (is INVALID),
+	 * the tasklist will not be added to History.
+	 * @param filename category of the tasklist to be saved
+	 * @param tasklist ArrayList of tasks to be saved
+	 */
+	public void set(String filename, ArrayList<Task> tasklist) {
+		FileType tasklistCategory = FileType.getType(filename);
+		if (tasklistCategory != FileType.INVALID) {
+			lastSavedTasklists.put(tasklistCategory, tasklist);
+		}
 	}
 
-	ArrayList<Task> get(String filename) {
-		FilenameEnum tasklistCategory = FilenameEnum.getType(filename);
-    	switch (tasklistCategory) {
-			case PENDING:
-				return (lastModifiedTasklist_PENDING == null) ? new ArrayList<Task>() : lastModifiedTasklist_PENDING;
-			case EXPIRED:
-				return (lastModifiedTasklist_EXPIRED == null) ? new ArrayList<Task>() :  lastModifiedTasklist_EXPIRED;
-			case GENERAL:
-				return (lastModifiedTasklist_GENERAL == null) ? new ArrayList<Task>() :  lastModifiedTasklist_GENERAL;
-			case DEADLINE:
-				return (lastModifiedTasklist_DEADLINE == null) ? new ArrayList<Task>() :  lastModifiedTasklist_DEADLINE;
-			case EVENT:
-				return (lastModifiedTasklist_EVENT == null) ? new ArrayList<Task>() :  lastModifiedTasklist_EVENT;
-			case COMPLETED:
-				return (lastModifiedTasklist_COMPLETED == null) ? new ArrayList<Task>() :  lastModifiedTasklist_COMPLETED;
-			default:
-				return null;
-    	}
+	/**
+	 * Gets the last-saved tasklist specified by filename.
+	 * An empty ArrayList is returned if the tasklist specified by filename
+	 * has not been added to History yet,
+	 * or if the tasklist category specified by filename is invalid.
+	 * @param filename category of the last-saved tasklist
+	 * @return the last-saved tasklist specified by filename
+	 */
+	public ArrayList<Task> get(String filename) {
+		FileType tasklistCategory = FileType.getType(filename);
+		ArrayList<Task> ret = lastSavedTasklists.get(tasklistCategory);
+		if (ret == null) {
+			ret = new ArrayList<Task>();
+		}
+		return ret;
 	}
 }

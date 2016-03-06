@@ -58,6 +58,15 @@ public class UserTagDatabase {
 		return false; 
 	}
 	
+	/**
+	 * For Logic: Get the entire tagList so that 
+	 * it can be displayed by the UI 
+	 * @return
+	 */
+	public ArrayList<String> getTagList() {
+		return userTags; 
+	}
+	
 	
 	/*
 	 * LOAD DATABASE  

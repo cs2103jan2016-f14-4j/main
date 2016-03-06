@@ -82,6 +82,8 @@ public class Storage {
     		instance = new Storage();
     		if (instance.loadDirectory() == false) {
         		instance.setDirectory(DEFAULT_DIRECTORY);
+    		} else {
+    			instance.setDirectory(instance.directory.getPath());
     		}
     	}
     	return instance;
@@ -249,7 +251,7 @@ public class Storage {
     	File config = new File(FILENAME_CONFIG);
     	try {
     		directory = readFromFile(config, new TypeToken<File>() {});
-    		System.out.println("{Storage directory loaded} " + directory.getPath());
+    		System.out.println("{Storage directory loaded}");
     		return true;
     	} catch (FileNotFoundException e) {
     		System.out.println("{Storage config file not found; setting default directory}");

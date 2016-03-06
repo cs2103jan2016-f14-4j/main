@@ -21,6 +21,7 @@ package taskey.logic;
  * 14. DONE_BY_NAME
  * 15. SEARCH
  * 16. UNDO 
+ * 17. CHANGE_FILE_LOC
  * 
  * @author Xue Hui
  *
@@ -42,6 +43,7 @@ public class ProcessedObject {
 	private String errorType = null;
 	private String searchPhrase = null; 
 	private String newTaskName = null; 
+	private String newFileLoc = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -54,7 +56,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR/UNDO/SEARCH 
+	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -151,6 +153,14 @@ public class ProcessedObject {
 	
 	public String getNewTaskName() {
 		return newTaskName; 
+	}
+	
+	public String getNewFileLoc() {
+		return newFileLoc; 
+	}
+	
+	public void setNewFileLoc(String newFileLoc) {
+		this.newFileLoc = newFileLoc; 
 	}
 	
 	@Override 

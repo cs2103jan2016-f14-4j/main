@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Purpose of this class is to handle the storage and retrieval
+ * of userTags, so that they can be displayed by Logic as 
+ * categories that users can search for
+ * @author Xue Hui
+ *
+ */
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
 	private static final String DEFAULT_FILENAME = "user_tag_db";

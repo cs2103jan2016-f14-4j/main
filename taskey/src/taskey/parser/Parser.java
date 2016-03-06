@@ -16,14 +16,14 @@ public class Parser {
 	private ParseError parseError = new ParseError(); 
 	private ParseAdd parseAdd = new ParseAdd(); 
 	private ParseEdit parseEdit = new ParseEdit(); 
-	private ParseUndo parseUndo = new ParseUndo(); 
-	private ParseView parseView = new ParseView(); 
+	private ParseUndo parseUndo = new ParseUndo();  
 	private ParseSearch parseSearch = new ParseSearch(); 
 	private ParseDelete parseDelete = new ParseDelete();
 	private ParseDone parseDone = new ParseDone(); 
+	private ParseFileLocation parseDir = new ParseFileLocation(); 
 	
 	private UserTagDatabase tagDB = new UserTagDatabase(); 
-	 
+	private ParseView parseView = new ParseView(tagDB);
 	
 	public Parser() {
 		commandList.put("add", "add"); 
@@ -53,6 +53,9 @@ public class Parser {
 			case "del":
 				processed = parseDelete.processDelete(command, stringInput); 
 				break;
+			case "file_loc":
+				processed = parseDir.processLoc(command, stringInput);
+				break; 
 				
 			//need to check date: 
 			//add floating, add deadline, add event,

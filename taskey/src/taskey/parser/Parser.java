@@ -122,15 +122,17 @@ public class Parser {
 	 */
 	public void trackTags(ProcessedObject po) {
 		Task task = po.getTask();
-		ArrayList<String> tags = task.getTaskTags(); 
-		
-		if (tags != null) {
-			for(int i = 0; i < tags.size(); i++) {
-				if (!tagDB.hasTag(tags.get(i))) {
-					tagDB.addTag(tags.get(i));
+		if (task != null) {
+			ArrayList<String> tags = task.getTaskTags(); 
+			
+			if (tags != null) {
+				for(int i = 0; i < tags.size(); i++) {
+					if (!tagDB.hasTag(tags.get(i))) {
+						tagDB.addTag(tags.get(i));
+					}
 				}
-			}
-		}	
+			}	 
+		}
 	}
 	
 	/**

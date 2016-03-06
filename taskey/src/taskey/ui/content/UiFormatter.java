@@ -7,6 +7,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -35,6 +36,10 @@ public abstract class UiFormatter {
 	protected UiClockService clockService;
 	protected GridPane currentGrid;
 	protected ArrayList<GridPane> myGrids;
+	
+	public abstract void clearOtherVariables();
+	public abstract void format(ArrayList<Task> myTaskList);
+	
 	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
 		currentGrid = _gridPane;
 		clockService = _clockService;
@@ -65,11 +70,10 @@ public abstract class UiFormatter {
 		if (currentGrid.isGridLinesVisible()) {
 			currentGrid.getChildren().add(0, node);
 		}
+		clearOtherVariables();
 	}
 	public void cleanUp() {
 		myGrids.clear();
-	}
-	public void format(ArrayList<Task> myTaskList) {
 	}
 	
 	protected StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
@@ -113,25 +117,33 @@ public abstract class UiFormatter {
 		cellWrapper.getChildren().add(circle);
 	}
 	
-	// Wraps image to be placed anywhere in cell
-	protected StackPane addImageToCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
+	protected ImageView createImageInCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
 		assert(gridPane != null);
-		StackPane imageWrapper = createStackPaneInCell(col,row,"",gridPane);
+		StackPane imageWrapper = getWrapperAtCell(col,row,gridPane);
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(width);
 		myImg.setFitWidth(height);
 		imageWrapper.getChildren().add(myImg);
-		return imageWrapper;
+		return myImg;
 	}
 	
-	// Such that the stackpane does not stretch with cell size
+	protected Label createLabelInCell( int col, int row, String text, String labelStyle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		Label myLabel = new Label(text);
+		myLabel.getStyleClass().add(labelStyle);
+		cellWrapper.getChildren().add(myLabel);
+		return myLabel;
+	}		
+	
+	// Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
+	// formatters, methods for the single wrapper can still be used, but switch the parents
 	protected StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
 		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		StackPane pane = new StackPane();
 		pane.getStyleClass().add(paneStyle);
-		GridPane.setFillHeight(pane, false);
-		GridPane.setFillWidth(pane,false);
-		gridPane.add(pane,col,row);
+		cellWrapper.getChildren().add(pane);
 		return pane;
 	}
 }

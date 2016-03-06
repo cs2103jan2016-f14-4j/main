@@ -63,6 +63,10 @@ public class UiActionFormatter extends UiFormatter {
 		}
 	}
 
+	@Override
+	public void clearOtherVariables() {
+	}
+	
 	private void addTaskID(Task theTask, int col, int row) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();

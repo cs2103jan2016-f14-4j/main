@@ -4,15 +4,18 @@ import java.util.ArrayList;
 
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.stage.Popup;
 import javafx.util.Duration;
+import javafx.util.Pair;
+import taskey.ui.UiConstants.ActionListMode;
 
 /**
- * This class provides abstractions for some basic animations in javafx
+ * This class provides modified abstractions for some basic animations in javafx
  * as well as custom ones
  * @author JunWei
  *
@@ -46,5 +49,18 @@ public class UiAnimationManager {
 		ft.setFromValue(theNode.getOpacity());
 		ft.setToValue(toAlpha);
 		return ft;
+	}
+	
+	public TranslateTransition createTranslateTransition(Node theNode, Pair<Double,Double> source, Pair<Double,Double> dest,
+														 int animDuration) {
+		assert(theNode != null);
+		TranslateTransition shift = new TranslateTransition();
+		shift.setFromX(source.getKey());
+		shift.setFromY(source.getValue());
+		shift.setToX(dest.getKey());
+		shift.setToY(dest.getValue());
+		shift.setDuration(Duration.millis(animDuration));
+		shift.setNode(theNode);
+		return shift;	
 	}
 }

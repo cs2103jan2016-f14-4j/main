@@ -31,20 +31,17 @@ public class UiCategoryFormatter extends UiFormatter {
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
 			// add bullet
-			//createStyledCell(0, i,"", currentGrid);
 			addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
 			
 			
 			// add tag name
 			TextFlow element = new TextFlow();
 			element.getChildren().addAll(myConfig.build(myCategoryList.get(i)));
-			//createStyledCell(1,i,"",currentGrid);
 			addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
 			element = new TextFlow();
 			element.getChildren().addAll(myConfig.build(""+ categoryNums.get(i) ));
-			//createStyledCell(2,i,"",currentGrid);
 			addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
 		}
 	}
@@ -55,5 +52,13 @@ public class UiCategoryFormatter extends UiFormatter {
 		LinearGradient myGradiant = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
 		myCircle.setFill(myGradiant);
 		return myCircle;
+	}
+
+	@Override
+	public void clearOtherVariables() {
+	}
+
+	@Override
+	public void format(ArrayList<Task> myTaskList) {
 	}
 }

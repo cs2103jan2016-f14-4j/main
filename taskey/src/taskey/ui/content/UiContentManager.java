@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import taskey.logic.Task;	
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
@@ -20,6 +21,7 @@ import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
 import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiGridSettings;
 
@@ -140,17 +142,17 @@ public class UiContentManager {
 		} else {
 			return;
 		}
-		TranslateTransition shiftGrid = new TranslateTransition();
-		shiftGrid.setFromX(currentGrid.getLayoutX());
-		shiftGrid.setDuration(Duration.millis(1000));
-		shiftGrid.setToX(currentGrid.getLayoutX()+currentGrid.getWidth()*direction);
-		shiftGrid.setNode(currentGrid);
-		shiftGrid.play();
+		TranslateTransition shiftGrid = UiAnimationManager.getInstance().createTranslateTransition(
+				currentGrid, 
+				new Pair<Double,Double>(currentGrid.getLayoutX(),currentGrid.getLayoutY()),
+				new Pair<Double,Double>(currentGrid.getLayoutX()+currentGrid.getWidth()*direction, currentGrid.getLayoutY()+100),
+				1000);
 		shiftGrid.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				updateActionContentBox(null,ActionListMode.HELP_MAIN);			
 			}
 		});
+		shiftGrid.play();
 	}
 }

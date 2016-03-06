@@ -15,7 +15,7 @@
 
 .tab-pane .tab:selected
 {
-    -fx-background-color: #3c3c3c;
+    -fx-background-color: #b3ffb3;
 }
 
 .tab .tab-label { 
@@ -27,5 +27,5 @@
 
 .tab:selected .tab-label { 
     -fx-alignment: CENTER;
-    -fx-text-fill: #a9ff00;
+    -fx-text-fill: #3c3c3c;
 }

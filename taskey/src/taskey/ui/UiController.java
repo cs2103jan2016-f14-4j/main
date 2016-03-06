@@ -140,6 +140,7 @@ public class UiController {
 				}
 				if ( event.getCode().isArrowKey()) {
 	        		  myDropDown.processArrowKey(event);
+	        		  myManager.processArrowKey(event);
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
@@ -192,7 +193,7 @@ public class UiController {
 						stage.setIconified(true);
 					}
 				} else if (event.getCode() == KeyCode.BACK_QUOTE) {
-					setStyleSheets(UiConstants.UI_LIGHT_STYLE);
+					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
 				}
 			}
 		});

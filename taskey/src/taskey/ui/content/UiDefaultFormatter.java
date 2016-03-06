@@ -7,6 +7,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
+import taskey.ui.UiConstants;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextConfig;
 
@@ -35,27 +36,24 @@ public class UiDefaultFormatter extends UiFormatter {
 	private void addTaskID(Task theTask, int col, int row) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, "textBlue");
+		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (row + 1);
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, "numberIcon", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_NUMBER_ICON, TextAlignment.CENTER);
 	}
 
 	private void addTaskName(Task theTask, int col, int row) {
 		UiTextConfig myConfig = new UiTextConfig();
 		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, "textBlack");
+		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK);
 		String line = theTask.getTaskName();
 		theDate = "";
 		if (theTask.getDeadline() != "") {
 			String[] params = theTask.getDeadline().split(" ");
 			theDate = params[0] + params[1] + params[2];
-			//line += " at ";
-			//myConfig.addMarker(line.length(), "textRed");
-			//line += params[3];
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.LEFT);
+		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.LEFT);
 	}
 
 	private void addTaskDate(Task theTask, int col, int row) {
@@ -64,13 +62,13 @@ public class UiDefaultFormatter extends UiFormatter {
 		
 		String line;
 		if (theDate == "") {
-			myConfig.addMarker(0, "textBlue");
+			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 			line = "------";
 		} else {
-			myConfig.addMarker(0, "textRed");
+			myConfig.addMarker(0, UiConstants.STYLE_TEXT_RED);
 			line = theDate;
 		}
 		element.getChildren().addAll(myConfig.format(line));
-		addStyledCellTextFlow(element, currentGrid, col, row, "whiteBox", TextAlignment.CENTER);
+		addStyledCellTextFlow(element, currentGrid, col, row, UiConstants.STYLE_WHITE_BOX, TextAlignment.CENTER);
 	}
 }

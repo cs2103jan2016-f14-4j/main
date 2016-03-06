@@ -16,6 +16,7 @@ public class SpecialDaysConverter {
 	long currTime = -1;
 	private HashMap<String,Long> specialDays = new HashMap<String,Long>();
 	private TimeConverter timeConverter = new TimeConverter(); 
+	private int toEndOfWeek = -1; //num. of days to the end of the current week.  
 	
 	public SpecialDaysConverter() { 
 		try {
@@ -36,6 +37,14 @@ public class SpecialDaysConverter {
 	}
 	
 	/**
+	 * Returns the number of days to the end of the current week
+	 * @return
+	 */
+	public int getToEndOfWeek() {
+		return toEndOfWeek; 
+	}
+	
+	/**
 	 * Returns the HashMap specialDays
 	 * @return
 	 */
@@ -53,7 +62,7 @@ public class SpecialDaysConverter {
 				timeConverter.getMonth(currTime)-1,
 				timeConverter.getDay(currTime));
 		int day = cal.get(cal.DAY_OF_WEEK); 
-		//System.out.println("Day is "+ day);
+		
 		
 		switch (day) {
 			case 1: //sun
@@ -86,6 +95,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processFri(long currTime) {
+		toEndOfWeek = 2;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.TWO_DAYS); 
 		specialDays.put("this mon", 
@@ -120,6 +131,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processThu(long currTime) {
+		toEndOfWeek = 3;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.THREE_DAYS); 
 		specialDays.put("this mon", 
@@ -154,6 +167,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processWed(long currTime) {
+		toEndOfWeek = 4;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FOUR_DAYS); 
 		specialDays.put("this mon", 
@@ -188,6 +203,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processTue(long currTime) {
+		toEndOfWeek = 5;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this mon", 
@@ -222,6 +239,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processMon(long currTime) {
+		toEndOfWeek = 6;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.SIX_DAYS); 
 		specialDays.put("this tue", 
@@ -256,6 +275,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processSun(long currTime) {
+		toEndOfWeek = 7;
+		
 		specialDays.put("this mon", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this tue", 
@@ -289,6 +310,8 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processSat(long currTime) {
+		toEndOfWeek = 0;
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this mon", 

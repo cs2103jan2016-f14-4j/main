@@ -13,16 +13,15 @@ import taskey.ui.UiConstants;
  * @author Junwei
  *
  */
-public class UiTextConfig {
+public class UiTextBuilder {
 
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
 	private char symbol;
-	private Font myFont; // Font is usually shared across all Text nodes in a line
-
-	public UiTextConfig() {
+	
+	public UiTextBuilder() {
 		initVariables();
 	}
-	public UiTextConfig(String ...styles) { // for quick styling (primarily for formatting by symbol
+	public UiTextBuilder(String ...styles) { // for quick styling (primarily for building by symbol
 		initVariables();
 		addMarkers(styles);
 	}
@@ -30,24 +29,13 @@ public class UiTextConfig {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
-		myFont = UiConstants.UI_DEFAULT_FONT; // default (overridden by styles specifying font)
 	}
-	
-	public void setFont(Font newFont) {
-		myFont = newFont;
-	}
-	
 	public void setSymbol(char _symbol) {
 		symbol = _symbol;
 	}
 	
-	private Text createText(String segment) {
-		Text newText = new Text(segment);
-		//newText.setFont(myFont); 
-		return newText;
-	}	
-	
 	public void addMarker(Integer startIndex, String style) {
+		assert(startIndex >= 0);
 		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
 	}
 	
@@ -61,7 +49,7 @@ public class UiTextConfig {
 		styleMarkers.clear();
 	}
 	
-	public ArrayList<Text> format(String line) {
+	public ArrayList<Text> build(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		int currentStart = styleMarkers.get(0).getKey();
 		int currentEnd = 0;
@@ -84,7 +72,8 @@ public class UiTextConfig {
 				currentEnd = Math.min(styleMarkers.get(i + 1).getKey(), line.length());
 			}
 			segment = line.substring(currentStart, currentEnd);
-			Text newText = createText(segment);
+			Text newText = new Text(segment);
+			newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 			newText.getStyleClass().add(currentStyle);
 			myTexts.add(newText);
 			currentStart = currentEnd;
@@ -93,13 +82,13 @@ public class UiTextConfig {
 	}
 	
 	/**
-	 * Using a symbol like #, etc to format, reuse markers but not using indexes
+	 * Using a symbol like #, etc to build, reuse markers but not using indexes
 	 * Markers are ignored in a queue-like fashion for each symbol encountered
 	 * @param symbol - #, $ etc
-	 * @param line - line to format
+	 * @param line - line to build text objects from
 	 * @return
 	 */
-	public ArrayList<Text> formatBySymbol(String line) {
+	public ArrayList<Text> buildBySymbol(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		String segment = "";
 		int styleIndex = 0;
@@ -114,7 +103,8 @@ public class UiTextConfig {
 					currentStyle = styleMarkers.get(styleIndex).getValue();
 					styleIndex++; // ignore previous style
 				}
-				Text newText = createText(segment);
+				Text newText = new Text(segment);
+				newText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 				newText.getStyleClass().add(currentStyle);
 				myTexts.add(newText);
 				segment = "";

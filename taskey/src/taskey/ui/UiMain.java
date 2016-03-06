@@ -2,11 +2,13 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
@@ -15,32 +17,41 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionContentMode;
+import taskey.ui.UiConstants.ActionListMode;
 
+// TODO: Auto-generated Javadoc
 /**
- *
  * This class is the main entry point for Taskey It performs the main setups for
- * the UI
- * 
- * @author JunWei
+ * the UI.
  *
+ * @author JunWei
  */
 
 public class UiMain extends Application {
 
+	/** The instance. */
 	private static UiMain instance = null;
+	
+	/** The my controller. */
 	private UiController myController;
+	
+	/** The root. */
 	private Parent root = null;
 
+	/**
+	 * Gets the single instance of UiMain.
+	 *
+	 * @return single instance of UiMain
+	 */
 	public static UiMain getInstance() {
+		assert(instance != null);
 		return instance;
 	}
 
 	/**
 	 * This method loads the .fxml file and set ups the scene
-	 * 
-	 * @param stage object which is called automatically by the javaFX plugin
-	 *            
+	 *
+	 * @param primaryStage the primary stage
 	 */
 	@Override
 	public void start(Stage primaryStage) {
@@ -64,10 +75,10 @@ public class UiMain extends Application {
 	 * @param root which is obtained after loading the .fxml file
 	 *             
 	 */
-	public void setUpScene(Stage primaryStage, Parent root) {
+	private void setUpScene(Stage primaryStage, Parent root) {
 		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
-		primaryStage.initStyle(StageStyle.DECORATED);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
 		Scene newScene = new Scene(root);
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
@@ -77,53 +88,68 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
-		//testUI();
 		Logic.getInstance().initialize();
+		//testUI();
 	}
 
+	/**
+	 * Gets the controller.
+	 *
+	 * @return the controller
+	 */
 	public UiController getController() {
+		assert(myController != null);
 		return myController;
 	}
 
+	/**
+	 * This method is overridden from Application to handle clean ups.
+	 */
 	@Override
 	public void stop() {
 		myController.cleanUp();
 		UiImageManager.getInstance().cleanUp();
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
 	}
 
-	/************************************** MY TESTING ***********************************/
-	public void testUI() {
+	/**
+	 * ************************************ MY TESTING **********************************.
+	 */
+	private void testUI() {
 		ArrayList<Task> myTaskList = new ArrayList<Task>();
 		// Temporary;
 		Task temp = new Task("General Task");
 		myTaskList.add(temp);
-		temp = new Task("Task A");
-		temp.setDeadline("27 Feb 2016 01:00:00");
-		myTaskList.add(temp);
-		temp = new Task("AAAAAAAAAA VVVVVVVVVEEEEEEERRRRRRRRRRYYY LOOOOONG TASKKK");
-		temp.setDeadline("27 Feb 2016 04:00:00");
-		myTaskList.add(temp);
-		temp = new Task("Task B");
-		temp.setDeadline("29 Feb 2016 09:00:00");
-		myTaskList.add(temp);
-
-		temp = new Task("Task C");
-		temp.setDeadline("27 Feb 2016 04:00:00");
-		myTaskList.add(temp);
-		temp = new Task("Task B");
-		temp.setDeadline("29 Feb 2016 09:00:00");
-		myTaskList.add(temp);
 
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
-
+		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
-		myController.updateActionDisplay(myTaskList, ActionContentMode.TASKLIST);
+		//myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
+		
+		ArrayList<String> myCategoryList = new ArrayList<String>(
+				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
+		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
+				Arrays.asList(1,22,3,14,0,6));
+		ArrayList<Color> categoryColors = new ArrayList<Color>(
+				Arrays.asList(Color.RED,Color.RED,Color.RED,Color.RED,Color.RED,Color.YELLOW));
+		myController.updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);
 	}
 
+	/**
+	 * Do hash.
+	 *
+	 * @param line the line
+	 * @param offsest the offsest
+	 * @return the string
+	 */
 	public String doHash(String line, int offsest) {
 		int encode = 7; // prime
 		String temp = line.replace("[^A-Za-z0-9]", ""); // replace non-alphanumeric
@@ -132,6 +158,13 @@ public class UiMain extends Application {
 		return String.valueOf(encode);
 	}
 
+	/**
+	 * Random input.
+	 *
+	 * @param line the line
+	 * @param maxItems the max items
+	 * @return the array list
+	 */
 	public ArrayList<String> randomInput(String line, int maxItems) {
 		int test = (int) (Math.random() * maxItems) + 1;
 		ArrayList<String> tempList = new ArrayList<String>();

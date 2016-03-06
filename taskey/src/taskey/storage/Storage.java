@@ -19,6 +19,7 @@ import taskey.logic.Task;
 public class Storage {
 	private static Storage instance = null;
 	private File directory;
+	private History history;
 
 	static final String DEFAULT_DIRECTORY = "Taskey savefiles";
 	static final String FILENAME_CONFIG = "last-used directory.taskey_config";
@@ -38,33 +39,40 @@ public class Storage {
 
 		// Initialize - tasklist
 		System.out.println("\nInitial load ======================================");
-		ArrayList<Task> loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
-		for (Task t : loadedTaskList) {
-			System.out.println(t);
-		}
+		ArrayList<Task> loadedTasklist = storageTest.getTaskList("TEST_TASKLIST");
+		print(loadedTasklist);
 
 		// Initialize - tags hashmap
 		HashMap<String, Integer> loadedTags = storageTest.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 
+
 		// Load after save - tasklist
 		System.out.println("\n\nLoad after save ===================================");
-		ArrayList<Task> testTaskList = new ArrayList<Task>();
-		testTaskList.add(new Task("1. This is a test task"));
-		testTaskList.add(new Task("2. This is a test task"));
-		testTaskList.add(new Task("3. This is a test task"));
-		storageTest.saveTaskList(testTaskList, "TEST_TASKLIST");
-		loadedTaskList = storageTest.getTaskList("TEST_TASKLIST");
-		for (Task t : loadedTaskList) {
-			System.out.println(t);
+		ArrayList<Task> savedTasklist = new ArrayList<Task>();
+		savedTasklist.add(new Task("1. This is a test task"));
+		savedTasklist.add(new Task("2. This is a test task"));
+		savedTasklist.add(new Task("3. This is a test task"));
+		try {
+			storageTest.saveTaskList(savedTasklist, "TEST_TASKLIST");
+		} catch (StorageException e) {
+			System.out.println(e.getMessage());
+			print(e.getLastModifiedTasklist());
 		}
+		loadedTasklist = storageTest.getTaskList("TEST_TASKLIST");
+		print(loadedTasklist);
 
-		// Load after save - tags hashmap
+		// Load after save - tagsmap
 		HashMap<String, Integer> tags = new HashMap<String, Integer>();
 		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
 		storageTest.saveTags(tags);
 		loadedTags = storageTest.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
+	}
+
+	private static void print(ArrayList<Task> list) {
+		for (Task t : list)
+			System.out.println(t);
 	}
 
     /*=============*
@@ -80,6 +88,8 @@ public class Storage {
     public static Storage getInstance() {
     	if (instance == null) {
     		instance = new Storage();
+    		instance.history = new History();
+
     		if (instance.loadDirectory() == false) {
         		instance.setDirectory(DEFAULT_DIRECTORY);
     		} else {
@@ -137,14 +147,16 @@ public class Storage {
      * This method is invoked by Logic.
      * @param tasks list of Task objects for saving
      * @param filename name the file will be saved as
-     * @throws IOException
+     * @throws StorageException contains the last saved tasklist corresponding to the filename
      */
-    public void saveTaskList(ArrayList<Task> tasks, String filename) {
+    public void saveTaskList(ArrayList<Task> tasks, String filename) throws StorageException {
+    	history.set(filename, tasks);
     	File file = new File(directory, filename);
     	try {
     		writeToFile(file, tasks, new TypeToken<ArrayList<Task>>() {});
     	} catch (IOException e) {
-    		//TODO When exception is encountered during write-after-modified, return/throw the last-modified list to Logic
+    		// When exception is encountered during write-after-modified, throw the last-modified list to Logic
+    		throw new StorageException(e, history.get(filename));
     	}
     }
 

@@ -289,9 +289,9 @@ public class Storage {
     	HashMap<String, Integer> tags;
     	try {
     		tags = readFromFile(file, new TypeToken<HashMap<String, Integer>>() {});
-    		System.out.println("{UserTagDatabase loaded} " + FILENAME_TAGS); //debug info
+    		System.out.println("{Tags loaded} " + FILENAME_TAGS); //debug info
     	} catch (FileNotFoundException e) {
-    		System.out.println("{UserTagDatabase not found} " + FILENAME_TAGS); //debug info
+    		System.out.println("{Tags not found} " + FILENAME_TAGS); //debug info
     		tags = new HashMap<String, Integer>();
     	}
     	return tags;

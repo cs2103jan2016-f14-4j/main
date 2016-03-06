@@ -80,7 +80,9 @@ public class UserTagDatabase {
 	
 	/**
 	 * For Logic: Get the entire tagList so that 
-	 * it can be displayed by the UI 
+	 * it can be displayed by the UI.
+	 * Remember to call this function every time a task tag is added/removed,
+	 * cos the main form is a HashMap...
 	 * @return
 	 */
 	public ArrayList<String> getTagList() {

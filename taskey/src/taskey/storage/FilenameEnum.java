@@ -49,7 +49,7 @@ public enum FilenameEnum {
     	}
     }
 
-    public String getName() {
+    public String getFilename() {
     	return filename;
     }
 }

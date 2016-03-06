@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -82,8 +83,18 @@ public class UserTagDatabase {
 	 * it can be displayed by the UI 
 	 * @return
 	 */
-	public HashMap<String,Integer> getTagList() {
-		return userTags; 
+	public ArrayList<String> getTagList() {
+		ArrayList<String> tagList = new ArrayList<String>(); 
+		
+		if (!userTags.isEmpty()) {
+			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
+			
+			while(itKeys.hasNext()) {
+				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
+				tagList.add(pair.getKey()); 
+			}
+		}
+		return tagList; 
 	}
 	
 	

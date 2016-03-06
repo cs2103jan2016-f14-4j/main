@@ -144,13 +144,4 @@ public class UserTagDatabase {
 		}
 		return stringRep; 
 	}
-	
-	/*
-	public static void main(String[] args) {
-		UserTagDatabase db = new UserTagDatabase(); 
-		db.addTag("hello");
-		db.addTag("mufy");
-		System.out.println(db);
-		db.saveTagDatabase(); 
-	} */ 
 }

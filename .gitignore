@@ -1,3 +1,4 @@
 *.class
 javadoc
 taskey/bin/taskey/parser/Parser.class
+taskey/user_tag_db

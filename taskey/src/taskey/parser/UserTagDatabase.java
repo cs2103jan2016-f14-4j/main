@@ -1,18 +1,12 @@
 package taskey.parser;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import taskey.storage.Storage;
 
 /**
  * Purpose of this class is to handle the storage and retrieval
@@ -23,13 +17,12 @@ import com.google.gson.reflect.TypeToken;
  */
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
-	private static final String DEFAULT_FILENAME = "user_tag_db";
-	private File savefile = new File(DEFAULT_FILENAME);
 	HashMap<String,Integer> userTags = new HashMap<String,Integer>(); 
+	Storage db = new Storage(); 
 	
 	public UserTagDatabase() {
 		//initialise the database of tags. 
-		loadDatabase(); 
+		userTags = db.loadTags();  
 	}
 	
 	/**
@@ -73,8 +66,7 @@ public class UserTagDatabase {
 	public boolean hasTag(String tag) {
 		if (userTags.containsKey(tag)) {
 			return true;
-		}
-		
+		}	
 		return false; 
 	}
 	
@@ -98,70 +90,15 @@ public class UserTagDatabase {
 		}
 		return tagList; 
 	}
-	
-	
-	/*
-	 * LOAD DATABASE  
-	 */
-	
-	/**
-	 * Load database of userTags into program
-	 */
-	private void loadDatabase() {
-		//load the file. 
-		try {
-			userTags = readFromFile(new TypeToken<HashMap<String,Integer>>(){});
-			//System.out.println("<Loaded> " + savefile.getPath());
-		} catch (Exception e) {
-			//do nothing
-		}
-	}
-	
-	/**
-     * Private method. Reads tasks from JSON file.
-     * @return ArrayList of Task objects generated from the JSON file.
-     * @throws FileNotFoundException
-     */
-    private <T> T readFromFile(TypeToken<T> typeToken) throws FileNotFoundException {
-    	Gson gson = new Gson();
-    	FileReader reader = new FileReader(savefile);
-		T object = gson.fromJson(reader, typeToken.getType());
-		return object;
-    }
-    
-    
-    /*
-     * SAVE DATABASE
-     */
-    
-    /**
-	 * Called when the program quits, so that the entire tag list 
-	 * can be written to file.  
-	 * @return true if saved successfully. 
-	 */
-	public boolean saveTagDatabase() {
-		try {
-			writeToFile(userTags);
-			return true; 
-		} catch (IOException e) {
-			return false; 
-		}
-	}
-    
-	/**
-     * Private method. Writes an Object to JSON file.
-     * @param object to be written as a JSON file.
-     * @throws IOException
-     */
-    private <T> void writeToFile(T object) throws IOException {
-    	Gson gson = new Gson();
-    	String json = gson.toJson(object);
-    	FileWriter writer = new FileWriter(savefile);
-    	writer.write(json);
-    	writer.close();
-    }
   
+	/**
+	 * Save the tag hash map into a file for persistent storage. 
+	 */
+	public void saveTagDatabase() {
+		db.saveTags(userTags); 
+	}
     
+	
     /*
      * FOR DEBUGGING
      */
@@ -187,5 +124,5 @@ public class UserTagDatabase {
 		db.addTag("monkey");
 		System.out.println(db);
 		db.saveTagDatabase(); 
-	} */ 
+	} */
 }

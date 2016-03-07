@@ -24,14 +24,13 @@ import taskey.ui.UiConstants;
  * @author JunWei
  *
  */
-public class UiPopupFactory {
-
-	private static UiPopupFactory instance = null;
+public class UiPopupManager {
+	private static UiPopupManager instance = null;
 	private ArrayList<PopupWindow> popupList = new ArrayList<PopupWindow>();
 
-	public static UiPopupFactory getInstance() {
+	public static UiPopupManager getInstance() {
 		if (instance == null) {
-			instance = new UiPopupFactory();
+			instance = new UiPopupManager();
 		}
 		return instance;
 	}
@@ -45,7 +44,8 @@ public class UiPopupFactory {
 	 * @param offsetY - from node Y position
 	 * @return Popup object
 	 */
-	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY) {
+	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY, boolean deleteAfter) {
+		assert(node != null);
 		Popup newPopup = new Popup();
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
@@ -54,10 +54,22 @@ public class UiPopupFactory {
 		newPopup.getContent().add(content);
 		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  
 		popupList.add(newPopup);
+		
+		if ( deleteAfter == true ) {
+			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(newPopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+			fade.play();
+			fade.setOnFinished(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					removePopup(newPopup);
+				}
+			});
+		}
 		return newPopup;
 	}
 
 	public Popup createPopupMenu(int numRows) {
+		assert(numRows >= 0);
 		Popup newPopup = new Popup();
 		VBox container = new VBox(); // VBox is used only for formatting purposes purposes
 		for (int i = 0; i < numRows; i++) {
@@ -71,48 +83,17 @@ public class UiPopupFactory {
 	}
 
 	public Bounds getScreenBoundsOfNode(Node node) {
+		assert(node != null);
 		Bounds bounds = node.getBoundsInLocal();
 		Bounds screenBounds = node.localToScreen(bounds);
 		return screenBounds;
 	}
-
-	/**
-	 * This method creates fade transitions for first content (usually the
-	 * container) of the popup
-	 * 
-	 * @param thePopup - popUp object to place animation on
-	 * @param startDelay - delay before animation starts
-	 * @param animDuration - how long to play the animation
-	 * @param fromAlpha - start opacity
-	 * @param toAlpha - end opacity
-	 * @param deleteOnFinished - whether to automate clean up
-	 * @return FadeTransition object for custom handling
-	 */
-	public FadeTransition createFadeTransition(Popup thePopup, int startDelay, int animDuration, double fromAlpha,
-			double toAlpha, boolean deleteOnFinished) {
-		ObservableList<Node> myList = thePopup.getContent(); 
-		Node target = myList.get(0); // usually only the container needs to be animated
-		FadeTransition ft = new FadeTransition(Duration.millis(animDuration), target);
-		ft.setDelay(Duration.millis(startDelay));
-		target.setOpacity(fromAlpha);
-		ft.setFromValue(target.getOpacity());
-		ft.setToValue(0);
-
-		if (deleteOnFinished) {
-			ft.setOnFinished(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					removePopupWindow(thePopup);
-				}
-			});
-		}
-		return ft;
+	
+	public void removePopup(Popup thePopup) {
+		assert(thePopup != null);
+		popupList.remove(thePopup);
 	}
-
-	public void removePopupWindow(PopupWindow target) {
-		popupList.remove(target);
-	}
-
+	
 	public void cleanUp() {
 		popupList.clear();
 	}

@@ -10,12 +10,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
-import taskey.logic.Task;
+import taskey.logic.Task;	
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.ActionContentMode;
+import taskey.ui.content.formatters.UiActionFormatter;
+import taskey.ui.content.formatters.UiCategoryFormatter;
+import taskey.ui.content.formatters.UiDefaultFormatter;
+import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiGridSettings;
 
@@ -33,38 +37,37 @@ public class UiContentManager {
 	private ArrayList<UiFormatter> myFormatters; // for the grid panes
 
 	public UiContentManager(UiClockService _clockService) {
+		assert(_clockService != null);
 		clockService = _clockService;
 		contentBoxes = new ArrayList<ScrollPane>();
 		myFormatters = new ArrayList<UiFormatter>();
 	}
 
 	public void setUpContentBox(ScrollPane pane, ContentBox contentID) {
-		
+		assert(pane != null);
 		UiFormatter myFormatter;
 		switch (contentID) {
-		case WEEKLY:
-			myFormatter = new UiWeeklyFormatter(setUpGrid(UiConstants.GRID_SETTINGS_WEEKLY),clockService);
-			myFormatters.add(myFormatter);
-			break;
 		case ACTION:
 			myFormatter = new UiActionFormatter(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_LISTVIEW),clockService);
 			myFormatter.addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELPVIEW)); // additional grid
-			myFormatters.add(myFormatter);
+			break;
+		case CATEGORY:
+			myFormatter = new UiCategoryFormatter(setUpGrid(UiConstants.GRID_SETTINGS_CATEGORY),clockService);
 			break;
 		default:
-			myFormatter = new UiDefaultFormatter(setUpGrid(UiConstants.GRID_SETTINGS_PENDING), clockService);
-			myFormatters.add(myFormatter);
+			myFormatter = new UiDefaultFormatter(setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT), clockService);
 			break;
 		}
-		
+		myFormatters.add(myFormatter);
 		pane.setContent(myFormatter.getGrid());
 		pane.setFitToWidth(true);
 		contentBoxes.add(pane);
 	}
 
-	public GridPane setUpGrid(UiGridSettings settings) {
+	private GridPane setUpGrid(UiGridSettings settings) {
+		assert(settings != null);
 		GridPane gridPane = new GridPane();
-		//gridPane.setGridLinesVisible(true);
+		gridPane.setGridLinesVisible(true);
 		gridPane.setPadding(settings.getPaddings());
 		gridPane.setHgap(settings.getHGap());
 		gridPane.setVgap(settings.getVGap());
@@ -84,13 +87,10 @@ public class UiContentManager {
 	 * @param contentID - id of content box
 	 */
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
+		assert(myTaskList != null);
 		UiFormatter myFormatter = myFormatters.get(contentID.getValue());
 		myFormatter.clearGridContents();
 		myFormatter.format(myTaskList);
-
-		if (contentID == ContentBox.PENDING) { // update weekly list also when pending list is updated
-			updateContentBox(myTaskList, ContentBox.WEEKLY);
-		}
 	}
 
 	/**
@@ -98,7 +98,8 @@ public class UiContentManager {
 	 * @param myTaskList - which is the list of tasks
 	 * @param mode - Content LIST, HELP
 	 */
-	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionContentMode mode) {
+	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionListMode mode) {
+		//assert(myTaskList != null);
 		int arrayIndex = ContentBox.ACTION.getValue();
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
 		ScrollPane pane = contentBoxes.get(arrayIndex);
@@ -107,7 +108,16 @@ public class UiContentManager {
 		pane.setContent(myFormatter.getGrid());
 		myFormatter.updateContents(myTaskList); // update display
 	}
-	public void cleanUp() {
+	public void updateCategoryContentBox(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		assert(myCategoryList != null);
+		assert(categoryNums != null);
+		int arrayIndex = ContentBox.CATEGORY.getValue();
+		UiCategoryFormatter myFormatter = (UiCategoryFormatter) myFormatters.get(arrayIndex);
+		myFormatter.clearGridContents();
+		myFormatter.updateCategories(myCategoryList,categoryNums,categoryColors);
+	}
+
+	public void cleanUp() 		{
 		for ( int i = 0; i < myFormatters.size(); i ++ ) {
 			myFormatters.get(i).cleanUp();
 		}
@@ -117,6 +127,7 @@ public class UiContentManager {
 	
 	
 	public void processArrowKey(KeyEvent event) {
+		assert(event != null);
 		// temporary, need to get current tab
 		int arrayIndex = ContentBox.ACTION.getValue();
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
@@ -138,7 +149,7 @@ public class UiContentManager {
 		shiftGrid.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				updateActionContentBox(null,ActionContentMode.HELP_MAIN);			
+				updateActionContentBox(null,ActionListMode.HELP_MAIN);			
 			}
 		});
 	}

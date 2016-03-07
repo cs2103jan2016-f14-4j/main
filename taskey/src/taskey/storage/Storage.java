@@ -23,7 +23,7 @@ public class Storage {
 
 	static final String DEFAULT_DIRECTORY = "Taskey savefiles";
 	static final String FILENAME_CONFIG = "last-used directory.taskey_config";
-	static final String FILENAME_TAGS = "TAGS";
+	static final String FILENAME_TAGS = "USER_TAG_DB";
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.

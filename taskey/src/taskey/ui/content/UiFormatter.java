@@ -8,8 +8,11 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -23,6 +26,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.utility.UiClockService;
+import taskey.ui.utility.UiGridSettings;
 
 /**
  * This class contains methods to add content to grids, is extended by other
@@ -32,35 +36,61 @@ import taskey.ui.utility.UiClockService;
  *
  */
 public abstract class UiFormatter {
-	protected String defaultWrapperStyle;
-	protected UiClockService clockService;
+	protected String defaultWrapperStyle; // per cell
+	protected ScrollPane mainPane;
 	protected GridPane currentGrid;
 	protected ArrayList<GridPane> myGrids;
 	
 	public abstract void clearOtherVariables();
 	public abstract void format(ArrayList<Task> myTaskList);
+	public abstract void processArrowKey(KeyEvent event);
 	
-	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
-		currentGrid = _gridPane;
-		clockService = _clockService;
+	public UiFormatter(ScrollPane thePane) {
+		mainPane = thePane;
+		mainPane.setFitToWidth(true);
 		myGrids = new ArrayList<GridPane>();
-		myGrids.add(currentGrid);
 		defaultWrapperStyle = UiConstants.STYLE_WHITE_BOX;
 	}
 	
-	public void setGrid(int index) {
+	/**
+	 * This sets up the grid using predefined GridSettings which only set for column constraints
+	 * Row constraints have to be set manually
+	 * @param settings - the UiGridSettings
+	 * @return
+	 */
+	protected GridPane setUpGrid(UiGridSettings settings) {
+		assert(settings != null);
+		GridPane gridPane = new GridPane();
+		//gridPane.setGridLinesVisible(true);
+		gridPane.setPadding(settings.getPaddings());
+		gridPane.setHgap(settings.getHGap());
+		gridPane.setVgap(settings.getVGap());
+		ArrayList<Integer> colPercents = settings.getColPercents();
+		for (int i = 0; i < colPercents.size(); i++) {
+			ColumnConstraints column = new ColumnConstraints();
+			column.setPercentWidth(colPercents.get(i));
+			gridPane.getColumnConstraints().add(column);
+		}
+		return gridPane;
+	}
+	
+	protected void setGrid(int index) {
 		assert(index >= 0 && index < myGrids.size());
 		currentGrid = myGrids.get(index);
+		mainPane.setContent(currentGrid);
 	}
-	public void addGrid(GridPane newGrid) {
+	protected void addGrid(GridPane newGrid, boolean setToCurrent) {
 		assert(newGrid != null);
+		if ( setToCurrent == true ) {
+			currentGrid = newGrid;
+		}
 		myGrids.add(newGrid);
 	}
-	public GridPane getGrid() {
-		assert(currentGrid != null);
-		return currentGrid;
-	}
-	public void clearGridContents() {
+	
+	/**
+	 * Clear contents of currentGrid variable
+	 */
+	protected void clearGridContents() {
 		assert(currentGrid != null);
 		Node node = null;
 		if (currentGrid.isGridLinesVisible()) {

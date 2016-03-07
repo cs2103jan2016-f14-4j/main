@@ -2,13 +2,11 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Paint;
-import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
@@ -16,23 +14,24 @@ import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.content.UiFormatter;
-import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiCategoryFormatter extends UiFormatter {
 	public static final int BULLET_RADIUS = 5;
 	
-	public UiCategoryFormatter(GridPane _gridPane, UiClockService _clockService) {
-		super(_gridPane, _clockService);
+	public UiCategoryFormatter(ScrollPane thePane) {
+		super(thePane);
+		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_CATEGORY),true);
+		mainPane.setContent(currentGrid);
 	}
 
 	public void updateCategories(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		clearGridContents();
 		UiTextBuilder myConfig = new UiTextBuilder();
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
 			// add bullet
 			addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
-			
 			
 			// add tag name
 			TextFlow element = new TextFlow();
@@ -60,5 +59,11 @@ public class UiCategoryFormatter extends UiFormatter {
 
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
+	}
+
+	@Override
+	public void processArrowKey(KeyEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 }

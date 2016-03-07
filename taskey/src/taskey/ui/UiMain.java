@@ -126,9 +126,11 @@ public class UiMain extends Application {
 	private void testUI() {
 		ArrayList<Task> myTaskList = new ArrayList<Task>();
 		// Temporary;
-		Task temp = new Task("General Task");
-		myTaskList.add(temp);
-
+		for ( int i = 0; i < 8; i ++ ) {
+			Task temp = new Task("General Task " + i);
+			myTaskList.add(temp);
+		}
+		
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);

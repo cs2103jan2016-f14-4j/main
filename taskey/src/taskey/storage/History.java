@@ -17,10 +17,22 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
+	private static History instance;
 	private HashMap<FileType, ArrayList<Task>> lastSavedTasklists;
 
 	public History() {
 		lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();
+	}
+
+	/**
+	 * Returns the History singleton.
+	 * @return
+	 */
+	public static History getInstance() {
+		if (instance == null) {
+			instance = new History();
+		}
+		return instance;
 	}
 
 	/**

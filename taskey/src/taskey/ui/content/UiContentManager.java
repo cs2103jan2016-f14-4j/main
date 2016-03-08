@@ -27,8 +27,7 @@ import taskey.ui.utility.UiGridSettings;
 
 /**
  * This class acts as the interface for all content display related operations
- * It does the main job of setting up the grids and attaching UiFormatters to
- * them
+ * It does the main job of setting up the UiFormatters
  * 
  * @author JunWei
  *
@@ -70,7 +69,7 @@ public class UiContentManager {
 	}
 
 	/**
-	 * Update action list to have the correct grid, then display the grid accordingly
+	 * Update contents of action content box, depending on mode given
 	 * @param myTaskList - which is the list of tasks
 	 * @param mode - Content LIST, HELP
 	 */
@@ -88,44 +87,17 @@ public class UiContentManager {
 		myFormatter.updateCategories(myCategoryList,categoryNums,categoryColors);
 	}
 
-	public void cleanUp() 		{
+	public void cleanUp() {
 		for ( int i = 0; i < myFormatters.size(); i ++ ) {
 			myFormatters.get(i).cleanUp();
 		}
 		myFormatters.clear();
 	}
 	
-	
 	public void processArrowKey(KeyEvent event, ContentBox currentContent) {
 		assert(event != null);
 		int arrayIndex = currentContent.getValue();
 		UiFormatter myFormatter = myFormatters.get(arrayIndex);
 		myFormatter.processArrowKey(event);
-		/*
-		// temporary, need to get current tab
-		int arrayIndex = ContentBox.ACTION.getValue();
-		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
-		GridPane currentGrid = myFormatter.getGrid();
-		int direction = 1;
-		if ( event.getCode() == KeyCode.RIGHT) {
-			direction = 1;		
-		} else if ( event.getCode() == KeyCode.LEFT) {
-			direction = -1;
-		} else {
-			return;
-		}
-		TranslateTransition shiftGrid = UiAnimationManager.getInstance().createTranslateTransition(
-				currentGrid, 
-				new Pair<Double,Double>(currentGrid.getLayoutX(),currentGrid.getLayoutY()),
-				new Pair<Double,Double>(currentGrid.getLayoutX()+currentGrid.getWidth()*direction, currentGrid.getLayoutY()+100),
-				1000);
-		shiftGrid.setOnFinished(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				updateActionContentBox(null,ActionListMode.HELP_MAIN);			
-			}
-		});
-		shiftGrid.play();
-		*/
 	}
 }

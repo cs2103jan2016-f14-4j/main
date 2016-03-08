@@ -35,7 +35,8 @@ public class UiDefaultFormatter extends UiFormatter {
 	private ArrayList<Task> theTasks;
 	private int totalPages;
 	private int entriesPerPage = 5;
-	private int marginSpacing = 5;
+	private int marginSpacing = 3;
+	private int constraintPadding = 1;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
@@ -78,7 +79,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
 		selection %= pageContent.size();
 		if ( selection < 0 ) {
-			selection = 0;
+			selection = pageContent.size()-1;
 		}
 		// remove previous
 		 StackPane myPane = pageContent.get(currentSelection);
@@ -94,7 +95,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		// Note row constraints can expand cells but not contract, tweak text sizes and spacings to achieve effect
 		for (int i = 0; i < entriesPerPage; i++) {
 			RowConstraints row = new RowConstraints();
-			row.setPercentHeight(100/entriesPerPage);
+			row.setPercentHeight((100.0-constraintPadding)/entriesPerPage);
 			currentGrid.getRowConstraints().add(row);
 		}
 	}
@@ -104,9 +105,10 @@ public class UiDefaultFormatter extends UiFormatter {
 		int startIndex = pageIndex * entriesPerPage;
 		for (int i = startIndex; i < theTasks.size() && i < startIndex + entriesPerPage; i++) {	
 			Task theTask = theTasks.get(i);
-			createStackForEntry(0,entryNo,pageContent);
-			addTaskDescription(theTask,entryNo,pageContent);
-			addTaskID(theTask, i, entryNo, pageContent);	
+			addTaskID(theTask, i, entryNo);	
+			// Main content
+			createStackForEntry(1,entryNo,pageContent);
+			addTaskDescription(theTask, entryNo,pageContent);
 			addImage(theTask, entryNo, pageContent);
 			entryNo++;
 		}
@@ -135,15 +137,21 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	// create a stack to place contents on
 	private void createStackForEntry(int col, int row, ArrayList<StackPane> pageEntries) {
-		StackPane stackOn = createStackPaneInCell(0, row, UiConstants.STYLE_WHITE_BOX, currentGrid);
-		StackPane.setMargin(stackOn, new Insets(5));
+		StackPane stackOn = createStackPaneInCell(col, row, UiConstants.STYLE_WHITE_BOX, currentGrid);
+		StackPane.setMargin(stackOn, new Insets(marginSpacing));
 		pageEntries.add(stackOn);
 	}
 
 	private void createPagination() {
 		myPages = new Pagination(); // because there's no method to clear pages
-		myPages.setPageCount(totalPages);
-		myPages.setMaxPageIndicatorCount(totalPages);
+		
+		if ( totalPages == 0 ) {// for formatting
+			myPages.setPageCount(1);
+			myPages.setMaxPageIndicatorCount(1);
+		} else {
+			myPages.setPageCount(totalPages);
+			myPages.setMaxPageIndicatorCount(totalPages);
+		}
 		myPages.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 		myPages.setPageFactory(new Callback<Integer, Node>() {
             @Override
@@ -168,6 +176,17 @@ public class UiDefaultFormatter extends UiFormatter {
 		myGrids.clear(); // remove all grid references, even though they are kept by Pagination
 	}
 	
+	private void addTaskID(Task theTask, int id, int row) {
+		assert(theTask != null);
+		UiTextBuilder myConfig = new UiTextBuilder();
+		TextFlow element = new TextFlow();
+		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+		String line = "" + (id + 1);
+		element.getChildren().addAll(myConfig.build(line));
+		createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
+		addTextFlowToCell(0, row, element,TextAlignment.CENTER, currentGrid);
+	}
+	
 	private void addTaskDescription(Task theTask, int row, ArrayList<StackPane> pageEntries) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
@@ -185,20 +204,13 @@ public class UiDefaultFormatter extends UiFormatter {
 		line += "\n";
 		line += "TAGS: ";
 		element.getChildren().addAll(myConfig.build(line));
-		addTextFlowToCell(0, row, element,TextAlignment.LEFT, currentGrid);
+		addTextFlowToCell(1, row, element,TextAlignment.LEFT, currentGrid);
 		pageEntries.get(row).getChildren().add(element); // switch to use this second level wrapper
 		StackPane.setMargin(element, new Insets(marginSpacing));
 	}
-	private void addTaskID(Task theTask, int id, int row, ArrayList<StackPane> pageEntries) {
-		assert(theTask != null);
-		Label temp = createLabelInCell(0, row, "ID: " + id, UiConstants.STYLE_NUMBER_ICON, currentGrid);
-		pageEntries.get(row).getChildren().add(temp); 
-		StackPane.setAlignment(temp, Pos.TOP_RIGHT);
-		StackPane.setMargin(temp, new Insets(marginSpacing));
-	}
 	
 	private void addImage(Task theTask, int row,  ArrayList<StackPane> pageEntries) { 
-		ImageView img = createImageInCell(0,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
+		ImageView img = createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
 				30,30,currentGrid);
 		pageEntries.get(row).getChildren().add(img); 
 		StackPane.setMargin(img, new Insets(marginSpacing));

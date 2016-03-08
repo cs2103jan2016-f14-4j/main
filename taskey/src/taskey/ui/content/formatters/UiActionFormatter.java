@@ -49,6 +49,7 @@ public class UiActionFormatter extends UiFormatter {
 			Task theTask = myTaskList.get(i);
 			addTaskID(theTask, 0, i);
 			addTaskName(theTask, 1, i);
+			addTaskDate(theTask, 2, i);
 		}
 	}
 
@@ -78,6 +79,28 @@ public class UiActionFormatter extends UiFormatter {
 		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
 	}
 
+	private void addTaskDate(Task theTask, int col, int row) {
+		String theDate = "";
+		if (theTask.getDeadline().length() != 0 ) {
+			String[] params = theTask.getDeadline().split(" ");
+			theDate = params[0] + params[1] + params[2];
+		}
+		
+		UiTextBuilder myConfig = new UiTextBuilder();
+		TextFlow element = new TextFlow();
+		
+		String line;
+		if (theDate.length() == 0) {
+			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+			line = "------";
+		} else {
+			myConfig.addMarker(0, UiConstants.STYLE_TEXT_RED);
+			line = theDate;
+		}
+		element.getChildren().addAll(myConfig.build(line));
+		addTextFlowToCell(col, row, element,TextAlignment.CENTER, currentGrid);
+	}
+	
 	private void showHelp() {
 		ArrayList<UiTextBuilder> lineConfigs = new ArrayList<UiTextBuilder>();
 		String line = "";

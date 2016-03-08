@@ -21,6 +21,8 @@ public class ParserTest {
 		
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
+		
+		System.out.println(parser.parseInput("ADD MEETING2"));
 	}
 	
 	@Test

@@ -42,6 +42,7 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		ProcessedObject processed = null;  
+		stringInput = stringInput.toLowerCase(); 
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"

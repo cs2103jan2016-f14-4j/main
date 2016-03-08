@@ -2,7 +2,6 @@ package taskey.parser;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 
 import taskey.constants.ParserConstants;
 

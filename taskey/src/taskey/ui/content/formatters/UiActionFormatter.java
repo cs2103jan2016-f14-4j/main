@@ -2,47 +2,32 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.animation.TranslateTransition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Circle;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.util.Duration;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.content.UiFormatter;
-import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiActionFormatter extends UiFormatter {
 
 	private ActionListMode currentMode;
-	public UiActionFormatter(GridPane _gridPane, UiClockService _clockService) {
-		super(_gridPane, _clockService);
+	public UiActionFormatter(ScrollPane thePane) {
+		super(thePane);
 		currentMode = ActionListMode.TASKLIST;
-	}
-
-	public void updateGrid(ActionListMode mode) {
-		switch ( mode ) {
-			case HELP_MAIN:
-			case HELP_ADD:
-			case HELP_DEL:
-				setGrid(1);
-				break;
-			default:
-				setGrid(0);
-				break;
-		}
-		currentMode = mode;
+		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_LISTVIEW),true);
+		mainPane.setContent(currentGrid);
+		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELPVIEW),false);
 	}
 	
-	public void updateContents(ArrayList<Task> myList) {
-		switch ( currentMode ) {
+	public void updateContents(ArrayList<Task> myList, ActionListMode mode) {
+		switch ( mode ) {
 			case HELP_MAIN: 
+				setGrid(1);
+				clearGridContents();
 				showHelp();
 				break;
 			case HELP_ADD: 
@@ -50,12 +35,16 @@ public class UiActionFormatter extends UiFormatter {
 			case HELP_DEL: 
 				break;
 			default:
+				setGrid(0);
+				clearGridContents();
 				format(myList);
 		}
+		currentMode = mode;
 	}
 	
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);
+		clearGridContents();
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
 			addTaskID(theTask, 0, i);
@@ -63,6 +52,10 @@ public class UiActionFormatter extends UiFormatter {
 		}
 	}
 
+	@Override
+	public void clearOtherVariables() {
+	}
+	
 	private void addTaskID(Task theTask, int col, int row) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
@@ -161,5 +154,11 @@ public class UiActionFormatter extends UiFormatter {
 			createStyledCell(0, i,style, currentGrid);
 			addTextFlowToCell(0, i, element,TextAlignment.LEFT, currentGrid);
 		}
+	}
+
+	@Override
+	public void processArrowKey(KeyEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 }

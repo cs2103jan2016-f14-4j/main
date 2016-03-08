@@ -2,39 +2,173 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.util.Callback;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
-import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
+	private int currentSelection;
+	private Pagination myPages;
+	private int currentPage;
+	private ArrayList<Task> theTasks;
+	private int totalPages;
+	private int entriesPerPage = 5;
+	private int marginSpacing = 5;
+	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	
-	public UiDefaultFormatter(GridPane _gridPane, UiClockService _clockService) {
-		super(_gridPane, _clockService);
+	public UiDefaultFormatter(ScrollPane thePane) {
+		super(thePane);
+		totalEntries = new ArrayList<ArrayList<StackPane>>(); 
+		mainPane.setFitToHeight(true);
+		disableScrollBar();
+		currentSelection = 0;
+	}
+
+	// disable all default inputs, inputs are passed through UiContentManager
+	private void disableScrollBar() {
+		mainPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+		mainPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() { 
+          public void handle(KeyEvent event) {
+        	  if ( event.getCode().isArrowKey()) {
+        			  event.consume();
+        	  }
+          }
+        });	
+	}
+	@Override
+	public void processArrowKey(KeyEvent event) {
+		if ( totalEntries.size() == 0 ) {
+			return;
+		}
+		
+		if ( event.getCode() == KeyCode.DOWN) {
+			select(currentSelection + 1);
+		} else if ( event.getCode() == KeyCode.UP) {
+			select(currentSelection - 1);
+		} else if ( event.getCode() == KeyCode.RIGHT) {
+			myPages.setCurrentPageIndex(currentPage+1); 
+		} else {
+			myPages.setCurrentPageIndex(currentPage-1); // note Pagination handles negative values
+		}
+	}	
+	
+	private void select(int selection) {
+		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
+		selection %= pageContent.size();
+		if ( selection < 0 ) {
+			selection = 0;
+		}
+		// remove previous
+		 StackPane myPane = pageContent.get(currentSelection);
+		if ( myPane.getStyleClass().size() > 1) {
+			myPane.getStyleClass().remove(1);
+		}
+		currentSelection = selection;
+		myPane = (StackPane) pageContent.get(currentSelection);
+		myPane.getStyleClass().add(UiConstants.STYLE_GRAY_BOX);
+	};
+	private void addGridToPagination() {
+		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT),true);	
+		// Note row constraints can expand cells but not contract, tweak text sizes and spacings to achieve effect
+		for (int i = 0; i < entriesPerPage; i++) {
+			RowConstraints row = new RowConstraints();
+			row.setPercentHeight(100/entriesPerPage);
+			currentGrid.getRowConstraints().add(row);
+		}
+	}
+	private void fillPageContent(int pageIndex) {
+		ArrayList<StackPane> pageContent = new ArrayList<StackPane>();
+		int entryNo = 0;
+		int startIndex = pageIndex * entriesPerPage;
+		for (int i = startIndex; i < theTasks.size() && i < startIndex + entriesPerPage; i++) {	
+			Task theTask = theTasks.get(i);
+			createStackForEntry(0,entryNo,pageContent);
+			addTaskDescription(theTask,entryNo,pageContent);
+			addTaskID(theTask, i, entryNo, pageContent);	
+			addImage(theTask, entryNo, pageContent);
+			entryNo++;
+		}
+		totalEntries.add(pageContent); 
+	}
+	// Note this methods creates the whole page by default, therefore we modify it
+	private GridPane createPage(int pageIndex) {
+		if ( pageIndex >= totalPages ) {
+			return null; // invalid pages
+		} 
+		if ( currentSelection != 0 ) {
+			select(0); // de-select previous selection
+		}
+		if ( myGrids.size() < pageIndex+1  ) {
+			// only create a new grid if not enough grids
+			addGridToPagination();
+			fillPageContent(pageIndex);
+		} else {
+			currentGrid = myGrids.get(pageIndex);
+		}   
+		currentSelection = 0;
+		currentPage = pageIndex;
+		select(0); // only after arraylist has been initialized
+		return currentGrid;
+    }
+	
+	// create a stack to place contents on
+	private void createStackForEntry(int col, int row, ArrayList<StackPane> pageEntries) {
+		StackPane stackOn = createStackPaneInCell(0, row, UiConstants.STYLE_WHITE_BOX, currentGrid);
+		StackPane.setMargin(stackOn, new Insets(5));
+		pageEntries.add(stackOn);
+	}
+
+	private void createPagination() {
+		myPages = new Pagination(); // because there's no method to clear pages
+		myPages.setPageCount(totalPages);
+		myPages.setMaxPageIndicatorCount(totalPages);
+		myPages.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+		myPages.setPageFactory(new Callback<Integer, Node>() {
+            @Override
+            public Node call(Integer pageIndex) {
+                return createPage(pageIndex);
+            }
+        });
+	}
+	@Override
+	public void format(ArrayList<Task> myTaskList) {
+		assert(myTaskList != null);	
+		clearOtherVariables();
+		theTasks = myTaskList;
+		totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double
+		createPagination();
+		mainPane.setContent(myPages);
 	}
 
 	@Override
-	public void format(ArrayList<Task> myTaskList) {
-		assert(myTaskList != null);
-		for (int i = 0; i < myTaskList.size(); i++) {
-			Task theTask = myTaskList.get(i);
-			addTaskDescription(theTask,  i);
-			addTaskID(theTask, i);	
-			addImage(theTask,  i);
-		}
+	public void clearOtherVariables() {
+		totalEntries.clear();
+		myGrids.clear(); // remove all grid references, even though they are kept by Pagination
 	}
-
-	private void addTaskDescription(Task theTask, int row) {
+	
+	private void addTaskDescription(Task theTask, int row, ArrayList<StackPane> pageEntries) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
@@ -48,30 +182,25 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			line += "---------";
 		}
-		line += "\n\n";
+		line += "\n";
 		line += "TAGS: ";
 		element.getChildren().addAll(myConfig.build(line));
 		addTextFlowToCell(0, row, element,TextAlignment.LEFT, currentGrid);
+		pageEntries.get(row).getChildren().add(element); // switch to use this second level wrapper
+		StackPane.setMargin(element, new Insets(marginSpacing));
 	}
-	
-	private void addTaskID(Task theTask, int row) {
+	private void addTaskID(Task theTask, int id, int row, ArrayList<StackPane> pageEntries) {
 		assert(theTask != null);
-		UiTextBuilder myConfig = new UiTextBuilder();
-		TextFlow element = new TextFlow();
-		element = new TextFlow();
-		element.getChildren().addAll(myConfig.build("ID: -1"));
-		
-		StackPane ID_Wrapper = createStackPaneInCell(0, row, UiConstants.STYLE_NUMBER_ICON, currentGrid);
-		ID_Wrapper.getChildren().add(element);
-		GridPane.setValignment(ID_Wrapper, VPos.TOP);
-		GridPane.setHalignment(ID_Wrapper, HPos.RIGHT);
+		Label temp = createLabelInCell(0, row, "ID: " + id, UiConstants.STYLE_NUMBER_ICON, currentGrid);
+		pageEntries.get(row).getChildren().add(temp); 
+		StackPane.setAlignment(temp, Pos.TOP_RIGHT);
+		StackPane.setMargin(temp, new Insets(marginSpacing));
 	}
 	
-	private void addImage(Task theTask, int row) { 
-		StackPane ImageWrapper = addImageToCell(0,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
+	private void addImage(Task theTask, int row,  ArrayList<StackPane> pageEntries) { 
+		ImageView img = createImageInCell(0,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
 				30,30,currentGrid);
-		GridPane.setValignment(ImageWrapper, VPos.CENTER);
-		GridPane.setHalignment(ImageWrapper, HPos.CENTER);
-		ImageWrapper.setTranslateX(50);
+		pageEntries.get(row).getChildren().add(img); 
+		StackPane.setMargin(img, new Insets(marginSpacing));
 	}
 }

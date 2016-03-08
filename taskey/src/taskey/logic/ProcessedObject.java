@@ -35,6 +35,7 @@ public class ProcessedObject {
 	 * 2. GENERAL
 	 * 3. DEADLINES
 	 * 4. EVENTS 
+	 * 5. ARCHIVE 
 	 */
 	private String command = null;
 	private Task task = null; 

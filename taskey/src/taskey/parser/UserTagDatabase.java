@@ -11,7 +11,8 @@ import taskey.storage.Storage;
 /**
  * Purpose of this class is to handle the storage and retrieval
  * of userTags, so that they can be displayed by Logic as 
- * categories that users can search for
+ * categories that users can view their tasks by.
+ * Used by ParseView
  * @author Xue Hui
  *
  */

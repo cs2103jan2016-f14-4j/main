@@ -125,6 +125,7 @@ public class UiController {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 		currentTab = myTabs.getTabs().size()-1; // focus the tab
+		myTabs.getTabs().get(ContentBox.ACTION.getValue()).setText("TEST");
 		//displayTabContents(currentTab);
 	}
 	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {

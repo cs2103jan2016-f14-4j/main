@@ -133,9 +133,8 @@ public class UiMain extends Application {
 		
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
-		//myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
-		
+		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
+	
 		ArrayList<String> myCategoryList = new ArrayList<String>(
 				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
 		ArrayList<Integer> categoryNums = new ArrayList<Integer>(

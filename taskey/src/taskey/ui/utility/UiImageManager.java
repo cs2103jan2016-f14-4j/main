@@ -42,7 +42,7 @@ public class UiImageManager {
 	public Image getImage(IMAGE_ID id) {
 		Image theImage = myImageContainer.get(id);
 		if ( theImage == null ) {
-			System.out.println("Image not found by" + id);
+			System.out.println("Image not found by " + id);
 		}
 		return theImage;
 	}

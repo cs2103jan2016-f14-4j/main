@@ -121,11 +121,11 @@ public class UiController {
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode, String tabName) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 		currentTab = myTabs.getTabs().size()-1; // focus the tab
-		myTabs.getTabs().get(ContentBox.ACTION.getValue()).setText("TEST");
+		myTabs.getTabs().get(ContentBox.ACTION.getValue()).setText(tabName);
 		//displayTabContents(currentTab);
 	}
 	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {

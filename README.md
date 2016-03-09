@@ -34,7 +34,7 @@ Examples:
 ###Editing a task
 A task's name or its date details can be changed when required.
 
-Format: set <old taskname/id> "new taskname"/[new date] 
+Format: set \<old taskname/id\> "new taskname"/[new date] 
 
 Examples:
 <ul> 
@@ -50,7 +50,8 @@ When you are done with a task, you can archive it.
 Format: done \<taskname/id\>
 
 ###Search for a task
-If you have many tasks, you can search for your tasks by typing the command "search". 
+If you have many tasks, you can search for your tasks by typing the command "<b>search</b>". 
+
 Format: search \<phrase\>
 
 Example:

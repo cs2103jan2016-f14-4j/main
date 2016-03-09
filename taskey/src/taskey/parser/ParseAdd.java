@@ -108,7 +108,12 @@ public class ParseAdd {
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
-		if (!specialDays.containsKey(rawStartDate)) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(rawStartDate);
+		if (epochTime != -1) {
+			task.setStartDate(epochTime); 
+		} else if (!specialDays.containsKey(rawStartDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
@@ -122,7 +127,12 @@ public class ParseAdd {
 			task.setStartDate(epochTime);
 		}
 		
-		if (!specialDays.containsKey(rawEndDate)) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(rawEndDate);
+		if (epochTime != -1) {
+			task.setEndDate(epochTime); 
+		} else if (!specialDays.containsKey(rawEndDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
@@ -268,7 +278,7 @@ public class ParseAdd {
 				return processedTime.get(0).getTime(); 
 			}
 		}
-		return -1; 
+		return -1; //no time indicated, or time is in the wrong format
 	}
 	
 	/**

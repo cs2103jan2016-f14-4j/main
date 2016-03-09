@@ -2,16 +2,17 @@ package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task;
 import taskey.parser.Parser;
 
 public class ParserTest {
 	Parser parser = new Parser(); 
+	PrettyTimeParser p = new PrettyTimeParser();
 	
 	@Test
 	public void testFloating() {
@@ -22,7 +23,27 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		
-		System.out.println(parser.parseInput("ADD MEETING2"));
+		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
+				parser.parseInput("ADD MEETING2").toString());
+		//date.getTime();
+		List<Date> test = p.parse("add complete essay by next wed morning");
+		System.out.println(test.get(0).getTime());
+		System.out.println(p.parse("add meeting at 1p.m."));
+		System.out.println(p.parse("add meeting from 17 feb to 18 feb"));
+		
+		/*
+		 * tomorrow morning- auto 8am
+		   tomorrow night - auto 8pm
+
+		   -ie, change time to 23.59 if it doesnt contain
+		   am or pm or a.m. or p.m. or morning or night?
+		   
+		   TODO: 
+		   add a conditional: if the time contains am/pm/a.m./p.m. or morning or night,
+		   use the PrettyTime Converter.
+		   Do not support commands like 'three days from now' or times that do not
+		   contain am or pm 
+		 */
 	}
 	
 	@Test
@@ -37,6 +58,9 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
 				+ "due on 17 Feb 2016 23:59:59\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+	}
+	
+	public void testDeadlineHuman() {
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
@@ -50,11 +74,14 @@ public class ParserTest {
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
 				+ "to 20 Feb 2016 23:59:59\n",
-				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
+				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());		
+	}
+	
+	public void testEventsHuman() {
 		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to next wed"));		
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
 	@Test

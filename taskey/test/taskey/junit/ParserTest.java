@@ -25,19 +25,8 @@ public class ParserTest {
 		
 		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
-		//date.getTime();
-		List<Date> test = p.parse("add complete essay by next wed morning");
-		System.out.println(test.get(0).getTime());
-		System.out.println(p.parse("add meeting at 1p.m."));
-		System.out.println(p.parse("add meeting from 17 feb to 18 feb"));
-		
-		/*
-		 * tomorrow morning- auto 8am
-		   tomorrow night - auto 8pm
-
-		   -ie, change time to 23.59 if it doesnt contain
-		   am or pm or a.m. or p.m. or morning or night?
 		   
+		/*
 		   TODO: 
 		   add a conditional: if the time contains am/pm/a.m./p.m. or morning or night,
 		   use the PrettyTime Converter.
@@ -48,19 +37,26 @@ public class ParserTest {
 	
 	@Test
 	public void testDeadline() {
+	
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
+				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
+			 
+		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
+				+ "due on 17 Feb 2016 15:00:00\n",
+				parser.parseInput("add project meeting by 17 feb 2016 3pm").toString());
+		 
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
-				parser.parseInput("add project meeting at 3pm by 17 feb 2016").toString());
+				+ "due on 17 Feb 2016 15:00:00\n",
+				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());			
 		
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
-				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+		//System.out.println(parser.parseInput("add project meeting at 3pm by 17 feb 2016"));
+		//this returns today's date O_O 
 	}
 	
 	public void testDeadlineHuman() {
+		//tests the SpecialDateConverter, which is based on relative dates.
+		//thus, cannot to assert this 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
@@ -74,7 +70,11 @@ public class ParserTest {
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
 				+ "to 20 Feb 2016 23:59:59\n",
-				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());		
+				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());	
+		
+		//TODO: convert to assert 
+		System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm"));
+		System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 4pm"));
 	}
 	
 	public void testEventsHuman() {

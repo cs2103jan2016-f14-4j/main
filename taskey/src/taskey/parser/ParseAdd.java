@@ -99,21 +99,32 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
+		String withoutTagList = simpString.split("#")[0].trim();
+		
 		String simpString2 = simpString.replace("today", "2day"); 
 		simpString2 = simpString2.replace("tomorrow", "tmr"); 
-		String[] removeTagList = simpString2.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("from");
+		String[] inputList = withoutTagList.split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
-		//if time contains am or pm or morning or night, 
-		//call pretty parser to process the time.
-		epochTime = getPrettyTime(rawStartDate);
-		if (epochTime != -1) {
-			task.setStartDate(epochTime); 
-		} else if (!specialDays.containsKey(rawStartDate)) {
+		//if date contains am or pm or morning or night, 
+		//call pretty parser to process the time and return. 
+		try {
+			long[] epochTimeEvent = getPrettyTimeEvent(withoutTagList);
+			task.setStartDate(epochTimeEvent[0]);
+			task.setEndDate(epochTimeEvent[1]);
+			task.setTaskName(taskName);
+			task.setTaskType("EVENT");
+			processed = new ProcessedObject("ADD_EVENT",task);
+			return processed;
+		} catch (Error e) {
+			//do nothing, continue to code below
+			//ie. date format wrong or has no time in the date
+		}
+		
+		if (!specialDays.containsKey(rawStartDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
@@ -127,12 +138,8 @@ public class ParseAdd {
 			task.setStartDate(epochTime);
 		}
 		
-		//if time contains am or pm or morning or night, 
-		//call pretty parser to process the time.
-		epochTime = getPrettyTime(rawEndDate);
-		if (epochTime != -1) {
-			task.setEndDate(epochTime); 
-		} else if (!specialDays.containsKey(rawEndDate)) {
+		
+		if (!specialDays.containsKey(rawEndDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
@@ -162,14 +169,14 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] removeTagList = simpString.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("by");
+		String withoutTagList = simpString.split("#")[0].trim(); 
+		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(rawDate);
+		epochTime = getPrettyTime(withoutTagList);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -203,14 +210,14 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] removeTagList = simpString.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("on"); 
+		String withoutTagList = simpString.split("#")[0].trim(); 
+		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(rawDate);
+		epochTime = getPrettyTime(withoutTagList);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -270,15 +277,42 @@ public class ParseAdd {
 	 * @return epochTime (long) of rawDate
 	 */
 	public long getPrettyTime(String rawDate) {
-		
 		for(int i = 0; i < timeWords.size(); i++) {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser
 				List<Date> processedTime = prettyParser.parse(rawDate); 
-				return processedTime.get(0).getTime(); 
+				if (!processedTime.isEmpty()) { 
+					return processedTime.get(0).getTime() / 1000; 
+				} else {
+					return -1; 
+				}
 			}
 		}
 		return -1; //no time indicated, or time is in the wrong format
+	}
+	
+	/**
+	 * If the rawDate contains time field for an event, 
+	 * use PrettyTimeParser to parse the date
+	 * @param rawDate
+	 * @return epochTime (long array) of rawDate (FOR EVENTS) 
+	 */
+	public long[] getPrettyTimeEvent(String rawDate) throws Error {
+		for(int i = 0; i < timeWords.size(); i++) {
+			if (rawDate.contains(timeWords.get(i))) {
+				//if the date contains any of the time words, call prettyParser
+				List<Date> processedTime = prettyParser.parse(rawDate); 
+				if (processedTime.size() >= 2) {
+					long[] epochTimes = {processedTime.get(0).getTime() / 1000,
+							processedTime.get(1).getTime() / 1000}; 
+					
+					return epochTimes; 
+				} else {
+					throw new Error(); 
+				}
+			}
+		}
+		throw new Error(); //no time indicated, or time is in the wrong format
 	}
 	
 	/**

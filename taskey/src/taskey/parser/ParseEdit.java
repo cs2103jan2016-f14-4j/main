@@ -387,7 +387,7 @@ public class ParseEdit {
 				//if the date contains any of the time words, call prettyParser
 				List<Date> processedTime = prettyParser.parse(rawDate); 
 				if (!processedTime.isEmpty()) {
-					return processedTime.get(0).getTime(); 
+					return processedTime.get(0).getTime() / 1000; 
 				} else {
 					return -1; //unable to process 
 				}

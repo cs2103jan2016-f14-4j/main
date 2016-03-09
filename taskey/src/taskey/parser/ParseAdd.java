@@ -59,15 +59,15 @@ public class ParseAdd {
 		//simpString: basically string without the command
 		String simpString = getTaskName(command, stringInput); 
 		
-		if (simpString.split("on").length != 1) {
+		if (simpString.split("from").length != 1) {
+			//event
+			processed = handleEvent(task, simpString);
+		} else if (simpString.split("on").length != 1) {
 			//deadline
 			processed = handleDeadlineOn(task, simpString);	
 		} else if (simpString.split("by").length != 1) {
 			//deadline 
 			processed = handleDeadlineBy(task, simpString);
-		} else if (simpString.split("from").length != 1) {
-			//event
-			processed = handleEvent(task, simpString);
 		} else if (simpString.compareTo("") == 0) {
 			//empty add
 			processed = parseError.processError("empty add");

@@ -73,8 +73,10 @@ public class ParserTest {
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());	
 		
 		//TODO: convert to assert 
-		System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm"));
-		System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 4pm"));
+		//System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm"));
+		//System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 4pm"));
+		System.out.println(parser.parseInput("add project meeting from 4pm to 5pm on 19 feb"));
+		System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
 	public void testEventsHuman() {
@@ -141,8 +143,8 @@ public class ParserTest {
 		
 		//test time usage
 		//TODO: convert to assert 
-		System.out.println(parser.parseInput("set 2 [16 feb 3pm]"));
-		System.out.println(parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]"));
+		//System.out.println(parser.parseInput("set 2 [16 feb 3pm]"));
+		//System.out.println(parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]"));
 	}
 	
 	public void testChangesHuman() {

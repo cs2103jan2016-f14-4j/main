@@ -61,7 +61,8 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of views is available, return null 
 	 */
-	public ArrayList<String> completeView(String phrase) {
+	public ArrayList<String> completeView(String phrase, 
+			ArrayList<String> tagDB) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("view", ""); 
@@ -71,7 +72,60 @@ public class AutoComplete {
 				availViews.add(viewList.get(i)); 
 			}
 		}
-		//TODO: Handle case for tagged categories
+		
+		for(int i = 0; i < tagDB.size(); i++) {
+			if (tagDB.get(i).contains(phrase)) {
+				availViews.add(tagDB.get(i)); 
+			}
+		}
+		
+		if (!availViews.isEmpty()) {
+			return availViews; 
+		}
+		return null; 
+	}
+	
+	/**
+	 * Given a partial input that contains "del xxxx",
+	 * display a list of tasks that the user can delete 
+	 * (he can delete by task name or number)
+	 * @param phrase
+	 * @return If no such list of tasks is available, return null 
+	 */
+	public ArrayList<String> completeDelete(String phrase, ArrayList<String> tasks) {
+		ArrayList<String> availViews = new ArrayList<String>();
+		phrase = phrase.toLowerCase();
+		phrase = phrase.replaceFirst("del", ""); 
+		
+		for(int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).contains(phrase)) {
+				availViews.add(tasks.get(i)); 
+			}
+		}
+		
+		if (!availViews.isEmpty()) {
+			return availViews; 
+		}
+		return null; 
+	}
+	
+	/**
+	 * Given a partial input that contains "done xxxx",
+	 * display a list of tasks that the user can set as done 
+	 * (he can set done by task name or number)
+	 * @param phrase
+	 * @return If no such list of tasks is available, return null 
+	 */
+	public ArrayList<String> completeDone(String phrase, ArrayList<String> tasks) {
+		ArrayList<String> availViews = new ArrayList<String>();
+		phrase = phrase.toLowerCase();
+		phrase = phrase.replaceFirst("done", ""); 
+		
+		for(int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).contains(phrase)) {
+				availViews.add(tasks.get(i)); 
+			}
+		}
 		
 		if (!availViews.isEmpty()) {
 			return availViews; 

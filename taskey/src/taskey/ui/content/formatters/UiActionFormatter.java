@@ -27,7 +27,7 @@ public class UiActionFormatter extends UiFormatter {
 		switch ( mode ) {
 			case HELP_MAIN: 
 				setGrid(1);
-				clearGridContents();
+				clearCurrentGridContents();
 				showHelp();
 				break;
 			case HELP_ADD: 
@@ -36,7 +36,7 @@ public class UiActionFormatter extends UiFormatter {
 				break;
 			default:
 				setGrid(0);
-				clearGridContents();
+				clearCurrentGridContents();
 				format(myList);
 		}
 		currentMode = mode;
@@ -44,7 +44,7 @@ public class UiActionFormatter extends UiFormatter {
 	
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);
-		clearGridContents();
+		clearCurrentGridContents();
 		for (int i = 0; i < myTaskList.size(); i++) {
 			Task theTask = myTaskList.get(i);
 			addTaskID(theTask, 0, i);
@@ -184,4 +184,11 @@ public class UiActionFormatter extends UiFormatter {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public int processDeleteKey() {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
 }

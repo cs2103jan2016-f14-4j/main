@@ -26,7 +26,7 @@ public class UiCategoryFormatter extends UiFormatter {
 	}
 
 	public void updateCategories(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		clearGridContents();
+		clearCurrentGridContents();
 		UiTextBuilder myConfig = new UiTextBuilder();
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
@@ -65,5 +65,11 @@ public class UiCategoryFormatter extends UiFormatter {
 	public void processArrowKey(KeyEvent event) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int processDeleteKey() {
+		// TODO Auto-generated method stub
+		return -1;
 	}
 }

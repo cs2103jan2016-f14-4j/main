@@ -105,6 +105,7 @@ public class ParserTest {
 	@Test
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
+		//by task id
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 1",
 				parser.parseInput("set 1 \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 2",
@@ -121,7 +122,7 @@ public class ParserTest {
 				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
 				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
 		
-		
+		//by task name
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n",
 				parser.parseInput("set meeting \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
@@ -136,7 +137,17 @@ public class ParserTest {
 				parser.parseInput("set meeting [16 feb, 17 Feb]").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, EVENT, "
 				+ "from 16 Feb 2016 23:59:59 to 17 Feb 2016 23:59:59\n",
-				parser.parseInput("set meeting [16 feb,17 Feb]").toString());		
+				parser.parseInput("set meeting [16 feb,17 Feb]").toString());	
+		
+		//test time usage
+		//TODO: convert to assert 
+		System.out.println(parser.parseInput("set 2 [16 feb 3pm]"));
+		System.out.println(parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]"));
+	}
+	
+	public void testChangesHuman() {
+		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
+		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
 	@Test

@@ -290,7 +290,10 @@ public class ParseEdit {
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
+		epochTime = getPrettyTime(newDateRaw);
+		if (epochTime != -1) {
+			changedTask.setDeadline(epochTime); 
+		} else if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
@@ -316,7 +319,10 @@ public class ParseEdit {
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("DEADLINE");
 		
-		if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
+		epochTime = getPrettyTime(newDateRaw);
+		if (epochTime != -1) {
+			changedTask.setDeadline(epochTime); 
+		} else if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
@@ -380,7 +386,11 @@ public class ParseEdit {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser
 				List<Date> processedTime = prettyParser.parse(rawDate); 
-				return processedTime.get(0).getTime(); 
+				if (!processedTime.isEmpty()) {
+					return processedTime.get(0).getTime(); 
+				} else {
+					return -1; //unable to process 
+				}
 			}
 		}
 		return -1; //no time indicated, or time is in the wrong format

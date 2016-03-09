@@ -1,6 +1,9 @@
 package taskey.junit;
 
 import static org.junit.Assert.*;
+
+import java.text.ParseException;
+
 import org.junit.Test;
 import taskey.parser.TimeConverter;
 
@@ -10,11 +13,27 @@ public class TimeConverterTest {
 	public void test() {
 		TimeConverter timeConverter = new TimeConverter(); 
 		
-		//System.out.println("Current Time in Epoch: " + timeConverter.getCurrTime()); 
-		assertEquals(1455123600,timeConverter.toEpochTime("11 Feb 2016 01:00:00"));
-		
-		assertFalse(timeConverter.isSameDay(timeConverter.getCurrTime(),
-				timeConverter.toEpochTime("11 Feb 2016 23:00:00")));
+		try {
+			//System.out.println("Current Time in Epoch: " + timeConverter.getCurrTime()); 
+			assertEquals(1455123600,timeConverter.toEpochTime("11 Feb 2016 01:00:00"));
+			
+			assertFalse(timeConverter.isSameDay(timeConverter.getCurrTime(),
+					timeConverter.toEpochTime("11 Feb 2016 23:00:00")));
+			
+			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb 2016"));
+			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb"));
+			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb 2016"));
+			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb"));
+			assertEquals("01 Feb 2016 23:59:59",timeConverter.toHumanTime(1454342399));
+			
+			long time1 = timeConverter.toEpochTime("31 Mar");
+			long time2 = timeConverter.toEpochTime("1 Apr");
+			assertTrue(timeConverter.isSameWeek(time1, time2));
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//compare 10Feb 11pm vs 11Feb 1am 
 		assertFalse(timeConverter.isSameDay(1455123600,1455116400));
 		//compare 11 feb a few minutes later 

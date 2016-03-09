@@ -173,7 +173,7 @@ public class UiController {
 					input.clear();
 
 					int statusCode = 0;
-					//statusCode = Logic.getInstance().executeCommand(currentContent,line);
+					statusCode = Logic.getInstance().executeCommand(currentContent,line);
 					
 					UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
 					event.consume();

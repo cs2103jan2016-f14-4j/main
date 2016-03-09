@@ -1,6 +1,6 @@
 package taskey.logic;
 
-import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import taskey.parser.TimeConverter; 
@@ -26,7 +26,7 @@ import taskey.parser.TimeConverter;
  *
  */
 
-public class Task implements Comparable<Task>, Serializable {
+public class Task implements Comparable<Task> {
 	public static final int NONE = -1; 
 	public static final String EMPTY = ""; 
 	
@@ -109,7 +109,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setStartDate(String startDate) {
 		datesHuman[1] = startDate; 
-		datesEpoch[1] = timeConverter.toEpochTime(startDate); 	
+		try {
+			datesEpoch[1] = timeConverter.toEpochTime(startDate);
+		} catch (ParseException error) {
+			//do nothing
+		}
 	}
 	
 	/**
@@ -129,7 +133,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setEndDate(String endDate) {
 		datesHuman[2] = endDate; 
-		datesEpoch[2] = timeConverter.toEpochTime(endDate); 	
+		try {
+			datesEpoch[2] = timeConverter.toEpochTime(endDate); 
+		} catch (ParseException error) {
+			
+		}
 	}
 	
 	/**
@@ -149,7 +157,11 @@ public class Task implements Comparable<Task>, Serializable {
 	 */
 	public void setDeadline(String deadline) {
 		datesHuman[3] = deadline; 
-		datesEpoch[3] = timeConverter.toEpochTime(deadline); 	
+		try {
+			datesEpoch[3] = timeConverter.toEpochTime(deadline); 
+		} catch (ParseException error) {
+			
+		}
 	}
 	
 	/**
@@ -201,6 +213,10 @@ public class Task implements Comparable<Task>, Serializable {
 				taskTags.remove(i); 
 				break; 
 			}
+		}
+		//if empty, remove the arraylist 
+		if (taskTags.isEmpty()) {
+			taskTags = null; 
 		}
 	}
 	
@@ -262,13 +278,16 @@ public class Task implements Comparable<Task>, Serializable {
 	 * tasks are the same if they have the same name
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
-	 * @return 0 if they have the same name, else return -1 
+	 * @return true if they have the same name, else return false 
 	 */
-	public int equals(Task anotherTask) {
-		if (taskName.compareTo(anotherTask.getTaskName()) == 0) {
-			return 0; 
-		}	
-		return -1; 
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Task)) {
+		    return false;
+		  }
+		
+		Task other = (Task) obj;
+		
+		return taskName.equals(other.getTaskName()); 
 	}
 	
 	@Override 
@@ -301,6 +320,14 @@ public class Task implements Comparable<Task>, Serializable {
 			}
 		}
 		stringRep += "\n";
+		
+		if (taskTags != null) { 
+			stringRep += "tags: ";
+			for(int i  =0; i < taskTags.size(); i++) {
+				stringRep += taskTags.get(i) + ", "; 
+			}
+			stringRep += "\n";
+		}
 		
 		return stringRep; 
 	}

@@ -1,10 +1,9 @@
 package taskey.parser;
 
-import taskey.logic.ProcessedObject;
-
 import java.util.HashMap;
 
-import taskey.constants.ParserConstants; 
+import taskey.constants.ParserConstants;
+import taskey.logic.ProcessedObject; 
 
 /**
  * Purpose of this class is to parse the "view" command 
@@ -13,14 +12,18 @@ import taskey.constants.ParserConstants;
  */
 public class ParseView {
 	private HashMap<String,String> viewList = new HashMap<String,String>();
-	private HashMap<String,String> userDefinedList = new HashMap<String,String>(); 
+	private UserTagDatabase tagDB = null; 
 	private ParseError parseError = new ParseError(); 
 	
-	public ParseView() {
+	public ParseView(UserTagDatabase tagDB) {
+		this.tagDB = tagDB; 
+		
 		viewList.put("all", "all"); 
 		viewList.put("general", "general");
 		viewList.put("deadlines", "deadlines");
 		viewList.put("events", "events"); 
+		viewList.put("archive", "archive"); 
+		viewList.put("help", "help"); 
 	}
 	
 	/**
@@ -29,6 +32,9 @@ public class ParseView {
 	 * 2. GENERAL
 	 * 3. DEADLINES
 	 * 4. EVENTS 
+	 * 5. ARCHIVE
+	 * 6. HELP 
+	 * 7. #tags 
 	 * @param command
 	 * @param stringInput
 	 * @return processedStuff
@@ -58,18 +64,10 @@ public class ParseView {
 		
 		if (viewList.containsKey(viewType)) {
 			return viewType; 
-		} else if (userDefinedList.containsKey(viewType)) {
+		} else if (tagDB.hasTag(viewType)) {
 			return viewType; 
 		}
 		return "error"; 
-	}
-	
-	/**
-	 * This allows the user to create user defined categories according to their tags. 
-	 * @param tag
-	 */
-	public void addUserDefinedView(String tag) {
-		userDefinedList.put(tag, tag);
 	}
 
 }

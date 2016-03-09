@@ -1,9 +1,11 @@
 package taskey.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject; 
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task; 
 
 
 
@@ -14,12 +16,14 @@ public class Parser {
 	private ParseError parseError = new ParseError(); 
 	private ParseAdd parseAdd = new ParseAdd(); 
 	private ParseEdit parseEdit = new ParseEdit(); 
-	private ParseUndo parseUndo = new ParseUndo(); 
-	private ParseView parseView = new ParseView(); 
+	private ParseUndo parseUndo = new ParseUndo();  
 	private ParseSearch parseSearch = new ParseSearch(); 
 	private ParseDelete parseDelete = new ParseDelete();
 	private ParseDone parseDone = new ParseDone(); 
-	 
+	private ParseFileLocation parseDir = new ParseFileLocation(); 
+	
+	private UserTagDatabase tagDB = new UserTagDatabase(); 
+	private ParseView parseView = new ParseView(tagDB);
 	
 	public Parser() {
 		commandList.put("add", "add"); 
@@ -29,6 +33,7 @@ public class Parser {
 		commandList.put("search", "search"); 
 		commandList.put("done", "done"); 
 		commandList.put("undo", "undo"); 
+		commandList.put("file_loc", "file_loc");
 	}
 	
 	/**
@@ -38,6 +43,7 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		ProcessedObject processed = null;  
+		stringInput = stringInput.toLowerCase(); 
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"
@@ -49,6 +55,9 @@ public class Parser {
 			case "del":
 				processed = parseDelete.processDelete(command, stringInput); 
 				break;
+			case "file_loc":
+				processed = parseDir.processLoc(command, stringInput);
+				break; 
 				
 			//need to check date: 
 			//add floating, add deadline, add event,
@@ -73,6 +82,8 @@ public class Parser {
 				processed = parseError.processError(ParserConstants.ERROR_COMMAND); 
 				break; 
 		}
+		//update tag categories if needed
+		trackTags(processed); 
 		
 		return processed;   
 	}
@@ -104,5 +115,35 @@ public class Parser {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * This function takes in a ProcessedObject, checks whether there are
+	 * tags that can be added to the UserTagDatabase, else do nothing. 
+	 * @param po
+	 */
+	public void trackTags(ProcessedObject po) {
+		Task task = po.getTask();
+		if (task != null) {
+			ArrayList<String> tags = task.getTaskTags(); 
+			
+			if (tags != null) {
+				for(int i = 0; i < tags.size(); i++) {
+					if (!tagDB.hasTag(tags.get(i))) {
+						tagDB.addTag(tags.get(i));
+					}
+				}
+			}	 
+		}
+	}
+	
+	/**
+	 * For Logic: you can get this database to update the 
+	 * available categories to display, or even update
+	 * if all tasks do not have that category. 
+	 * @return
+	 */
+	public UserTagDatabase getUserTagDB() {
+		return tagDB; 
 	}
 }

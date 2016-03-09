@@ -1,7 +1,12 @@
 package taskey.parser;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.constants.ParserConstants;
 import taskey.logic.ProcessedObject;
@@ -13,10 +18,12 @@ import taskey.logic.Task;
  *
  */
 public class ParseEdit {
+	ArrayList<String> timeWords = new ArrayList<String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
+	private PrettyTimeParser prettyParser = new PrettyTimeParser();
 	
 	private ParseError parseError = new ParseError(); 
 	
@@ -26,6 +33,14 @@ public class ParseEdit {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
+		
+		timeWords.add("am");
+		timeWords.add("a.m.");
+		timeWords.add("pm");
+		timeWords.add("p.m.");
+		//PrettyTime's default time for morning/night is 8am/8pm
+		timeWords.add("morning"); 
+		timeWords.add("night"); //can be tonight, tomorrow night, etc
 	}
 	
 	/**
@@ -188,7 +203,12 @@ public class ParseEdit {
 		Task changedTask = new Task(); 
 		changedTask.setTaskType("EVENT");
 		
-		if (!specialDays.containsKey(startDate)) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(startDate);
+		if (epochTime != -1) {
+			changedTask.setStartDate(epochTime); 
+		} else if (!specialDays.containsKey(startDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
@@ -198,7 +218,10 @@ public class ParseEdit {
 			}
 		}
 		
-		if (!specialDays.containsKey(endDate)) {
+		epochTime = getPrettyTime(endDate);
+		if (epochTime != -1) {
+			changedTask.setEndDate(epochTime); 
+		} else if (!specialDays.containsKey(endDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
@@ -227,7 +250,10 @@ public class ParseEdit {
 		Task changedTask = new Task(newTaskName); 
 		changedTask.setTaskType("EVENT");
 		
-		if (!specialDays.containsKey(startDate)) {
+		epochTime = getPrettyTime(startDate);
+		if (epochTime != -1) {
+			changedTask.setStartDate(epochTime); 
+		} else if (!specialDays.containsKey(startDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
@@ -237,7 +263,10 @@ public class ParseEdit {
 			}
 		}
 		
-		if (!specialDays.containsKey(endDate)) {
+		epochTime = getPrettyTime(endDate);
+		if (epochTime != -1) {
+			changedTask.setEndDate(epochTime); 
+		} else if (!specialDays.containsKey(endDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
@@ -337,6 +366,24 @@ public class ParseEdit {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * If the rawDate contains a time field, use PrettyTimeParser to
+	 * parse the date
+	 * @param rawDate
+	 * @return epochTime (long) of rawDate
+	 */
+	public long getPrettyTime(String rawDate) {
+		
+		for(int i = 0; i < timeWords.size(); i++) {
+			if (rawDate.contains(timeWords.get(i))) {
+				//if the date contains any of the time words, call prettyParser
+				List<Date> processedTime = prettyParser.parse(rawDate); 
+				return processedTime.get(0).getTime(); 
+			}
+		}
+		return -1; //no time indicated, or time is in the wrong format
 	}
 
 }

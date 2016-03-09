@@ -33,6 +33,7 @@ public class Parser {
 		commandList.put("search", "search"); 
 		commandList.put("done", "done"); 
 		commandList.put("undo", "undo"); 
+		commandList.put("file_loc", "file_loc");
 	}
 	
 	/**
@@ -42,6 +43,7 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		ProcessedObject processed = null;  
+		stringInput = stringInput.toLowerCase(); 
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"

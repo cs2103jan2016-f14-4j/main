@@ -44,6 +44,7 @@ public abstract class UiFormatter {
 	public abstract void clearOtherVariables();
 	public abstract void format(ArrayList<Task> myTaskList);
 	public abstract void processArrowKey(KeyEvent event);
+	public abstract int processDeleteKey();
 	
 	public UiFormatter(ScrollPane thePane) {
 		mainPane = thePane;
@@ -90,7 +91,7 @@ public abstract class UiFormatter {
 	/**
 	 * Clear contents of currentGrid variable
 	 */
-	protected void clearGridContents() {
+	protected void clearCurrentGridContents() {
 		assert(currentGrid != null);
 		Node node = null;
 		if (currentGrid.isGridLinesVisible()) {

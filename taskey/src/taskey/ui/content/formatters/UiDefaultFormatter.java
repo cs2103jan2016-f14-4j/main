@@ -29,14 +29,14 @@ import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
-	private int currentSelection;
 	private Pagination myPages;
 	private int currentPage;
-	private ArrayList<Task> theTasks;
 	private int totalPages;
+	private ArrayList<Task> theTasks;
+	private int currentSelection;
 	private int entriesPerPage = 5;
 	private int marginSpacing = 3;
-	private int constraintPadding = 1;
+	private int constraintPadding = 1; // space for the pagination content bar
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
@@ -58,12 +58,19 @@ public class UiDefaultFormatter extends UiFormatter {
           }
         });	
 	}
+
+	@Override
+	public int processDeleteKey() {
+		if ( totalEntries.size() == 0 ) {
+			return -1;
+		}
+		return currentPage*entriesPerPage + currentSelection + 1;
+	}
 	@Override
 	public void processArrowKey(KeyEvent event) {
 		if ( totalEntries.size() == 0 ) {
 			return;
 		}
-		
 		if ( event.getCode() == KeyCode.DOWN) {
 			select(currentSelection + 1);
 		} else if ( event.getCode() == KeyCode.UP) {
@@ -75,13 +82,27 @@ public class UiDefaultFormatter extends UiFormatter {
 		}
 	}	
 	
+	public ArrayList<Task> getTasksInPage() {
+		if ( totalEntries.size() == 0 ) {
+			return null;
+		}
+		int startIndex = currentPage * entriesPerPage;
+		ArrayList<Task> subList = new ArrayList<Task>();
+		for ( int i = startIndex; i < theTasks.size() && i < startIndex + entriesPerPage; i ++ ) {
+			subList.add(theTasks.get(startIndex));
+		}
+		return subList;
+	}
 	private void select(int selection) {
+		if ( totalEntries.size() == 0 ) {
+			return;
+		}
 		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
 		selection %= pageContent.size();
 		if ( selection < 0 ) {
 			selection = pageContent.size()-1;
 		}
-		// remove previous
+		// remove previous selection's style
 		 StackPane myPane = pageContent.get(currentSelection);
 		if ( myPane.getStyleClass().size() > 1) {
 			myPane.getStyleClass().remove(1);
@@ -89,7 +110,8 @@ public class UiDefaultFormatter extends UiFormatter {
 		currentSelection = selection;
 		myPane = (StackPane) pageContent.get(currentSelection);
 		myPane.getStyleClass().add(UiConstants.STYLE_GRAY_BOX);
-	};
+	}
+	
 	private void addGridToPagination() {
 		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT),true);	
 		// Note row constraints can expand cells but not contract, tweak text sizes and spacings to achieve effect
@@ -144,7 +166,6 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	private void createPagination() {
 		myPages = new Pagination(); // because there's no method to clear pages
-		
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);
 			myPages.setMaxPageIndicatorCount(1);

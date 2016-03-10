@@ -100,4 +100,10 @@ public class UiContentManager {
 		UiFormatter myFormatter = myFormatters.get(arrayIndex);
 		myFormatter.processArrowKey(event);
 	}
+
+	public int processDelete(ContentBox currentContent) {
+		int arrayIndex = currentContent.getValue();
+		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		return myFormatter.processDeleteKey();
+	}
 }

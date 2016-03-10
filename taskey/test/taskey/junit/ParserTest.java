@@ -26,13 +26,6 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
 		   
-		/*
-		   TODO: 
-		   add a conditional: if the time contains am/pm/a.m./p.m. or morning or night,
-		   use the PrettyTime Converter.
-		   Do not support commands like 'three days from now' or times that do not
-		   contain am or pm 
-		 */
 	}
 	
 	@Test

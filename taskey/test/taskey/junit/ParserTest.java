@@ -47,6 +47,8 @@ public class ParserTest {
 	public void testDeadlineHuman() {
 		//tests the SpecialDateConverter, which is based on relative dates.
 		//thus, cannot to assert this 
+		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
+		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
@@ -174,7 +176,7 @@ public class ParserTest {
 	
 	@Test
 	public void testDone() {
-		assertEquals("Command: DONE_BY_INDEX\nat index: 5",
+		assertEquals("Command: DONE_BY_INDEX\nat index: 4",
 				parser.parseInput("done 5").toString());
 		assertEquals("Command: DONE_BY_NAME\nhello world, \n",
 				parser.parseInput("done hello world").toString());
@@ -196,5 +198,7 @@ public class ParserTest {
 				parser.parseInput("vieW deadlines").toString());
 		assertEquals("Command: VIEW\nview type: EVENTS\n",
 				parser.parseInput("view Events").toString());
+		assertEquals("Command: VIEW\nview type: ARCHIVE\n",
+				parser.parseInput("view archive").toString());
 	}
 }

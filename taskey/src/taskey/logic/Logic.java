@@ -91,9 +91,9 @@ public class Logic {
 			case EXPIRED:
 				targetList = lists.get(ListID.EXPIRED.getValue());
 				break;
-			//case COMPLETED:
-			//	targetList = myLists.get(ListsID.COMPLETED.getValue());
-			//	break;
+			case THIS_WEEK:
+				targetList = lists.get(ListID.THIS_WEEK.getValue());
+				break;
 			//case ACTION:
 			//	targetList = lists.get(ListsID.ACTION.getValue());
 			//	break;
@@ -197,16 +197,11 @@ public class Logic {
 				statusCode = search(searchPhrase);
 				break;
 				
-			/*case "DONE_BY_INDEX":
-				//System.out.println(taskIndex);
-				done = targetList.remove(taskIndex - 1); //Temporary fix 
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				doneList = lists.get(ListID.COMPLETED.getValue());
-				doneList.add(done);
-			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+			case "DONE_BY_INDEX":
+				statusCode = doneByIndex(currentContent, taskIndex - 1); //Temporary fix	
 				break;
 				
-			case "DONE_BY_NAME":
+			/*case "DONE_BY_NAME":
 				done = getTaskByName(targetList, task.getTaskName());
 				targetList.remove(done);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -252,6 +247,48 @@ public class Logic {
 		saveAllTasks();
 		
 		return statusCode; 
+	}
+	
+	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
+	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
+	private int doneByIndex(ContentBox currentContent, int taskIndex) {
+		Task toMarkAsDone = null;
+		if (currentContent.equals(ContentBox.THIS_WEEK)) {
+			try {
+				toMarkAsDone = lists.get(ListID.THIS_WEEK.getValue()).remove(taskIndex);
+			} catch (IndexOutOfBoundsException e) {
+				return -1;
+			}
+		} else if (currentContent.equals(ContentBox.PENDING)) {
+			try {
+				toMarkAsDone = lists.get(ListID.PENDING.getValue()).remove(taskIndex);
+			} catch (IndexOutOfBoundsException e) {
+				return -1;
+			}
+		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
+			return -1;
+		}
+		
+		lists.get(ListID.COMPLETED.getValue()).add(toMarkAsDone);
+		
+		//Remove the completed task from any other lists it may be included in.
+		//If duplicate task names are allowed, the intended task may not be removed.
+		lists.get(ListID.THIS_WEEK.getValue()).remove(toMarkAsDone);
+		lists.get(ListID.PENDING.getValue()).remove(toMarkAsDone);
+		lists.get(ListID.GENERAL.getValue()).remove(toMarkAsDone);
+		lists.get(ListID.DEADLINE.getValue()).remove(toMarkAsDone);
+		lists.get(ListID.EVENT.getValue()).remove(toMarkAsDone);
+
+		//Update UI display
+		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
+		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.PENDING.getValue()), ContentBox.PENDING);
+		categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
+															 lists.get(ListID.DEADLINE.getValue()).size(),
+															 lists.get(ListID.EVENT.getValue()).size(),
+															 lists.get(ListID.COMPLETED.getValue()).size()));
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		
+		return 0;
 	}
 
 	//View the type of task specified by viewType.

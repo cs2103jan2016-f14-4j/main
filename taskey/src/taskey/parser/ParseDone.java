@@ -35,7 +35,7 @@ public class ParseDone {
 		
 		try {
 			int index = Integer.parseInt(taskName);
-			processed = new ProcessedObject(ParserConstants.DONE_BY_INDEX, index); 
+			processed = new ProcessedObject(ParserConstants.DONE_BY_INDEX, index-1); 
 			
 		} catch (Exception e) {
 			//if the done is not by index, then it's by task name. 

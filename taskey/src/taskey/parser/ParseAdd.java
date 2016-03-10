@@ -57,23 +57,52 @@ public class ParseAdd {
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = getTaskName(command, stringInput); 
+		String simpString = getTaskName(command, stringInput);  
 		
-		if (simpString.split("from").length != 1) {
-			//event
-			processed = handleEvent(task, simpString);
-		} else if (simpString.split("on").length != 1) {
-			//deadline
-			processed = handleDeadlineOn(task, simpString);	
-		} else if (simpString.split("by").length != 1) {
-			//deadline 
-			processed = handleDeadlineBy(task, simpString);
-		} else if (simpString.compareTo("") == 0) {
+		if (simpString.compareTo("") == 0) {
 			//empty add
 			processed = parseError.processError("empty add");
-			return processed; 
-		} else {
-			//floating task 
+			return processed;
+		}
+		
+		String[] splitString = simpString.split(" ");
+		boolean isSet = false; 
+		
+		for (int i = 0; i < splitString.length; i++) { 
+			String word = splitString[i]; 
+			switch (word) {
+				case "from": 
+					if (simpString.split("from").length != 1) {
+						//event
+						processed = handleEvent(task, simpString);
+						isSet = true; 
+					}
+					break;
+				case "by":
+					if (simpString.split("by").length != 1) {
+						//deadline 
+						processed = handleDeadlineBy(task, simpString);
+						isSet = true;
+					} 
+					break; 
+				case "on":
+					if (simpString.split("on").length != 1) {
+						//deadline
+						processed = handleDeadlineOn(task, simpString);	
+						isSet = true;
+					}
+					break;
+				default:
+					break; 
+			}
+			
+			if (isSet) {
+				break; //prematurely end loop once processing done
+			}
+		}
+		
+		if (!isSet) {
+			//set as floating task 
 			processed = handleFloating(command, simpString);
 		}
 		
@@ -329,5 +358,4 @@ public class ParseAdd {
 		}
 		return tagList; 
 	}
-
 }

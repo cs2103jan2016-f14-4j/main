@@ -62,7 +62,7 @@ public class ParseEdit {
 			try {
 				int index = Integer.parseInt(rawIndex);
 				
-				return updateByIndex(taskName, index); 
+				return updateByIndex(taskName, index-1); 
 			} catch (Exception e) {
 				//if the update is not by index, then it's by task name. 
 				return updateByName(taskName); 

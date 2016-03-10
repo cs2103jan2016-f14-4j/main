@@ -109,20 +109,20 @@ public class ParserTest {
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
 		//by task id
-		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 1",
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 0",
 				parser.parseInput("set 1 \"urgent meeting\"").toString());
-		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 2",
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 1",
 				parser.parseInput("set 2 [none]").toString());
 		assertEquals("Command: ERROR\nerror type: invalid input\n",
 				parser.parseInput("set 2 []").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\nat index: 2",
+				+ "due on 17 Feb 2016 23:59:59\nat index: 1",
 				parser.parseInput("set 2 [17 feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
-				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
+				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 1",
 				parser.parseInput("set 2 [16 feb, 17 Feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
-				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
+				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 1",
 				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
 		
 		//by task name
@@ -144,11 +144,11 @@ public class ParserTest {
 		
 		//test time usage
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
-				+ "Feb 2016 15:00:00\nat index: 2",
+				+ "Feb 2016 15:00:00\nat index: 1",
 				parser.parseInput("set 2 [16 feb 3pm]").toString());
 		
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016"
-				+ " 15:00:00 to 19 Feb 2016 17:00:00\nat index: 2",
+				+ " 15:00:00 to 19 Feb 2016 17:00:00\nat index: 1",
 				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
 	}
 	

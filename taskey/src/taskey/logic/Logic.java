@@ -37,7 +37,7 @@ public class Logic {
 	
 	/** Get the Logic singleton */
 	public static Logic getInstance() {
-		if ( instance == null ) {
+		if (instance == null) {
 			instance = new Logic();
 		}
 		return instance;

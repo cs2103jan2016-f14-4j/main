@@ -2,7 +2,11 @@ package taskey.parser;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.constants.ParserConstants;
 import taskey.logic.ProcessedObject;
@@ -14,10 +18,12 @@ import taskey.logic.Task;
  *
  */
 public class ParseAdd { 
+	ArrayList<String> timeWords = new ArrayList<String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
+	private PrettyTimeParser prettyParser = new PrettyTimeParser();
 	
 	private ParseError parseError = new ParseError(); 
 	
@@ -27,6 +33,14 @@ public class ParseAdd {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
+		
+		timeWords.add("am");
+		timeWords.add("a.m.");
+		timeWords.add("pm");
+		timeWords.add("p.m.");
+		//PrettyTime's default time for morning/night is 8am/8pm
+		timeWords.add("morning"); 
+		timeWords.add("night"); //can be tonight, tomorrow night, etc
 		
 	}
 	
@@ -45,15 +59,15 @@ public class ParseAdd {
 		//simpString: basically string without the command
 		String simpString = getTaskName(command, stringInput); 
 		
-		if (simpString.split("on").length != 1) {
+		if (simpString.split("from").length != 1) {
+			//event
+			processed = handleEvent(task, simpString);
+		} else if (simpString.split("on").length != 1) {
 			//deadline
 			processed = handleDeadlineOn(task, simpString);	
 		} else if (simpString.split("by").length != 1) {
 			//deadline 
 			processed = handleDeadlineBy(task, simpString);
-		} else if (simpString.split("from").length != 1) {
-			//event
-			processed = handleEvent(task, simpString);
 		} else if (simpString.compareTo("") == 0) {
 			//empty add
 			processed = parseError.processError("empty add");
@@ -85,14 +99,30 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
+		String withoutTagList = simpString.split("#")[0].trim();
+		
 		String simpString2 = simpString.replace("today", "2day"); 
 		simpString2 = simpString2.replace("tomorrow", "tmr"); 
-		String[] removeTagList = simpString2.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("from");
+		String[] inputList = withoutTagList.split("from");
 		String[] dateList = inputList[1].split("to"); 
 		taskName = inputList[0].trim(); 
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
+		
+		//if date contains am or pm or morning or night, 
+		//call pretty parser to process the time and return. 
+		try {
+			long[] epochTimeEvent = getPrettyTimeEvent(withoutTagList);
+			task.setStartDate(epochTimeEvent[0]);
+			task.setEndDate(epochTimeEvent[1]);
+			task.setTaskName(taskName);
+			task.setTaskType("EVENT");
+			processed = new ProcessedObject("ADD_EVENT",task);
+			return processed;
+		} catch (Error e) {
+			//do nothing, continue to code below
+			//ie. date format wrong or has no time in the date
+		}
 		
 		if (!specialDays.containsKey(rawStartDate)) {
 			try {
@@ -107,6 +137,7 @@ public class ParseAdd {
 			epochTime = specialDays.get(rawStartDate);
 			task.setStartDate(epochTime);
 		}
+		
 		
 		if (!specialDays.containsKey(rawEndDate)) {
 			try {
@@ -138,12 +169,18 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] removeTagList = simpString.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("by");
+		String withoutTagList = simpString.split("#")[0].trim(); 
+		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
-		if (!specialDays.containsKey(rawDate)) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(withoutTagList);
+		if (epochTime != -1) {
+			task.setDeadline(epochTime); 
+		} else if (!specialDays.containsKey(rawDate)) {
+			//process standard calendar dates (eg. 17 Feb) 
 			try {
 				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
@@ -173,12 +210,17 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String taskName;
-		String[] removeTagList = simpString.split("#"); 
-		String[] inputList = removeTagList[0].trim().split("on"); 
+		String withoutTagList = simpString.split("#")[0].trim(); 
+		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
-		if (!specialDays.containsKey(rawDate)) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(withoutTagList);
+		if (epochTime != -1) {
+			task.setDeadline(epochTime); 
+		} else if (!specialDays.containsKey(rawDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawDate);
 				task.setDeadline(epochTime);
@@ -226,6 +268,51 @@ public class ParseAdd {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * If the rawDate contains a time field, use PrettyTimeParser to
+	 * parse the date
+	 * @param rawDate
+	 * @return epochTime (long) of rawDate
+	 */
+	public long getPrettyTime(String rawDate) {
+		for(int i = 0; i < timeWords.size(); i++) {
+			if (rawDate.contains(timeWords.get(i))) {
+				//if the date contains any of the time words, call prettyParser
+				List<Date> processedTime = prettyParser.parse(rawDate); 
+				if (!processedTime.isEmpty()) { 
+					return processedTime.get(0).getTime() / 1000; 
+				} else {
+					return -1; 
+				}
+			}
+		}
+		return -1; //no time indicated, or time is in the wrong format
+	}
+	
+	/**
+	 * If the rawDate contains time field for an event, 
+	 * use PrettyTimeParser to parse the date
+	 * @param rawDate
+	 * @return epochTime (long array) of rawDate (FOR EVENTS) 
+	 */
+	public long[] getPrettyTimeEvent(String rawDate) throws Error {
+		for(int i = 0; i < timeWords.size(); i++) {
+			if (rawDate.contains(timeWords.get(i))) {
+				//if the date contains any of the time words, call prettyParser
+				List<Date> processedTime = prettyParser.parse(rawDate); 
+				if (processedTime.size() >= 2) {
+					long[] epochTimes = {processedTime.get(0).getTime() / 1000,
+							processedTime.get(1).getTime() / 1000}; 
+					
+					return epochTimes; 
+				} else {
+					throw new Error(); 
+				}
+			}
+		}
+		throw new Error(); //no time indicated, or time is in the wrong format
 	}
 	
 	/**

@@ -14,6 +14,7 @@ public class TimeConverterTest {
 		TimeConverter timeConverter = new TimeConverter(); 
 		
 		try {
+			//System.out.println(timeConverter.toHumanTime(1455692400));
 			//System.out.println("Current Time in Epoch: " + timeConverter.getCurrTime()); 
 			assertEquals(1455123600,timeConverter.toEpochTime("11 Feb 2016 01:00:00"));
 			

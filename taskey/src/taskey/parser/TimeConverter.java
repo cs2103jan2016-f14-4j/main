@@ -56,7 +56,7 @@ public class TimeConverter {
 							date3).getTime() / 1000;
 					return epochTime; 
 				} catch (ParseException e3) {
-					System.out.println(e3); 
+					//System.out.println(e3); 
 					throw e3; 
 				}
 			}

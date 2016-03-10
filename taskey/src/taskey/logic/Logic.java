@@ -2,6 +2,7 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
+import taskey.storage.FileType;
 import taskey.storage.Storage;
 import taskey.ui.UiMain;
 import taskey.ui.UiController;
@@ -29,7 +30,7 @@ public class Logic {
 	private TimeConverter timeConverter;
 	private UiController uiController;
 	private ArrayList<String> fileNames;
-	private ArrayList<ArrayList<Task>> lists;
+	private ArrayList<ArrayList<Task>> taskLists;
 	private ArrayList<String> categoryList;
 	private ArrayList<Integer> categorySizes;
 	private ArrayList<Color> colorList;
@@ -42,87 +43,45 @@ public class Logic {
 		return instance;
 	}
 	
-	/** Initializes the Logic singleton and updates Ui with the lists from Storage. */
+	/** Initializes the Logic singleton and updates UI with the lists from Storage. */
 	public void initialize() {
 		instance = Logic.getInstance();
 		parser = new Parser();
 		timeConverter = new TimeConverter();
 		uiController = UiMain.getInstance().getController();
-		fileNames = new ArrayList<String>(Arrays.asList("PENDING", "EXPIRED", "GENERAL", "DEADLINE", "EVENT",
-				                                        "COMPLETED"));
-		lists = new ArrayList<ArrayList<Task>>();
+		fileNames = new ArrayList<String>(Arrays.asList(FileType.PENDING.getFilename(),
+				                                        FileType.EXPIRED.getFilename(),
+				                                        FileType.GENERAL.getFilename(),
+				                                        FileType.DEADLINE.getFilename(),
+				                                        FileType.EVENT.getFilename(),
+				                                        FileType.COMPLETED.getFilename()));
+		taskLists = new ArrayList<ArrayList<Task>>();
 		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		lists.add(thisWeek);
+		taskLists.add(thisWeek); //Reserve first slot in taskLists for this week's task list
 		
+		//Get lists from Storage
 		for (int i = 0; i < fileNames.size(); i++) {
 			ArrayList<Task> list = Storage.getInstance().getTaskList(fileNames.get(i));
-			lists.add(list);
-			
-			if (i < 2) { //Only "PENDING" and "EXPIRED" have tabs
-				uiController.updateDisplay(list, ContentBox.fromInteger(i + 1));
-			}
+			taskLists.add(list);
 		}
 		
-		//Update THIS_WEEK tab
-		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		//Update THIS_WEEK tab based on the current date and time
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		for (Task t : pendingList) {
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime()) ||
-				timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
+			//Add pending deadline or event tasks to the weekly list if they belong to the same week as 
+			//the current week
+			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime()) 
+				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 				thisWeek.add(t);
 			}
 		}
-		uiController.updateDisplay(thisWeek, ContentBox.THIS_WEEK);
-		
+	
 		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
 		//Values will be updated with refreshUiCategoryDisplay();
 		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0)); 
 		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
+		refreshUiTabDisplay();
 		refreshUiCategoryDisplay();
-	}
-	
-	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
-		ArrayList<Task> targetList = null;
-		switch (currentContent) {
-			case PENDING:
-				targetList = lists.get(ListID.PENDING.getValue());
-				break;
-			case EXPIRED:
-				targetList = lists.get(ListID.EXPIRED.getValue());
-				break;
-			case THIS_WEEK:
-				targetList = lists.get(ListID.THIS_WEEK.getValue());
-				break;
-			//case ACTION:
-			//	targetList = lists.get(ListsID.ACTION.getValue());
-			//	break;
-			default:
-				System.out.println("ContentBox invalid");
-		}
-		return targetList;
-	}
-	
-	//Returns the first Task whose name matches the given name, or null otherwise.
-	private Task getTaskByName(ArrayList<Task> targetList, String name ) {
-		for ( int i = 0; i < targetList.size(); i ++ ) {
-			Task theTask = targetList.get(i);
-			if ( theTask.getTaskName().equals(name)) {
-				return theTask;
-			}
-		}
-		
-		return null;
-	}
-	
-	private int clearAllLists(ContentBox currentContent) {
-		if (!currentContent.equals(ContentBox.PENDING)) { // "clear" only allowed in pending tab
-			return -1;
-		}
-		
-		for (int i = 0; i < fileNames.size() + 1; i++) {
-			lists.get(i).clear();
-		}
-		
-		return 0;
 	}
 	
 	/** 
@@ -135,14 +94,10 @@ public class Logic {
 	public int executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
 		
-		//System.out.println(input);
-		
-    	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
-			statusCode = clearAllLists(currentContent);
+    	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
+			clearAllLists(currentContent);
 			saveAllTasks();
-			UiMain.getInstance().getController().updateDisplay(lists.get(0), ContentBox.THIS_WEEK);
-			UiMain.getInstance().getController().updateDisplay(lists.get(1), ContentBox.PENDING);
-			UiMain.getInstance().getController().updateDisplay(lists.get(2), ContentBox.EXPIRED);
+			refreshUiTabDisplay();
 			//Clear the action tab
 			UiMain.getInstance().getController().updateDisplay(new ArrayList<Task>(), ContentBox.ACTION);
 			refreshUiCategoryDisplay();
@@ -162,7 +117,6 @@ public class Logic {
     	Task toUpdate;
     	ArrayList<Task> doneList;
     
-    	ArrayList<Task> targetList = getListFromContentBox(currentContent);
     	System.out.println("Command: " + command);
     	
     	switch (command) {		
@@ -179,11 +133,11 @@ public class Logic {
 				break;
 				
 			case "DELETE_BY_INDEX":
-				statusCode = deleteByIndex(currentContent, taskIndex, targetList);
+				statusCode = deleteByIndex(currentContent, taskIndex);
 				break;
 				
 			case "DELETE_BY_NAME":
-				statusCode = deleteByName(currentContent, task.getTaskName(), targetList);
+				statusCode = deleteByName(currentContent, task.getTaskName());
 				break;
 				
 			case "VIEW":
@@ -246,144 +200,135 @@ public class Logic {
 		return statusCode; 
 	}
 	
-	private void refreshUiCategoryDisplay() {
-		categorySizes.set(CategoryID.GENERAL.getValue(), lists.get(ListID.GENERAL.getValue()).size());
-		categorySizes.set(CategoryID.DEADLINE.getValue(), lists.get(ListID.DEADLINE.getValue()).size());
-		categorySizes.set(CategoryID.EVENT.getValue(), lists.get(ListID.EVENT.getValue()).size());
-		categorySizes.set(CategoryID.COMPLETED.getValue(), lists.get(ListID.COMPLETED.getValue()).size());
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+	//Updates UI with a new floating task. Returns a status code reflecting outcome of command execution.
+	private int addFloating(Task task) {
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
+		pendingList.add(task);
+		taskLists.get(ListID.GENERAL.getIndex()).add(task);
+		
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		uiController.displayTabContents(ContentBox.PENDING.getValue()); 
+		
+		return 0; //Stub
 	}
 	
-	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
-	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
-	private int doneByIndex(ContentBox currentContent, int taskIndex) {
-		Task toMarkAsDone = null;
-		if (currentContent.equals(ContentBox.THIS_WEEK)) {
-			try {
-				toMarkAsDone = lists.get(ListID.THIS_WEEK.getValue()).remove(taskIndex);
-			} catch (IndexOutOfBoundsException e) {
-				return -1;
-			}
-		} else if (currentContent.equals(ContentBox.PENDING)) {
-			try {
-				toMarkAsDone = lists.get(ListID.PENDING.getValue()).remove(taskIndex);
-			} catch (IndexOutOfBoundsException e) {
-				return -1;
-			}
-		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
+	//Updates UI with a new deadline task. Returns a status code reflecting outcome of command execution.
+	private int addDeadline(Task task) {
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
+		pendingList.add(task);
+		taskLists.get(ListID.DEADLINE.getIndex()).add(task);
+		
+		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
+		}
+		
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		uiController.displayTabContents(ContentBox.PENDING.getValue());
+		
+		return 0; //Stub
+	}
+	
+	//Updates UI with a new event task. Returns a status code reflecting outcome of command execution.
+	private int addEvent(Task task) {
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		
+		if (pendingList.contains(task)) { //Duplicate task name not allowed
+			return -1; //Stub
+		}
+		
+		pendingList.add(task);
+		taskLists.get(ListID.EVENT.getIndex()).add(task);
+		
+		if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
+			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
+		}
+		
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		uiController.displayTabContents(ContentBox.PENDING.getValue());
+		
+		return 0; //Stub
+	}
+	
+	//Removes an indexed task from the "PENDING" tab.
+	//TODO: support removal from the "THIS_WEEK" tab.
+	private int deleteByIndex(ContentBox currentContent, int taskIndex) {
+		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
+			return -1; //Stub
+		}
+		
+    	ArrayList<Task> targetList = getListFromContentBox(currentContent);
+    	Task toDelete;
+		
+		try {
+			toDelete = targetList.remove(taskIndex);
+		} catch (IndexOutOfBoundsException e) {
 			return -1;
 		}
 		
-		lists.get(ListID.COMPLETED.getValue()).add(toMarkAsDone);
-		
-		//Remove the completed task from any other lists it may be included in.
-		//If duplicate task names are allowed, the intended task may not be removed.
-		lists.get(ListID.THIS_WEEK.getValue()).remove(toMarkAsDone);
-		lists.get(ListID.PENDING.getValue()).remove(toMarkAsDone);
-		lists.get(ListID.GENERAL.getValue()).remove(toMarkAsDone);
-		lists.get(ListID.DEADLINE.getValue()).remove(toMarkAsDone);
-		lists.get(ListID.EVENT.getValue()).remove(toMarkAsDone);
-
-		//Update UI display
-		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.PENDING.getValue()), ContentBox.PENDING);
+		removeFromAllLists(toDelete);
+		refreshUiTabDisplay();
 		refreshUiCategoryDisplay();
 		
-		return 0;
+		return 0; //Stub
 	}
-
+	
+	//Removes a named task from the "PENDING" tab.
+	//TODO: support removal from the "THIS_WEEK" tab.
+	private int deleteByName(ContentBox currentContent, String taskName) {
+		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
+			return -1; //Stub
+		}
+		
+		Task toDelete = new Task(taskName);
+		
+		//Named task does not exist in the list
+		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toDelete)) { 
+			return -1; //Stub
+		}
+		
+		removeFromAllLists(toDelete);
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		
+		return 0; //Stub
+	}
+	
 	//View the type of task specified by viewType.
 	private int view(String viewType) {
 		if (viewType.equals("GENERAL")) {
-			uiController.updateActionDisplay(lists.get(ListID.GENERAL.getValue()), ActionListMode.TASKLIST);
+			uiController.updateActionDisplay(taskLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
 			uiController.displayTabContents(ContentBox.ACTION.getValue());
 		} else if (viewType.equals("DEADLINES")) {
-			uiController.updateActionDisplay(lists.get(ListID.DEADLINE.getValue()), ActionListMode.TASKLIST);
+			uiController.updateActionDisplay(taskLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
 			uiController.displayTabContents(ContentBox.ACTION.getValue());
 		} else if (viewType.equals("EVENTS")) {
-			uiController.updateActionDisplay(lists.get(ListID.EVENT.getValue()), ActionListMode.TASKLIST);
+			uiController.updateActionDisplay(taskLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
 			uiController.displayTabContents(ContentBox.ACTION.getValue());
 		} else if (viewType.equals("ARCHIVE")) {
-			uiController.updateActionDisplay(lists.get(ListID.COMPLETED.getValue()), ActionListMode.TASKLIST);
+			uiController.updateActionDisplay(taskLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
 			uiController.displayTabContents(ContentBox.ACTION.getValue());
 		}
 		
 		return 0; //Stub
 	}
 	
-	//Removes an indexed task from the Ui tab specified by currentContent.
-	private int deleteByIndex(ContentBox currentContent, int taskIndex, ArrayList<Task> targetList) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //Delete command only allowed in pending tab
-			return -1; //Stub
-		}
-		
-		if (taskIndex >= targetList.size()) { //Out of bounds
-			return -1; //Stub
-		}
-		
-		Task t = targetList.get(taskIndex);
-		String taskType = t.getTaskType();
-		targetList.remove(taskIndex);
-		
-		if (taskType.equals("FLOATING")) {
-			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
-			floatingList.remove(t);
-		} else if (taskType.equals("DEADLINE")) {
-			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
-			deadlineList.remove(t);
-			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-		} else if (taskType.equals("EVENT")) {
-			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
-			eventList.remove(t);
-			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-		}
-		
-		uiController.updateDisplay(targetList, currentContent);
-		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		refreshUiCategoryDisplay();
-		
-		return 0; //Stub
-	}
-	
-	//Removes an named task from the Ui tab specified by currentContent.
-	private int deleteByName(ContentBox currentContent, String taskName, ArrayList<Task> targetList) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //Delete command only allowed in pending tab
-			return -1; //Stub
-		}
-		
-		Task t = getTaskByName(targetList, taskName);
-		
-		if (t == null) { //Named task does not exist in the list
-			return -1; //Stub
-		}
-		
-		String taskType = t.getTaskType();
-		targetList.remove(t);
-		
-		if (taskType.equals("FLOATING")) {
-			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
-			floatingList.remove(t);
-		} else if (taskType.equals("DEADLINE")) {
-			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
-			deadlineList.remove(t);
-			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-		} else if (taskType.equals("EVENT")) {
-			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
-			eventList.remove(t);
-			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-		}
-		
-		uiController.updateDisplay(targetList, currentContent);
-		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		refreshUiCategoryDisplay();
-		
-		return 0; //Stub
-	}
-	
-	//Search for all tasks that contain searchPhrase. searchPhrase is not case sensitive.
+	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
 	private int search(String searchPhrase) {
 		ArrayList<Task> matches = new ArrayList<Task>();
-		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		
 		for (Task t : pendingList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
@@ -397,83 +342,106 @@ public class Logic {
 		return 0; //Stub
 	}
 	
-	//Updates Ui with a new floating task. Returns a status code reflecting outcome of command execution.
-	private int addFloating(Task task) {
-		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
-		ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
-		
-		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
+	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
+	private int doneByIndex(ContentBox currentContent, int taskIndex) {
+		Task toMarkAsDone = null;
+		if (currentContent.equals(ContentBox.THIS_WEEK)) {
+			try {
+				toMarkAsDone = taskLists.get(ListID.THIS_WEEK.getIndex()).remove(taskIndex);
+			} catch (IndexOutOfBoundsException e) {
+				return -1;
+			}
+		} else if (currentContent.equals(ContentBox.PENDING)) {
+			try {
+				toMarkAsDone = taskLists.get(ListID.PENDING.getIndex()).remove(taskIndex);
+			} catch (IndexOutOfBoundsException e) {
+				return -1;
+			}
+		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
+			return -1;
 		}
 		
-		pendingList.add(task);
-		floatingList.add(task);
-		updateUiContentDisplay(pendingList, ContentBox.PENDING);
-		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
+		removeFromAllLists(toMarkAsDone);
+		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
+		refreshUiTabDisplay();
 		refreshUiCategoryDisplay();
 		
-		return 0; //Stub
+		return 0;
 	}
 	
-	//Updates Ui with a new deadline task. Returns a status code reflecting outcome of command execution.
-	private int addDeadline(Task task) {
-		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
-		ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
-		
-		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+	//Gets the list corresponding to the given ContentBox.
+	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
+		ArrayList<Task> targetList = null;
+		switch (currentContent) {
+			case PENDING:
+				targetList = taskLists.get(ListID.PENDING.getIndex());
+				break;
+			case EXPIRED:
+				targetList = taskLists.get(ListID.EXPIRED.getIndex());
+				break;
+			case THIS_WEEK:
+				targetList = taskLists.get(ListID.THIS_WEEK.getIndex());
+				break;
+			/*case ACTION:
+				targetList = lists.get(ListsID.ACTION.getValue());
+				break;*/
+			default:
+				System.out.println("ContentBox invalid");
 		}
 		
-		pendingList.add(task);
-		deadlineList.add(task);
-		
-		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-			lists.get(ListID.THIS_WEEK.getValue()).add(task);
-			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		}
-		
-		updateUiContentDisplay(pendingList, ContentBox.PENDING);
-		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
-		refreshUiCategoryDisplay();
-		
-		return 0; //Stub
+		return targetList;
 	}
 	
-	//Updates Ui with a new event task. Returns a status code reflecting outcome of command execution.
-	private int addEvent(Task task) {
-		ArrayList<Task> pendingList = lists.get(ListID.PENDING.getValue());
-		ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
-		
-		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
-		}
-		
-		pendingList.add(task);
-		eventList.add(task);
-		
-		if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
-			lists.get(ListID.THIS_WEEK.getValue()).add(task);
-			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		}
-		
-		updateUiContentDisplay(pendingList, ContentBox.PENDING);
-		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
-		refreshUiCategoryDisplay();
-		
-		return 0; //Stub
+	//Refresh all UI tabs except the "ACTION" tab.
+	private void refreshUiTabDisplay() {
+		uiController.updateDisplay(taskLists.get(ListID.THIS_WEEK.getIndex()), ContentBox.THIS_WEEK);
+		uiController.updateDisplay(taskLists.get(ListID.PENDING.getIndex()), ContentBox.PENDING);
+		uiController.updateDisplay(taskLists.get(ListID.EXPIRED.getIndex()), ContentBox.EXPIRED);
 	}
 	
-	//Sorts targetList and updates the Ui tab corresponding to currentContent with the sorted list.
-	private void updateUiContentDisplay(ArrayList<Task> targetList, ContentBox currentContent) {
-		Collections.sort(targetList); //Right now doesn't seem to do anything
-		uiController.updateDisplay(targetList, currentContent);
+	private void refreshUiCategoryDisplay() {
+		categorySizes.set(CategoryID.GENERAL.getIndex(), taskLists.get(ListID.GENERAL.getIndex()).size());
+		categorySizes.set(CategoryID.DEADLINE.getIndex(), taskLists.get(ListID.DEADLINE.getIndex()).size());
+		categorySizes.set(CategoryID.EVENT.getIndex(), taskLists.get(ListID.EVENT.getIndex()).size());
+		categorySizes.set(CategoryID.COMPLETED.getIndex(), taskLists.get(ListID.COMPLETED.getIndex()).size());
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+	}
+	
+	/*
+	//Returns the first Task whose name matches the given name, or null otherwise.
+	private Task getTaskByName(ArrayList<Task> targetList, String name ) {
+		for (int i = 0; i < targetList.size(); i++) {
+			Task theTask = targetList.get(i);
+			if ( theTask.getTaskName().equals(name)) {
+				return theTask;
+			}
+		}
+		
+		return null;
+	}*/
+	
+	//Removes the given Task from all existing lists except the "EXPIRED" and "COMPLETED" lists.
+	//The intended Task may not be removed if duplicate Task names are allowed.
+	private void removeFromAllLists(Task toRemove) {
+		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
+		taskLists.get(ListID.PENDING.getIndex()).remove(toRemove);
+		taskLists.get(ListID.GENERAL.getIndex()).remove(toRemove);
+		taskLists.get(ListID.DEADLINE.getIndex()).remove(toRemove);
+		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
+	}
+	
+	private void clearAllLists(ContentBox currentContent) {
+		for (int i = 0; i < taskLists.size(); i++) {
+			taskLists.get(i).clear();
+		}
 	}
 	
 	//Save all task lists to Storage.
 	private void saveAllTasks() {
 		try {
 			for (int i = 0; i < fileNames.size(); i++) {
-				Storage.getInstance().saveTaskList(lists.get(i + 1), fileNames.get(i));
+				Storage.getInstance().saveTaskList(taskLists.get(i + 1), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}
 		} catch (Exception e) {

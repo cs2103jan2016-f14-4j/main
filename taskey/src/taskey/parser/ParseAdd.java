@@ -201,6 +201,7 @@ public class ParseAdd {
 		String withoutTagList = simpString.split("#")[0].trim(); 
 		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(taskName); 
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		//if time contains am or pm or morning or night, 
@@ -242,6 +243,7 @@ public class ParseAdd {
 		String withoutTagList = simpString.split("#")[0].trim(); 
 		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(taskName); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
 		//if time contains am or pm or morning or night, 
@@ -357,5 +359,60 @@ public class ParseAdd {
 			tagList.add(splitString[i].trim());
 		}
 		return tagList; 
+	}
+	
+	/**
+	 * Depending on where the user keyed in his dates, the task name
+	 * might still contain the time in it. So this function will remove
+	 * the time from the task name (if it is there) 
+	 * @param taskName
+	 * @return
+	 */
+	public String removeTimeFromName(String taskName) {
+		boolean hasTime = false; 
+		
+		if (taskName.contains("am")) {
+			hasTime = true; 
+		} else if (taskName.contains("a.m.")) {
+			hasTime = true; 
+		} else if (taskName.contains("pm")) {
+			hasTime = true;
+		} else if (taskName.contains("p.m.")) {
+			hasTime = true; 
+		}
+		
+		if (!hasTime) {
+			return taskName; 
+		}
+		
+		String stringRep = ""; 
+		String[] splitName = taskName.split(" "); 
+		int size = splitName.length; 
+		
+		for(int i = 0; i < size; i++) {
+			String word = splitName[i]; 
+			if (word.compareTo("at") == 0) {
+				if (i+1 < size) {
+					String time = splitName[i+1];
+					if (time.contains("am")) {
+						i += 2; 
+					} else if (time.contains("pm")) {
+						i += 2; 
+					} else if (time.contains("p.m.")) {
+						i += 2; 
+					} else if (time.contains("a.m.")) {
+						i += 2; 
+					} else {
+						//probably a place and not time,
+						//so add it to the task name 
+						stringRep += word + " " + time + " ";
+						i += 2; 
+					}
+				}
+			} else {
+				stringRep += word + " "; 
+			}
+		}	
+		return stringRep.trim(); 
 	}
 }

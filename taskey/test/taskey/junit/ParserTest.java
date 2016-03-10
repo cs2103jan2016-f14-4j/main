@@ -2,16 +2,17 @@ package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task;
 import taskey.parser.Parser;
 
 public class ParserTest {
 	Parser parser = new Parser(); 
+	PrettyTimeParser p = new PrettyTimeParser();
 	
 	@Test
 	public void testFloating() {
@@ -22,21 +23,30 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		
-		System.out.println(parser.parseInput("ADD MEETING2"));
+		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
+				parser.parseInput("ADD MEETING2").toString());
+		   
 	}
 	
 	@Test
 	public void testDeadline() {
+	
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
+				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
+			 
+		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
+				+ "due on 17 Feb 2016 15:00:00\n",
+				parser.parseInput("add project meeting by 17 feb 2016 3pm").toString());
+		 
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
-				parser.parseInput("add project meeting at 3pm by 17 feb 2016").toString());
-		
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
-				+ "due on 17 Feb 2016 23:59:59\n",
+				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+	}
+	
+	public void testDeadlineHuman() {
+		//tests the SpecialDateConverter, which is based on relative dates.
+		//thus, cannot to assert this 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
@@ -50,11 +60,29 @@ public class ParserTest {
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 23:59:59 "
 				+ "to 20 Feb 2016 23:59:59\n",
-				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());
+				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());	
+		
+		//TODO: convert to assert 
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00:00 "
+				+ "to 19 Feb 2016 16:00:00\n",
+				parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm").toString());
+		
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00:00 "
+				+ "to 19 Feb 2016 16:00:00\n",
+				parser.parseInput("add meeting from 19 feb 3pm to 4pm").toString());
+		
+		assertEquals("Command: ADD_EVENT\nproject meeting, EVENT, from 19 Feb 2016 "
+				+ "16:00:00 to 19 Feb 2016 17:00:00\n",
+				parser.parseInput("add project meeting from 4pm to "
+						+ "5pm on 19 feb").toString());
+		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
+	}
+	
+	public void testEventsHuman() {
 		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to next wed"));		
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
 	@Test
@@ -78,6 +106,7 @@ public class ParserTest {
 	@Test
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
+		//by task id
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 1",
 				parser.parseInput("set 1 \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 2",
@@ -94,7 +123,7 @@ public class ParserTest {
 				+ "23:59:59 to 17 Feb 2016 23:59:59\nat index: 2",
 				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
 		
-		
+		//by task name
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n",
 				parser.parseInput("set meeting \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
@@ -109,7 +138,21 @@ public class ParserTest {
 				parser.parseInput("set meeting [16 feb, 17 Feb]").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, EVENT, "
 				+ "from 16 Feb 2016 23:59:59 to 17 Feb 2016 23:59:59\n",
-				parser.parseInput("set meeting [16 feb,17 Feb]").toString());		
+				parser.parseInput("set meeting [16 feb,17 Feb]").toString());	
+		
+		//test time usage
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
+				+ "Feb 2016 15:00:00\nat index: 2",
+				parser.parseInput("set 2 [16 feb 3pm]").toString());
+		
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016"
+				+ " 15:00:00 to 19 Feb 2016 17:00:00\nat index: 2",
+				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
+	}
+	
+	public void testChangesHuman() {
+		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
+		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
 	@Test

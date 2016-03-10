@@ -145,6 +145,8 @@ public class Logic {
 			UiMain.getInstance().getController().updateDisplay(lists.get(0), ContentBox.THIS_WEEK);
 			UiMain.getInstance().getController().updateDisplay(lists.get(1), ContentBox.PENDING);
 			UiMain.getInstance().getController().updateDisplay(lists.get(2), ContentBox.EXPIRED);
+			//Clear the action tab
+			UiMain.getInstance().getController().updateDisplay(new ArrayList<Task>(), ContentBox.ACTION);
 			categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
 					 											 lists.get(ListID.DEADLINE.getValue()).size(),
 					 											 lists.get(ListID.EVENT.getValue()).size(),

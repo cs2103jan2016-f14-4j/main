@@ -9,6 +9,7 @@ import taskey.constants.ParserConstants;
 /**
  * Purpose of this class is to convert date formats like
  * "tomorrow" or "next Wed" into forms that the Parser can process. 
+ * Used by ParseAdd and ParseEdit
  * @author Xue Hui
  *
  */

@@ -33,6 +33,7 @@ public class Parser {
 		commandList.put("search", "search"); 
 		commandList.put("done", "done"); 
 		commandList.put("undo", "undo"); 
+		commandList.put("file_loc", "file_loc");
 	}
 	
 	/**

@@ -21,8 +21,8 @@ import taskey.ui.UiConstants.ActionListMode;
 
 // TODO: Auto-generated Javadoc
 /**
- * This class is the main entry point for Taskey It performs the main setups for
- * the UI.
+ * This class is the main entry point for Taskey. 
+ * It performs the main setups for the UI.
  *
  * @author JunWei
  */
@@ -133,9 +133,8 @@ public class UiMain extends Application {
 		
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		//myController.updateActionDisplay(myTaskList, ActionContentMode.HELP_MAIN);
-		//myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
-		
+		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
+	
 		ArrayList<String> myCategoryList = new ArrayList<String>(
 				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
 		ArrayList<Integer> categoryNums = new ArrayList<Integer>(

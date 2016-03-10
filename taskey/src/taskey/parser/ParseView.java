@@ -22,6 +22,8 @@ public class ParseView {
 		viewList.put("general", "general");
 		viewList.put("deadlines", "deadlines");
 		viewList.put("events", "events"); 
+		viewList.put("archive", "archive"); 
+		viewList.put("help", "help"); 
 	}
 	
 	/**
@@ -30,6 +32,9 @@ public class ParseView {
 	 * 2. GENERAL
 	 * 3. DEADLINES
 	 * 4. EVENTS 
+	 * 5. ARCHIVE
+	 * 6. HELP 
+	 * 7. #tags 
 	 * @param command
 	 * @param stringInput
 	 * @return processedStuff

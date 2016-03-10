@@ -173,8 +173,7 @@ public class UiController {
 					input.clear();
 
 					int statusCode = 0;
-					statusCode = Logic.getInstance().executeCommand(currentContent,line);
-					
+					statusCode = Logic.getInstance().executeCommand(currentContent,line);	
 					UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
 					event.consume();
 
@@ -196,6 +195,15 @@ public class UiController {
 	        	  }
 	        	  if (event.getCode() == KeyCode.TAB) {
 	        		  event.consume();
+	        	  }
+	        	  if ( event.getCode() == KeyCode.DELETE ) {
+	        		  if ( myDropDown.isMenuOpen() == false ) {
+	        			  int id = myContentManager.processDelete(currentContent); 
+	        			  if ( id != -1 ) {
+		        			  int statusCode = Logic.getInstance().executeCommand(currentContent, "del " + id);	
+		  					  UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
+	        			  }
+	        		  }
 	        	  }
 	          };
 	        });	

@@ -2,7 +2,6 @@ package taskey.parser;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 
 import taskey.constants.ParserConstants;
 
@@ -57,7 +56,7 @@ public class TimeConverter {
 							date3).getTime() / 1000;
 					return epochTime; 
 				} catch (ParseException e3) {
-					System.out.println(e3); 
+					//System.out.println(e3); 
 					throw e3; 
 				}
 			}

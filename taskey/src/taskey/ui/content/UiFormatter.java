@@ -7,8 +7,12 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -22,6 +26,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.utility.UiClockService;
+import taskey.ui.utility.UiGridSettings;
 
 /**
  * This class contains methods to add content to grids, is extended by other
@@ -31,31 +36,62 @@ import taskey.ui.utility.UiClockService;
  *
  */
 public abstract class UiFormatter {
-	protected String defaultWrapperStyle;
-	protected UiClockService clockService;
+	protected String defaultWrapperStyle; // per cell
+	protected ScrollPane mainPane;
 	protected GridPane currentGrid;
 	protected ArrayList<GridPane> myGrids;
-	public UiFormatter(GridPane _gridPane, UiClockService _clockService) {
-		currentGrid = _gridPane;
-		clockService = _clockService;
+	
+	public abstract void clearOtherVariables();
+	public abstract void format(ArrayList<Task> myTaskList);
+	public abstract void processArrowKey(KeyEvent event);
+	public abstract int processDeleteKey();
+	
+	public UiFormatter(ScrollPane thePane) {
+		mainPane = thePane;
+		mainPane.setFitToWidth(true);
 		myGrids = new ArrayList<GridPane>();
-		myGrids.add(currentGrid);
 		defaultWrapperStyle = UiConstants.STYLE_WHITE_BOX;
 	}
 	
-	public void setGrid(int index) {
+	/**
+	 * This sets up the grid using predefined GridSettings which only set for column constraints
+	 * Row constraints have to be set manually
+	 * @param settings - the UiGridSettings
+	 * @return
+	 */
+	protected GridPane setUpGrid(UiGridSettings settings) {
+		assert(settings != null);
+		GridPane gridPane = new GridPane();
+		//gridPane.setGridLinesVisible(true);
+		gridPane.setPadding(settings.getPaddings());
+		gridPane.setHgap(settings.getHGap());
+		gridPane.setVgap(settings.getVGap());
+		ArrayList<Integer> colPercents = settings.getColPercents();
+		for (int i = 0; i < colPercents.size(); i++) {
+			ColumnConstraints column = new ColumnConstraints();
+			column.setPercentWidth(colPercents.get(i));
+			gridPane.getColumnConstraints().add(column);
+		}
+		return gridPane;
+	}
+	
+	protected void setGrid(int index) {
 		assert(index >= 0 && index < myGrids.size());
 		currentGrid = myGrids.get(index);
+		mainPane.setContent(currentGrid);
 	}
-	public void addGrid(GridPane newGrid) {
+	protected void addGrid(GridPane newGrid, boolean setToCurrent) {
 		assert(newGrid != null);
+		if ( setToCurrent == true ) {
+			currentGrid = newGrid;
+		}
 		myGrids.add(newGrid);
 	}
-	public GridPane getGrid() {
-		assert(currentGrid != null);
-		return currentGrid;
-	}
-	public void clearGridContents() {
+	
+	/**
+	 * Clear contents of currentGrid variable
+	 */
+	protected void clearCurrentGridContents() {
 		assert(currentGrid != null);
 		Node node = null;
 		if (currentGrid.isGridLinesVisible()) {
@@ -65,11 +101,10 @@ public abstract class UiFormatter {
 		if (currentGrid.isGridLinesVisible()) {
 			currentGrid.getChildren().add(0, node);
 		}
+		clearOtherVariables();
 	}
 	public void cleanUp() {
 		myGrids.clear();
-	}
-	public void format(ArrayList<Task> myTaskList) {
 	}
 	
 	protected StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
@@ -113,25 +148,33 @@ public abstract class UiFormatter {
 		cellWrapper.getChildren().add(circle);
 	}
 	
-	// Wraps image to be placed anywhere in cell
-	protected StackPane addImageToCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
+	protected ImageView createImageInCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
 		assert(gridPane != null);
-		StackPane imageWrapper = createStackPaneInCell(col,row,"",gridPane);
+		StackPane imageWrapper = getWrapperAtCell(col,row,gridPane);
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(width);
 		myImg.setFitWidth(height);
 		imageWrapper.getChildren().add(myImg);
-		return imageWrapper;
+		return myImg;
 	}
 	
-	// Such that the stackpane does not stretch with cell size
+	protected Label createLabelInCell( int col, int row, String text, String labelStyle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		Label myLabel = new Label(text);
+		myLabel.getStyleClass().add(labelStyle);
+		cellWrapper.getChildren().add(myLabel);
+		return myLabel;
+	}		
+	
+	// Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
+	// formatters, methods for the single wrapper can still be used, but switch the parents
 	protected StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
 		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		StackPane pane = new StackPane();
 		pane.getStyleClass().add(paneStyle);
-		GridPane.setFillHeight(pane, false);
-		GridPane.setFillWidth(pane,false);
-		gridPane.add(pane,col,row);
+		cellWrapper.getChildren().add(pane);
 		return pane;
 	}
 }

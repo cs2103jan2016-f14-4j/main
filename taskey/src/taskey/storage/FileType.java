@@ -41,20 +41,20 @@ public enum FileType {
      */
     public static FileType getType(String filename) {
     	switch (filename) {
-    		case "PENDING":
+    		case "PENDING.taskey":
     			return PENDING;
-    		case "EXPIRED":
+    		case "EXPIRED.taskey":
     			return EXPIRED;
-    		case "GENERAL":
+    		case "GENERAL.taskey":
     			return GENERAL;
-    		case "DEADLINE":
+    		case "DEADLINE.taskey":
     			return DEADLINE;
-    		case "EVENT":
+    		case "EVENT.taskey":
     			return EVENT;
-    		case "COMPLETED":
+    		case "COMPLETED.taskey":
     			return COMPLETED;
-    		case "TAGS":
-    		case "USER_TAG_DB":
+    		case "TAGS.taskey":
+    		case "USER_TAG_DB.taskey":
     			return TAGS;
     		default:
     			return INVALID;

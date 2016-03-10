@@ -21,8 +21,8 @@ import taskey.ui.UiConstants.ActionListMode;
 
 // TODO: Auto-generated Javadoc
 /**
- * This class is the main entry point for Taskey It performs the main setups for
- * the UI.
+ * This class is the main entry point for Taskey. 
+ * It performs the main setups for the UI.
  *
  * @author JunWei
  */

@@ -31,7 +31,7 @@ public class ParserTest {
 	@Test
 	public void testDeadline() {
 	
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
+		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
 			 
@@ -39,7 +39,7 @@ public class ParserTest {
 				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting by 17 feb 2016 3pm").toString());
 		 
-		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
+		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 	}

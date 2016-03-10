@@ -114,7 +114,6 @@ public class Logic {
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	Task done;
-    	Task toUpdate;
     	ArrayList<Task> doneList;
     
     	System.out.println("Command: " + command);
@@ -156,13 +155,11 @@ public class Logic {
 				statusCode = doneByName(currentContent, task.getTaskName());
 				break;
 				
-			/*case "UPDATE_BY_INDEX_CHANGE_NAME":
-				toUpdate = targetList.get(taskIndex - 1); //Temporary fix
-				toUpdate.setTaskName(newTaskName);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+				statusCode = updateByIndexChangeName(currentContent, taskIndex, newTaskName);
 				break;
 				
-			case "UPDATE_BY_INDEX_CHANGE_DATE":
+			/*case "UPDATE_BY_INDEX_CHANGE_DATE":
 				toUpdate = targetList.remove(taskIndex - 1); //Temporary fix
 				task.setTaskName(toUpdate.getTaskName());
 				targetList.add(task);
@@ -386,6 +383,29 @@ public class Logic {
 		refreshUiCategoryDisplay();
 		
 		return 0;
+	}
+	
+	//Update an indexed task's name with newTaskName. 
+	//Also updates the UI display to reflect the updated lists.
+	private int updateByIndexChangeName(ContentBox currentContent, int taskIndex, String newTaskName) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return -1;
+		}
+		
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate;
+		
+		try {
+			toUpdate = targetList.get(taskIndex - 1); //Temporary fix
+		} catch (IndexOutOfBoundsException e) {
+			return -1;
+		}
+		
+		toUpdate.setTaskName(newTaskName);
+		refreshUiTabDisplay();
+		
+		return 0; //Stub
 	}
 	
 	//Gets the list corresponding to the given ContentBox.

@@ -115,6 +115,18 @@ public class Logic {
 		return null;
 	}
 	
+	private int clearAllLists(ContentBox currentContent) {
+		if (!currentContent.equals(ContentBox.PENDING)) { // "clear" only allowed in pending tab
+			return -1;
+		}
+		
+		for (int i = 0; i < fileNames.size() + 1; i++) {
+			lists.get(i).clear();
+		}
+		
+		return 0;
+	}
+	
 	/** 
 	 * Executes the user supplied command.
 	 * 
@@ -124,8 +136,24 @@ public class Logic {
 	 */
 	public int executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
-    	ProcessedObject po = parser.parseInput(input);
+		
+		//System.out.println(input);
+		
+    	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
+			statusCode = clearAllLists(currentContent);
+			saveAllTasks();
+			UiMain.getInstance().getController().updateDisplay(lists.get(0), ContentBox.THIS_WEEK);
+			UiMain.getInstance().getController().updateDisplay(lists.get(1), ContentBox.PENDING);
+			UiMain.getInstance().getController().updateDisplay(lists.get(2), ContentBox.EXPIRED);
+			categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
+					 											 lists.get(ListID.DEADLINE.getValue()).size(),
+					 											 lists.get(ListID.EVENT.getValue()).size(),
+					 											 lists.get(ListID.COMPLETED.getValue()).size()));
+			uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+			return statusCode;
+    	}
     	
+    	ProcessedObject po = parser.parseInput(input); 	
     	String command = po.getCommand();
     	Task task = po.getTask();
     	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
@@ -140,7 +168,7 @@ public class Logic {
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
     	System.out.println("Command: " + command);
     	
-    	switch (command) {
+    	switch (command) {		
 			case "ADD_FLOATING":
 				statusCode = addFloating(task);
 				break;

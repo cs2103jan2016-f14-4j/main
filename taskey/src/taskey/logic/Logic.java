@@ -74,12 +74,10 @@ public class Logic {
 		uiController.updateDisplay(thisWeek, ContentBox.THIS_WEEK);
 		
 		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
-		categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
-															 lists.get(ListID.DEADLINE.getValue()).size(),
-															 lists.get(ListID.EVENT.getValue()).size(),
-															 lists.get(ListID.COMPLETED.getValue()).size()));
+		//Values will be updated with refreshUiCategoryDisplay();
+		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0)); 
 		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 	}
 	
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
@@ -147,11 +145,8 @@ public class Logic {
 			UiMain.getInstance().getController().updateDisplay(lists.get(2), ContentBox.EXPIRED);
 			//Clear the action tab
 			UiMain.getInstance().getController().updateDisplay(new ArrayList<Task>(), ContentBox.ACTION);
-			categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
-					 											 lists.get(ListID.DEADLINE.getValue()).size(),
-					 											 lists.get(ListID.EVENT.getValue()).size(),
-					 											 lists.get(ListID.COMPLETED.getValue()).size()));
-			uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+			refreshUiCategoryDisplay();
+			
 			return statusCode;
     	}
     	
@@ -200,7 +195,7 @@ public class Logic {
 				break;
 				
 			case "DONE_BY_INDEX":
-				statusCode = doneByIndex(currentContent, taskIndex - 1); //Temporary fix	
+				statusCode = doneByIndex(currentContent, taskIndex); 
 				break;
 				
 			/*case "DONE_BY_NAME":
@@ -251,6 +246,14 @@ public class Logic {
 		return statusCode; 
 	}
 	
+	private void refreshUiCategoryDisplay() {
+		categorySizes.set(CategoryID.GENERAL.getValue(), lists.get(ListID.GENERAL.getValue()).size());
+		categorySizes.set(CategoryID.DEADLINE.getValue(), lists.get(ListID.DEADLINE.getValue()).size());
+		categorySizes.set(CategoryID.EVENT.getValue(), lists.get(ListID.EVENT.getValue()).size());
+		categorySizes.set(CategoryID.COMPLETED.getValue(), lists.get(ListID.COMPLETED.getValue()).size());
+		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+	}
+	
 	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
 	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
 	private int doneByIndex(ContentBox currentContent, int taskIndex) {
@@ -284,11 +287,7 @@ public class Logic {
 		//Update UI display
 		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		UiMain.getInstance().getController().updateDisplay(lists.get(ListID.PENDING.getValue()), ContentBox.PENDING);
-		categorySizes = new ArrayList<Integer>(Arrays.asList(lists.get(ListID.GENERAL.getValue()).size(),
-															 lists.get(ListID.DEADLINE.getValue()).size(),
-															 lists.get(ListID.EVENT.getValue()).size(),
-															 lists.get(ListID.COMPLETED.getValue()).size()));
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0;
 	}
@@ -329,22 +328,19 @@ public class Logic {
 		if (taskType.equals("FLOATING")) {
 			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
 			floatingList.remove(t);
-			categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
 		} else if (taskType.equals("DEADLINE")) {
 			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
 			deadlineList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
 		} else if (taskType.equals("EVENT")) {
 			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
 			eventList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-			categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
 		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
 	}
@@ -367,22 +363,19 @@ public class Logic {
 		if (taskType.equals("FLOATING")) {
 			ArrayList<Task> floatingList = lists.get(ListID.GENERAL.getValue());
 			floatingList.remove(t);
-			categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
 		} else if (taskType.equals("DEADLINE")) {
 			ArrayList<Task> deadlineList = lists.get(ListID.DEADLINE.getValue());
 			deadlineList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-			categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
 		} else if (taskType.equals("EVENT")) {
 			ArrayList<Task> eventList = lists.get(ListID.EVENT.getValue());
 			eventList.remove(t);
 			lists.get(ListID.THIS_WEEK.getValue()).remove(t);
-			categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		}
 		
 		uiController.updateDisplay(targetList, currentContent);
 		uiController.updateDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
 	}
@@ -415,10 +408,9 @@ public class Logic {
 		
 		pendingList.add(task);
 		floatingList.add(task);
-		categorySizes.set(CategoryID.GENERAL.getValue(), floatingList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
 	}
@@ -440,10 +432,9 @@ public class Logic {
 			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		}
 		
-		categorySizes.set(CategoryID.DEADLINE.getValue(), deadlineList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
 	}
@@ -465,10 +456,9 @@ public class Logic {
 			updateUiContentDisplay(lists.get(ListID.THIS_WEEK.getValue()), ContentBox.THIS_WEEK);
 		}
 		
-		categorySizes.set(CategoryID.EVENT.getValue(), eventList.size());
 		updateUiContentDisplay(pendingList, ContentBox.PENDING);
 		uiController.displayTabContents(ContentBox.PENDING.getValue()); //Automatically switch to pending tab
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
+		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
 	}

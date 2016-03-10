@@ -41,10 +41,7 @@ public class ParserTest {
 		 
 		assertEquals("Command: ADD_DEADLINE\nproject meeting at 3pm, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00:00\n",
-				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());			
-		
-		//System.out.println(parser.parseInput("add project meeting at 3pm by 17 feb 2016"));
-		//this returns today's date O_O 
+				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 	}
 	
 	public void testDeadlineHuman() {
@@ -66,10 +63,19 @@ public class ParserTest {
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());	
 		
 		//TODO: convert to assert 
-		//System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm"));
-		//System.out.println(parser.parseInput("add meeting from 19 feb 3pm to 4pm"));
-		System.out.println(parser.parseInput("add project meeting from 4pm to 5pm on 19 feb"));
-		System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00:00 "
+				+ "to 19 Feb 2016 16:00:00\n",
+				parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm").toString());
+		
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00:00 "
+				+ "to 19 Feb 2016 16:00:00\n",
+				parser.parseInput("add meeting from 19 feb 3pm to 4pm").toString());
+		
+		assertEquals("Command: ADD_EVENT\nproject meeting, EVENT, from 19 Feb 2016 "
+				+ "16:00:00 to 19 Feb 2016 17:00:00\n",
+				parser.parseInput("add project meeting from 4pm to "
+						+ "5pm on 19 feb").toString());
+		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
 	public void testEventsHuman() {
@@ -135,9 +141,13 @@ public class ParserTest {
 				parser.parseInput("set meeting [16 feb,17 Feb]").toString());	
 		
 		//test time usage
-		//TODO: convert to assert 
-		//System.out.println(parser.parseInput("set 2 [16 feb 3pm]"));
-		//System.out.println(parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]"));
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
+				+ "Feb 2016 15:00:00\nat index: 2",
+				parser.parseInput("set 2 [16 feb 3pm]").toString());
+		
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016"
+				+ " 15:00:00 to 19 Feb 2016 17:00:00\nat index: 2",
+				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
 	}
 	
 	public void testChangesHuman() {

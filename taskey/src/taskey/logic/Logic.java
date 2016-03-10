@@ -397,7 +397,7 @@ public class Logic {
 		Task toUpdate;
 		
 		try {
-			toUpdate = targetList.get(taskIndex - 1); //Temporary fix
+			toUpdate = targetList.get(taskIndex); 
 		} catch (IndexOutOfBoundsException e) {
 			return -1;
 		}

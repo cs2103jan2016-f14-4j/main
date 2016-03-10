@@ -34,27 +34,27 @@ public enum FileType {
     }
 
     /**
-     * Legacy method.
+     * LEGACY METHOD. DO NOT PASS IN THE NEW FILENAME STRINGS.
      * Converts our old filenames to the corresponding new enum types.
      * @param filename string
      * @return the corresponding enum type
      */
     public static FileType getType(String filename) {
     	switch (filename) {
-    		case "PENDING.taskey":
+    		case "PENDING":
     			return PENDING;
-    		case "EXPIRED.taskey":
+    		case "EXPIRED":
     			return EXPIRED;
-    		case "GENERAL.taskey":
+    		case "GENERAL":
     			return GENERAL;
-    		case "DEADLINE.taskey":
+    		case "DEADLINE":
     			return DEADLINE;
-    		case "EVENT.taskey":
+    		case "EVENT":
     			return EVENT;
-    		case "COMPLETED.taskey":
+    		case "COMPLETED":
     			return COMPLETED;
-    		case "TAGS.taskey":
-    		case "USER_TAG_DB.taskey":
+    		case "TAGS":
+    		case "USER_TAG_DB":
     			return TAGS;
     		default:
     			return INVALID;

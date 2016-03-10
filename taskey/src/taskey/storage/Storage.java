@@ -161,10 +161,19 @@ public class Storage {
      * @throws StorageException
      */
     public void saveTaskList(ArrayList<Task> tasks, FileType tasklistCategory) throws StorageException {
-    	saveTaskList(tasks, tasklistCategory.getFilename());
+    	history.set(tasklistCategory, tasks);
+    	File file = new File(directory, tasklistCategory.getFilename());
+    	try {
+    		writeToFile(file, tasks, new TypeToken<ArrayList<Task>>() {});
+    	} catch (IOException e) {
+    		// When exception is encountered during write-after-modified, throw the last-modified list to Logic
+    		throw new StorageException(e, history.get(tasklistCategory));
+    	}
     }
 
     /**
+     * LEGACY METHOD: String filename IS EXPECTED TO BE USING THE OLD FILENAMES.
+     *
      * Saves an ArrayList of Task objects to the file specified by the given filename String.
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
      * This method is invoked by Logic.

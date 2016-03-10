@@ -36,7 +36,7 @@ public class History {
 	}
 
 	/*========*
-	 * Getter *
+	 * Setter *
 	 *========*/
 
     /**
@@ -51,6 +51,8 @@ public class History {
 	}
 
 	/**
+	 * LEGACY METHOD: String filename is expected to be using the OLD FILENAMES.
+	 *
 	 * Storage will invoke this method for every call to saveTaskList,
 	 * so Logic should not need to use this.
 	 *
@@ -61,14 +63,14 @@ public class History {
 	 * @param tasklist ArrayList of tasks to be saved
 	 */
 	public void set(String filename, ArrayList<Task> tasklist) {
-		FileType tasklistCategory = FileType.getType(filename);
+		FileType tasklistCategory = FileType.getType(filename); //FileType.getType is a legacy method whose argument takes in the OLD FILENAME
 		if (tasklistCategory != FileType.INVALID) {
 			lastSavedTasklists.put(tasklistCategory, tasklist);
 		}
 	}
 
 	/*========*
-	 * Setter *
+	 * Getter *
 	 *========*/
 
 	/**
@@ -85,6 +87,8 @@ public class History {
 	}
 
 	/**
+	 * LEGACY METHOD: String filename is expected to be using the OLD FILENAMES.
+	 *
 	 * Gets the last-saved tasklist specified by filename.
 	 * An empty ArrayList is returned if the tasklist specified by filename
 	 * has not been added to History yet,
@@ -93,7 +97,7 @@ public class History {
 	 * @return the last-saved tasklist specified by filename
 	 */
 	public ArrayList<Task> get(String filename) {
-		FileType tasklistCategory = FileType.getType(filename);
+		FileType tasklistCategory = FileType.getType(filename); //FileType.getType is a legacy method whose argument takes in the OLD FILENAME
 		ArrayList<Task> ret = lastSavedTasklists.get(tasklistCategory);
 		if (ret == null) {
 			ret = new ArrayList<Task>();

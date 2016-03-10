@@ -213,9 +213,9 @@ public class UiDefaultFormatter extends UiFormatter {
 
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
-		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		myConfig.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
-		line += "Name: "; 
+		line += "$Name: "; 
 		line += theTask.getTaskName() + "\n";
 		
 		switch ( theTask.getTaskType() ) {
@@ -223,19 +223,21 @@ public class UiDefaultFormatter extends UiFormatter {
 			break;
 		case "EVENT": 
 			String [] timings = theTask.getEventTime();
-			line += "Event from: (" + timings[0] + " to " + timings[1] + ")";
+			myConfig.addMarkers(UiConstants.STYLE_TEXT_BLUE,
+					UiConstants.STYLE_TEXT_BLACK_TO_PURPLE, 
+					UiConstants.STYLE_TEXT_BLUE);
+			line += "Event from: $";
+			line += timings[0] + "$ to $" + timings[1];
 			break;
  		case "DEADLINE":
 			line += "Due by: ";
-			if (theTask.getDeadline().length() != 0 ) {
-				line += " (" + theTask.getDeadline() + ")";
-			} else {
-				line += "---------";
-			}
+			myConfig.addMarkers(UiConstants.STYLE_TEXT_BLUE);			
+			line += "$" + theTask.getDeadline();
 			break;
 		}
 		line += "\n";
-		line += "Tags: ";
+		myConfig.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		line += "$Tags: ";
 		if ( theTask.getTaskTags() != null ) {
 			ArrayList<String> tags = theTask.getTaskTags();
 			for ( String s : tags) {
@@ -244,7 +246,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			line += "None";
 		}
-		element.getChildren().addAll(myConfig.build(line));
+		element.getChildren().addAll(myConfig.buildBySymbol(line));
 		addTextFlowToCell(1, row, element,TextAlignment.LEFT, currentGrid);
 		pageEntries.get(row).getChildren().add(element); // switch to use this second level wrapper
 		StackPane.setMargin(element, new Insets(marginSpacing));

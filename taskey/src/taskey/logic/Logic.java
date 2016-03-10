@@ -152,16 +152,11 @@ public class Logic {
 				statusCode = doneByIndex(currentContent, taskIndex); 
 				break;
 				
-			/*case "DONE_BY_NAME":
-				done = getTaskByName(targetList, task.getTaskName());
-				targetList.remove(done);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				doneList = lists.get(ListID.COMPLETED.getValue());
-				doneList.add(done);
-			//	UiMain.getInstance().getController().updateDisplay(doneList, ContentBox.COMPLETED);
+			case "DONE_BY_NAME":
+				statusCode = doneByName(currentContent, task.getTaskName());
 				break;
 				
-			case "UPDATE_BY_INDEX_CHANGE_NAME":
+			/*case "UPDATE_BY_INDEX_CHANGE_NAME":
 				toUpdate = targetList.get(taskIndex - 1); //Temporary fix
 				toUpdate.setTaskName(newTaskName);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -359,6 +354,29 @@ public class Logic {
 				return -1;
 			}
 		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
+			return -1;
+		}
+		
+		removeFromAllLists(toMarkAsDone);
+		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		
+		return 0;
+	}
+	
+	//Mark a named task as done by adding it to the "completed" list and removing it from all the
+	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
+	private int doneByName(ContentBox currentContent, String taskName) {
+		Task toMarkAsDone = new Task(taskName);
+		
+		//"done" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return -1;
+		}
+		
+		//Named task does not exist in the list
+		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toMarkAsDone)) {
 			return -1;
 		}
 		

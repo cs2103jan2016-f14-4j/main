@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import taskey.parser.TimeConverter; 
+import static taskey.constants.ParserConstants.DAY_END_SHORT; 
 
 /**
  * Task object holds all the details of the task 
@@ -79,6 +80,19 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public String getStartDate() {
+		String date = datesHuman[1]; 
+		
+		if (date.contains(DAY_END_SHORT)) {
+			date = date.replaceFirst(DAY_END_SHORT, ""); 
+		}
+		return date.trim(); 
+	}
+	
+	/**
+	 * Get the startDate without stripping off 23:59
+	 * @return
+	 */
+	public String getStartDateFull() {
 		return datesHuman[1]; 
 	}
 	
@@ -87,6 +101,15 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public String getEndDate() {
+		String date = datesHuman[2]; 
+		
+		if (date.contains(DAY_END_SHORT)) {
+			date = date.replaceFirst(DAY_END_SHORT, ""); 
+		}
+		return date.trim(); 
+	}
+	
+	public String getEndDateFull() {
 		return datesHuman[2]; 
 	}
 	
@@ -95,6 +118,15 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public String getDeadline() {
+		String date = datesHuman[3]; 
+		
+		if (date.contains(DAY_END_SHORT)) {
+			date = date.replaceFirst(DAY_END_SHORT, ""); 
+		}
+		return date.trim(); 
+	}
+	
+	public String getDeadlineFull() {
 		return datesHuman[3]; 
 	}
 	
@@ -180,7 +212,12 @@ public class Task implements Comparable<Task> {
 	
 	
 	public String[] getEventTime() {
-		String[] eventTime = {datesHuman[1],datesHuman[2]};
+		String[] eventTime = {getStartDate(),getEndDate()};
+		return eventTime; 
+	}
+	
+	public String[] getEventTimeFull() {
+		String[] eventTime = {getStartDateFull(),getEndDateFull()};
 		return eventTime; 
 	}
 	

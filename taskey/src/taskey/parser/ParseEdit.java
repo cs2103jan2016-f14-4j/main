@@ -381,7 +381,6 @@ public class ParseEdit {
 	 * @return epochTime (long) of rawDate
 	 */
 	public long getPrettyTime(String rawDate) {
-		
 		for(int i = 0; i < timeWords.size(); i++) {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser

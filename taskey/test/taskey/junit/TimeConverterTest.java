@@ -25,7 +25,7 @@ public class TimeConverterTest {
 			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb"));
 			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb 2016"));
 			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb"));
-			assertEquals("01 Feb 2016 23:59:59",timeConverter.toHumanTime(1454342399));
+			assertEquals("01 Feb 2016 23:59",timeConverter.toHumanTime(1454342399));
 			
 			long time1 = timeConverter.toEpochTime("31 Mar");
 			long time2 = timeConverter.toEpochTime("1 Apr");
@@ -42,7 +42,7 @@ public class TimeConverterTest {
 		//compare 10Feb 11pm and 11Feb 1am 
 		assertTrue(timeConverter.isSameWeek(1455123600,1455116400));
 		
-		assertEquals("11 Feb 2016 01:00:00",timeConverter.toHumanTime(1455123600)); 
+		assertEquals("11 Feb 2016 01:00",timeConverter.toHumanTime(1455123600)); 
 
 	}
 

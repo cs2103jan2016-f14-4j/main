@@ -12,7 +12,7 @@ import taskey.logic.Task;
  * @author Dylan
  */
 @SuppressWarnings("serial")
-class StorageException extends IOException {
+public class StorageException extends IOException {
 	private ArrayList<Task> lastModified_Tasklist;
 
 	public StorageException(ArrayList<Task> lastModifiedTasklist) {

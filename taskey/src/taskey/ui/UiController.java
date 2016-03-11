@@ -2,6 +2,7 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
@@ -26,6 +27,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import taskey.logic.Task;
+import taskey.logic.LogicConstants.ListID;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.UiConstants.ActionListMode;
@@ -35,6 +37,8 @@ import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 import taskey.logic.Logic;
+import taskey.logic.LogicFeedback;
+import taskey.logic.ProcessedObject;
 
 /**
  * This class is the main class that handles all of the Ui nodes The
@@ -77,6 +81,8 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
+		
+		updateAll(Logic.getInstance().getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here
@@ -99,7 +105,7 @@ public class UiController {
 	private void setUpTabDisplay() {
 		currentTab = 0;
 		input.requestFocus();
-		displayTabContents(currentTab);
+		displayTabContents(ContentBox.THIS_WEEK);
 	}
 
 	private void registerEventHandlersToNodes(Parent root) {
@@ -109,25 +115,22 @@ public class UiController {
 		registerButtonHandlers();
 	}
 
-	public void displayTabContents(int tabNo) {
-		assert(tabNo >= 0 && tabNo < myTabs.getTabs().size());
+	private void displayTabContents(ContentBox toContent) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
-		selectionModel.select(tabNo);
-		currentContent = ContentBox.fromInteger(tabNo);
+		selectionModel.select(toContent.getValue());
+		currentContent = toContent;
 	}
 
-	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+	private void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	private void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
-		currentTab = myTabs.getTabs().size()-1; // focus the tab
-		//displayTabContents(currentTab);
 	}
-	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	private void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);
 		assert(categoryColors != null);
@@ -146,7 +149,7 @@ public class UiController {
 	 * 
 	 * @param styleSheets - style sheets to use for the display as an Array List
 	 */
-	public void setStyleSheets(ArrayList<String> styleSheets) {
+	void setStyleSheets(ArrayList<String> styleSheets) {
 		assert(styleSheets != null);
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
 		myStyleSheets.clear();
@@ -159,24 +162,83 @@ public class UiController {
 		}
 	}
 
+	private ContentBox getCurrentContent() {
+		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
+		return currentContent;
+	}
+	private void handleFeedback( LogicFeedback feedback ) {
+		Exception statusCode = feedback.getException();
+		//System.out.println(statusCode);
+		//UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
+		updateAll(allLists);
+		ProcessedObject processed = feedback.getPo();
+		String command = processed.getCommand();
+		switch (command) {		// change display based on which command was inputted
+			case "ADD_DEADLINE": // update 2 lists
+			case "ADD_EVENT":
+			case "ADD_FLOATING":
+				displayTabContents(ContentBox.PENDING);
+				break;
+			case "DELETE_BY_INDEX":
+			case "DELETE_BY_NAME":
+				break;	
+			case "VIEW":
+				String viewType = processed.getViewType();
+				if (viewType.equals("GENERAL")) {
+					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
+				} else if (viewType.equals("DEADLINES")) {
+					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
+				} else if (viewType.equals("EVENTS")) {
+					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
+				} else if (viewType.equals("ARCHIVE")) {
+					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
+				}
+				displayTabContents(ContentBox.ACTION);
+				break;
+			case "SEARCH":
+				//displayTabContents(ContentBox.ACTION);
+				break;	
+			case "DONE_BY_INDEX":
+			case "DONE_BY_NAME":
+				break;	
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				break;
+			default:
+				System.out.println("Command not defined");
+				break;
+		}
+	}
+	
+	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
+		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
+		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
+		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);
+		ArrayList<String> categoryList = new ArrayList<String>(
+				Arrays.asList("General","Deadlines","Events","Archive"));
+		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
+				Arrays.asList(allLists.get(ListID.GENERAL.getIndex()).size(),allLists.get(ListID.DEADLINE.getIndex()).size(),
+						allLists.get(ListID.EVENT.getIndex()).size(),allLists.get(ListID.COMPLETED.getIndex()).size()));
+		ArrayList<Color> categoryColors = new ArrayList<Color>(
+				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
+		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
+	}
 	/************************************ EVENT HANDLERS  *******************************************/
 	private void registerInputEventHandler() {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
 				if ( event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
-					myDropDown.updateMenuItems(UiMain.getInstance().randomInput("TEST" + Math.random(), 4));
+					myDropDown.updateMenuItems(UiMain.randomInput("TEST" + Math.random(), 4));
 					myDropDown.updateMenu();
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
-
-					int statusCode = 0;
-					statusCode = Logic.getInstance().executeCommand(currentContent,line);	
-					UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
+					
+					handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),line));
 					event.consume();
-
 					myDropDown.closeMenu();
 				}
 			}
@@ -189,7 +251,7 @@ public class UiController {
 	        		  if ( myDropDown.isMenuOpen()) {
 	        			  myDropDown.processArrowKey(event);
 	        		  } else {
-	        			  myContentManager.processArrowKey(event, currentContent);
+	        			  myContentManager.processArrowKey(event, getCurrentContent());
 	        		  }	  
 	        		  event.consume();
 	        	  }
@@ -198,10 +260,9 @@ public class UiController {
 	        	  }
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
-	        			  int id = myContentManager.processDelete(currentContent); 
+	        			  int id = myContentManager.processDelete(getCurrentContent()); 
 	        			  if ( id != -1 ) {
-		        			  int statusCode = Logic.getInstance().executeCommand(currentContent, "del " + id);	
-		  					  UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
+	        				  handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),"del " + id));
 	        			  }
 	        		  }
 	        	  }
@@ -223,7 +284,7 @@ public class UiController {
 				if (event.getCode() == KeyCode.TAB) {
 					currentTab = myTabs.getSelectionModel().getSelectedIndex();
 					currentTab = (currentTab + 1) % myTabs.getTabs().size();
-					displayTabContents(currentTab);
+					displayTabContents(ContentBox.fromInteger(currentTab));
 					event.consume();
 				} else if (event.getCode() == KeyCode.ESCAPE) {
 					System.exit(0);

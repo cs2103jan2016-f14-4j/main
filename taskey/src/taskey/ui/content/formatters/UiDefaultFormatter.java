@@ -263,7 +263,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		GridPane myGrid = (GridPane)pageEntries.get(row).getChildren().get(0);
 		myGrid.add(element,0,0); // switch to use this second level wrapper
 		StackPane.setMargin(element, new Insets(marginSpacing));
-		myGrid.setGridLinesVisible(true);
+		//myGrid.setGridLinesVisible(true);
 	}
 	
 	private void addImage(Task theTask, int row,  ArrayList<StackPane> pageEntries) { 

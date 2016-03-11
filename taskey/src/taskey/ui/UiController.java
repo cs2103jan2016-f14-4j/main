@@ -81,6 +81,8 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
+		Logic.getInstance().initialize();
+		updateCategories(Logic.getInstance().getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here
@@ -119,16 +121,16 @@ public class UiController {
 		currentContent = toContent;
 	}
 
-	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+	private void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	private void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
-	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	private void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);
 		assert(categoryColors != null);

@@ -73,9 +73,6 @@ public class UiMain extends Application {
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		
-		Logic.getInstance().initialize();
-		myController.updateCategories(Logic.getInstance().getAllTaskLists());
 		//testUI();
 	}
 
@@ -109,7 +106,7 @@ public class UiMain extends Application {
 			myTaskList.add(temp);
 		}
 		
-		myController.updateDisplay(myTaskList, ContentBox.PENDING);
+		//myController.updateDisplay(myTaskList, ContentBox.PENDING);
 		/*
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);

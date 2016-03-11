@@ -57,23 +57,52 @@ public class ParseAdd {
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = getTaskName(command, stringInput); 
+		String simpString = getTaskName(command, stringInput);  
 		
-		if (simpString.split("from").length != 1) {
-			//event
-			processed = handleEvent(task, simpString);
-		} else if (simpString.split("on").length != 1) {
-			//deadline
-			processed = handleDeadlineOn(task, simpString);	
-		} else if (simpString.split("by").length != 1) {
-			//deadline 
-			processed = handleDeadlineBy(task, simpString);
-		} else if (simpString.compareTo("") == 0) {
+		if (simpString.compareTo("") == 0) {
 			//empty add
 			processed = parseError.processError("empty add");
-			return processed; 
-		} else {
-			//floating task 
+			return processed;
+		}
+		
+		String[] splitString = simpString.split(" ");
+		boolean isSet = false; 
+		
+		for (int i = 0; i < splitString.length; i++) { 
+			String word = splitString[i]; 
+			switch (word) {
+				case "from": 
+					if (simpString.split("from").length != 1) {
+						//event
+						processed = handleEvent(task, simpString);
+						isSet = true; 
+					}
+					break;
+				case "by":
+					if (simpString.split("by").length != 1) {
+						//deadline 
+						processed = handleDeadlineBy(task, simpString);
+						isSet = true;
+					} 
+					break; 
+				case "on":
+					if (simpString.split("on").length != 1) {
+						//deadline
+						processed = handleDeadlineOn(task, simpString);	
+						isSet = true;
+					}
+					break;
+				default:
+					break; 
+			}
+			
+			if (isSet) {
+				break; //prematurely end loop once processing done
+			}
+		}
+		
+		if (!isSet) {
+			//set as floating task 
 			processed = handleFloating(command, simpString);
 		}
 		
@@ -172,6 +201,7 @@ public class ParseAdd {
 		String withoutTagList = simpString.split("#")[0].trim(); 
 		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(taskName); 
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		//if time contains am or pm or morning or night, 
@@ -213,6 +243,7 @@ public class ParseAdd {
 		String withoutTagList = simpString.split("#")[0].trim(); 
 		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(taskName); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
 		//if time contains am or pm or morning or night, 
@@ -329,5 +360,59 @@ public class ParseAdd {
 		}
 		return tagList; 
 	}
-
+	
+	/**
+	 * Depending on where the user keyed in his dates, the task name
+	 * might still contain the time in it. So this function will remove
+	 * the time from the task name (if it is there) 
+	 * @param taskName
+	 * @return
+	 */
+	public String removeTimeFromName(String taskName) {
+		boolean hasTime = false; 
+		
+		if (taskName.contains("am")) {
+			hasTime = true; 
+		} else if (taskName.contains("a.m.")) {
+			hasTime = true; 
+		} else if (taskName.contains("pm")) {
+			hasTime = true;
+		} else if (taskName.contains("p.m.")) {
+			hasTime = true; 
+		}
+		
+		if (!hasTime) {
+			return taskName; 
+		}
+		
+		String stringRep = ""; 
+		String[] splitName = taskName.split(" "); 
+		int size = splitName.length; 
+		
+		for(int i = 0; i < size; i++) {
+			String word = splitName[i]; 
+			if (word.compareTo("at") == 0) {
+				if (i+1 < size) {
+					String time = splitName[i+1];
+					if (time.contains("am")) {
+						i += 2; 
+					} else if (time.contains("pm")) {
+						i += 2; 
+					} else if (time.contains("p.m.")) {
+						i += 2; 
+					} else if (time.contains("a.m.")) {
+						i += 2; 
+					} else {
+						//probably a place and not time,
+						//so add it to the task name 
+						stringRep += word + " " + time + " ";
+						i += 2; 
+					}
+				}
+			} else {
+				stringRep += word + " "; 
+			}
+		}	
+		return stringRep.trim(); 
+	}
 }

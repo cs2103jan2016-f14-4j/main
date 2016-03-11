@@ -1,7 +1,7 @@
 package taskey.storage;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import taskey.logic.Task;
 
@@ -17,15 +17,15 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
+	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;
 	private static History instance;
-	private HashMap<FileType, ArrayList<Task>> lastSavedTasklists;
 
 	public History() {
-		lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();
+		stack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
 	}
 
 	/**
-	 * Logic can get the History singleton.
+	 * Logic can get the History singleton, if it uses this class in the future.
 	 * @return the history singleton
 	 */
 	public static History getInstance() {
@@ -35,73 +35,51 @@ public class History {
 		return instance;
 	}
 
-	/*========*
-	 * Setter *
-	 *========*/
-
-    /**
-     * Overloaded auxiliary method that takes in the FileType enum.
-     * The other method that takes in a filename string will be deprecated once we move
-     * on to use the FileType enum, so classes should use this method instead.
-     * @param category
-     * @param tasklist
-     */
-	public void set(FileType category, ArrayList<Task> tasklist) {
-		set(category.getFilename(), tasklist);
+	/**
+	 * Adds a superlist to History.
+	 * @param superlist
+	 */
+	public void add(ArrayList<ArrayList<Task>> superlist) {
+		stack.push(superlist);
 	}
 
 	/**
-	 * LEGACY METHOD: String filename is expected to be using the OLD FILENAMES.
-	 *
-	 * Storage will invoke this method for every call to saveTaskList,
-	 * so Logic should not need to use this.
-	 *
+	 * Pops the last saved superlist from History.
+	 * @return
+	 */
+	public ArrayList<ArrayList<Task>>get() {
+		return stack.pop();
+	}
+
+
+	// Old implementation - ignore
+	//private HashMap<TasklistEnum, ArrayList<Task>> lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();
+	/**
 	 * Sets History to map the category specified by filename to tasklist.
 	 * If the filename does not correspond to any type (is INVALID),
 	 * the tasklist will not be added to History.
+	 * Storage will invoke this method for every call to saveTaskList,
+	 * so Logic should not need to use this.
 	 * @param filename category of the tasklist to be saved
 	 * @param tasklist ArrayList of tasks to be saved
-	 */
-	public void set(String filename, ArrayList<Task> tasklist) {
-		FileType tasklistCategory = FileType.getType(filename); //FileType.getType is a legacy method whose argument takes in the OLD FILENAME
-		if (tasklistCategory != FileType.INVALID) {
-			lastSavedTasklists.put(tasklistCategory, tasklist);
-		}
-	}
 
-	/*========*
-	 * Getter *
-	 *========*/
-
-	/**
-	 * Logic can use this method for the undo command.
-	 *
-	 * Overloaded auxiliary method that takes in the FileType enum.
-     * The other method that takes in a filename string will be deprecated once we move
-     * on to use the FileType enum, so classes should use this method instead.
-	 * @param category
-	 * @return
-	 */
-	public ArrayList<Task> get(FileType category) {
-		return get(category.getFilename());
+	public void set(TasklistEnum tasklistType, ArrayList<Task> tasklist) {
+		lastSavedTasklists.put(tasklistType, tasklist);
 	}
 
 	/**
-	 * LEGACY METHOD: String filename is expected to be using the OLD FILENAMES.
-	 *
 	 * Gets the last-saved tasklist specified by filename.
 	 * An empty ArrayList is returned if the tasklist specified by filename
 	 * has not been added to History yet,
 	 * or if the tasklist category specified by filename is invalid.
 	 * @param filename category of the last-saved tasklist
 	 * @return the last-saved tasklist specified by filename
-	 */
-	public ArrayList<Task> get(String filename) {
-		FileType tasklistCategory = FileType.getType(filename); //FileType.getType is a legacy method whose argument takes in the OLD FILENAME
-		ArrayList<Task> ret = lastSavedTasklists.get(tasklistCategory);
+
+	public ArrayList<Task> get(TasklistEnum tasklistType) {
+		ArrayList<Task> ret = lastSavedTasklists.get(tasklistType);
 		if (ret == null) {
 			ret = new ArrayList<Task>();
 		}
 		return ret;
-	}
+	} */
 }

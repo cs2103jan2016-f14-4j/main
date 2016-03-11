@@ -159,14 +159,11 @@ public class Logic {
 				statusCode = updateByIndexChangeName(currentContent, taskIndex, newTaskName);
 				break;
 				
-			/*case "UPDATE_BY_INDEX_CHANGE_DATE":
-				toUpdate = targetList.remove(taskIndex - 1); //Temporary fix
-				task.setTaskName(toUpdate.getTaskName());
-				targetList.add(task);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
 				break;
 				
-			case "UPDATE_BY_NAME_CHANGE_NAME":
+			/*case "UPDATE_BY_NAME_CHANGE_NAME":
 				toUpdate = getTaskByName(targetList, task.getTaskName());
 				toUpdate.setTaskName(newTaskName);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -408,6 +405,31 @@ public class Logic {
 		return 0; //Stub
 	}
 	
+	//Replace the indexed Task with a Task that has the changed date. 
+	//Also updates the UI display to reflect the updated lists.
+	private int updateByIndexChangeDate(ContentBox currentContent, int taskIndex, Task changedTask) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return -1;
+		}
+		
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate;
+		
+		try {
+			toUpdate = targetList.get(taskIndex); 
+		} catch (IndexOutOfBoundsException e) {
+			return -1;
+		}
+		
+		changedTask.setTaskName(toUpdate.getTaskName());
+		updateAllLists(toUpdate.getTaskName(), changedTask);
+		refreshUiTabDisplay();
+		refreshUiCategoryDisplay();
+		
+		return 0; //Stub
+	}
+	
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
 		ArrayList<Task> targetList = null;
@@ -487,6 +509,39 @@ public class Logic {
 				taskLists.get(i).get(taskIndex).setTaskName(newTaskName);
 			}
 		}
+	}
+	
+	//Replace the Task whose name is oldTaskName with another task changedTask.
+	//Also updates all lists containing the updated Task.
+	private void updateAllLists(String oldTaskName, Task changedTask) {
+		Task toRemove = new Task(oldTaskName);
+		removeFromAllLists(toRemove);
+		
+		for (int i = 0; i < taskLists.size(); i++) {				
+			if (belongsToList(changedTask, i)) { 
+				taskLists.get(i).add(changedTask);
+			}
+		}
+	}
+	
+	//Returns true if and only if a given task should be classified under the list specified by listIndex.
+	private boolean belongsToList(Task task, int listIndex) {
+		String taskType = task.getTaskType();
+		
+		if (listIndex == ListID.THIS_WEEK.getIndex()) {
+			return (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime()) 
+					|| timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime()));
+		} else if (listIndex == ListID.PENDING.getIndex()) {
+			return true;
+		} else if (listIndex == ListID.GENERAL.getIndex()) {
+			return (taskType == "FLOATING");
+		} else if (listIndex == ListID.DEADLINE.getIndex()) {
+			return (taskType == "DEADLINE");
+		} else if (listIndex == ListID.EVENT.getIndex()) {
+			return (taskType == "EVENT");
+		} 
+		
+		return false; //Stub
 	}
 	
 	//Save all task lists to Storage.

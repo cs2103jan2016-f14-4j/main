@@ -196,10 +196,9 @@ public class Logic {
     	
     	switch (command) {		
 			case "ADD_FLOATING":
-				statusCode = addFloating(task);
-				break;
+				return addFloating(task, po);
 				
-			case "ADD_DEADLINE":
+			/*case "ADD_DEADLINE":
 				statusCode = addDeadline(task);
 				break;
 				
@@ -239,7 +238,7 @@ public class Logic {
 				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
 				break;
 				
-			/*case "UPDATE_BY_NAME_CHANGE_NAME":
+			case "UPDATE_BY_NAME_CHANGE_NAME":
 				toUpdate = getTaskByName(targetList, task.getTaskName());
 				toUpdate.setTaskName(newTaskName);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -256,31 +255,28 @@ public class Logic {
 				break; */
 				
 			default:
-				statusCode = -1; //Stub
 				break;
 		}
 	
 		saveAllTasks();
 		
-		return statusCode; 
+		return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+                				 new Exception("Failed to execute command.")); //Stub
 	}
 	
 	//Updates UI with a new floating task. Returns a status code reflecting outcome of command execution.
-	private int addFloating(Task task) {
+	private LogicFeedback addFloating(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		
-		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+		if (pendingList.contains(task)) { //Duplicate task names not allowed
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+					                 new Exception("The task " + task.getTaskName() + " already exists!"));
 		}
 		
 		pendingList.add(task);
 		taskLists.get(ListID.GENERAL.getIndex()).add(task);
 		
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-		uiController.displayTabContents(ContentBox.PENDING.getValue()); 
-		
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
 	
 	//Updates UI with a new deadline task. Returns a status code reflecting outcome of command execution.

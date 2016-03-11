@@ -81,7 +81,6 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
-		Logic.getInstance().initialize();
 		updateCategories(Logic.getInstance().getAllTaskLists());
 	}
 

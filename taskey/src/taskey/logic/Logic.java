@@ -43,6 +43,76 @@ public class Logic {
 		return instance;
 	}
 	
+	public ArrayList<Task> getThisWeekList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> thisWeekList = taskLists.get(ListID.THIS_WEEK.getIndex());
+		assert (thisWeekList != null);
+		
+		return thisWeekList;
+	}
+	
+	public ArrayList<Task> getPendingList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		assert (pendingList != null);
+		
+		return pendingList;
+	}
+	
+	public ArrayList<Task> getExpiredList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> expiredList = taskLists.get(ListID.EXPIRED.getIndex());
+		assert (expiredList != null);
+		
+		return expiredList;
+	}
+	
+	public ArrayList<Task> getGeneralList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> generalList = taskLists.get(ListID.GENERAL.getIndex());
+		assert (generalList != null);
+		
+		return generalList;
+	}
+	
+	public ArrayList<Task> getDeadlineList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> deadlineList = taskLists.get(ListID.DEADLINE.getIndex());
+		assert (deadlineList != null);
+		
+		return deadlineList;
+	}
+	
+	public ArrayList<Task> getEventList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> eventList = taskLists.get(ListID.EVENT.getIndex());
+		assert (eventList != null);
+		
+		return eventList;
+	}
+	
+	public ArrayList<Task> getCompletedList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> completedList = taskLists.get(ListID.COMPLETED.getIndex());
+		assert (completedList != null);
+		
+		return completedList;
+	}
+	
 	/** Initializes the Logic singleton and updates UI with the lists from Storage. */
 	public void initialize() {
 		instance = Logic.getInstance();

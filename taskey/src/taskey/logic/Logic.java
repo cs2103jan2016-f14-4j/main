@@ -402,7 +402,7 @@ public class Logic {
 			return -1;
 		}
 		
-		toUpdate.setTaskName(newTaskName);
+		updateAllLists(toUpdate.getTaskName(), newTaskName);
 		refreshUiTabDisplay();
 		
 		return 0; //Stub
@@ -472,6 +472,20 @@ public class Logic {
 	private void clearAllLists(ContentBox currentContent) {
 		for (int i = 0; i < taskLists.size(); i++) {
 			taskLists.get(i).clear();
+		}
+	}
+	
+	//Change the Task whose name is oldTaskName, if any, to have a new name newTaskName.
+	//Also updates all lists containing the updated Task.
+	private void updateAllLists(String oldTaskName, String newTaskName) {
+		Task t = new Task(oldTaskName);
+		
+		for (int i = 0; i < taskLists.size(); i++) {
+			int taskIndex = taskLists.get(i).indexOf(t);
+			
+			if (taskIndex != -1) { //List contains the Task
+				taskLists.get(i).get(taskIndex).setTaskName(newTaskName);
+			}
 		}
 	}
 	

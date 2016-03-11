@@ -23,7 +23,7 @@ public class Storage {
 
 	static final String DEFAULT_DIRECTORY = "Taskey savefiles";
 	static final String FILENAME_CONFIG = "last-used directory.taskey_config";
-	static final String FILENAME_TAGS = "USER_TAG_DB";
+	static final String FILENAME_TAGS = FileType.TAGS.getFilename();
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
@@ -88,7 +88,7 @@ public class Storage {
     public static Storage getInstance() {
     	if (instance == null) {
     		instance = new Storage();
-    		instance.history = new History();
+    		instance.history = History.getInstance();
 
     		if (instance.loadDirectory() == false) {
         		instance.setDirectory(DEFAULT_DIRECTORY);
@@ -102,6 +102,17 @@ public class Storage {
     /*================*
      * Load task list *
      *================*/
+
+    /**
+     * Overloaded auxiliary method.
+     * The other method that takes in a filename string will be deprecated once we move
+     * on to use the FileType enum, so use this method instead.
+     * @param tasklistCategory
+     * @return
+     */
+    public ArrayList<Task> getTaskList(FileType tasklistCategory) {
+    	return getTaskList(tasklistCategory.getFilename());
+    }
 
     /**
      * Returns an ArrayList of Task objects read from the file specified by the given filename String.
@@ -140,6 +151,18 @@ public class Storage {
     /*================*
      * Save task list *
      *================*/
+
+    /**
+     * Overloaded auxiliary method.
+     * The other method that takes in a filename string will be deprecated once we move
+     * on to use the FileType enum, so use this method instead.
+     * @param tasks
+     * @param tasklistCategory
+     * @throws StorageException
+     */
+    public void saveTaskList(ArrayList<Task> tasks, FileType tasklistCategory) throws StorageException {
+    	saveTaskList(tasks, tasklistCategory.getFilename());
+    }
 
     /**
      * Saves an ArrayList of Task objects to the file specified by the given filename String.
@@ -244,9 +267,9 @@ public class Storage {
      * @return true if save was succesful; false otherwise.
      */
     private boolean saveDirectory() {
-    	File config = new File(FILENAME_CONFIG);
+    	File configFile = new File(FILENAME_CONFIG);
     	try {
-    		writeToFile(config, directory, new TypeToken<File>() {});
+    		writeToFile(configFile, directory, new TypeToken<File>() {});
     		System.out.println("{Storage directory saved}"); //debug info
     		return true;
     	} catch (IOException e) {
@@ -260,9 +283,9 @@ public class Storage {
      * @return true if the directory was successfully loaded; false otherwise.
      */
     private boolean loadDirectory() {
-    	File config = new File(FILENAME_CONFIG);
+    	File configFile = new File(FILENAME_CONFIG);
     	try {
-    		directory = readFromFile(config, new TypeToken<File>() {});
+    		directory = readFromFile(configFile, new TypeToken<File>() {});
     		System.out.println("{Storage directory loaded}"); //debug info
     		return true;
     	} catch (FileNotFoundException e) {

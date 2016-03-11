@@ -25,20 +25,24 @@ public class UiImageManager {
 	}
 	
 	public void loadImages() {
-		myImageContainer.put(IMAGE_ID.WINDOW_ICON, 
-				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "windowIcon.png")));
-		myImageContainer.put(IMAGE_ID.CROSS_DEFAULT, 
-				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossDefault.png")));
-		myImageContainer.put(IMAGE_ID.CROSS_SELECT, 
-				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossSelect.png")));
-		myImageContainer.put(IMAGE_ID.INBOX, 
-				new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
+		try {
+			myImageContainer.put(IMAGE_ID.WINDOW_ICON, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "windowIcon.png")));
+			myImageContainer.put(IMAGE_ID.CROSS_DEFAULT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossDefault.png")));
+			myImageContainer.put(IMAGE_ID.CROSS_SELECT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossSelect.png")));
+			myImageContainer.put(IMAGE_ID.INBOX, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
+		} catch ( NullPointerException e ) {
+			System.out.println("Images cant be loaded for some reason, check constants");
+		}
 	}
 	
 	public Image getImage(IMAGE_ID id) {
 		Image theImage = myImageContainer.get(id);
 		if ( theImage == null ) {
-			System.out.println("Image not found by" + id);
+			System.out.println("Image not found by " + id);
 		}
 		return theImage;
 	}

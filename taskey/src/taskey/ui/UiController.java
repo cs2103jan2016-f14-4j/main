@@ -87,7 +87,7 @@ public class UiController {
 
 	private void setUpContentBoxes() {
 		assert(myTabs != null);
-		myContentManager = new UiContentManager(clockService);
+		myContentManager = new UiContentManager();
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
@@ -98,7 +98,7 @@ public class UiController {
 
 	private void setUpTabDisplay() {
 		currentTab = 0;
-	//	input.requestFocus();
+		input.requestFocus();
 		displayTabContents(currentTab);
 	}
 
@@ -168,17 +168,12 @@ public class UiController {
 					myDropDown.updateMenuItems(UiMain.getInstance().randomInput("TEST" + Math.random(), 4));
 					myDropDown.updateMenu();
 				}
-				if ( event.getCode().isArrowKey()) {
-	        		  myDropDown.processArrowKey(event);
-	        		  myContentManager.processArrowKey(event);
-				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
 
 					int statusCode = 0;
-					statusCode = Logic.getInstance().executeCommand(currentContent,line);
-					
+					statusCode = Logic.getInstance().executeCommand(currentContent,line);	
 					UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
 					event.consume();
 
@@ -191,8 +186,23 @@ public class UiController {
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 	          public void handle(KeyEvent event) {
 	        	  if ( event.getCode().isArrowKey()) {
-	        		  if  (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
-	        			  event.consume();
+	        		  if ( myDropDown.isMenuOpen()) {
+	        			  myDropDown.processArrowKey(event);
+	        		  } else {
+	        			  myContentManager.processArrowKey(event, currentContent);
+	        		  }	  
+	        		  event.consume();
+	        	  }
+	        	  if (event.getCode() == KeyCode.TAB) {
+	        		  event.consume();
+	        	  }
+	        	  if ( event.getCode() == KeyCode.DELETE ) {
+	        		  if ( myDropDown.isMenuOpen() == false ) {
+	        			  int id = myContentManager.processDelete(currentContent); 
+	        			  if ( id != -1 ) {
+		        			  int statusCode = Logic.getInstance().executeCommand(currentContent, "del " + id);	
+		  					  UiPopupManager.getInstance().createPopupLabelAtNode("Status code: " + statusCode, input, 0,input.getHeight(),true);
+	        			  }
 	        		  }
 	        	  }
 	          };

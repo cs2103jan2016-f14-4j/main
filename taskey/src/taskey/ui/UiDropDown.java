@@ -116,6 +116,10 @@ public class UiDropDown {
 		currentItemSize = 0;
 	}
 	
+	public boolean isMenuOpen() {
+		return myMenu.isShowing();
+	}
+	
 	/**
 	 * Most of the time after switching styles or setting visibility
 	 * The popup window has some tears, probably because it renders separately from the main program

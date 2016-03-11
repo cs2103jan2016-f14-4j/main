@@ -210,20 +210,40 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	private void addTaskDescription(Task theTask, int row, ArrayList<StackPane> pageEntries) {
 		assert(theTask != null);
+
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
-		line += "NAME: "; 
+		line += "Name: "; 
 		line += theTask.getTaskName() + "\n";
-		line += "DUE: ";
-		if (theTask.getDeadline().length() != 0 ) {
-			line += " (" + theTask.getDeadline() + ")";
-		} else {
-			line += "---------";
+		
+		switch ( theTask.getTaskType() ) {
+		case "FLOATING":
+			break;
+		case "EVENT": 
+			String [] timings = theTask.getEventTime();
+			line += "Event from: (" + timings[0] + " to " + timings[1] + ")";
+			break;
+ 		case "DEADLINE":
+			line += "Due by: ";
+			if (theTask.getDeadline().length() != 0 ) {
+				line += " (" + theTask.getDeadline() + ")";
+			} else {
+				line += "---------";
+			}
+			break;
 		}
 		line += "\n";
-		line += "TAGS: ";
+		line += "Tags: ";
+		if ( theTask.getTaskTags() != null ) {
+			ArrayList<String> tags = theTask.getTaskTags();
+			for ( String s : tags) {
+				line += s + " ";
+			}
+		} else {
+			line += "None";
+		}
 		element.getChildren().addAll(myConfig.build(line));
 		addTextFlowToCell(1, row, element,TextAlignment.LEFT, currentGrid);
 		pageEntries.get(row).getChildren().add(element); // switch to use this second level wrapper
@@ -233,6 +253,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	private void addImage(Task theTask, int row,  ArrayList<StackPane> pageEntries) { 
 		ImageView img = createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
 				30,30,currentGrid);
+		img.setTranslateX(150);
 		pageEntries.get(row).getChildren().add(img); 
 		StackPane.setMargin(img, new Insets(marginSpacing));
 	}

@@ -4,7 +4,7 @@ import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.storage.FileType;
 import taskey.storage.Storage;
-import taskey.ui.UiMain;
+import taskey.storage.StorageException;
 import taskey.ui.UiController;
 import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.UiConstants.ContentBox;
@@ -124,7 +124,7 @@ public class Logic {
 	public void initialize() {
 		parser = new Parser();
 		timeConverter = new TimeConverter();
-		uiController = UiMain.getInstance().getController();
+		uiController = new UiController();
 		fileNames = new ArrayList<String>(Arrays.asList(FileType.PENDING.getFilename(),
 				                                        FileType.EXPIRED.getFilename(),
 				                                        FileType.GENERAL.getFilename(),
@@ -276,9 +276,16 @@ public class Logic {
 		pendingList.add(task);
 		taskLists.get(ListID.GENERAL.getIndex()).add(task);
 		
+		/*try {
+			saveAllTasks();
+		} catch (Exception e) {
+			//TODO: revert task lists
+			return new LogicFeedback(taskLists, po, new Exception("Unable to save changes."));
+		}*/
+		
 		return new LogicFeedback(taskLists, po, null);
 	}
-	
+	/*
 	//Updates UI with a new deadline task. Returns a status code reflecting outcome of command execution.
 	private int addDeadline(Task task) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
@@ -500,7 +507,7 @@ public class Logic {
 		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
-	}
+	}*/
 	
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
@@ -524,7 +531,7 @@ public class Logic {
 		
 		return targetList;
 	}
-	
+	/*
 	//Refresh all UI tabs except the "ACTION" tab.
 	private void refreshUiTabDisplay() {
 		uiController.updateDisplay(taskLists.get(ListID.THIS_WEEK.getIndex()), ContentBox.THIS_WEEK);
@@ -538,7 +545,7 @@ public class Logic {
 		categorySizes.set(CategoryID.EVENT.getIndex(), taskLists.get(ListID.EVENT.getIndex()).size());
 		categorySizes.set(CategoryID.COMPLETED.getIndex(), taskLists.get(ListID.COMPLETED.getIndex()).size());
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
-	}
+	}*/
 	
 	/*
 	//Returns the first Task whose name matches the given name, or null otherwise.
@@ -618,13 +625,14 @@ public class Logic {
 	
 	//Save all task lists to Storage.
 	private void saveAllTasks() {
+		int i = 0;
 		try {
-			for (int i = 0; i < fileNames.size(); i++) {
+			for (; i < fileNames.size(); i++) {
 				Storage.getInstance().saveTaskList(taskLists.get(i + 1), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}
-		} catch (Exception e) {
-			System.out.println("Error in saving tasks");
+		} catch (StorageException se) {
+			System.out.println("Failed to save " + fileNames.get(i));
 		}
 	}
 }

@@ -170,16 +170,11 @@ public class Logic {
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
 		
-    	/*if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
+    	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(currentContent);
 			saveAllTasks();
-			refreshUiTabDisplay();
-			//Clear the action tab
-			UiMain.getInstance().getController().updateDisplay(new ArrayList<Task>(), ContentBox.ACTION);
-			refreshUiCategoryDisplay();
-			
-			return statusCode;
-    	}*/
+			return new LogicFeedback(taskLists, new ProcessedObject("CLEAR"), null); //Stub
+    	}
     	
     	ProcessedObject po = parser.parseInput(input); 	
     	String command = po.getCommand();

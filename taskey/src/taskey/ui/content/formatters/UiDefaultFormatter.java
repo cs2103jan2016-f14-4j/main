@@ -2,12 +2,16 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -15,16 +19,23 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
+import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiTextBuilder;
 
@@ -49,7 +60,7 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	// disable all default inputs, inputs are passed through UiContentManager
 	private void disableScrollBar() {
-		mainPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+		//mainPane.setVbarPolicy(ScrollBarPolicy.NEVER);
 		mainPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() { 
           public void handle(KeyEvent event) {
         	  if ( event.getCode().isArrowKey()) {
@@ -161,6 +172,8 @@ public class UiDefaultFormatter extends UiFormatter {
 	private void createStackForEntry(int col, int row, ArrayList<StackPane> pageEntries) {
 		StackPane stackOn = createStackPaneInCell(col, row, UiConstants.STYLE_WHITE_BOX, currentGrid);
 		StackPane.setMargin(stackOn, new Insets(marginSpacing));
+		GridPane testPane = setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT_STACKPANE);
+		stackOn.getChildren().add(testPane);
 		pageEntries.add(stackOn);
 	}
 
@@ -210,7 +223,6 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	private void addTaskDescription(Task theTask, int row, ArrayList<StackPane> pageEntries) {
 		assert(theTask != null);
-
 		UiTextBuilder myConfig = new UiTextBuilder();
 		TextFlow element = new TextFlow();
 		myConfig.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
@@ -248,8 +260,10 @@ public class UiDefaultFormatter extends UiFormatter {
 		}
 		element.getChildren().addAll(myConfig.buildBySymbol(line));
 		addTextFlowToCell(1, row, element,TextAlignment.LEFT, currentGrid);
-		pageEntries.get(row).getChildren().add(element); // switch to use this second level wrapper
+		GridPane myGrid = (GridPane)pageEntries.get(row).getChildren().get(0);
+		myGrid.add(element,0,0); // switch to use this second level wrapper
 		StackPane.setMargin(element, new Insets(marginSpacing));
+		myGrid.setGridLinesVisible(true);
 	}
 	
 	private void addImage(Task theTask, int row,  ArrayList<StackPane> pageEntries) { 

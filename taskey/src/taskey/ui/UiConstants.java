@@ -67,7 +67,8 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 63, 30);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
-
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT_STACKPANE = new UiGridSettings(0, 0, 0, 80, 20);
+	
 	// Resources 
 	public static final String UI_IMAGE_PATH_OFFSET = "../images/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";

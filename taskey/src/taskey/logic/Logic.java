@@ -43,6 +43,34 @@ public class Logic {
 		return instance;
 	}
 	
+	public ArrayList<Task> getThisWeekList() {
+		return taskLists.get(ListID.THIS_WEEK.getIndex());
+	}
+	
+	public ArrayList<Task> getPendingList() {
+		return taskLists.get(ListID.PENDING.getIndex());
+	}
+	
+	public ArrayList<Task> getExpiredList() {
+		return taskLists.get(ListID.EXPIRED.getIndex());
+	}
+	
+	public ArrayList<Task> getGeneralList() {
+		return taskLists.get(ListID.GENERAL.getIndex());
+	}
+	
+	public ArrayList<Task> getDeadlineList() {
+		return taskLists.get(ListID.DEADLINE.getIndex());
+	}
+	
+	public ArrayList<Task> getEventList() {
+		return taskLists.get(ListID.EVENT.getIndex());
+	}
+	
+	public ArrayList<Task> getCompletedList() {
+		return taskLists.get(ListID.COMPLETED.getIndex());
+	}
+	
 	/** Initializes the Logic singleton and updates UI with the lists from Storage. */
 	public void initialize() {
 		instance = Logic.getInstance();

@@ -17,7 +17,6 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
-	private static History instance;
 	private HashMap<FileType, ArrayList<Task>> lastSavedTasklists;
 
 	public History() {
@@ -25,35 +24,6 @@ public class History {
 	}
 
 	/**
-	 * Logic can get the History singleton.
-	 * @return the history singleton
-	 */
-	public static History getInstance() {
-		if (instance == null) {
-			instance = new History();
-		}
-		return instance;
-	}
-
-	/*========*
-	 * Getter *
-	 *========*/
-
-    /**
-     * Overloaded auxiliary method that takes in the FileType enum.
-     * The other method that takes in a filename string will be deprecated once we move
-     * on to use the FileType enum, so classes should use this method instead.
-     * @param category
-     * @param tasklist
-     */
-	public void set(FileType category, ArrayList<Task> tasklist) {
-		set(category.getFilename(), tasklist);
-	}
-
-	/**
-	 * Storage will invoke this method for every call to saveTaskList,
-	 * so Logic should not need to use this.
-	 *
 	 * Sets History to map the category specified by filename to tasklist.
 	 * If the filename does not correspond to any type (is INVALID),
 	 * the tasklist will not be added to History.
@@ -65,23 +35,6 @@ public class History {
 		if (tasklistCategory != FileType.INVALID) {
 			lastSavedTasklists.put(tasklistCategory, tasklist);
 		}
-	}
-
-	/*========*
-	 * Setter *
-	 *========*/
-
-	/**
-	 * Logic can use this method for the undo command.
-	 *
-	 * Overloaded auxiliary method that takes in the FileType enum.
-     * The other method that takes in a filename string will be deprecated once we move
-     * on to use the FileType enum, so classes should use this method instead.
-	 * @param category
-	 * @return
-	 */
-	public ArrayList<Task> get(FileType category) {
-		return get(category.getFilename());
 	}
 
 	/**

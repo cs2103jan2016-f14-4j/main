@@ -1,7 +1,7 @@
 /* Switchable Text styles */
 /* Only for text objects under UiTextConfig */
 .textAll {
-	-fx-font-size: 13px;
+	-fx-font-size: 15px;
 }
 .textRed {
 	-fx-fill: red;
@@ -31,33 +31,10 @@
 	-fx-fill: black;
 }
 
-/* Pagination */
-.pagination .pagination-control {
-    -fx-background-color: white;    
-}
-.pagination .pagination-control .bullet-button {
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, white;
-}
- 
-.pagination .pagination-control .bullet-button:selected {   
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, #0E5D79;
-}
- 
-.pagination .pagination-control .left-arrow, .right-arrow{
-    -fx-background-color: #DDF1F8, #0E5D79;
-}
-
 /* Boxes */
 .whiteBox {
 	-fx-background-color: 
         radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
-}
-
-.grayBox {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #AAAAAA 50%, #BBBBBB 50%);
     -fx-padding: 3px;
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
@@ -69,5 +46,3 @@
     -fx-padding: 3px;
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
-
-

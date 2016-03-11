@@ -63,8 +63,8 @@ public class UiConstants {
 		TASKLIST, HELP_MAIN, HELP_ADD, HELP_DEL;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(5, 0, 0, 2, 98);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 63, 30);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(0, 10, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 93);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
 
@@ -82,7 +82,6 @@ public class UiConstants {
 	public static final String STYLE_TEXT_BLACK_TO_PURPLE = "textBlackToPurple";
 	
 	public static final String STYLE_NUMBER_ICON = "numberIcon";
-	public static final String STYLE_GRAY_BOX = "grayBox";
 	public static final String STYLE_WHITE_BOX = "whiteBox";
 	public static final String STYLE_RED_BOX = "redBox";
 	public static final String STYLE_PROMPT = "prompt";

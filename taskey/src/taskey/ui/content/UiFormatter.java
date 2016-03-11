@@ -107,6 +107,7 @@ public abstract class UiFormatter {
 		myGrids.clear();
 	}
 	
+	// All helper methods for manipulating a GridPane below
 	protected StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane styledCell = new StackPane();

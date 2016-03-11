@@ -81,7 +81,8 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
-		updateCategories(Logic.getInstance().getAllTaskLists());
+		
+		updateAll(Logic.getInstance().getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here
@@ -161,25 +162,26 @@ public class UiController {
 		}
 	}
 
+	private ContentBox getCurrentContent() {
+		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
+		return currentContent;
+	}
 	private void handleFeedback( LogicFeedback feedback ) {
 		Exception statusCode = feedback.getException();
-		UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+		//System.out.println(statusCode);
+		//UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+		updateAll(Logic.getInstance().getAllTaskLists());
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
 		ProcessedObject processed = feedback.getPo();
 		String command = processed.getCommand();
-		switch (command) {		
+		switch (command) {		// change display based on which command was inputted
 			case "ADD_DEADLINE": // update 2 lists
 			case "ADD_EVENT":
-				updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 			case "ADD_FLOATING":
-				updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 				displayTabContents(ContentBox.PENDING);
 				break;
 			case "DELETE_BY_INDEX":
 			case "DELETE_BY_NAME":
-				updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
-				updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
-				displayTabContents(ContentBox.PENDING);
 				break;	
 			case "VIEW":
 				String viewType = processed.getViewType();
@@ -199,30 +201,28 @@ public class UiController {
 				break;	
 			case "DONE_BY_INDEX":
 			case "DONE_BY_NAME":
-				updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
-				updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 				break;	
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
-				updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 				break;
 			default:
 				System.out.println("Command not defined");
 				break;
 		}
-		updateCategories(allLists);
 	}
 	
-	public void updateCategories(ArrayList<ArrayList<Task>> allLists) {
-		ArrayList<String> myCategoryList = new ArrayList<String>(
+	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
+		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
+		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
+		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);
+		ArrayList<String> categoryList = new ArrayList<String>(
 				Arrays.asList("General","Deadlines","Events","Archive"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>();
+		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
 				Arrays.asList(allLists.get(ListID.GENERAL.getIndex()).size(),allLists.get(ListID.DEADLINE.getIndex()).size(),
-						allLists.get(ListID.EVENT.getIndex()).size(),allLists.get(ListID.COMPLETED.getIndex()).size());
+						allLists.get(ListID.EVENT.getIndex()).size(),allLists.get(ListID.COMPLETED.getIndex()).size()));
 		ArrayList<Color> categoryColors = new ArrayList<Color>(
 				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
-		updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);
+		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
 	}
 	/************************************ EVENT HANDLERS  *******************************************/
 	private void registerInputEventHandler() {
@@ -236,8 +236,8 @@ public class UiController {
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
 					input.clear();
-					currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
-					handleFeedback(Logic.getInstance().executeCommand(currentContent,line));
+					
+					handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),line));
 					event.consume();
 					myDropDown.closeMenu();
 				}
@@ -251,7 +251,7 @@ public class UiController {
 	        		  if ( myDropDown.isMenuOpen()) {
 	        			  myDropDown.processArrowKey(event);
 	        		  } else {
-	        			  myContentManager.processArrowKey(event, currentContent);
+	        			  myContentManager.processArrowKey(event, getCurrentContent());
 	        		  }	  
 	        		  event.consume();
 	        	  }
@@ -260,9 +260,9 @@ public class UiController {
 	        	  }
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
-	        			  int id = myContentManager.processDelete(currentContent); 
+	        			  int id = myContentManager.processDelete(getCurrentContent()); 
 	        			  if ( id != -1 ) {
-	        				  handleFeedback(Logic.getInstance().executeCommand(currentContent,"del " + id));
+	        				  handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),"del " + id));
 	        			  }
 	        		  }
 	        	  }

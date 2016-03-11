@@ -30,15 +30,16 @@ public class Logic {
 	private TimeConverter timeConverter;
 	private UiController uiController;
 	private ArrayList<String> fileNames;
-	private ArrayList<ArrayList<Task>> taskLists;
-	private ArrayList<String> categoryList;
+	private ArrayList<ArrayList<Task>> taskLists; //Can be moved to a LogicMemory component next time
+	/*private ArrayList<String> categoryList;
 	private ArrayList<Integer> categorySizes;
-	private ArrayList<Color> colorList;
+	private ArrayList<Color> colorList;*/
 	
-	/** Get the Logic singleton */
+	/** Get the Logic singleton after initializing it */
 	public static Logic getInstance() {
 		if (instance == null) {
 			instance = new Logic();
+			instance.initialize();
 		}
 		return instance;
 	}

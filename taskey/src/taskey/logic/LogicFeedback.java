@@ -13,23 +13,23 @@ import java.util.ArrayList;
 public class LogicFeedback {
 	private ArrayList<ArrayList<Task>> taskLists;
 	private ProcessedObject po;
-	private int statusCode;
+	private Exception e;
 	
 	/** This is the only constructor for the LogicFeedback class. taskLists and po should not be null.
 	 * 
 	 * @param taskLists  a list of task lists for the purposes of updating the UI display
 	 * @param po         an object encapsulating information on the executed command and its associated task
-	 * @param statusCode reflecting outcome of command execution
+	 * @param e          an exception containing an error message. If not error occurred, this will be null.
 	 */
-	protected LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, int statusCode) {
+	protected LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
 		assert (taskLists != null);
 		assert (taskLists.size() == 7); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
 		assert (po != null);
 		
-		this.setTaskLists(taskLists);
-		this.setPo(po);
-		this.setStatusCode(statusCode);
+		this.taskLists = taskLists;
+		this.po = po;
+		this.e = e;
 	}
 
 	public ArrayList<ArrayList<Task>> getTaskLists() {
@@ -50,12 +50,11 @@ public class LogicFeedback {
 		this.po = po;
 	}
 
-	public int getStatusCode() {
-		return statusCode;
+	public Exception getException() {
+		return e;
 	}
 	
-	//TODO: assert restrictions on statusCode
-	protected void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
+	protected void setException(Exception e) {
+		this.e = e;
 	}
 }

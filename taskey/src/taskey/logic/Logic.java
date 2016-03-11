@@ -193,11 +193,10 @@ public class Logic {
 			case "ADD_FLOATING":
 				return addFloating(task, po);
 				
-			/*case "ADD_DEADLINE":
-				statusCode = addDeadline(task);
-				break;
+			case "ADD_DEADLINE":
+				return addDeadline(task, po);
 				
-			case "ADD_EVENT":
+			/*case "ADD_EVENT":
 				statusCode = addEvent(task);
 				break;
 				
@@ -259,13 +258,13 @@ public class Logic {
                 				 new Exception("Failed to execute command.")); //Stub
 	}
 	
-	//Updates UI with a new floating task. Returns a status code reflecting outcome of command execution.
+	//Adds a floating task to the relevant lists.
 	private LogicFeedback addFloating(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
-					                 new Exception("The task " + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,  new Exception("The task " 
+		                             + task.getTaskName() + " already exists!"));
 		}
 		
 		pendingList.add(task);
@@ -280,13 +279,14 @@ public class Logic {
 		
 		return new LogicFeedback(taskLists, po, null);
 	}
-	/*
-	//Updates UI with a new deadline task. Returns a status code reflecting outcome of command execution.
-	private int addDeadline(Task task) {
+	
+	//Adds a deadline task to the relevant lists.
+	private LogicFeedback addDeadline(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task " 
+		                             + task.getTaskName() + " already exists!"));
 		}
 		
 		pendingList.add(task);
@@ -296,13 +296,9 @@ public class Logic {
 			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
 		}
 		
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-		uiController.displayTabContents(ContentBox.PENDING.getValue());
-		
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
-	
+	/*
 	//Updates UI with a new event task. Returns a status code reflecting outcome of command execution.
 	private int addEvent(Task task) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());

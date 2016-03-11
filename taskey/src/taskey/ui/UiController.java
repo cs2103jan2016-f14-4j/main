@@ -170,8 +170,8 @@ public class UiController {
 		Exception statusCode = feedback.getException();
 		//System.out.println(statusCode);
 		//UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
-		updateAll(Logic.getInstance().getAllTaskLists());
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
+		updateAll(allLists);
 		ProcessedObject processed = feedback.getPo();
 		String command = processed.getCommand();
 		switch (command) {		// change display based on which command was inputted

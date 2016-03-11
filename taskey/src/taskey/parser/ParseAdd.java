@@ -65,6 +65,15 @@ public class ParseAdd {
 			return processed;
 		}
 		
+		//if taskname consists entirely of numbers, return error
+		try {
+			int temp = Integer.parseInt(simpString); 
+			processed = parseError.processError("task name cannot consist entirely of numbers");
+			return processed; 
+		} catch (Exception e) {
+			//do nothing, continue. 
+		} 
+		
 		String[] splitString = simpString.split(" ");
 		boolean isSet = false; 
 		

@@ -44,13 +44,19 @@ public class Logic {
 		return instance;
 	}
 	
+	public ArrayList<ArrayList<Task>> getAllTaskLists() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		assert (!taskLists.contains(null)); //All lists should be instantiated
+		return taskLists;
+	}
+	
 	public ArrayList<Task> getThisWeekList() {
 		assert (taskLists != null);
 		assert (taskLists.size() == 7); //taskLists should be fully initialized
 		
 		ArrayList<Task> thisWeekList = taskLists.get(ListID.THIS_WEEK.getIndex());
 		assert (thisWeekList != null);
-		
 		return thisWeekList;
 	}
 	
@@ -114,9 +120,8 @@ public class Logic {
 		return completedList;
 	}
 	
-	/** Initializes the Logic singleton and updates UI with the lists from Storage. */
+	/** Initializes the Logic singleton. */
 	public void initialize() {
-		instance = Logic.getInstance();
 		parser = new Parser();
 		timeConverter = new TimeConverter();
 		uiController = UiMain.getInstance().getController();
@@ -147,12 +152,12 @@ public class Logic {
 			}
 		}
 	
-		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
+		/*categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
 		//Values will be updated with refreshUiCategoryDisplay();
 		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0)); 
 		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
 		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		refreshUiCategoryDisplay();*/
 	}
 	
 	/** 
@@ -160,12 +165,12 @@ public class Logic {
 	 * 
 	 * @param currentContent specifies the current tab that user is in.
 	 * @param input			 the input String entered by the user
-	 * @return               status code representing outcome of command execution
+	 * @return               an object encapsulating the information required to update UI display
 	 */
-	public int executeCommand(ContentBox currentContent, String input) {
+	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
 		
-    	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
+    	/*if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(currentContent);
 			saveAllTasks();
 			refreshUiTabDisplay();
@@ -174,7 +179,7 @@ public class Logic {
 			refreshUiCategoryDisplay();
 			
 			return statusCode;
-    	}
+    	}*/
     	
     	ProcessedObject po = parser.parseInput(input); 	
     	String command = po.getCommand();

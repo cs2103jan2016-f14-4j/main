@@ -2,20 +2,14 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
+import taskey.storage.History;
 import taskey.storage.Storage;
-import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageException;
-import taskey.ui.UiController;
-import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
-import javafx.scene.paint.Color;
-import taskey.logic.LogicConstants.CategoryID;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.ProcessedObject;
 
@@ -25,29 +19,43 @@ import taskey.logic.ProcessedObject;
  * @author Hubert Wong
  */
 public class Logic {
-	private static Logic instance = null;
 	private Parser parser;
-	private Storage storage;
 	private TimeConverter timeConverter;
-	private UiController uiController;
+	private Storage storage;
+	private History history;
 	private ArrayList<ArrayList<Task>> taskLists; //Can be moved to a LogicMemory component next time
-	/*private ArrayList<String> categoryList;
-	private ArrayList<Integer> categorySizes;
-	private ArrayList<Color> colorList;*/
+	
+	public Logic() {
+		parser = new Parser();
+		timeConverter = new TimeConverter();
+		storage = new Storage();
+		history = new History();
 
-	/** Get the Logic singleton after initializing it */
-	public static Logic getInstance() {
-		if (instance == null) {
-			instance = new Logic();
-			instance.initialize();
+		//Get lists from Storage
+		taskLists = new ArrayList<ArrayList<Task>>();
+		taskLists = storage.loadAllTasklists();
+		ArrayList<Task> thisWeek = new ArrayList<Task>();
+		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
+
+		//Update THIS_WEEK list based on the current date and time
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		for (Task t : pendingList) {
+			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
+			//the current week
+			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
+				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
+				thisWeek.add(t);
+			}
 		}
-		return instance;
+		
+		history.add(taskLists);
 	}
 
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
 		assert (taskLists != null);
 		assert (taskLists.size() == 7); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
+		
 		return taskLists;
 	}
 
@@ -120,38 +128,6 @@ public class Logic {
 		return completedList;
 	}
 
-	/** Initializes the Logic singleton. */
-	public void initialize() {
-		parser = new Parser();
-		storage = new Storage();
-		timeConverter = new TimeConverter();
-		uiController = new UiController();
-
-		//Get lists from Storage
-		taskLists = new ArrayList<ArrayList<Task>>();
-		taskLists = storage.loadAllTasklists();
-		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
-
-		//Update THIS_WEEK tab based on the current date and time
-		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (Task t : pendingList) {
-			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
-			//the current week
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
-				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-				thisWeek.add(t);
-			}
-		}
-
-		/*categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
-		//Values will be updated with refreshUiCategoryDisplay();
-		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0));
-		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();*/
-	}
-
 	/**
 	 * Executes the user supplied command.
 	 *
@@ -160,11 +136,13 @@ public class Logic {
 	 * @return               an object encapsulating the information required to update UI display
 	 */
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
-		int statusCode = 0; //Stub
-
     	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
-			clearAllLists(currentContent);
-			saveAllTasks();
+			clearAllLists();
+			try {
+				saveAllTasks();
+			} catch (Exception e) {
+				return new LogicFeedback(taskLists, new ProcessedObject("CLEAR"), e); //Stub
+			}
 			return new LogicFeedback(taskLists, new ProcessedObject("CLEAR"), null); //Stub
     	}
 
@@ -181,17 +159,12 @@ public class Logic {
 
     	System.out.println("Command: " + command);
 
-    	LogicFeedback lol;
     	switch (command) {
 			case "ADD_FLOATING":
-				lol = addFloating(task, po); //JUST TESTING LOL -- Dylan
-				saveAllTasks();
-				return lol;
-
+				return addFloating(task, po);
+				
 			case "ADD_DEADLINE":
-				lol = addDeadline(task, po); // Storage seems to work on these two commands
-				saveAllTasks();
-				return lol;
+				return addDeadline(task, po);
 
 			/*case "ADD_EVENT":
 				statusCode = addEvent(task);
@@ -249,14 +222,12 @@ public class Logic {
 				break;
 		}
 
-		saveAllTasks();
-
 		return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,
                 				 new Exception("Failed to execute command.")); //Stub
 	}
 
-	//Adds a floating task to the relevant lists.
-	private LogicFeedback addFloating(Task task, ProcessedObject po) {
+	//Adds a floating task to the relevant lists, and saves the updated lists to disk.
+	LogicFeedback addFloating(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
@@ -267,18 +238,17 @@ public class Logic {
 		pendingList.add(task);
 		taskLists.get(ListID.GENERAL.getIndex()).add(task);
 
-		/*try {
+		try {
 			saveAllTasks();
 		} catch (Exception e) {
-			//TODO: revert task lists
-			return new LogicFeedback(taskLists, po, new Exception("Unable to save changes."));
-		}*/
+			return new LogicFeedback(taskLists, po, e);
+		}
 
 		return new LogicFeedback(taskLists, po, null);
 	}
 
 	//Adds a deadline task to the relevant lists.
-	private LogicFeedback addDeadline(Task task, ProcessedObject po) {
+	LogicFeedback addDeadline(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
@@ -291,6 +261,12 @@ public class Logic {
 
 		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
 			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
+		}
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
 		}
 
 		return new LogicFeedback(taskLists, po, null);
@@ -558,7 +534,7 @@ public class Logic {
 		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
 	}
 
-	private void clearAllLists(ContentBox currentContent) {
+	private void clearAllLists() {
 		for (int i = 0; i < taskLists.size(); i++) {
 			taskLists.get(i).clear();
 		}
@@ -611,22 +587,16 @@ public class Logic {
 		return false; //Stub
 	}
 
-	//Save all task lists to Storage.
-	private void saveAllTasks() {
+	//Save all task lists to Storage. If the save failed, the task lists will be reverted to the states
+	//they were in before they were modified.
+	private void saveAllTasks() throws Exception {
 		try {
-			//Dylan: not sure how to get a copy of taskLists that excludes the first element, so I'm just gonna use a loop here
-			ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
-			for (TasklistEnum e : TasklistEnum.values()) {
-				temp.add(taskLists.get(e.index() + 1));
-			}
-			storage.saveAllTasklists(temp);
-			System.out.println("All tasklists saved");
+			storage.saveAllTasklists(taskLists);
+			System.out.println("All tasklists saved.");
 		} catch (StorageException se) {
-			System.out.println("Failed to save");
 			System.out.println(se.getMessage());
-			ArrayList<ArrayList<Task>> superlist = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
-			superlist.add(0, taskLists.get(0)); //not sure if this is what you want to do
-			taskLists = superlist;
+			taskLists = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
+			throw new Exception (se.getMessage());
 		}
 	}
 }

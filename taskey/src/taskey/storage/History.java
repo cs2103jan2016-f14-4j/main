@@ -47,8 +47,16 @@ public class History {
 	 * Pops the last saved superlist from History.
 	 * @return
 	 */
-	public ArrayList<ArrayList<Task>>get() {
+	public ArrayList<ArrayList<Task>> pop() {
 		return stack.pop();
+	}
+	
+	/**
+	 * Gets the last saved superlist from History.
+	 * @return
+	 */
+	public ArrayList<ArrayList<Task>> peek() {
+		return stack.peek();
 	}
 
 

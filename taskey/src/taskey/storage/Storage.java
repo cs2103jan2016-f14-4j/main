@@ -154,7 +154,8 @@ public class Storage {
 	/**
 	 * Returns the superlist of tasks.
 	 * Logic calls this on program startup.
-	 * Post-cond: the lists in superlist are in the same order as in the enum TasklistEnum
+	 * Post-cond: the lists in superlist are in the same order as in the enum TasklistEnum.
+	 *            These lists are read from disk and hence do not include the THIS_WEEK list.
 	 * @return the arraylist of arraylists of tasks
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
@@ -165,26 +166,32 @@ public class Storage {
 			ArrayList<Task> tasklist = loader.loadTasklist(file);
 			superlist.add(tasklist);
 		}
+		
 		return superlist;
 	}
 
 	/**
 	 * Saves the superlist of tasks.
-	 * Pre-cond: the lists in superlist are in the same order as in the enum TasklistEnum
+	 * Pre-cond: Starting from index 1, the lists in superlist are in the same order as in the enum 
+	 *           TasklistEnum. Index 0 is reserved for THIS_WEEK list and is not saved to disk because
+	 *           it is time dependent.
+	 *           
 	 * @param superlist
 	 * @throws StorageException
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		history.add(superlist);
-
+		assert (superlist.size() == 7);
+		
 		for (TasklistEnum e : TasklistEnum.values()) {
-			if (e.index() >= superlist.size()) { //check for when testing in main method
+			if (e.index() >= superlist.size() - 1) { //check for when testing in main method
 				break;
 			}
-			ArrayList<Task> tasklist = superlist.get(e.index());
+			ArrayList<Task> tasklist = superlist.get(e.index() + 1);
 			File file = new File(directory, e.filename());
 			saver.saveTasklist(tasklist, file);
 		}
+		
+		history.add(superlist); //Only if all the lists were successfully saved
 	}
 
     /*================*

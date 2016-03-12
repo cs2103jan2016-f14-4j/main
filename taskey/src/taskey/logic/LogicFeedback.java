@@ -57,4 +57,35 @@ public class LogicFeedback {
 	protected void setException(Exception e) {
 		this.e = e;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof LogicFeedback)) {
+		    return false;
+		  }
+		
+		LogicFeedback other = (LogicFeedback) obj;
+		
+		if (this.taskLists.size() != other.taskLists.size()) {
+			return false;
+		}
+		
+		//Check if both objects' task lists are equal and in the same order
+		for (int i = 0; i < this.taskLists.size(); i++) {
+			if (!(this.taskLists.get(i).equals(other.taskLists.get(i)))) {
+				return false;
+			}
+		}
+		
+		if (!po.equals(other.po)) {
+			return false;
+		}
+		
+		if (e == null && other.e != null || e != null 
+			&& (other.e == null || !e.getMessage().equals(other.e.getMessage()))) {
+			return false;
+		}
+		
+		return true;
+	}
 }

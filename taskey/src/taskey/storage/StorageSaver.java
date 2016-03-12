@@ -46,7 +46,7 @@ class StorageSaver {
 			writeToFile(file, tasks, new TypeToken<ArrayList<Task>>() {});
 		} catch (IOException e) {
 			// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-			throw new StorageException(e, History.getInstance().get());
+			throw new StorageException(e, History.getInstance().peek());
 		}
 
     }
@@ -56,7 +56,7 @@ class StorageSaver {
      *================*/
     /**
      * Private method. Saves the current directory to file in "user.dir".
-     * @return true if save was succesful; false otherwise.
+     * @return true if save was successful; false otherwise.
      */
     boolean saveDirectory(File directory) {
     	File configFile = new File(Constants.FILENAME_CONFIG);

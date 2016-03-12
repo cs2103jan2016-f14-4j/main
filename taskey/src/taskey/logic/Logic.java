@@ -183,11 +183,10 @@ public class Logic {
 			case "DONE_BY_INDEX":
 				return doneByIndex(currentContent, po, taskIndex);
 
-			/*case "DONE_BY_NAME":
-				statusCode = doneByName(currentContent, task.getTaskName());
-				break;
+			case "DONE_BY_NAME":
+				return doneByName(currentContent, po, task.getTaskName());
 
-			case "UPDATE_BY_INDEX_CHANGE_NAME":
+			/*case "UPDATE_BY_INDEX_CHANGE_NAME":
 				statusCode = updateByIndexChangeName(currentContent, taskIndex, newTaskName);
 				break;
 
@@ -372,7 +371,7 @@ public class Logic {
 
 	
 	//Marks an indexed task from the current tab as done and saves the updated lists to disk.
-	//TODO: support removal from the "ACTION" tab. 
+	//TODO: support "done" from the "ACTION" tab. 
 	LogicFeedback doneByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		Task toMarkAsDone = null;
 		if (currentContent.equals(ContentBox.THIS_WEEK)) {
@@ -403,30 +402,35 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	/*
-	//Mark a named task as done by adding it to the "completed" list and removing it from all the
-	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
-	private int doneByName(ContentBox currentContent, String taskName) {
+	
+	//Marks an named task from the current tab as done and saves the updated lists to disk.
+	//TODO: support "done" from the "ACTION" tab. 
+	LogicFeedback doneByName(ContentBox currentContent, ProcessedObject po, String taskName) {
 		Task toMarkAsDone = new Task(taskName);
 
 		//"done" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
 
 		//Named task does not exist in the list
 		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toMarkAsDone)) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception(taskName + " does not exist in this tab!"));
 		}
 
 		removeFromAllLists(toMarkAsDone);
 		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0;
+		return new LogicFeedback(taskLists, po, null);
 	}
 
+	/*
 	//Update an indexed task's name with newTaskName.
 	//Also updates the UI display to reflect the updated lists.
 	private int updateByIndexChangeName(ContentBox currentContent, int taskIndex, String newTaskName) {

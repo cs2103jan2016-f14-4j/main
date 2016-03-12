@@ -14,14 +14,14 @@ import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.content.UiFormatter;
-import taskey.ui.utility.UiTextBuilder;
+import taskey.ui.content.UiTextBuilder;
 
 public class UiCategoryFormatter extends UiFormatter {
 	public static final int BULLET_RADIUS = 5;
 	
 	public UiCategoryFormatter(ScrollPane thePane) {
 		super(thePane);
-		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_CATEGORY),true);
+		addGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_CATEGORY),true);
 		mainPane.setContent(currentGrid);
 	}
 
@@ -31,17 +31,17 @@ public class UiCategoryFormatter extends UiFormatter {
 		myConfig.addMarker(0,"textCategory");
 		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
 			// add bullet
-			addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
+			gridHelper.addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
 			
 			// add tag name
 			TextFlow element = new TextFlow();
 			element.getChildren().addAll(myConfig.build(myCategoryList.get(i)));
-			addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
 			element = new TextFlow();
 			element.getChildren().addAll(myConfig.build(""+ categoryNums.get(i) ));
-			addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
 		}
 	}
 	private Circle createBullet(int radius, Color theCenter) {

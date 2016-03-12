@@ -17,12 +17,13 @@ public class UiPagination {
 	private int currentPage;
 	private int currentSelection;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
-	
+	private String selectionStyle;
 	public Pagination getPagination() {
 		return myPages;
 	}
-	public UiPagination() {
-		myPages = new Pagination(); // because there's no method to clear pages
+	public UiPagination(String _selectionStyle) {
+		selectionStyle = _selectionStyle;
+		myPages = new Pagination(); 
 		myGrids = new ArrayList<GridPane>();	
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
 		myPages.setVisible(false);
@@ -94,7 +95,7 @@ public class UiPagination {
 		}
 		currentSelection = selection;
 		myPane = (StackPane) pageContent.get(currentSelection);
-		myPane.getStyleClass().add(UiConstants.STYLE_GRAY_BOX);
+		myPane.getStyleClass().add(selectionStyle);
 	}
 
 	public void addGridToPagination(GridPane theGrid, ArrayList<StackPane> pageEntries) {

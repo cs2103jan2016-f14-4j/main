@@ -33,7 +33,6 @@ import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiAnimationManager;
-import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 import taskey.logic.Logic;
@@ -81,7 +80,7 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
-		//updateAll(Logic.getInstance().getAllTaskLists());
+		updateAll(Logic.getInstance().getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here

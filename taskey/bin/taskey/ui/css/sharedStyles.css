@@ -62,7 +62,7 @@
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
 
-.redBox {
+.redEllipse {
 	-fx-background-color: 
         radial-gradient(center 50% -50%, radius 200%, #ff3333 50%, #ff6666 50%);
     -fx-background-radius: 15px;

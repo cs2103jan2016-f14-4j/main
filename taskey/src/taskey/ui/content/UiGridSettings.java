@@ -1,11 +1,11 @@
-package taskey.ui.utility;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 
 import javafx.geometry.Insets;
 
 /**
- * Helper class for static initialization objects for grid, placed in Constants
+ * Helper class for static initialization objects for grid, placed in UiConstants
  * @author JunWei
  *
  */

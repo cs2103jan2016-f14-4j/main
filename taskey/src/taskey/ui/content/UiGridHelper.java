@@ -1,0 +1,118 @@
+package taskey.ui.content;
+
+import java.util.ArrayList;
+
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
+import taskey.ui.UiConstants;
+
+public class UiGridHelper {
+	private String defaultWrapperStyle; // per cell if getWrapper does not exist
+	
+	public UiGridHelper(String wrapperStyle) {
+		defaultWrapperStyle = wrapperStyle;
+	}
+	// All helper methods for manipulating a GridPane below
+	/**
+	 * This sets up the grid using predefined GridSettings which only set for column constraints
+	 * Row constraints have to be set manually
+	 * @param settings - the UiGridSettings
+	 * @return
+	 */
+	public GridPane setUpGrid(UiGridSettings settings) {
+		assert(settings != null);
+		GridPane gridPane = new GridPane();
+		//gridPane.setGridLinesVisible(true);
+		gridPane.setPadding(settings.getPaddings());
+		gridPane.setHgap(settings.getHGap());
+		gridPane.setVgap(settings.getVGap());
+		ArrayList<Integer> colPercents = settings.getColPercents();
+		for (int i = 0; i < colPercents.size(); i++) {
+			ColumnConstraints column = new ColumnConstraints();
+			column.setPercentWidth(colPercents.get(i));
+			gridPane.getColumnConstraints().add(column);
+		}
+		return gridPane;
+	}
+	
+	public StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane styledCell = new StackPane();
+		styledCell.getStyleClass().add(cellStyle);
+		gridPane.add(styledCell, col, row);
+		return styledCell;
+	}
+	
+	public StackPane getWrapperAtCell(int col, int row, GridPane gridPane ) {
+		assert(gridPane != null);
+		Node theNode = null;
+		ObservableList<Node> childrens = gridPane.getChildren();
+		for(int i = 0; i < childrens.size(); i ++ ) {
+			if ( i == 0 && gridPane.isGridLinesVisible()) {
+				continue; // skip the grid lines which have no row/col
+			}
+			Node node = childrens.get(i);
+		    if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col) {
+		    	theNode = node;
+		        break;
+		    }
+		}
+		// create a cell if not available
+		if ( theNode == null ) {
+			theNode = createStyledCell(col,row,defaultWrapperStyle,gridPane);
+		}
+		return (StackPane)theNode;
+	}
+	public void addTextFlowToCell(int col, int row, TextFlow textFlow, TextAlignment align, GridPane gridPane ) {
+		assert(gridPane != null);
+		assert(textFlow != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		cellWrapper.getChildren().add(textFlow);
+		textFlow.setTextAlignment(align);	
+	}
+	public void addCircleToCell(int col, int row, Circle circle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		cellWrapper.getChildren().add(circle);
+	}
+	
+	public ImageView createImageInCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane imageWrapper = getWrapperAtCell(col,row,gridPane);
+		ImageView myImg = new ImageView(img);
+		myImg.setFitHeight(width);
+		myImg.setFitWidth(height);
+		myImg.setPreserveRatio(true);
+		imageWrapper.getChildren().add(myImg);
+		return myImg;
+	}
+	
+	public Label createLabelInCell( int col, int row, String text, String labelStyle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		Label myLabel = new Label(text);
+		myLabel.getStyleClass().add(labelStyle);
+		cellWrapper.getChildren().add(myLabel);
+		return myLabel;
+	}		
+	
+	// Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
+	// formatters, methods for the single wrapper can still be used, but switch the parents
+	public StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		StackPane pane = new StackPane();
+		pane.getStyleClass().add(paneStyle);
+		cellWrapper.getChildren().add(pane);
+		return pane;
+	}
+}

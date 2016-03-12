@@ -79,6 +79,7 @@ public class UiContentManager {
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
 		myFormatter.updateContents(myTaskList,mode);
 	}
+	
 	public void updateCategoryContentBox(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);

@@ -189,11 +189,10 @@ public class Logic {
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 				return updateByIndexChangeName(currentContent, po, taskIndex, newTaskName);
 
-			/*case "UPDATE_BY_INDEX_CHANGE_DATE":
-				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
-				break;
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				return updateByIndexChangeDate(currentContent, po, taskIndex, task);
 
-			case "UPDATE_BY_NAME_CHANGE_NAME":
+			/*case "UPDATE_BY_NAME_CHANGE_NAME":
 				toUpdate = getTaskByName(targetList, task.getTaskName());
 				toUpdate.setTaskName(newTaskName);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -428,7 +427,6 @@ public class Logic {
 
 		return new LogicFeedback(taskLists, po, null);
 	}
-
 	
 	//Updates an indexed task on the current tab as done and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
@@ -459,13 +457,13 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	/*
-	//Replace the indexed Task with a Task that has the changed date.
-	//Also updates the UI display to reflect the updated lists.
-	private int updateByIndexChangeDate(ContentBox currentContent, int taskIndex, Task changedTask) {
+	//Updates an indexed task on the current tab as done and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ProcessedObject po, int taskIndex, 
+			                              Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
 		}
 
 		ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -474,16 +472,20 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
 		updateAllLists(toUpdate.getTaskName(), changedTask);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
-	}*/
+		return new LogicFeedback(taskLists, po, null);
+	}
 
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {

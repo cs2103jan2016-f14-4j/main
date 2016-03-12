@@ -137,7 +137,7 @@ public class Logic {
 	 */
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
     	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
-			clearAllLists(currentContent);
+			clearAllLists();
 			try {
 				saveAllTasks();
 			} catch (Exception e) {
@@ -159,7 +159,6 @@ public class Logic {
 
     	System.out.println("Command: " + command);
 
-    	LogicFeedback lol;
     	switch (command) {
 			case "ADD_FLOATING":
 				return addFloating(task, po);
@@ -535,7 +534,7 @@ public class Logic {
 		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
 	}
 
-	private void clearAllLists(ContentBox currentContent) {
+	private void clearAllLists() {
 		for (int i = 0; i < taskLists.size(); i++) {
 			taskLists.get(i).clear();
 		}

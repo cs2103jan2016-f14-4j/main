@@ -13,6 +13,9 @@ import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.ui.UiConstants.ContentBox;
 
+/**
+ * @author Hubert
+ */
 public class LogicTest {
 	
 	public static int NUM_SECONDS_1_DAY = 86400;
@@ -553,6 +556,32 @@ public class LogicTest {
 		}
 		temp.get(ListID.COMPLETED.getIndex()).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDoneTaskByNameNotFound() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		po = parser.parseInput("done " + "ayy lmao");
+		LogicFeedback actual = logic.doneByName(ContentBox.PENDING, po, "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("ayy lmao does not exist in this tab!"));
 		
 		assertTrue(actual.equals(expected));
 	}

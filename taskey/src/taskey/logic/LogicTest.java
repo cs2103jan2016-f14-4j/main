@@ -643,4 +643,60 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testUpdateTaskByIndexFromWrongTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		Task afterUpdate = beforeUpdate.getDuplicate();
+		afterUpdate.setTaskName("ayy lmao");
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByIndexChangeName(ContentBox.EXPIRED, po, 0, "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(beforeUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(beforeUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Cannot use \"set\" command from this tab!"));
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexOutOfBounds() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		Task afterUpdate = beforeUpdate.getDuplicate();
+		afterUpdate.setTaskName("ayy lmao");
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 1 \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByIndexChangeName(ContentBox.PENDING, po, 1, "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(beforeUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(beforeUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		
+		assertTrue(actual.equals(expected));
+	}
 }

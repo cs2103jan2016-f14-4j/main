@@ -2,11 +2,10 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
+import taskey.storage.History;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageException;
-import taskey.ui.UiController;
-import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javafx.scene.paint.Color;
 import taskey.logic.LogicConstants.CategoryID;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.ProcessedObject;
@@ -26,19 +24,16 @@ import taskey.logic.ProcessedObject;
  */
 public class Logic {
 	private Parser parser;
-	private Storage storage;
 	private TimeConverter timeConverter;
-	private UiController uiController;
+	private Storage storage;
+	private History history;
 	private ArrayList<ArrayList<Task>> taskLists; //Can be moved to a LogicMemory component next time
-	/*private ArrayList<String> categoryList;
-	private ArrayList<Integer> categorySizes;
-	private ArrayList<Color> colorList;*/
 	
 	public Logic() {
 		parser = new Parser();
-		storage = new Storage();
 		timeConverter = new TimeConverter();
-		uiController = new UiController();
+		storage = new Storage();
+		history = new History();
 
 		//Get lists from Storage
 		taskLists = new ArrayList<ArrayList<Task>>();
@@ -56,6 +51,8 @@ public class Logic {
 				thisWeek.add(t);
 			}
 		}
+		
+		history.add(taskLists);
 	}
 
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
@@ -596,18 +593,11 @@ public class Logic {
 	//Save all task lists to Storage.
 	private void saveAllTasks() {
 		try {
-			//Dylan: not sure how to get a copy of taskLists that excludes the first element, so I'm just gonna use a loop here
-			ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
-			for (TasklistEnum e : TasklistEnum.values()) {
-				temp.add(taskLists.get(e.index() + 1));
-			}
-			storage.saveAllTasklists(temp);
-			System.out.println("All tasklists saved");
+			storage.saveAllTasklists(taskLists);
+			System.out.println("All tasklists saved.");
 		} catch (StorageException se) {
-			System.out.println("Failed to save");
 			System.out.println(se.getMessage());
 			ArrayList<ArrayList<Task>> superlist = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
-			superlist.add(0, taskLists.get(0)); //not sure if this is what you want to do
 			taskLists = superlist;
 		}
 	}

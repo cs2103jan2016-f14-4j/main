@@ -109,7 +109,6 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String input = "add g2 a?b ,  from " + timeConverter.getDate(currTime)
 		                + " to " + timeConverter.getDate(currTime + 10000);
-		System.out.println(input);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		LogicFeedback actual = logic.addEvent(t, po);
@@ -151,6 +150,7 @@ public class LogicTest {
 		assertTrue(actual.equals(expected));
 	}
 	
+	@Test
 	public void testDeleteTaskByIndexFromThisWeekTab() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
@@ -161,7 +161,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
-		LogicFeedback actual = logic.deleteByIndex(ContentBox.THIS_WEEK, po, 1);
+		LogicFeedback actual = logic.deleteByIndex(ContentBox.THIS_WEEK, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -172,6 +172,7 @@ public class LogicTest {
 		assertTrue(actual.equals(expected));
 	}
 	
+	@Test
 	public void testDeleteTaskByIndexFromPendingTab() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
@@ -182,7 +183,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
-		LogicFeedback actual = logic.deleteByIndex(ContentBox.PENDING, po, 1);
+		LogicFeedback actual = logic.deleteByIndex(ContentBox.PENDING, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {

@@ -169,10 +169,10 @@ public class Logic {
 			case "ADD_EVENT":
 				return addEvent(task, po);
 
-			/*case "DELETE_BY_INDEX":
-				statusCode = deleteByIndex(currentContent, taskIndex);
-				break;
+			case "DELETE_BY_INDEX":
+				return deleteByIndex(currentContent, po, taskIndex);
 
+			/*
 			case "DELETE_BY_NAME":
 				statusCode = deleteByName(currentContent, task.getTaskName());
 				break;
@@ -296,12 +296,13 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
-	/*
 	//Removes an indexed task from the "PENDING" tab.
-	//TODO: support removal from the "THIS_WEEK" tab.
-	private int deleteByIndex(ContentBox currentContent, int taskIndex) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
-			return -1; //Stub
+	//TODO: support removal from the "ACTION" tab.
+	LogicFeedback deleteByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
+		//"del" command only allowed in THIS_WEEK or PENDING tab
+		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+									 new Exception("Cannot delete from this tab!"));
 		}
 
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -310,16 +311,22 @@ public class Logic {
 		try {
 			toDelete = targetList.remove(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+					 				 new Exception("Index out of bounds!"));
 		}
 
 		removeFromAllLists(toDelete);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
 
+	/*
 	//Removes a named task from the "PENDING" tab.
 	//TODO: support removal from the "THIS_WEEK" tab.
 	private int deleteByName(ContentBox currentContent, String taskName) {

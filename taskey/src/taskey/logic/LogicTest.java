@@ -193,4 +193,55 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testDeleteTaskByIndexFromWrongTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		LogicFeedback actual = logic.deleteByIndex(ContentBox.EXPIRED, po, 0);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, 
+				                                   new Exception("Cannot delete from this tab!"));
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDeleteTaskByIndexOutOfBounds() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		LogicFeedback actual = logic.deleteByIndex(ContentBox.PENDING, po, 1);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		
+		assertTrue(actual.equals(expected));
+	}
 }

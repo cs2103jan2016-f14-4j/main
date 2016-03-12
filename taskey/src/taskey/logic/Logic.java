@@ -230,7 +230,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,  new Exception("The task "
+			return new LogicFeedback(taskLists, po,  new Exception("The task "
 		                             + task.getTaskName() + " already exists!"));
 		}
 
@@ -251,7 +251,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task "
+			return new LogicFeedback(taskLists, po, new Exception("The task "
 		                             + task.getTaskName() + " already exists!"));
 		}
 
@@ -276,7 +276,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task "
+			return new LogicFeedback(taskLists, po, new Exception("The task "
 								     + task.getTaskName() + " already exists!"));
 		}
 
@@ -301,8 +301,7 @@ public class Logic {
 	LogicFeedback deleteByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		//"del" command only allowed in THIS_WEEK or PENDING tab
 		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
-									 new Exception("Cannot delete from this tab!"));
+			return new LogicFeedback(taskLists, po, new Exception("Cannot delete from this tab!"));
 		}
 
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -311,8 +310,7 @@ public class Logic {
 		try {
 			toDelete = targetList.remove(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
-					 				 new Exception("Index out of bounds!"));
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		removeFromAllLists(toDelete);

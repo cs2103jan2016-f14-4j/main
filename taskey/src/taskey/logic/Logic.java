@@ -186,11 +186,10 @@ public class Logic {
 			case "DONE_BY_NAME":
 				return doneByName(currentContent, po, task.getTaskName());
 
-			/*case "UPDATE_BY_INDEX_CHANGE_NAME":
-				statusCode = updateByIndexChangeName(currentContent, taskIndex, newTaskName);
-				break;
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+				return updateByIndexChangeName(currentContent, po, taskIndex, newTaskName);
 
-			case "UPDATE_BY_INDEX_CHANGE_DATE":
+			/*case "UPDATE_BY_INDEX_CHANGE_DATE":
 				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
 				break;
 
@@ -430,13 +429,14 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	/*
-	//Update an indexed task's name with newTaskName.
-	//Also updates the UI display to reflect the updated lists.
-	private int updateByIndexChangeName(ContentBox currentContent, int taskIndex, String newTaskName) {
+	
+	//Updates an indexed task on the current tab as done and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByIndexChangeName(ContentBox currentContent, ProcessedObject po, int taskIndex, 
+			                                      String newTaskName) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
 		}
 
 		ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -445,15 +445,21 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		updateAllLists(toUpdate.getTaskName(), newTaskName);
-		refreshUiTabDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
 
+	/*
 	//Replace the indexed Task with a Task that has the changed date.
 	//Also updates the UI display to reflect the updated lists.
 	private int updateByIndexChangeDate(ContentBox currentContent, int taskIndex, Task changedTask) {

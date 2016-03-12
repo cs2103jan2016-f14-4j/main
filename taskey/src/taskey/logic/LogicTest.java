@@ -997,4 +997,196 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateSameWeekFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + 10) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+				                                            afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateSameWeekFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + 10) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.PENDING, po, beforeUpdate.getTaskName(),
+				                                            afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateDiffWeekFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(), 
+				                                            afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateDiffWeekFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.PENDING, po, beforeUpdate.getTaskName(), 
+				                                            afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateFromFloatingToDeadline() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b";
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addFloating(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateFromDeadlineToEvent() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
+				               + 10000) + ", " + timeConverter.getDate(currTime 
+				               + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.EVENT.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeDateFromEventToFloating() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b from " + timeConverter.getDate(currTime) + " to "
+				        + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addEvent(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [none]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByNameChangeDate(ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.GENERAL.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
 }

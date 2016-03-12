@@ -226,8 +226,8 @@ public class Logic {
                 				 new Exception("Failed to execute command.")); //Stub
 	}
 
-	//Adds a floating task to the relevant lists.
-	private LogicFeedback addFloating(Task task, ProcessedObject po) {
+	//Adds a floating task to the relevant lists, and saves the updated lists to disk.
+	protected LogicFeedback addFloating(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed

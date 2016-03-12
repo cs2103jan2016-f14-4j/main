@@ -23,6 +23,13 @@
     -fx-background-insets: 0px,2px;
     -fx-padding: 2px;
     -fx-font-weight: bold;
+    -fx-font-family: 'Montserrat';
+    -fx-font-smoothing-type: gray;
+}
+
+#categoryLabel {
+    -fx-font-smoothing-type: gray;
+    -fx-font-family: 'Montserrat';
 }
 
 #dragBar {

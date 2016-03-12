@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
@@ -17,7 +18,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -29,24 +30,11 @@ import taskey.ui.UiConstants.ActionListMode;
 
 public class UiMain extends Application {
 
-	/** The instance. */
-	private static UiMain instance = null;
-	
 	/** The my controller. */
 	private UiController myController;
 	
 	/** The root. */
 	private Parent root = null;
-
-	/**
-	 * Gets the single instance of UiMain.
-	 *
-	 * @return single instance of UiMain
-	 */
-	public static UiMain getInstance() {
-		assert(instance != null);
-		return instance;
-	}
 
 	/**
 	 * This method loads the .fxml file and set ups the scene
@@ -55,7 +43,6 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
-		instance = this;
 		myController = new UiController();
 		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
 		myloader.setController(myController);
@@ -87,19 +74,7 @@ public class UiMain extends Application {
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		
-		Logic.getInstance().initialize();
-		//testUI();
-	}
-
-	/**
-	 * Gets the controller.
-	 *
-	 * @return the controller
-	 */
-	public UiController getController() {
-		assert(myController != null);
-		return myController;
+		testUI();
 	}
 
 	/**
@@ -128,20 +103,14 @@ public class UiMain extends Application {
 		// Temporary;
 		for ( int i = 0; i < 8; i ++ ) {
 			Task temp = new Task("General Task " + i);
+			temp.setTaskType("FLOATING");
 			myTaskList.add(temp);
 		}
 		
-		myController.updateDisplay(myTaskList, ContentBox.PENDING);
+		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
-	
-		ArrayList<String> myCategoryList = new ArrayList<String>(
-				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
-				Arrays.asList(1,22,3,14,0,6));
-		ArrayList<Color> categoryColors = new ArrayList<Color>(
-				Arrays.asList(Color.RED,Color.RED,Color.RED,Color.RED,Color.RED,Color.YELLOW));
-		myController.updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);
+		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
+		myController.displayTabContents(ContentBox.ACTION);
 	}
 
 	/**
@@ -151,7 +120,7 @@ public class UiMain extends Application {
 	 * @param offsest the offsest
 	 * @return the string
 	 */
-	public String doHash(String line, int offsest) {
+	public static String doHash(String line, int offsest) {
 		int encode = 7; // prime
 		String temp = line.replace("[^A-Za-z0-9]", ""); // replace non-alphanumeric
 		for (int i = 0; i < temp.length(); i++)
@@ -166,7 +135,7 @@ public class UiMain extends Application {
 	 * @param maxItems the max items
 	 * @return the array list
 	 */
-	public ArrayList<String> randomInput(String line, int maxItems) {
+	public static ArrayList<String> randomInput(String line, int maxItems) {
 		int test = (int) (Math.random() * maxItems) + 1;
 		ArrayList<String> tempList = new ArrayList<String>();
 		for (int i = 0; i < test; i++) {

@@ -4,9 +4,9 @@ import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.storage.FileType;
 import taskey.storage.Storage;
-import taskey.ui.UiMain;
+import taskey.storage.StorageException;
 import taskey.ui.UiController;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
@@ -30,25 +30,101 @@ public class Logic {
 	private TimeConverter timeConverter;
 	private UiController uiController;
 	private ArrayList<String> fileNames;
-	private ArrayList<ArrayList<Task>> taskLists;
-	private ArrayList<String> categoryList;
+	private ArrayList<ArrayList<Task>> taskLists; //Can be moved to a LogicMemory component next time
+	/*private ArrayList<String> categoryList;
 	private ArrayList<Integer> categorySizes;
-	private ArrayList<Color> colorList;
+	private ArrayList<Color> colorList;*/
 	
-	/** Get the Logic singleton */
+	/** Get the Logic singleton after initializing it */
 	public static Logic getInstance() {
 		if (instance == null) {
 			instance = new Logic();
+			instance.initialize();
 		}
 		return instance;
 	}
 	
-	/** Initializes the Logic singleton and updates UI with the lists from Storage. */
+	public ArrayList<ArrayList<Task>> getAllTaskLists() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		assert (!taskLists.contains(null)); //All lists should be instantiated
+		return taskLists;
+	}
+	
+	public ArrayList<Task> getThisWeekList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> thisWeekList = taskLists.get(ListID.THIS_WEEK.getIndex());
+		assert (thisWeekList != null);
+		return thisWeekList;
+	}
+	
+	public ArrayList<Task> getPendingList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		assert (pendingList != null);
+		
+		return pendingList;
+	}
+	
+	public ArrayList<Task> getExpiredList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> expiredList = taskLists.get(ListID.EXPIRED.getIndex());
+		assert (expiredList != null);
+		
+		return expiredList;
+	}
+	
+	public ArrayList<Task> getGeneralList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> generalList = taskLists.get(ListID.GENERAL.getIndex());
+		assert (generalList != null);
+		
+		return generalList;
+	}
+	
+	public ArrayList<Task> getDeadlineList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> deadlineList = taskLists.get(ListID.DEADLINE.getIndex());
+		assert (deadlineList != null);
+		
+		return deadlineList;
+	}
+	
+	public ArrayList<Task> getEventList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> eventList = taskLists.get(ListID.EVENT.getIndex());
+		assert (eventList != null);
+		
+		return eventList;
+	}
+	
+	public ArrayList<Task> getCompletedList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		
+		ArrayList<Task> completedList = taskLists.get(ListID.COMPLETED.getIndex());
+		assert (completedList != null);
+		
+		return completedList;
+	}
+	
+	/** Initializes the Logic singleton. */
 	public void initialize() {
-		instance = Logic.getInstance();
 		parser = new Parser();
 		timeConverter = new TimeConverter();
-		uiController = UiMain.getInstance().getController();
+		uiController = new UiController();
 		fileNames = new ArrayList<String>(Arrays.asList(FileType.PENDING.getFilename(),
 				                                        FileType.EXPIRED.getFilename(),
 				                                        FileType.GENERAL.getFilename(),
@@ -76,12 +152,12 @@ public class Logic {
 			}
 		}
 	
-		categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
+		/*categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
 		//Values will be updated with refreshUiCategoryDisplay();
 		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0)); 
 		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
 		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		refreshUiCategoryDisplay();*/
 	}
 	
 	/** 
@@ -89,12 +165,12 @@ public class Logic {
 	 * 
 	 * @param currentContent specifies the current tab that user is in.
 	 * @param input			 the input String entered by the user
-	 * @return               status code representing outcome of command execution
+	 * @return               an object encapsulating the information required to update UI display
 	 */
-	public int executeCommand(ContentBox currentContent, String input) {
+	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
 		int statusCode = 0; //Stub
 		
-    	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
+    	/*if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(currentContent);
 			saveAllTasks();
 			refreshUiTabDisplay();
@@ -103,7 +179,7 @@ public class Logic {
 			refreshUiCategoryDisplay();
 			
 			return statusCode;
-    	}
+    	}*/
     	
     	ProcessedObject po = parser.parseInput(input); 	
     	String command = po.getCommand();
@@ -120,10 +196,9 @@ public class Logic {
     	
     	switch (command) {		
 			case "ADD_FLOATING":
-				statusCode = addFloating(task);
-				break;
+				return addFloating(task, po);
 				
-			case "ADD_DEADLINE":
+			/*case "ADD_DEADLINE":
 				statusCode = addDeadline(task);
 				break;
 				
@@ -163,7 +238,7 @@ public class Logic {
 				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
 				break;
 				
-			/*case "UPDATE_BY_NAME_CHANGE_NAME":
+			case "UPDATE_BY_NAME_CHANGE_NAME":
 				toUpdate = getTaskByName(targetList, task.getTaskName());
 				toUpdate.setTaskName(newTaskName);
 				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
@@ -180,33 +255,37 @@ public class Logic {
 				break; */
 				
 			default:
-				statusCode = -1; //Stub
 				break;
 		}
 	
 		saveAllTasks();
 		
-		return statusCode; 
+		return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+                				 new Exception("Failed to execute command.")); //Stub
 	}
 	
 	//Updates UI with a new floating task. Returns a status code reflecting outcome of command execution.
-	private int addFloating(Task task) {
+	private LogicFeedback addFloating(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		
-		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+		if (pendingList.contains(task)) { //Duplicate task names not allowed
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, 
+					                 new Exception("The task " + task.getTaskName() + " already exists!"));
 		}
 		
 		pendingList.add(task);
 		taskLists.get(ListID.GENERAL.getIndex()).add(task);
 		
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-		uiController.displayTabContents(ContentBox.PENDING.getValue()); 
+		/*try {
+			saveAllTasks();
+		} catch (Exception e) {
+			//TODO: revert task lists
+			return new LogicFeedback(taskLists, po, new Exception("Unable to save changes."));
+		}*/
 		
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
-	
+	/*
 	//Updates UI with a new deadline task. Returns a status code reflecting outcome of command execution.
 	private int addDeadline(Task task) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
@@ -428,7 +507,7 @@ public class Logic {
 		refreshUiCategoryDisplay();
 		
 		return 0; //Stub
-	}
+	}*/
 	
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
@@ -452,7 +531,7 @@ public class Logic {
 		
 		return targetList;
 	}
-	
+	/*
 	//Refresh all UI tabs except the "ACTION" tab.
 	private void refreshUiTabDisplay() {
 		uiController.updateDisplay(taskLists.get(ListID.THIS_WEEK.getIndex()), ContentBox.THIS_WEEK);
@@ -466,7 +545,7 @@ public class Logic {
 		categorySizes.set(CategoryID.EVENT.getIndex(), taskLists.get(ListID.EVENT.getIndex()).size());
 		categorySizes.set(CategoryID.COMPLETED.getIndex(), taskLists.get(ListID.COMPLETED.getIndex()).size());
 		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
-	}
+	}*/
 	
 	/*
 	//Returns the first Task whose name matches the given name, or null otherwise.
@@ -546,13 +625,14 @@ public class Logic {
 	
 	//Save all task lists to Storage.
 	private void saveAllTasks() {
+		int i = 0;
 		try {
-			for (int i = 0; i < fileNames.size(); i++) {
+			for (; i < fileNames.size(); i++) {
 				Storage.getInstance().saveTaskList(taskLists.get(i + 1), fileNames.get(i));
 				System.out.println("List: " + fileNames.get(i) + " saved");
 			}
-		} catch (Exception e) {
-			System.out.println("Error in saving tasks");
+		} catch (StorageException se) {
+			System.out.println("Failed to save " + fileNames.get(i));
 		}
 	}
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javafx.scene.text.Font;
-import taskey.ui.utility.UiGridSettings;
+import taskey.ui.content.UiGridSettings;
 
 /**
  * 
@@ -55,21 +55,32 @@ public class UiConstants {
 	}
 	
 	public enum IMAGE_ID {
-		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, INBOX;
+		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, INBOX,
+		ADD_FLOAT, ADD_DEADLINE, ADD_DEADLINE_DATE, ADD_EVENT, ADD_LAST,
+		DELETE_ID, DELETE_NAME, DELETE_LAST,
+		SET_ID_DATE, SET_ID_EVENT, SET_LAST,
+		DONE_ID, DONE_NAME, DONE_LAST,
+		SEARCH_NAME, SEARCH_LAST,
+		UNDO, UNDO_LAST,
+		TAG, TAG_LAST,
+		VIEW_GENERAL, VIEW_DEADLINE, VIEW_EVENT;
 	}
 	
-	// For action List
-	public enum ActionListMode {
-		TASKLIST, HELP_MAIN, HELP_ADD, HELP_DEL;
+	// For action 
+	public enum ActionMode {
+		LIST, HELP;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(5, 0, 0, 2, 98);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_LISTVIEW = new UiGridSettings(10, 15, 7, 7, 63, 30);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_HELPVIEW = new UiGridSettings(0, 10, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(5, 5, 0, 2, 98);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_LIST = new UiGridSettings(10, 15, 7, 7, 63, 30);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 25, 0, 20, 80);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
-
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT_STACKPANE = new UiGridSettings(0, 0, 0, 80, 20);
+	
 	// Resources 
 	public static final String UI_IMAGE_PATH_OFFSET = "../images/";
+	public static final String UI_IMAGE_HELP_PATH_OFFSET = "help/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	
 	// Use of TextFlow for text, setting style of textflow only affects the container
@@ -84,7 +95,7 @@ public class UiConstants {
 	public static final String STYLE_NUMBER_ICON = "numberIcon";
 	public static final String STYLE_GRAY_BOX = "grayBox";
 	public static final String STYLE_WHITE_BOX = "whiteBox";
-	public static final String STYLE_RED_BOX = "redBox";
+	public static final String STYLE_RED_ELLIPSE = "redEllipse";
 	public static final String STYLE_PROMPT = "prompt";
 	public static final String STYLE_PROMPT_SELECTED = "prompt-select";
 

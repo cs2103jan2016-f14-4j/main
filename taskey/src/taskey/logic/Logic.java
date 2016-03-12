@@ -150,7 +150,6 @@ public class Logic {
     	String command = po.getCommand();
     	Task task = po.getTask();
     	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
-    	String viewType = po.getViewType(); //Only used for view commands
     	String errorType = po.getErrorType(); //Only used for invalid commands
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
@@ -175,11 +174,10 @@ public class Logic {
 			case "DELETE_BY_NAME":
 				return deleteByName(currentContent, po, task.getTaskName());
 
-			/*case "VIEW":
-				statusCode = view(viewType);
-				break;
+			case "VIEW":
+				return new LogicFeedback(taskLists, po, null);
 
-			case "SEARCH":
+			/*case "SEARCH":
 				statusCode = search(searchPhrase);
 				break;
 
@@ -353,25 +351,6 @@ public class Logic {
 	}
 	
 	/*
-	//View the type of task specified by viewType.
-	private int view(String viewType) {
-		if (viewType.equals("GENERAL")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("DEADLINES")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("EVENTS")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("ARCHIVE")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		}
-
-		return 0; //Stub
-	}
-
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
 	private int search(String searchPhrase) {
 		ArrayList<Task> matches = new ArrayList<Task>();
@@ -510,34 +489,6 @@ public class Logic {
 
 		return targetList;
 	}
-	/*
-	//Refresh all UI tabs except the "ACTION" tab.
-	private void refreshUiTabDisplay() {
-		uiController.updateDisplay(taskLists.get(ListID.THIS_WEEK.getIndex()), ContentBox.THIS_WEEK);
-		uiController.updateDisplay(taskLists.get(ListID.PENDING.getIndex()), ContentBox.PENDING);
-		uiController.updateDisplay(taskLists.get(ListID.EXPIRED.getIndex()), ContentBox.EXPIRED);
-	}
-
-	private void refreshUiCategoryDisplay() {
-		categorySizes.set(CategoryID.GENERAL.getIndex(), taskLists.get(ListID.GENERAL.getIndex()).size());
-		categorySizes.set(CategoryID.DEADLINE.getIndex(), taskLists.get(ListID.DEADLINE.getIndex()).size());
-		categorySizes.set(CategoryID.EVENT.getIndex(), taskLists.get(ListID.EVENT.getIndex()).size());
-		categorySizes.set(CategoryID.COMPLETED.getIndex(), taskLists.get(ListID.COMPLETED.getIndex()).size());
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
-	}*/
-
-	/*
-	//Returns the first Task whose name matches the given name, or null otherwise.
-	private Task getTaskByName(ArrayList<Task> targetList, String name ) {
-		for (int i = 0; i < targetList.size(); i++) {
-			Task theTask = targetList.get(i);
-			if ( theTask.getTaskName().equals(name)) {
-				return theTask;
-			}
-		}
-
-		return null;
-	}*/
 
 	//Removes the given Task from all existing lists except the "EXPIRED" and "COMPLETED" lists.
 	//The intended Task may not be removed if duplicate Task names are allowed.

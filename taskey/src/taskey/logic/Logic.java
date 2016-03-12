@@ -192,13 +192,10 @@ public class Logic {
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
 				return updateByIndexChangeDate(currentContent, po, taskIndex, task);
 
-			/*case "UPDATE_BY_NAME_CHANGE_NAME":
-				toUpdate = getTaskByName(targetList, task.getTaskName());
-				toUpdate.setTaskName(newTaskName);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				break;
+			case "UPDATE_BY_NAME_CHANGE_NAME":
+				return updateByNameChangeName(currentContent, po, task.getTaskName(), newTaskName);
 
-			case "UPDATE_BY_NAME_CHANGE_DATE":
+			/*case "UPDATE_BY_NAME_CHANGE_DATE":
 				toUpdate = getTaskByName(targetList, task.getTaskName());
 				targetList.remove(toUpdate);
 				targetList.add(task);
@@ -428,7 +425,7 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
-	//Updates an indexed task on the current tab as done and saves the updated lists to disk.
+	//Updates an indexed task's name on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
 	LogicFeedback updateByIndexChangeName(ContentBox currentContent, ProcessedObject po, int taskIndex, 
 			                                      String newTaskName) {
@@ -457,7 +454,7 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	//Updates an indexed task on the current tab as done and saves the updated lists to disk.
+	//Updates an indexed task's date on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
 	LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ProcessedObject po, int taskIndex, 
 			                              Task changedTask) {
@@ -477,6 +474,33 @@ public class Logic {
 
 		changedTask.setTaskName(toUpdate.getTaskName());
 		updateAllLists(toUpdate.getTaskName(), changedTask);
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
+
+		return new LogicFeedback(taskLists, po, null);
+	}
+	
+	//Updates an named task's name on the current tab as done and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByNameChangeName(ContentBox currentContent, ProcessedObject po, String oldTaskName, 
+			                             String newTaskName) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
+		}
+
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate = new Task(oldTaskName);
+
+		if (!targetList.contains(toUpdate)) {
+			return new LogicFeedback(taskLists, po, new Exception(oldTaskName + " not found in this list!"));
+		}
+
+		updateAllLists(toUpdate.getTaskName(), newTaskName);
 		
 		try {
 			saveAllTasks();

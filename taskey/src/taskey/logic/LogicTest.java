@@ -100,7 +100,7 @@ public class LogicTest {
 		assertTrue(actual.equals(expected));
 	}
 	
-	//@Test
+	@Test
 	public void testAddEventForThisWeek() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
@@ -109,6 +109,7 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String input = "add g2 a?b ,  from " + timeConverter.getDate(currTime)
 		                + " to " + timeConverter.getDate(currTime + 10000);
+		System.out.println(input);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		LogicFeedback actual = logic.addEvent(t, po);
@@ -118,14 +119,14 @@ public class LogicTest {
 			temp.add(new ArrayList<Task>());
 		}
 		temp.get(ListID.PENDING.getIndex()).add(t);
-		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		temp.get(ListID.EVENT.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertTrue(actual.equals(expected));
 	}
 	
-	//@Test
+	@Test
 	public void testAddEventOutsideThisWeek() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
@@ -144,7 +145,7 @@ public class LogicTest {
 			temp.add(new ArrayList<Task>());
 		}
 		temp.get(ListID.PENDING.getIndex()).add(t);
-		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		temp.get(ListID.EVENT.getIndex()).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertTrue(actual.equals(expected));

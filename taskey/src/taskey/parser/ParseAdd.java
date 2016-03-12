@@ -60,12 +60,12 @@ public class ParseAdd {
 		String simpString = getTaskName(command, stringInput);  
 		
 		if (isEmptyAdd(simpString)) {
-			processed = parseError.processError("empty add");
+			processed = parseError.processError(ParserConstants.ERROR_ADD_EMPTY);
 			return processed;
 		}
 		
 		if(isOnlyNumbers(simpString)) {
-			processed = parseError.processError("task name cannot consist entirely of numbers");
+			processed = parseError.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 
 		
@@ -73,7 +73,7 @@ public class ParseAdd {
 		processed = processNormally(command, processed, task, simpString);
 		
 		//if there's error, don't continue to process tags
-		if (processed.getCommand().compareTo("ERROR") == 0) {
+		if (processed.getCommand().compareTo(ParserConstants.ERROR) == 0) {
 			return processed;
 		}
 		//process tags now: if there are tags, add it in.

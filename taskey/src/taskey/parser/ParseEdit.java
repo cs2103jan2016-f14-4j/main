@@ -68,7 +68,7 @@ public class ParseEdit {
 				return updateByName(taskName); 
 			}
 		}
-		return parseError.processError("invalid input");
+		return parseError.processError(ParserConstants.ERROR_INVALID_INPUT);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class ParseEdit {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
-			processed = parseError.processError("Wrong format for changing task name/date");
+			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
@@ -127,13 +127,14 @@ public class ParseEdit {
 			return updateChangeName(processed, taskName); 
 		} else if (taskName.split("\\[").length != 1) {
 			//if changing date, check for < >
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, 
+					new Task(taskName)); 
 			taskName = taskName.replace("]", ""); 
 			String[] taskParts = taskName.split("\\["); 
 			String oldTaskName = taskParts[0].trim(); 
 			
 			if (taskParts.length == 1) {
-				processed = parseError.processError("invalid input");
+				processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
 				return processed; 
 			}
 			
@@ -150,7 +151,7 @@ public class ParseEdit {
 				return updateToDeadline(processed, newDateRaw, oldTaskName);
 			}
 		} else {
-			processed = parseError.processError("Wrong format for changing task name/date");
+			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}

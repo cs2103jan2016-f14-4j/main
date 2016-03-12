@@ -25,7 +25,6 @@ import taskey.logic.ProcessedObject;
  * @author Hubert Wong
  */
 public class Logic {
-	private static Logic instance = null;
 	private Parser parser;
 	private Storage storage;
 	private TimeConverter timeConverter;
@@ -34,14 +33,29 @@ public class Logic {
 	/*private ArrayList<String> categoryList;
 	private ArrayList<Integer> categorySizes;
 	private ArrayList<Color> colorList;*/
+	
+	public Logic() {
+		parser = new Parser();
+		storage = new Storage();
+		timeConverter = new TimeConverter();
+		uiController = new UiController();
 
-	/** Get the Logic singleton after initializing it */
-	public static Logic getInstance() {
-		if (instance == null) {
-			instance = new Logic();
-			instance.initialize();
+		//Get lists from Storage
+		taskLists = new ArrayList<ArrayList<Task>>();
+		taskLists = storage.loadAllTasklists();
+		ArrayList<Task> thisWeek = new ArrayList<Task>();
+		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
+
+		//Update THIS_WEEK list based on the current date and time
+		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
+		for (Task t : pendingList) {
+			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
+			//the current week
+			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
+				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
+				thisWeek.add(t);
+			}
 		}
-		return instance;
 	}
 
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
@@ -120,38 +134,6 @@ public class Logic {
 		return completedList;
 	}
 
-	/** Initializes the Logic singleton. */
-	public void initialize() {
-		parser = new Parser();
-		storage = new Storage();
-		timeConverter = new TimeConverter();
-		uiController = new UiController();
-
-		//Get lists from Storage
-		taskLists = new ArrayList<ArrayList<Task>>();
-		taskLists = storage.loadAllTasklists();
-		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
-
-		//Update THIS_WEEK tab based on the current date and time
-		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (Task t : pendingList) {
-			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
-			//the current week
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
-				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-				thisWeek.add(t);
-			}
-		}
-
-		/*categoryList = new ArrayList<String>(Arrays.asList("General", "Deadline", "Event", "Completed"));
-		//Values will be updated with refreshUiCategoryDisplay();
-		categorySizes = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0));
-		colorList = new ArrayList<Color>(Arrays.asList(Color.INDIGO, Color.BISQUE, Color.HOTPINK, Color.LIME));
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();*/
-	}
-
 	/**
 	 * Executes the user supplied command.
 	 *
@@ -184,7 +166,7 @@ public class Logic {
     	LogicFeedback lol;
     	switch (command) {
 			case "ADD_FLOATING":
-				lol = addFloating(task, po); //JUST TESTING LOL -- Dylan
+				lol = addFloating(task, po);
 				saveAllTasks();
 				return lol;
 

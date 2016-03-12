@@ -180,11 +180,10 @@ public class Logic {
 			case "SEARCH":
 				return search(po, searchPhrase);
 
-			/*case "DONE_BY_INDEX":
-				statusCode = doneByIndex(currentContent, taskIndex);
-				break;
+			case "DONE_BY_INDEX":
+				return doneByIndex(currentContent, po, taskIndex);
 
-			case "DONE_BY_NAME":
+			/*case "DONE_BY_NAME":
 				statusCode = doneByName(currentContent, task.getTaskName());
 				break;
 
@@ -371,35 +370,40 @@ public class Logic {
 		return new LogicFeedback(matches, po, null);
 	}
 
-	/*
-	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
-	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
-	private int doneByIndex(ContentBox currentContent, int taskIndex) {
+	
+	//Marks an indexed task from the current tab as done and saves the updated lists to disk.
+	//TODO: support removal from the "ACTION" tab. 
+	LogicFeedback doneByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		Task toMarkAsDone = null;
 		if (currentContent.equals(ContentBox.THIS_WEEK)) {
 			try {
 				toMarkAsDone = taskLists.get(ListID.THIS_WEEK.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return -1;
+				return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 			}
 		} else if (currentContent.equals(ContentBox.PENDING)) {
 			try {
 				toMarkAsDone = taskLists.get(ListID.PENDING.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return -1;
+				return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 			}
 		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
 
 		removeFromAllLists(toMarkAsDone);
 		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0;
+		return new LogicFeedback(taskLists, po, null);
 	}
 
+	/*
 	//Mark a named task as done by adding it to the "completed" list and removing it from all the
 	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
 	private int doneByName(ContentBox currentContent, String taskName) {

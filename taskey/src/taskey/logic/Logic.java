@@ -4,16 +4,12 @@ import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.storage.History;
 import taskey.storage.Storage;
-import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageException;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
-import taskey.logic.LogicConstants.CategoryID;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.ProcessedObject;
 
@@ -59,6 +55,7 @@ public class Logic {
 		assert (taskLists != null);
 		assert (taskLists.size() == 7); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
+		
 		return taskLists;
 	}
 
@@ -139,11 +136,13 @@ public class Logic {
 	 * @return               an object encapsulating the information required to update UI display
 	 */
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
-		int statusCode = 0; //Stub
-
     	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(currentContent);
-			saveAllTasks();
+			try {
+				saveAllTasks();
+			} catch (Exception e) {
+				return new LogicFeedback(taskLists, new ProcessedObject("CLEAR"), e); //Stub
+			}
 			return new LogicFeedback(taskLists, new ProcessedObject("CLEAR"), null); //Stub
     	}
 
@@ -163,14 +162,10 @@ public class Logic {
     	LogicFeedback lol;
     	switch (command) {
 			case "ADD_FLOATING":
-				lol = addFloating(task, po);
-				saveAllTasks();
-				return lol;
-
+				return addFloating(task, po);
+				
 			case "ADD_DEADLINE":
-				lol = addDeadline(task, po); // Storage seems to work on these two commands
-				saveAllTasks();
-				return lol;
+				return addDeadline(task, po);
 
 			/*case "ADD_EVENT":
 				statusCode = addEvent(task);
@@ -228,8 +223,6 @@ public class Logic {
 				break;
 		}
 
-		saveAllTasks();
-
 		return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,
                 				 new Exception("Failed to execute command.")); //Stub
 	}
@@ -246,12 +239,11 @@ public class Logic {
 		pendingList.add(task);
 		taskLists.get(ListID.GENERAL.getIndex()).add(task);
 
-		/*try {
+		try {
 			saveAllTasks();
 		} catch (Exception e) {
-			//TODO: revert task lists
-			return new LogicFeedback(taskLists, po, new Exception("Unable to save changes."));
-		}*/
+			return new LogicFeedback(taskLists, po, e);
+		}
 
 		return new LogicFeedback(taskLists, po, null);
 	}
@@ -270,6 +262,12 @@ public class Logic {
 
 		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
 			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
+		}
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
 		}
 
 		return new LogicFeedback(taskLists, po, null);
@@ -590,15 +588,16 @@ public class Logic {
 		return false; //Stub
 	}
 
-	//Save all task lists to Storage.
-	private void saveAllTasks() {
+	//Save all task lists to Storage. If the save failed, the task lists will be reverted to the states
+	//they were in before they were modified.
+	private void saveAllTasks() throws Exception {
 		try {
 			storage.saveAllTasklists(taskLists);
 			System.out.println("All tasklists saved.");
 		} catch (StorageException se) {
 			System.out.println(se.getMessage());
-			ArrayList<ArrayList<Task>> superlist = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
-			taskLists = superlist;
+			taskLists = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
+			throw new Exception (se.getMessage());
 		}
 	}
 }

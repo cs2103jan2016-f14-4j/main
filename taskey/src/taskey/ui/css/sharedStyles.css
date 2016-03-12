@@ -13,6 +13,7 @@
 .textAll {
 	-fx-font-size: 14px;
 	-fx-font-family: 'Montserrat';
+	-fx-font-smoothing-type: gray;
 }
 .textRed {
 	-fx-fill: red;

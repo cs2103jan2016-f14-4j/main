@@ -75,7 +75,7 @@
       </StackPane>
       <ImageView fx:id="crossButton" fitHeight="25.0" fitWidth="30.0" layoutX="697.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/crossDefault.png" />
+            <Image url="@utility/images/crossDefault.png" />
          </image></ImageView>
       <StackPane fx:id="dragBar" prefHeight="12.0" prefWidth="740.0" AnchorPane.bottomAnchor="558.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
    </children>

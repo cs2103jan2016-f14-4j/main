@@ -67,7 +67,7 @@ public class UiMain extends Application {
 		primaryStage.setTitle(Constants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		Scene newScene = new Scene(root);
-		//primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
+		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file

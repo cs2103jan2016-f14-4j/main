@@ -177,11 +177,10 @@ public class Logic {
 			case "VIEW":
 				return new LogicFeedback(taskLists, po, null);
 
-			/*case "SEARCH":
-				statusCode = search(searchPhrase);
-				break;
+			case "SEARCH":
+				return search(po, searchPhrase);
 
-			case "DONE_BY_INDEX":
+			/*case "DONE_BY_INDEX":
 				statusCode = doneByIndex(currentContent, taskIndex);
 				break;
 
@@ -350,24 +349,29 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
-	/*
+	
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
-	private int search(String searchPhrase) {
-		ArrayList<Task> matches = new ArrayList<Task>();
+	LogicFeedback search(ProcessedObject po, String searchPhrase) {
+		if (searchPhrase.equals("")) {
+			return new LogicFeedback(taskLists, po, new Exception("Search phrase cannot be empty!"));
+		}
+		
+		ArrayList<ArrayList<Task>> matches = new ArrayList<ArrayList<Task>>();
+		while (matches.size() < 7) {
+			matches.add(new ArrayList<Task>());
+		}
+		
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-
 		for (Task t : pendingList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				matches.add(t);
+				matches.get(0).add(t);
 			}
 		}
 
-		uiController.updateActionDisplay(matches, ActionListMode.TASKLIST);
-		uiController.displayTabContents(ContentBox.ACTION.getValue());
-
-		return 0; //Stub
+		return new LogicFeedback(matches, po, null);
 	}
 
+	/*
 	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
 	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
 	private int doneByIndex(ContentBox currentContent, int taskIndex) {

@@ -16,7 +16,6 @@ public class UiPagination {
 	private ArrayList<GridPane> myGrids;
 	private int currentPage;
 	private int currentSelection;
-	private int entriesPerPage;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	
 	public Pagination getPagination() {
@@ -28,9 +27,8 @@ public class UiPagination {
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
 		myPages.setVisible(false);
 	}
-	public void initialize( int _entriesPerPage, int totalPages ) {
+	public void initialize( int totalPages ) {
 		currentSelection = 0;
-		entriesPerPage = _entriesPerPage;
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);
 			myPages.setMaxPageIndicatorCount(1);
@@ -51,7 +49,15 @@ public class UiPagination {
 		if ( totalEntries.size() == 0 ) {
 			return -1;
 		}
-		return currentPage*entriesPerPage + currentSelection + 1;
+		int currentIndex = 0; 
+		for ( int i = 0; i < totalEntries.size(); i++ ) {
+			if ( i != currentPage ) {
+				currentIndex += totalEntries.get(i).size();
+			} else {
+				currentIndex += currentSelection;
+			}
+		}
+		return currentIndex;
 	}
 	public void processArrowKey(KeyEvent event) {
 		if ( totalEntries.size() == 0 ) {

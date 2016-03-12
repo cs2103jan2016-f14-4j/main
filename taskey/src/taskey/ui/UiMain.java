@@ -73,7 +73,7 @@ public class UiMain extends Application {
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		//testUI();
+		testUI();
 	}
 
 	/**
@@ -106,18 +106,9 @@ public class UiMain extends Application {
 			myTaskList.add(temp);
 		}
 		
-		//myController.updateDisplay(myTaskList, ContentBox.PENDING);
-		/*
+		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
-	
-		ArrayList<String> myCategoryList = new ArrayList<String>(
-				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
-				Arrays.asList(1,22,3,14,0,6));
-		ArrayList<Color> categoryColors = new ArrayList<Color>(
-				Arrays.asList(Color.RED,Color.RED,Color.RED,Color.RED,Color.RED,Color.YELLOW));
-		myController.updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);*/
 	}
 
 	/**

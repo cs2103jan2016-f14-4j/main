@@ -54,10 +54,6 @@ public class UiCategoryFormatter extends UiFormatter {
 	}
 
 	@Override
-	public void clearOtherVariables() {
-	}
-
-	@Override
 	public void format(ArrayList<Task> myTaskList) {
 	}
 

@@ -76,7 +76,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);	
-		clearOtherVariables();
+		myPagination.clear();
 		createPaginationGrids(myTaskList);
 	}
 
@@ -87,7 +87,6 @@ public class UiDefaultFormatter extends UiFormatter {
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			//newGrid.setGridLinesVisible(true);
-			
 			for (int k = 0; k < entriesPerPage; k++) {
 				RowConstraints row = new RowConstraints();
 				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
@@ -109,14 +108,9 @@ public class UiDefaultFormatter extends UiFormatter {
 			}
 			myPagination.addGridToPagination(newGrid,pageEntries);
 		}
-		myPagination.initialize(entriesPerPage,totalPages); // update UI and bind call back
+		myPagination.initialize(totalPages); // update UI and bind call back
 	}
 
-	@Override
-	public void clearOtherVariables() {
-		myPagination.clear();
-	}
-	
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();

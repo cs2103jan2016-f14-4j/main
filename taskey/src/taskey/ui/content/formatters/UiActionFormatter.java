@@ -4,25 +4,70 @@ import java.util.ArrayList;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ActionListMode;
 import taskey.ui.content.UiFormatter;
+import taskey.ui.content.UiPagination;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiActionFormatter extends UiFormatter {
-
+	private UiPagination listView;
+	private UiPagination helpView;
 	private ActionListMode currentMode;
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);
 		currentMode = ActionListMode.TASKLIST;
+		listView = new UiPagination();
+		helpView = new UiPagination();
+		
 		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_LISTVIEW),true);
 		mainPane.setContent(currentGrid);
 		addGrid(setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELPVIEW),false);
+		
+		setUpHelpView(); // static
 	}
 	
+	private void setUpHelpView() {
+		int totalPages = 2;
+		int entryNo = 0;
+		addStartMenu();
+		addAddMenu();
+		addDelMenu();
+		
+		for ( int i = 0; i < totalPages; i ++ ) {
+			GridPane newGrid = setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
+			//newGrid.setGridLinesVisible(true);
+			for (int k = 0; k < entriesPerPage; k++) {
+				RowConstraints row = new RowConstraints();
+				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
+				newGrid.getRowConstraints().add(row);
+			}
+			
+			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
+			for ( int j = 0; j < entriesPerPage; j ++ ) {
+				if ( entryNo >= myTaskList.size() ) {
+					break;
+				}
+				StackPane entryPane = createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
+				pageEntries.add(entryPane);
+				Task theTask = myTaskList.get(entryNo);
+				addTaskID(theTask, entryNo, j, newGrid);	
+				addTaskDescription(theTask, j,newGrid);
+				addImage(theTask, j,newGrid);
+				entryNo++;
+			}
+			myPagination.addGridToPagination(newGrid,pageEntries);
+		}
+		myPagination.initialize(totalPages); // update UI and bind call back
+		
+	}
+
 	public void updateContents(ArrayList<Task> myList, ActionListMode mode) {
 		switch ( mode ) {
 			case HELP_MAIN: 
@@ -51,10 +96,6 @@ public class UiActionFormatter extends UiFormatter {
 			addTaskName(theTask, 1, i);
 			addTaskDate(theTask, 2, i);
 		}
-	}
-
-	@Override
-	public void clearOtherVariables() {
 	}
 	
 	private void addTaskID(Task theTask, int col, int row) {

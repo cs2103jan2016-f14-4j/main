@@ -81,8 +81,7 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
-		
-		updateAll(Logic.getInstance().getAllTaskLists());
+		//updateAll(Logic.getInstance().getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here
@@ -115,32 +114,26 @@ public class UiController {
 		registerButtonHandlers();
 	}
 
-	private void displayTabContents(ContentBox toContent) {
+	public void displayTabContents(ContentBox toContent) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(toContent.getValue());
 		currentContent = toContent;
 	}
 
-	private void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	private void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
-	private void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);
 		assert(categoryColors != null);
 		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums,categoryColors);
-	}
-
-	public void cleanUp() {
-		clockService.restart();
-		myContentManager.cleanUp();
-		UiPopupManager.getInstance().cleanUp();
 	}
 
 	/**
@@ -224,6 +217,13 @@ public class UiController {
 				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
 		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
 	}
+	
+	public void cleanUp() {
+		clockService.restart();
+		myContentManager.cleanUp();
+		UiPopupManager.getInstance().cleanUp();
+	}
+	
 	/************************************ EVENT HANDLERS  *******************************************/
 	private void registerInputEventHandler() {
 		assert(input != null);

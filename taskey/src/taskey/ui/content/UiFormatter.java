@@ -41,7 +41,6 @@ public abstract class UiFormatter {
 	protected GridPane currentGrid;
 	protected ArrayList<GridPane> myGrids;
 	
-	public abstract void clearOtherVariables();
 	public abstract void format(ArrayList<Task> myTaskList);
 	public abstract void processArrowKey(KeyEvent event);
 	public abstract int processDeleteKey();
@@ -101,7 +100,6 @@ public abstract class UiFormatter {
 		if (currentGrid.isGridLinesVisible()) {
 			currentGrid.getChildren().add(0, node);
 		}
-		clearOtherVariables();
 	}
 	public void cleanUp() {
 		myGrids.clear();

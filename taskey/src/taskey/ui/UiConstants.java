@@ -79,7 +79,7 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT_STACKPANE = new UiGridSettings(0, 0, 0, 80, 20);
 	
 	// Resources 
-	public static final String UI_IMAGE_PATH_OFFSET = "../images/";
+	public static final String UI_IMAGE_PATH_OFFSET = "images/";
 	public static final String UI_IMAGE_HELP_PATH_OFFSET = "help/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	

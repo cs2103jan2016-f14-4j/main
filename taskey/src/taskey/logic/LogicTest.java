@@ -337,4 +337,75 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testSearchPhraseFound() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String addInput = "add g2 a?b ,  ";
+		ProcessedObject addProcessedObj = parser.parseInput(addInput);
+		Task t = addProcessedObj.getTask();
+		logic.addFloating(t, addProcessedObj);
+
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		
+		String searchPhrase = "a?";
+		String searchInput = "search " + searchPhrase;
+		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
+		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);	
+		temp.get(0).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, searchProcessedObj, null);
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testSearchPhraseNotFound() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String addInput = "add g2 a?b ,  ";
+		ProcessedObject addProcessedObj = parser.parseInput(addInput);
+		Task t = addProcessedObj.getTask();
+		logic.addFloating(t, addProcessedObj);
+
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		
+		String searchPhrase = "2a";
+		String searchInput = "search " + searchPhrase;
+		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
+		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);
+		LogicFeedback expected = new LogicFeedback(temp, searchProcessedObj, null);
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testSearchPhraseEmpty() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String addInput = "add g2 a?b ,  ";
+		ProcessedObject addProcessedObj = parser.parseInput(addInput);
+		Task t = addProcessedObj.getTask();
+		logic.addFloating(t, addProcessedObj);
+
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		
+		String searchPhrase = "";
+		String searchInput = "search " + searchPhrase;
+		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
+		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);
+		LogicFeedback expected = new LogicFeedback(logic.getAllTaskLists(), searchProcessedObj, 
+				                     new Exception ("Search phrase cannot be empty!"));
+		assertTrue(actual.equals(expected));
+	}
 }

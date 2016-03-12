@@ -890,4 +890,111 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeNameFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		Task afterUpdate = beforeUpdate.getDuplicate();
+		afterUpdate.setTaskName("ayy lmao");
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+				                                            "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeNameFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		Task afterUpdate = beforeUpdate.getDuplicate();
+		afterUpdate.setTaskName("ayy lmao");
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.PENDING, po, beforeUpdate.getTaskName(),
+				                                            "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameChangeNameFromWrongTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String input = "add g2 a?b";
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addFloating(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.EXPIRED, po, beforeUpdate.getTaskName(),
+				                                            "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
+		temp.get(ListID.GENERAL.getIndex()).add(beforeUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Cannot use \"set\" command from this tab!"));
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByNameNotFound() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String input = "add g2 a?b";
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addFloating(beforeUpdate, po);
+		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+				                                            "ayy lmao");
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
+		temp.get(ListID.GENERAL.getIndex()).add(beforeUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(beforeUpdate.getTaskName() 
+				                                   + " not found in this list!"));
+		
+		assertTrue(actual.equals(expected));
+	}
 }

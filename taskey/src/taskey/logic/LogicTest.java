@@ -29,7 +29,7 @@ public class LogicTest {
 		while (temp.size() < 7) {
 			temp.add(new ArrayList<Task>());
 		}
-		LogicFeedback expected = new LogicFeedback(temp, new ProcessedObject("CLEAR"), null);
+		LogicFeedback expected = new LogicFeedback(temp, new ProcessedObject("CLEAR"), null); //Stub
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -187,6 +187,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del 0");
 		LogicFeedback actual = logic.deleteByIndex(ContentBox.THIS_WEEK, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -209,6 +210,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del 0");
 		LogicFeedback actual = logic.deleteByIndex(ContentBox.PENDING, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -231,6 +233,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del " + t.getTaskName());
 		LogicFeedback actual = logic.deleteByName(ContentBox.THIS_WEEK, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -253,6 +256,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del " + t.getTaskName());
 		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -275,6 +279,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del 0");
 		LogicFeedback actual = logic.deleteByIndex(ContentBox.EXPIRED, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -301,6 +306,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del 1");
 		LogicFeedback actual = logic.deleteByIndex(ContentBox.PENDING, po, 1);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -326,6 +332,7 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(t, po);
+		po = parser.parseInput("del ayy lmao");
 		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, po, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -346,10 +353,9 @@ public class LogicTest {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		logic.executeCommand(ContentBox.PENDING, "clear");
-		String addInput = "add g2 a?b ,  ";
-		ProcessedObject addProcessedObj = parser.parseInput(addInput);
-		Task t = addProcessedObj.getTask();
-		logic.addFloating(t, addProcessedObj);
+		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
+		Task t = po.getTask();
+		logic.addFloating(t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -357,11 +363,10 @@ public class LogicTest {
 		}
 		
 		String searchPhrase = "a?";
-		String searchInput = "search " + searchPhrase;
-		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
-		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);	
+		po = parser.parseInput("search " + searchPhrase);
+		LogicFeedback actual = logic.search(po, searchPhrase);	
 		temp.get(0).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, searchProcessedObj, null);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		assertTrue(actual.equals(expected));
 	}
 	
@@ -370,10 +375,9 @@ public class LogicTest {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		logic.executeCommand(ContentBox.PENDING, "clear");
-		String addInput = "add g2 a?b ,  ";
-		ProcessedObject addProcessedObj = parser.parseInput(addInput);
-		Task t = addProcessedObj.getTask();
-		logic.addFloating(t, addProcessedObj);
+		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
+		Task t = po.getTask();
+		logic.addFloating(t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -381,10 +385,9 @@ public class LogicTest {
 		}
 		
 		String searchPhrase = "2a";
-		String searchInput = "search " + searchPhrase;
-		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
-		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);
-		LogicFeedback expected = new LogicFeedback(temp, searchProcessedObj, null);
+		po = parser.parseInput("search " + searchPhrase);
+		LogicFeedback actual = logic.search(po, searchPhrase);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		assertTrue(actual.equals(expected));
 	}
 	
@@ -393,22 +396,21 @@ public class LogicTest {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		logic.executeCommand(ContentBox.PENDING, "clear");
-		String addInput = "add g2 a?b ,  ";
-		ProcessedObject addProcessedObj = parser.parseInput(addInput);
-		Task t = addProcessedObj.getTask();
-		logic.addFloating(t, addProcessedObj);
+		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
+		Task t = po.getTask();
+		logic.addFloating(t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
 			temp.add(new ArrayList<Task>());
 		}
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.GENERAL.getIndex()).add(t);
 		
 		String searchPhrase = "";
-		String searchInput = "search " + searchPhrase;
-		ProcessedObject searchProcessedObj = parser.parseInput(searchInput);
-		LogicFeedback actual = logic.search(searchProcessedObj, searchPhrase);
-		LogicFeedback expected = new LogicFeedback(logic.getAllTaskLists(), searchProcessedObj, 
-				                     new Exception ("Search phrase cannot be empty!"));
+		po = parser.parseInput("search " + searchPhrase);
+		LogicFeedback actual = logic.search(po, searchPhrase);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception ("Search phrase cannot be empty!"));
 		assertTrue(actual.equals(expected));
 	}
 	

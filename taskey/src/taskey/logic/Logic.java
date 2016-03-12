@@ -166,11 +166,10 @@ public class Logic {
 			case "ADD_DEADLINE":
 				return addDeadline(task, po);
 
-			/*case "ADD_EVENT":
-				statusCode = addEvent(task);
-				break;
+			case "ADD_EVENT":
+				return addEvent(task, po);
 
-			case "DELETE_BY_INDEX":
+			/*case "DELETE_BY_INDEX":
 				statusCode = deleteByIndex(currentContent, taskIndex);
 				break;
 
@@ -247,7 +246,7 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	//Adds a deadline task to the relevant lists.
+	//Adds a deadline task to the relevant lists, and saves the updated lists to disk.
 	LogicFeedback addDeadline(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
@@ -271,13 +270,14 @@ public class Logic {
 
 		return new LogicFeedback(taskLists, po, null);
 	}
-	/*
-	//Updates UI with a new event task. Returns a status code reflecting outcome of command execution.
-	private int addEvent(Task task) {
+	
+	//Adds an event task to the relevant lists, and saves the updated lists to disk.
+	LogicFeedback addEvent(Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return -1; //Stub
+			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task "
+								     + task.getTaskName() + " already exists!"));
 		}
 
 		pendingList.add(task);
@@ -287,13 +287,16 @@ public class Logic {
 			taskLists.get(ListID.THIS_WEEK.getIndex()).add(task);
 		}
 
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-		uiController.displayTabContents(ContentBox.PENDING.getValue());
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
-
+	
+	/*
 	//Removes an indexed task from the "PENDING" tab.
 	//TODO: support removal from the "THIS_WEEK" tab.
 	private int deleteByIndex(ContentBox currentContent, int taskIndex) {

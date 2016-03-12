@@ -172,12 +172,10 @@ public class Logic {
 			case "DELETE_BY_INDEX":
 				return deleteByIndex(currentContent, po, taskIndex);
 
-			/*
 			case "DELETE_BY_NAME":
-				statusCode = deleteByName(currentContent, task.getTaskName());
-				break;
+				return deleteByName(currentContent, po, task.getTaskName());
 
-			case "VIEW":
+			/*case "VIEW":
 				statusCode = view(viewType);
 				break;
 
@@ -296,7 +294,7 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
-	//Removes an indexed task from the "PENDING" tab.
+	//Removes an indexed task from the current tab and saves the updated lists to disk.
 	//TODO: support removal from the "ACTION" tab.
 	LogicFeedback deleteByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		//"del" command only allowed in THIS_WEEK or PENDING tab
@@ -324,28 +322,37 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 
-	/*
-	//Removes a named task from the "PENDING" tab.
-	//TODO: support removal from the "THIS_WEEK" tab.
-	private int deleteByName(ContentBox currentContent, String taskName) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
-			return -1; //Stub
+	
+	//Removes an indexed task from the current tab and saves the updated lists to disk.
+	//TODO: support removal from the "ACTION" tab.
+	LogicFeedback deleteByName(ContentBox currentContent, ProcessedObject po, 
+			                           String taskName) {
+		//"del" command only allowed in THIS_WEEK or PENDING tab
+		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+			return new LogicFeedback(taskLists, po, new Exception("Cannot delete from this tab!"));
 		}
-
+		
+    	ArrayList<Task> targetList = getListFromContentBox(currentContent);
 		Task toDelete = new Task(taskName);
 
 		//Named task does not exist in the list
-		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toDelete)) {
-			return -1; //Stub
+		if (!targetList.contains(toDelete)) {
+			return new LogicFeedback(taskLists, po, new Exception(taskName 
+					                                              + " not found in this list!"));
 		}
 
 		removeFromAllLists(toDelete);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
-
+	
+	/*
 	//View the type of task specified by viewType.
 	private int view(String viewType) {
 		if (viewType.equals("GENERAL")) {

@@ -508,4 +508,52 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testDoneTaskByNameFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		po = parser.parseInput("done " + t.getTaskName());
+		LogicFeedback actual = logic.doneByName(ContentBox.THIS_WEEK, po, t.getTaskName());
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.COMPLETED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDoneTaskByNameFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		po = parser.parseInput("done " + t.getTaskName());
+		LogicFeedback actual = logic.doneByName(ContentBox.PENDING, po, t.getTaskName());
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.COMPLETED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
 }

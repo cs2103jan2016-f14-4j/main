@@ -408,4 +408,52 @@ public class LogicTest {
 				                     new Exception ("Search phrase cannot be empty!"));
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void testDoneTaskByIndexFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		po = parser.parseInput("done 0");
+		LogicFeedback actual = logic.doneByIndex(ContentBox.THIS_WEEK, po, 0);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.COMPLETED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDoneTaskByIndexFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
+		po = parser.parseInput("done 0");
+		LogicFeedback actual = logic.doneByIndex(ContentBox.PENDING, po, 0);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.COMPLETED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
 }

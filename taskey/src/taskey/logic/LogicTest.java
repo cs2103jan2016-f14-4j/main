@@ -653,10 +653,8 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
-		Task beforeUpdate = po.getTask();
-		Task afterUpdate = beforeUpdate.getDuplicate();
-		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(beforeUpdate, po);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
 		po = parser.parseInput("set 0 \"ayy lmao \"");
 		LogicFeedback actual = logic.updateByIndexChangeName(ContentBox.EXPIRED, po, 0, "ayy lmao");
 		
@@ -664,9 +662,9 @@ public class LogicTest {
 		while (temp.size() < 7) {
 			temp.add(new ArrayList<Task>());
 		}
-		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
-		temp.get(ListID.THIS_WEEK.getIndex()).add(beforeUpdate);
-		temp.get(ListID.DEADLINE.getIndex()).add(beforeUpdate);
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Cannot use \"set\" command from this tab!"));
 		
 		assertTrue(actual.equals(expected));
@@ -681,10 +679,8 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
-		Task beforeUpdate = po.getTask();
-		Task afterUpdate = beforeUpdate.getDuplicate();
-		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(beforeUpdate, po);
+		Task t = po.getTask();
+		logic.addDeadline(t, po);
 		po = parser.parseInput("set 1 \"ayy lmao \"");
 		LogicFeedback actual = logic.updateByIndexChangeName(ContentBox.PENDING, po, 1, "ayy lmao");
 		
@@ -692,10 +688,205 @@ public class LogicTest {
 		while (temp.size() < 7) {
 			temp.add(new ArrayList<Task>());
 		}
-		temp.get(ListID.PENDING.getIndex()).add(beforeUpdate);
-		temp.get(ListID.THIS_WEEK.getIndex()).add(beforeUpdate);
-		temp.get(ListID.DEADLINE.getIndex()).add(beforeUpdate);
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateSameWeekFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + 10) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.THIS_WEEK, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateSameWeekFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + 10) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateDiffWeekFromThisWeekTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.THIS_WEEK, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateDiffWeekFromPendingTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateFromFloatingToDeadline() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b";
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addFloating(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.DEADLINE.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateFromDeadlineToEvent() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addDeadline(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
+				               + 10000) + ", " + timeConverter.getDate(currTime 
+				               + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.EVENT.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeDateFromEventToFloating() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b from " + timeConverter.getDate(currTime) + " to "
+				        + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addEvent(beforeUpdate, po);
+		po = parser.parseInput("set 0 [none]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, po, 0, afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.GENERAL.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertTrue(actual.equals(expected));
 	}

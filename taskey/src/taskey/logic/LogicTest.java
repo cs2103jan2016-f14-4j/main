@@ -151,6 +151,29 @@ public class LogicTest {
 	}
 	
 	@Test
+	public void testDuplicateTaskName() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		String input = "add g2 a?b ,  ";
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addFloating(t, po);
+		LogicFeedback actual = logic.addFloating(t, po);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		temp.get(ListID.GENERAL.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("The task " 
+		                                           + t.getTaskName() + " already exists!"));
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
 	public void testDeleteTaskByIndexFromThisWeekTab() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();

@@ -45,7 +45,7 @@ public class UiPagination {
         });
 		myPages.setVisible(true);
 	}
-	public int processDeleteKey() {
+	public int getSelection() { 
 		if ( totalEntries.size() == 0 ) {
 			return -1;
 		}
@@ -55,6 +55,7 @@ public class UiPagination {
 				currentIndex += totalEntries.get(i).size();
 			} else {
 				currentIndex += currentSelection;
+				break;
 			}
 		}
 		return currentIndex;
@@ -79,6 +80,9 @@ public class UiPagination {
 			return;
 		}
 		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
+		if ( pageContent.size() == 0 ) { // division by 0
+			return;
+		}
 		selection %= pageContent.size();
 		if ( selection < 0 ) {
 			selection = pageContent.size()-1;

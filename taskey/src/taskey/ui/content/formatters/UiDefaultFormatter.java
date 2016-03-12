@@ -2,47 +2,26 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.util.Callback;
-import javafx.util.Pair;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
-import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
 	private UiPagination myPagination;
-	private int entriesPerPage = 6;
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
 		disableScrollBar();
@@ -70,7 +49,7 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	@Override
 	public int processDeleteKey() {
-		return myPagination.processDeleteKey();
+		return myPagination.getSelection();
 	}
 	
 	@Override
@@ -82,6 +61,7 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	// This function creates the grids used by pagination
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
+		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
@@ -90,7 +70,7 @@ public class UiDefaultFormatter extends UiFormatter {
 			for (int k = 0; k < entriesPerPage; k++) {
 				RowConstraints row = new RowConstraints();
 				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
-				newGrid.getRowConstraints().add(row);
+			//	newGrid.getRowConstraints().add(row);
 			}
 			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
@@ -166,5 +146,11 @@ public class UiDefaultFormatter extends UiFormatter {
 		ImageView img = createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
 				30,30,newGrid);
 		img.setTranslateX(150);
+	}
+
+	@Override
+	public int processEnterKey() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

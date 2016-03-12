@@ -68,4 +68,10 @@ public class UiCategoryFormatter extends UiFormatter {
 		// TODO Auto-generated method stub
 		return -1;
 	}
+
+	@Override
+	public int processEnterKey() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

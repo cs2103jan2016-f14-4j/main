@@ -44,6 +44,7 @@ public abstract class UiFormatter {
 	public abstract void format(ArrayList<Task> myTaskList);
 	public abstract void processArrowKey(KeyEvent event);
 	public abstract int processDeleteKey();
+	public abstract int processEnterKey();
 	
 	public UiFormatter(ScrollPane thePane) {
 		mainPane = thePane;
@@ -153,6 +154,7 @@ public abstract class UiFormatter {
 		ImageView myImg = new ImageView(img);
 		myImg.setFitHeight(width);
 		myImg.setFitWidth(height);
+		myImg.setPreserveRatio(true);
 		imageWrapper.getChildren().add(myImg);
 		return myImg;
 	}

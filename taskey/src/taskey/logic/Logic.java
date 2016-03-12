@@ -6,7 +6,7 @@ import taskey.storage.FileType;
 import taskey.storage.Storage;
 import taskey.storage.StorageException;
 import taskey.ui.UiController;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 

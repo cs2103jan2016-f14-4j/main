@@ -30,7 +30,7 @@ import taskey.logic.Task;
 import taskey.logic.LogicConstants.ListID;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiClockService;
@@ -125,7 +125,7 @@ public class UiController {
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionMode mode) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
@@ -179,13 +179,13 @@ public class UiController {
 			case "VIEW":
 				String viewType = processed.getViewType();
 				if (viewType.equals("GENERAL")) {
-					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("DEADLINES")) {
-					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("EVENTS")) {
-					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("ARCHIVE")) {
-					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
 				}
 				displayTabContents(ContentBox.ACTION);
 				break;
@@ -235,11 +235,14 @@ public class UiController {
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
-					input.clear();
-					
-					handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),line));
-					event.consume();
-					myDropDown.closeMenu();
+					if ( line.isEmpty() == false ) {
+						input.clear();	
+						handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),line));
+						event.consume();
+						myDropDown.closeMenu();
+					} else {
+						myContentManager.processEnter(getCurrentContent());
+					}
 				}
 			}
 		});

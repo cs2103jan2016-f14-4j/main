@@ -17,7 +17,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -108,7 +108,8 @@ public class UiMain extends Application {
 		
 		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
+		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
+		myController.displayTabContents(ContentBox.ACTION);
 	}
 
 	/**

@@ -71,11 +71,6 @@ public class UiDefaultFormatter extends UiFormatter {
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			//newGrid.setGridLinesVisible(true);
-			for (int k = 0; k < entriesPerPage; k++) {
-				RowConstraints row = new RowConstraints();
-				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
-			//	newGrid.getRowConstraints().add(row);
-			}
 			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {

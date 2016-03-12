@@ -21,8 +21,9 @@
 .tab .tab-label { 
     -fx-alignment: CENTER;
     -fx-text-fill: #828282;
-    -fx-font-size: 12px;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
+    -fx-font-family: 'Montserrat';
 }
 
 .tab:selected .tab-label { 

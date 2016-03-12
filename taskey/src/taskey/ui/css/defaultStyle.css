@@ -23,6 +23,7 @@
     -fx-background-insets: 0px,2px;
     -fx-padding: 2px;
     -fx-font-weight: bold;
+    -fx-font-family: 'Montserrat';
 }
 
 #dragBar {

@@ -100,6 +100,7 @@ public class UiGridHelper {
 		assert(gridPane != null);
 		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		Label myLabel = new Label(text);
+		myLabel.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		myLabel.getStyleClass().add(labelStyle);
 		cellWrapper.getChildren().add(myLabel);
 		return myLabel;

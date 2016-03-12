@@ -22,7 +22,8 @@ public class UiHelpMenu {
 	private ArrayList<UiPagination> commandViews;
 	private UiPagination currentView;
 	private int entriesPerPage = 10; // main menu
-
+	private int imageWidth = 333;
+	
 	public UiHelpMenu() {
 		gridHelper = new UiGridHelper("");
 		helpView = new UiPagination(UiConstants.STYLE_RED_ELLIPSE);
@@ -44,8 +45,8 @@ public class UiHelpMenu {
 		return currentView;
 	}
 	private void addMainMenu() {
-		ArrayList<String> headers = new ArrayList<String>(Arrays.asList("Taskey Help Menu","Add Command",
-				"Delete Command","Edit Command", "Done Command", "Search Command", "Undo Command", "Tagging"));
+		ArrayList<String> headers = new ArrayList<String>(Arrays.asList("Taskey Help","Adding Tasks",
+				"Deleting Tasks","Set Tasks", "Done Tasks", "Search Tasks", "Undo Tasks", "Tagging Task"));
 		ArrayList<String> info = new ArrayList<String>(Arrays.asList(
 				"Welcome to Taskey's help menu, select the command "
 				+ "you would like to find out more about by use arrow keys and pressing Enter",
@@ -92,11 +93,10 @@ public class UiHelpMenu {
 	private void addMenu(ArrayList<IMAGE_ID> images, ArrayList<String> info ) {
 		UiPagination menu = new UiPagination("");
 		commandViews.add(menu);
-		int widthOfImage = 333;
 		int totalPages = images.size(); 
 		for ( int i = 0 ; i < totalPages; i++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP_MENU);
-			gridHelper.createImageInCell(0,0,UiImageManager.getInstance().getImage(images.get(i)),widthOfImage,0,newGrid);
+			gridHelper.createImageInCell(0,0,UiImageManager.getInstance().getImage(images.get(i)),imageWidth,0,newGrid);
 			UiTextBuilder myConfig = new UiTextBuilder();
 			TextFlow element = new TextFlow();
 			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);

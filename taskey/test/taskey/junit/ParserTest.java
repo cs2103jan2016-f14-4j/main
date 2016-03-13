@@ -25,7 +25,8 @@ public class ParserTest {
 		
 		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
-		   
+		
+		//add 2345
 	}
 	
 	@Test
@@ -42,6 +43,8 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+		
+		//add meeting222 on 17 feb 
 	}
 	
 	public void testDeadlineHuman() {
@@ -76,6 +79,7 @@ public class ParserTest {
 				+ "16:00 to 19 Feb 2016 17:00\n",
 				parser.parseInput("add project meeting from 4pm to "
 						+ "5pm on 19 feb").toString());
+		//add mtg2234 from 19 feb 4pm to 5pm 
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	

@@ -178,19 +178,21 @@ public class ParseAdd {
 		ProcessedObject processed;
 		String taskName;
 		String withoutTagList = simpString.split("#")[0].trim();
-		
+	
 		String simpString2 = simpString.replace("today", "2day"); 
 		simpString2 = simpString2.replace("tomorrow", "tmr"); 
 		String[] inputList = withoutTagList.split("from");
 		String[] dateList = inputList[1].split("to"); 
-		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(withoutTagList);
+		String dateForPrettyParser = withoutTagList.replace(taskName, "");
+		
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
 		//if date contains am or pm or morning or night, 
 		//call pretty parser to process the time and return. 
 		try {
-			long[] epochTimeEvent = getPrettyTimeEvent(withoutTagList);
+			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
 			task.setStartDate(epochTimeEvent[0]);
 			task.setEndDate(epochTimeEvent[1]);
 			task.setTaskName(taskName);
@@ -251,11 +253,12 @@ public class ParseAdd {
 		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
 		taskName = removeTimeFromName(taskName); 
+		String dateForPrettyParser = withoutTagList.replace(taskName, "");
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(withoutTagList);
+		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -293,11 +296,12 @@ public class ParseAdd {
 		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
 		taskName = removeTimeFromName(taskName); 
+		String dateForPrettyParser = withoutTagList.replace(taskName, ""); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(withoutTagList);
+		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -438,7 +442,7 @@ public class ParseAdd {
 		String[] splitName = taskName.split(" "); 
 		int size = splitName.length; 
 		
-		for(int i = 0; i < size; i++) {
+		for(int i = 0; i < size; ) {
 			String word = splitName[i]; 
 			if (word.compareTo("at") == 0) {
 				if (i+1 < size) {
@@ -456,6 +460,7 @@ public class ParseAdd {
 						//so add it to the task name 
 						stringRep += word + " " + time + " ";
 						i += 2; 
+						System.out.println("place "+ stringRep);
 					}
 				}
 			} else if (word.compareTo("from") == 0) {
@@ -466,6 +471,8 @@ public class ParseAdd {
 				break; 
 			} else {
 				stringRep += word + " "; 
+				System.out.println("else " + stringRep);
+				i += 1; 
 			}
 		}	
 		return stringRep.trim(); 

@@ -150,12 +150,10 @@ public class Logic {
     	String command = po.getCommand();
     	Task task = po.getTask();
     	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
-    	String viewType = po.getViewType(); //Only used for view commands
     	String errorType = po.getErrorType(); //Only used for invalid commands
     	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
     	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
-    	Task done;
-    	ArrayList<Task> doneList;
+
 
     	System.out.println("Command: " + command);
 
@@ -169,60 +167,49 @@ public class Logic {
 			case "ADD_EVENT":
 				return addEvent(task, po);
 
-			/*case "DELETE_BY_INDEX":
-				statusCode = deleteByIndex(currentContent, taskIndex);
-				break;
+			case "DELETE_BY_INDEX":
+				return deleteByIndex(currentContent, po, taskIndex);
 
 			case "DELETE_BY_NAME":
-				statusCode = deleteByName(currentContent, task.getTaskName());
-				break;
+				return deleteByName(currentContent, po, task.getTaskName());
 
 			case "VIEW":
-				statusCode = view(viewType);
-				break;
+				return new LogicFeedback(taskLists, po, null);
 
 			case "SEARCH":
-				statusCode = search(searchPhrase);
-				break;
+				return search(po, searchPhrase);
 
 			case "DONE_BY_INDEX":
-				statusCode = doneByIndex(currentContent, taskIndex);
-				break;
+				return doneByIndex(currentContent, po, taskIndex);
 
 			case "DONE_BY_NAME":
-				statusCode = doneByName(currentContent, task.getTaskName());
-				break;
+				return doneByName(currentContent, po, task.getTaskName());
 
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				statusCode = updateByIndexChangeName(currentContent, taskIndex, newTaskName);
-				break;
+				return updateByIndexChangeName(currentContent, po, taskIndex, newTaskName);
 
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				statusCode = updateByIndexChangeDate(currentContent, taskIndex, task);
-				break;
+				return updateByIndexChangeDate(currentContent, po, taskIndex, task);
 
 			case "UPDATE_BY_NAME_CHANGE_NAME":
-				toUpdate = getTaskByName(targetList, task.getTaskName());
-				toUpdate.setTaskName(newTaskName);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				break;
+				return updateByNameChangeName(currentContent, po, task.getTaskName(), newTaskName);
 
 			case "UPDATE_BY_NAME_CHANGE_DATE":
-				toUpdate = getTaskByName(targetList, task.getTaskName());
-				targetList.remove(toUpdate);
-				targetList.add(task);
-				UiMain.getInstance().getController().updateDisplay(targetList, currentContent);
-				break;
+				return updateByNameChangeDate(currentContent, po, task.getTaskName(), task);
 
 			case "UNDO":
-				break; */
+				//TODO
+				break;
+				
+			case "ERROR":
+				//TODO:
+				break;
 
 			default:
 				break;
 		}
 
-		return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,
-                				 new Exception("Failed to execute command.")); //Stub
+		return new LogicFeedback(taskLists, po, new Exception("Failed to execute command.")); 
 	}
 
 	//Adds a floating task to the relevant lists, and saves the updated lists to disk.
@@ -230,7 +217,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po,  new Exception("The task "
+			return new LogicFeedback(taskLists, po,  new Exception("The task "
 		                             + task.getTaskName() + " already exists!"));
 		}
 
@@ -251,7 +238,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task "
+			return new LogicFeedback(taskLists, po, new Exception("The task "
 		                             + task.getTaskName() + " already exists!"));
 		}
 
@@ -276,7 +263,7 @@ public class Logic {
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(new ArrayList<ArrayList<Task>>(), po, new Exception("The task "
+			return new LogicFeedback(taskLists, po, new Exception("The task "
 								     + task.getTaskName() + " already exists!"));
 		}
 
@@ -296,12 +283,12 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
-	/*
-	//Removes an indexed task from the "PENDING" tab.
-	//TODO: support removal from the "THIS_WEEK" tab.
-	private int deleteByIndex(ContentBox currentContent, int taskIndex) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
-			return -1; //Stub
+	//Removes an indexed task from the current tab and saves the updated lists to disk.
+	//TODO: support removal from the "ACTION" tab.
+	LogicFeedback deleteByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
+		//"del" command only allowed in THIS_WEEK or PENDING tab
+		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+			return new LogicFeedback(taskLists, po, new Exception("Cannot delete from this tab!"));
 		}
 
     	ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -310,130 +297,140 @@ public class Logic {
 		try {
 			toDelete = targetList.remove(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		removeFromAllLists(toDelete);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-
-		return 0; //Stub
-	}
-
-	//Removes a named task from the "PENDING" tab.
-	//TODO: support removal from the "THIS_WEEK" tab.
-	private int deleteByName(ContentBox currentContent, String taskName) {
-		if (!currentContent.equals(ContentBox.PENDING)) { //"del" command only allowed in pending tab
-			return -1; //Stub
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
 		}
 
+		return new LogicFeedback(taskLists, po, null);
+	}
+
+	
+	//Removes an indexed task from the current tab and saves the updated lists to disk.
+	//TODO: support removal from the "ACTION" tab.
+	LogicFeedback deleteByName(ContentBox currentContent, ProcessedObject po, 
+			                           String taskName) {
+		//"del" command only allowed in THIS_WEEK or PENDING tab
+		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+			return new LogicFeedback(taskLists, po, new Exception("Cannot delete from this tab!"));
+		}
+		
+    	ArrayList<Task> targetList = getListFromContentBox(currentContent);
 		Task toDelete = new Task(taskName);
 
 		//Named task does not exist in the list
-		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toDelete)) {
-			return -1; //Stub
+		if (!targetList.contains(toDelete)) {
+			return new LogicFeedback(taskLists, po, new Exception(taskName 
+					                                              + " not found in this list!"));
 		}
 
 		removeFromAllLists(toDelete);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
-
-		return 0; //Stub
-	}
-
-	//View the type of task specified by viewType.
-	private int view(String viewType) {
-		if (viewType.equals("GENERAL")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("DEADLINES")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("EVENTS")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
-		} else if (viewType.equals("ARCHIVE")) {
-			uiController.updateActionDisplay(taskLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
-			uiController.displayTabContents(ContentBox.ACTION.getValue());
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
 		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
-
+	
+	
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
-	private int search(String searchPhrase) {
-		ArrayList<Task> matches = new ArrayList<Task>();
+	LogicFeedback search(ProcessedObject po, String searchPhrase) {
+		if (searchPhrase.equals("")) {
+			return new LogicFeedback(taskLists, po, new Exception("Search phrase cannot be empty!"));
+		}
+		
+		ArrayList<ArrayList<Task>> matches = new ArrayList<ArrayList<Task>>();
+		while (matches.size() < 7) {
+			matches.add(new ArrayList<Task>());
+		}
+		
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-
 		for (Task t : pendingList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				matches.add(t);
+				matches.get(0).add(t);
 			}
 		}
 
-		uiController.updateActionDisplay(matches, ActionListMode.TASKLIST);
-		uiController.displayTabContents(ContentBox.ACTION.getValue());
-
-		return 0; //Stub
+		return new LogicFeedback(matches, po, null);
 	}
 
-	//Mark an indexed task as done by adding it to the "completed" list and removing it from all the
-	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
-	private int doneByIndex(ContentBox currentContent, int taskIndex) {
+	
+	//Marks an indexed task from the current tab as done and saves the updated lists to disk.
+	//TODO: support "done" from the "ACTION" tab. 
+	LogicFeedback doneByIndex(ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		Task toMarkAsDone = null;
 		if (currentContent.equals(ContentBox.THIS_WEEK)) {
 			try {
 				toMarkAsDone = taskLists.get(ListID.THIS_WEEK.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return -1;
+				return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 			}
 		} else if (currentContent.equals(ContentBox.PENDING)) {
 			try {
 				toMarkAsDone = taskLists.get(ListID.PENDING.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return -1;
+				return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 			}
 		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
 
 		removeFromAllLists(toMarkAsDone);
 		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0;
+		return new LogicFeedback(taskLists, po, null);
 	}
 
-	//Mark a named task as done by adding it to the "completed" list and removing it from all the
-	//lists of incomplete tasks. Also updates the UI display to reflect the updated lists.
-	private int doneByName(ContentBox currentContent, String taskName) {
+	
+	//Marks an named task from the current tab as done and saves the updated lists to disk.
+	//TODO: support "done" from the "ACTION" tab. 
+	LogicFeedback doneByName(ContentBox currentContent, ProcessedObject po, String taskName) {
 		Task toMarkAsDone = new Task(taskName);
 
 		//"done" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
 
 		//Named task does not exist in the list
 		if (!taskLists.get(ListID.PENDING.getIndex()).contains(toMarkAsDone)) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception(taskName + " does not exist in this tab!"));
 		}
 
 		removeFromAllLists(toMarkAsDone);
 		taskLists.get(ListID.COMPLETED.getIndex()).add(toMarkAsDone);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0;
+		return new LogicFeedback(taskLists, po, null);
 	}
-
-	//Update an indexed task's name with newTaskName.
-	//Also updates the UI display to reflect the updated lists.
-	private int updateByIndexChangeName(ContentBox currentContent, int taskIndex, String newTaskName) {
+	
+	//Updates an indexed task's name on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByIndexChangeName(ContentBox currentContent, ProcessedObject po, int taskIndex, 
+			                                      String newTaskName) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
 		}
 
 		ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -442,21 +439,27 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		updateAllLists(toUpdate.getTaskName(), newTaskName);
-		refreshUiTabDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
+		return new LogicFeedback(taskLists, po, null);
 	}
 
-	//Replace the indexed Task with a Task that has the changed date.
-	//Also updates the UI display to reflect the updated lists.
-	private int updateByIndexChangeDate(ContentBox currentContent, int taskIndex, Task changedTask) {
+	//Updates an indexed task's date on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ProcessedObject po, int taskIndex, 
+			                              Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
 		}
 
 		ArrayList<Task> targetList = getListFromContentBox(currentContent);
@@ -465,16 +468,75 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return -1;
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
 		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
 		updateAllLists(toUpdate.getTaskName(), changedTask);
-		refreshUiTabDisplay();
-		refreshUiCategoryDisplay();
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
 
-		return 0; //Stub
-	}*/
+		return new LogicFeedback(taskLists, po, null);
+	}
+	
+	//Updates an named task's name on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByNameChangeName(ContentBox currentContent, ProcessedObject po, String oldTaskName, 
+			                             String newTaskName) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
+		}
+
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate = new Task(oldTaskName);
+
+		if (!targetList.contains(toUpdate)) {
+			return new LogicFeedback(taskLists, po, new Exception(oldTaskName + " not found in this list!"));
+		}
+
+		updateAllLists(toUpdate.getTaskName(), newTaskName);
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
+
+		return new LogicFeedback(taskLists, po, null);
+	}
+	
+	//Updates an named task's date on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByNameChangeDate(ContentBox currentContent, ProcessedObject po, String taskName, 
+			                             Task changedTask) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
+		}
+
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate = new Task(taskName);
+
+		if (!targetList.contains(toUpdate)) {
+			return new LogicFeedback(taskLists, po, new Exception(taskName + " not found in this list!"));
+		}
+
+		updateAllLists(taskName, changedTask);
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
+
+		return new LogicFeedback(taskLists, po, null);
+	}
+
 
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
@@ -498,34 +560,6 @@ public class Logic {
 
 		return targetList;
 	}
-	/*
-	//Refresh all UI tabs except the "ACTION" tab.
-	private void refreshUiTabDisplay() {
-		uiController.updateDisplay(taskLists.get(ListID.THIS_WEEK.getIndex()), ContentBox.THIS_WEEK);
-		uiController.updateDisplay(taskLists.get(ListID.PENDING.getIndex()), ContentBox.PENDING);
-		uiController.updateDisplay(taskLists.get(ListID.EXPIRED.getIndex()), ContentBox.EXPIRED);
-	}
-
-	private void refreshUiCategoryDisplay() {
-		categorySizes.set(CategoryID.GENERAL.getIndex(), taskLists.get(ListID.GENERAL.getIndex()).size());
-		categorySizes.set(CategoryID.DEADLINE.getIndex(), taskLists.get(ListID.DEADLINE.getIndex()).size());
-		categorySizes.set(CategoryID.EVENT.getIndex(), taskLists.get(ListID.EVENT.getIndex()).size());
-		categorySizes.set(CategoryID.COMPLETED.getIndex(), taskLists.get(ListID.COMPLETED.getIndex()).size());
-		uiController.updateCategoryDisplay(categoryList, categorySizes, colorList);
-	}*/
-
-	/*
-	//Returns the first Task whose name matches the given name, or null otherwise.
-	private Task getTaskByName(ArrayList<Task> targetList, String name ) {
-		for (int i = 0; i < targetList.size(); i++) {
-			Task theTask = targetList.get(i);
-			if ( theTask.getTaskName().equals(name)) {
-				return theTask;
-			}
-		}
-
-		return null;
-	}*/
 
 	//Removes the given Task from all existing lists except the "EXPIRED" and "COMPLETED" lists.
 	//The intended Task may not be removed if duplicate Task names are allowed.

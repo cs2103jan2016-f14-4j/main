@@ -61,28 +61,37 @@ public class LogicFeedback {
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof LogicFeedback)) {
+			System.out.println("Objects not of the same type");
 		    return false;
 		  }
 		
 		LogicFeedback other = (LogicFeedback) obj;
 		
 		if (this.taskLists.size() != other.taskLists.size()) {
+			System.out.println("List sizes not equal");
+			System.out.println(this.taskLists.size());
+			System.out.println(other.taskLists.size());
 			return false;
 		}
 		
 		//Check if both objects' task lists are equal and in the same order
 		for (int i = 0; i < this.taskLists.size(); i++) {
 			if (!(this.taskLists.get(i).equals(other.taskLists.get(i)))) {
+				System.out.println("Lists unequal at list index " + i);
+				System.out.println(this.taskLists.get(i));
+				System.out.println(other.taskLists.get(i));
 				return false;
 			}
 		}
 		
 		if (!po.equals(other.po)) {
+			System.out.println("Processed objects not equal");
 			return false;
 		}
 		
 		if (e == null && other.e != null || e != null 
 			&& (other.e == null || !e.getMessage().equals(other.e.getMessage()))) {
+			System.out.println("Exceptions not equal");
 			return false;
 		}
 		

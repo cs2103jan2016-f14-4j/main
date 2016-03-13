@@ -79,6 +79,8 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT_STACKPANE = new UiGridSettings(0, 0, 0, 80, 20);
 	
 	// Resources 
+	// Not that getResourceByStream uses relative Package directory. 
+	// In this case, images has to be a sub package of utility for a runnable JAR to work
 	public static final String UI_IMAGE_PATH_OFFSET = "images/";
 	public static final String UI_IMAGE_HELP_PATH_OFFSET = "help/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";

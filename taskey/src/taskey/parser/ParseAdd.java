@@ -458,6 +458,12 @@ public class ParseAdd {
 						i += 2; 
 					}
 				}
+			} else if (word.compareTo("from") == 0) {
+				break; 
+			} else if (word.compareTo("on") == 0) {
+				break;
+			} else if (word.compareTo("by") == 0) {
+				break; 
 			} else {
 				stringRep += word + " "; 
 			}

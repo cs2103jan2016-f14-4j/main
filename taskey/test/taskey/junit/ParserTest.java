@@ -90,7 +90,7 @@ public class ParserTest {
 	public void testTag() {
 		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
 				parser.parseInput("add meeting #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: empty add\n",
+		assertEquals("Command: ERROR\nerror type: Cannot be an empty add\n",
 				parser.parseInput("add  ").toString());
 		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016\n"
 				+ "tags: sua, serious, \n",
@@ -129,7 +129,7 @@ public class ParserTest {
 				parser.parseInput("set meeting \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
 				parser.parseInput("set meeting [none]").toString());
-		assertEquals("Command: ERROR\nerror type: invalid input\n",
+		assertEquals("Command: ERROR\nerror type: Wrong format for new task name/date\n",
 				parser.parseInput("set meeting []").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, DEADLINE, "
 				+ "due on 17 Feb 2016\n",

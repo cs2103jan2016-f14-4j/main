@@ -53,7 +53,7 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	@Override
 	public int processDeleteKey() {
-		return myPagination.getSelection();
+		return myPagination.getSelection() + 1;
 	}
 	
 	@Override

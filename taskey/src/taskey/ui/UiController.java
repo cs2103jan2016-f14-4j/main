@@ -30,10 +30,9 @@ import taskey.logic.Task;
 import taskey.logic.LogicConstants.ListID;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiAnimationManager;
-import taskey.ui.utility.UiClockService;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 import taskey.logic.Logic;
@@ -84,7 +83,7 @@ public class UiController {
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
 		logic = new Logic();
-		
+		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
 		updateAll(logic.getAllTaskLists());
 	}
 
@@ -118,32 +117,26 @@ public class UiController {
 		registerButtonHandlers();
 	}
 
-	private void displayTabContents(ContentBox toContent) {
+	public void displayTabContents(ContentBox toContent) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(toContent.getValue());
 		currentContent = toContent;
 	}
 
-	private void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
+	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
 	}
 	
-	private void updateActionDisplay(ArrayList<Task> myTaskList, ActionListMode mode) {
+	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionMode mode) {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
-	private void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		assert(myCategoryList != null);
 		assert(categoryNums != null);
 		assert(categoryColors != null);
 		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums,categoryColors);
-	}
-
-	public void cleanUp() {
-		clockService.restart();
-		myContentManager.cleanUp();
-		UiPopupManager.getInstance().cleanUp();
 	}
 
 	/**
@@ -189,13 +182,13 @@ public class UiController {
 			case "VIEW":
 				String viewType = processed.getViewType();
 				if (viewType.equals("GENERAL")) {
-					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("DEADLINES")) {
-					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("EVENTS")) {
-					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("ARCHIVE")) {
-					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionListMode.TASKLIST);
+					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
 				}
 				displayTabContents(ContentBox.ACTION);
 				break;
@@ -227,6 +220,13 @@ public class UiController {
 				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
 		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
 	}
+	
+	public void cleanUp() {
+		clockService.restart();
+		myContentManager.cleanUp();
+		UiPopupManager.getInstance().cleanUp();
+	}
+	
 	/************************************ EVENT HANDLERS  *******************************************/
 	private void registerInputEventHandler() {
 		assert(input != null);
@@ -238,11 +238,14 @@ public class UiController {
 				}
 				if (event.getCode() == KeyCode.ENTER) {
 					String line = input.getText();
-					input.clear();
-					
-					handleFeedback(logic.executeCommand(getCurrentContent(),line));
-					event.consume();
-					myDropDown.closeMenu();
+					if ( line.isEmpty() == false ) {
+						input.clear();	
+						handleFeedback(logic.executeCommand(getCurrentContent(),line));
+						event.consume();
+						myDropDown.closeMenu();
+					} else {
+						myContentManager.processEnter(getCurrentContent());
+					}
 				}
 			}
 		});

@@ -59,12 +59,43 @@ public class ParseAdd {
 		//simpString: basically string without the command
 		String simpString = getTaskName(command, stringInput);  
 		
-		if (simpString.compareTo("") == 0) {
-			//empty add
+		if (isEmptyAdd(simpString)) {
 			processed = parseError.processError("empty add");
 			return processed;
 		}
 		
+		if(isOnlyNumbers(simpString)) {
+			processed = parseError.processError("task name cannot consist entirely of numbers");
+			return processed; 
+		} 
+		
+		//process as floating, event, deadline, or error 
+		processed = processNormally(command, processed, task, simpString);
+		
+		//if there's error, don't continue to process tags
+		if (processed.getCommand().compareTo("ERROR") == 0) {
+			return processed;
+		}
+		//process tags now: if there are tags, add it in.
+		if (simpString.split("#").length != 1) {
+			ArrayList<String> tags = getTagList(simpString); 
+			processed.getTask().setTaskTags(tags);
+		}
+		return processed; 
+	}
+	
+	/**
+	 * Processes the string normally as either a 
+	 * floating, deadline or event task.
+	 * If there is any formatting error, return error 
+	 * @param command
+	 * @param processed
+	 * @param task
+	 * @param simpString
+	 * @return
+	 */
+	private ProcessedObject processNormally(String command, 
+			ProcessedObject processed, Task task, String simpString) {
 		String[] splitString = simpString.split(" ");
 		boolean isSet = false; 
 		
@@ -105,17 +136,35 @@ public class ParseAdd {
 			//set as floating task 
 			processed = handleFloating(command, simpString);
 		}
-		
-		//if there's error, don't continue to process tags
-		if (processed.getCommand().compareTo("ERROR") == 0) {
-			return processed;
+		return processed;
+	}
+	
+	/**
+	 * If the task description is empty, it is considered an 
+	 * empty add. So, return true to indicate error. 
+	 * @param simpString
+	 * @return
+	 */
+	private boolean isEmptyAdd(String simpString) {
+		if (simpString.compareTo("") == 0) {
+			return true; 
 		}
-		//process tags now: if there are tags, add it in.
-		if (simpString.split("#").length != 1) {
-			ArrayList<String> tags = getTagList(simpString); 
-			processed.getTask().setTaskTags(tags);
-		}
-		return processed; 
+		return false; 
+	}
+	
+	/**
+	 * if taskname consists entirely of numbers, return true
+	 * to indicate error
+	 * @param simpString
+	 * @return
+	 */
+	private boolean isOnlyNumbers(String simpString) {
+		try {
+			int temp = Integer.parseInt(simpString); 
+			return true; 
+		} catch (Exception e) {
+			return false;
+		} 
 	}
 
 	/**

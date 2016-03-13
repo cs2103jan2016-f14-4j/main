@@ -70,9 +70,9 @@ public class TimeConverter {
 	 * @return String: human readable time 
 	 */
 	public String toHumanTime(long epochTime) {
-		String humanTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(
+		String humanTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm").format(
 				new java.util.Date(epochTime*1000));
-		
+
 		return humanTime; 
 	}
 	

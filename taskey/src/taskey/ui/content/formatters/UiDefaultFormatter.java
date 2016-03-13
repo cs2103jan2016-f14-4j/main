@@ -2,51 +2,30 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.util.Callback;
-import javafx.util.Pair;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
-import taskey.ui.utility.UiAnimationManager;
+import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiTextBuilder;
 
 public class UiDefaultFormatter extends UiFormatter {
 	private UiPagination myPagination;
-	private int entriesPerPage = 6;
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
 		disableScrollBar();
-		myPagination = new UiPagination();
+		myPagination = new UiPagination(UiConstants.STYLE_GRAY_BOX);
 		mainPane.setContent(myPagination.getPagination());
 		mainPane.setFitToHeight(true);
 	}
@@ -62,7 +41,11 @@ public class UiDefaultFormatter extends UiFormatter {
           }
         });	
 	}
-
+	@Override
+	public int processEnterKey() {
+		return 0;
+	}
+	
 	@Override
 	public void processArrowKey(KeyEvent event) {
 		myPagination.processArrowKey(event);
@@ -70,36 +53,31 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	@Override
 	public int processDeleteKey() {
-		return myPagination.processDeleteKey();
+		return myPagination.getSelection() + 1;
 	}
 	
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);	
-		clearOtherVariables();
+		myPagination.clear();
 		createPaginationGrids(myTaskList);
 	}
 
 	// This function creates the grids used by pagination
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
+		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
-			GridPane newGrid = setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
+			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			//newGrid.setGridLinesVisible(true);
-			
-			for (int k = 0; k < entriesPerPage; k++) {
-				RowConstraints row = new RowConstraints();
-				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
-				newGrid.getRowConstraints().add(row);
-			}
 			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {
 				if ( entryNo >= myTaskList.size() ) {
 					break;
 				}
-				StackPane entryPane = createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
+				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
 				pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
@@ -109,14 +87,9 @@ public class UiDefaultFormatter extends UiFormatter {
 			}
 			myPagination.addGridToPagination(newGrid,pageEntries);
 		}
-		myPagination.initialize(entriesPerPage,totalPages); // update UI and bind call back
+		myPagination.initialize(totalPages); // update UI and bind call back
 	}
 
-	@Override
-	public void clearOtherVariables() {
-		myPagination.clear();
-	}
-	
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myConfig = new UiTextBuilder();
@@ -124,8 +97,8 @@ public class UiDefaultFormatter extends UiFormatter {
 		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (id + 1);
 		element.getChildren().addAll(myConfig.build(line));
-		createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, theGrid);
-		addTextFlowToCell(0, row, element,TextAlignment.CENTER, theGrid);
+		gridHelper.createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, theGrid);
+		gridHelper.addTextFlowToCell(0, row, element,TextAlignment.CENTER, theGrid);
 	}
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
@@ -165,11 +138,11 @@ public class UiDefaultFormatter extends UiFormatter {
 			line += "None";
 		}
 		element.getChildren().addAll(myConfig.buildBySymbol(line));
-		addTextFlowToCell(1, row, element,TextAlignment.LEFT, newGrid);
+		gridHelper.addTextFlowToCell(1, row, element,TextAlignment.LEFT, newGrid);
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 
-		ImageView img = createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
+		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
 				30,30,newGrid);
 		img.setTranslateX(150);
 	}

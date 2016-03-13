@@ -58,7 +58,7 @@
          <children>
             <Label fx:id="dateLabel" text="WED: 2 MARCH" textAlignment="CENTER">
                <font>
-                  <Font name="Bauhaus 93" size="27.0" />
+                  <Font name="Montserrat" size="27.0" />
                </font>
             </Label>
          </children>
@@ -66,16 +66,16 @@
       <ScrollPane fx:id="categoryPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="14.0" layoutY="81.0" prefHeight="450.0" prefWidth="100.0" />
       <StackPane layoutX="15.0" layoutY="48.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="31.0" prefWidth="98.0">
          <children>
-            <Label text="Categories">
+            <Label fx:id="categoryLabel" text="Categories">
                <font>
-                  <Font name="Bauhaus 93" size="18.0" />
+                  <Font name="Montserrat" size="15.0" />
                </font>
             </Label>
          </children>
       </StackPane>
       <ImageView fx:id="crossButton" fitHeight="25.0" fitWidth="30.0" layoutX="697.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/crossDefault.png" />
+            <Image url="@utility/images/crossDefault.png" />
          </image></ImageView>
       <StackPane fx:id="dragBar" prefHeight="12.0" prefWidth="740.0" AnchorPane.bottomAnchor="558.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
    </children>

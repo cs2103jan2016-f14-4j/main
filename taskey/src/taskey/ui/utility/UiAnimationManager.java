@@ -17,7 +17,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Popup;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 
 /**
  * This class provides modified abstractions for some basic animations in javafx

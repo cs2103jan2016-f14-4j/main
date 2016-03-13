@@ -1,4 +1,4 @@
-package taskey.ui.utility;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,19 @@
 /* Switchable Text styles */
-/* Only for text objects under UiTextConfig */
+/* Mostly for text objects under UiTextConfig */
+/* For default objects like Labels etc, need to add StyleClass manually */
+@font-face {
+    font-family: Montserrat;
+    src: url('../fonts/Montserrat-Regular.ttf');
+}
+
+@font-face {
+    font-family: Montserrat-Bold;
+    src: url('../fonts/Montserrat-Bold.ttf');
+}
 .textAll {
-	-fx-font-size: 13px;
+	-fx-font-size: 14px;
+	-fx-font-family: 'Montserrat';
+	-fx-font-smoothing-type: gray;
 }
 .textRed {
 	-fx-fill: red;
@@ -10,7 +22,6 @@
 
 .textBlue { 
 	-fx-fill: blue;
-	-fx-font-weight: bold;
 }
 .textGreen { 
 	-fx-fill: green;
@@ -26,8 +37,7 @@
 }
 
 .textCategory { 
-	-fx-font-weight: bold;
-	-fx-font-size: 10px;
+	-fx-font-size: 9px;
 	-fx-fill: black;
 }
 
@@ -58,11 +68,11 @@
 .grayBox {
 	-fx-background-color: 
         radial-gradient(center 50% -50%, radius 200%, #AAAAAA 50%, #BBBBBB 50%);
-    -fx-padding: 3px;
+    -fx-padding: 1px;
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }
 
-.redBox {
+.redEllipse {
 	-fx-background-color: 
         radial-gradient(center 50% -50%, radius 200%, #ff3333 50%, #ff6666 50%);
     -fx-background-radius: 15px;

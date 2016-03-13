@@ -14,16 +14,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import taskey.logic.Task;	
+import taskey.logic.Task;
+import taskey.ui.UiClockService;
 import taskey.ui.UiConstants;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.utility.UiAnimationManager;
-import taskey.ui.utility.UiClockService;
-import taskey.ui.utility.UiGridSettings;
 
 /**
  * This class acts as the interface for all content display related operations
@@ -73,7 +72,7 @@ public class UiContentManager {
 	 * @param myTaskList - which is the list of tasks
 	 * @param mode - Content LIST, HELP
 	 */
-	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionListMode mode) {
+	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionMode mode) {
 		assert(myTaskList != null);
 		int arrayIndex = ContentBox.ACTION.getValue();
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
@@ -106,5 +105,11 @@ public class UiContentManager {
 		int arrayIndex = currentContent.getValue();
 		UiFormatter myFormatter = myFormatters.get(arrayIndex);
 		return myFormatter.processDeleteKey();
+	}
+
+	public void processEnter(ContentBox currentContent) {
+		int arrayIndex = currentContent.getValue();
+		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		myFormatter.processEnterKey();
 	}
 }

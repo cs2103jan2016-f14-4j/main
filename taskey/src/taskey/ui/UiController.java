@@ -53,6 +53,9 @@ public class UiController {
 	private ScrollPane categoryPane;
 	@FXML
 	private ImageView crossButton;
+	@FXML
+	private ImageView minusButton;
+	
 	private int mouseX, mouseY;
 	private Stage stage;
 	private Logic logic;
@@ -79,7 +82,6 @@ public class UiController {
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
 		logic = new Logic();
-		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
 		updateAll(logic.getAllTaskLists());
 	}
 
@@ -163,9 +165,12 @@ public class UiController {
 	}
 	
 	private void handleFeedback( LogicFeedback feedback ) {
+		assert(feedback != null);
 		Exception statusCode = feedback.getException();
-		//System.out.println(statusCode);
-		//UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+		if ( statusCode != null ) {
+			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+		}
+		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
 		updateAll(allLists);
 		ProcessedObject processed = feedback.getPo();
@@ -296,10 +301,9 @@ public class UiController {
 					event.consume();
 				} else if (event.getCode() == KeyCode.ESCAPE) {
 					System.exit(0);
-				} else if (event.getCode() == KeyCode.Q && event.isControlDown()) {
-					if (stage.isIconified() == false) {
-						stage.setIconified(true);
-					}
+				} else if (event.isControlDown() && event.getCode() == KeyCode.W){
+					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+					stage.close();
 				} else if (event.getCode() == KeyCode.BACK_QUOTE) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
 				}
@@ -327,12 +331,15 @@ public class UiController {
 	
 	private void registerButtonHandlers() {
 		assert(crossButton != null);
+		assert(minusButton != null);
+		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
+		minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+		
 		crossButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 				crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_SELECT));
 		  }
 		});
-		
 		crossButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 				// 1st level intersect
@@ -340,6 +347,21 @@ public class UiController {
 					System.exit(0);
 				} else {
 					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+				}
+			}
+		});
+		minusButton.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_SELECT));
+		  }
+		});
+		minusButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				if ( mouseEvent.getPickResult().getIntersectedNode() == minusButton) {
+					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+					stage.close();
+				} else {
+					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
 				}
 			}
 		});

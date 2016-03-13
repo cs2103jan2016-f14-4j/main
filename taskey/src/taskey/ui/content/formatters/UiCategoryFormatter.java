@@ -32,17 +32,17 @@ public class UiCategoryFormatter extends UiFormatter {
 
 	public void updateCategories(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		clearCurrentGridContents();
-		UiTextBuilder myConfig = new UiTextBuilder();
-		myConfig.addMarker(0,"textCategory");
+		UiTextBuilder myBuilder = new UiTextBuilder();
+		myBuilder.addMarker(0,"textCategory");
 		for ( int i = 0; i < categoryNames.size(); i ++ ) {
 			// add bullet
 			gridHelper.addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
 			
 			// add tag name
-			gridHelper.addTextFlowToCell(1,i,myConfig.build(categoryNames.get(i)),TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryNames.get(i)),TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
-			gridHelper.addTextFlowToCell(2,i,myConfig.build(""+ categoryNums.get(i)),TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryNums.get(i)),TextAlignment.CENTER,currentGrid);
 		}
 	}
 	

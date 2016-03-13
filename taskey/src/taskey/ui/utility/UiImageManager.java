@@ -32,6 +32,10 @@ public class UiImageManager {
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossDefault.png")));
 			myImageContainer.put(IMAGE_ID.CROSS_SELECT, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "crossSelect.png")));
+			myImageContainer.put(IMAGE_ID.MINUS_DEFAULT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusDefault.png")));
+			myImageContainer.put(IMAGE_ID.MINUS_SELECT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusSelect.png")));
 			myImageContainer.put(IMAGE_ID.INBOX, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
 			loadHelpMenuImages();

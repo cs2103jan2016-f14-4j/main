@@ -30,7 +30,8 @@ public class UiMain extends Application {
 
 	private UiController myController;
 	private Parent root = null;
-
+	private UiTrayModule trayModule;
+	
 	/**
 	 * This method loads the .fxml file and set ups the scene
 	 *
@@ -65,6 +66,8 @@ public class UiMain extends Application {
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
+		trayModule = new UiTrayModule(primaryStage);
+		
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();

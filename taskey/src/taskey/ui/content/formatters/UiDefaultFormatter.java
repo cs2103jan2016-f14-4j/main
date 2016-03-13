@@ -86,24 +86,24 @@ public class UiDefaultFormatter extends UiFormatter {
 
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
-		UiTextBuilder myConfig = new UiTextBuilder();
-		myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+		UiTextBuilder myBuilder = new UiTextBuilder();
+		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 		String line = "" + (id + 1);
 		gridHelper.createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, theGrid);
-		gridHelper.addTextFlowToCell(0, row, myConfig.build(line),TextAlignment.CENTER, theGrid);
+		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);
 	}
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
-		UiTextBuilder myConfig = new UiTextBuilder();
-		myConfig.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		UiTextBuilder myBuilder = new UiTextBuilder();
+		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
 		line += "$Name: "; 
 		line += theTask.getTaskName() + "\n";
 		switch ( theTask.getTaskType() ) {
 			case "EVENT": 
 				String [] timings = theTask.getEventTime();
-				myConfig.addMarkers(UiConstants.STYLE_TEXT_BLUE,
+				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE,
 						UiConstants.STYLE_TEXT_BLACK_TO_PURPLE, 
 						UiConstants.STYLE_TEXT_BLUE);
 				line += "Event from: $";
@@ -111,14 +111,14 @@ public class UiDefaultFormatter extends UiFormatter {
 				break;
 	 		case "DEADLINE":
 				line += "Due by: ";
-				myConfig.addMarkers(UiConstants.STYLE_TEXT_BLUE);			
+				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE);			
 				line += "$" + theTask.getDeadline();
 				break;
 			default:
 				break;
 		}
 		line += "\n";
-		myConfig.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		line += "$Tags: ";
 		if ( theTask.getTaskTags() != null ) {
 			ArrayList<String> tags = theTask.getTaskTags();
@@ -128,7 +128,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			line += "None";
 		}
-		gridHelper.addTextFlowToCell(1, row, myConfig.buildBySymbol(line),TextAlignment.LEFT, newGrid);
+		gridHelper.addTextFlowToCell(1, row, myBuilder.buildBySymbol(line),TextAlignment.LEFT, newGrid);
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 

@@ -88,11 +88,11 @@ public class UiHelpMenu {
 				if ( entryNo > 0 ) {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
-				UiTextBuilder myConfig = new UiTextBuilder();
-				myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+				UiTextBuilder myBuilder = new UiTextBuilder();
+				myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 				String line = info.get(entryNo);
 				gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
-				gridHelper.addTextFlowToCell(1, j, myConfig.build(line),TextAlignment.CENTER, newGrid);
+				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
 				entryNo++;
 			}
@@ -108,13 +108,11 @@ public class UiHelpMenu {
 		for ( int i = 0 ; i < totalPages; i++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP_MENU);
 			gridHelper.createImageInCell(0,0,UiImageManager.getInstance().getImage(images.get(i)),imageWidth,0,newGrid);
-			UiTextBuilder myConfig = new UiTextBuilder();
-			TextFlow element = new TextFlow();
-			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+			UiTextBuilder myBuilder = new UiTextBuilder();
+			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 			String line = info.get(i);
-			element.getChildren().addAll(myConfig.build(line));
 			gridHelper.createStyledCell(0, 1, UiConstants.STYLE_NUMBER_ICON, newGrid);
-			gridHelper.addTextFlowToCell(0, 1, element,TextAlignment.CENTER, newGrid);
+			gridHelper.addTextFlowToCell(0, 1, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 			menu.addGridToPagination(newGrid,new ArrayList<StackPane>()); // no interactions	
 		}
 		menu.initialize(totalPages); // update UI and bind call back

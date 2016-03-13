@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
@@ -17,7 +18,7 @@ import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionListMode;
+import taskey.ui.UiConstants.ActionMode;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -73,7 +74,7 @@ public class UiMain extends Application {
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		//testUI();
+		testUI();
 	}
 
 	/**
@@ -106,18 +107,10 @@ public class UiMain extends Application {
 			myTaskList.add(temp);
 		}
 		
-		//myController.updateDisplay(myTaskList, ContentBox.PENDING);
-		/*
+		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		myController.updateActionDisplay(myTaskList, ActionListMode.TASKLIST);
-	
-		ArrayList<String> myCategoryList = new ArrayList<String>(
-				Arrays.asList("All","General","Event","Deadlines","temptag","temptag2"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
-				Arrays.asList(1,22,3,14,0,6));
-		ArrayList<Color> categoryColors = new ArrayList<Color>(
-				Arrays.asList(Color.RED,Color.RED,Color.RED,Color.RED,Color.RED,Color.YELLOW));
-		myController.updateCategoryDisplay(myCategoryList, categoryNums, categoryColors);*/
+		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
+		myController.displayTabContents(ContentBox.ACTION);
 	}
 
 	/**

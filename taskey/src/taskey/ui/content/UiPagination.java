@@ -16,21 +16,20 @@ public class UiPagination {
 	private ArrayList<GridPane> myGrids;
 	private int currentPage;
 	private int currentSelection;
-	private int entriesPerPage;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
-	
+	private String selectionStyle;
 	public Pagination getPagination() {
 		return myPages;
 	}
-	public UiPagination() {
-		myPages = new Pagination(); // because there's no method to clear pages
+	public UiPagination(String _selectionStyle) {
+		selectionStyle = _selectionStyle;
+		myPages = new Pagination(); 
 		myGrids = new ArrayList<GridPane>();	
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
 		myPages.setVisible(false);
 	}
-	public void initialize( int _entriesPerPage, int totalPages ) {
+	public void initialize( int totalPages ) {
 		currentSelection = 0;
-		entriesPerPage = _entriesPerPage;
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);
 			myPages.setMaxPageIndicatorCount(1);
@@ -47,11 +46,20 @@ public class UiPagination {
         });
 		myPages.setVisible(true);
 	}
-	public int processDeleteKey() {
+	public int getSelection() { 
 		if ( totalEntries.size() == 0 ) {
 			return -1;
 		}
-		return currentPage*entriesPerPage + currentSelection + 1;
+		int currentIndex = 0; 
+		for ( int i = 0; i < totalEntries.size(); i++ ) {
+			if ( i != currentPage ) {
+				currentIndex += totalEntries.get(i).size();
+			} else {
+				currentIndex += currentSelection;
+				break;
+			}
+		}
+		return currentIndex;
 	}
 	public void processArrowKey(KeyEvent event) {
 		if ( totalEntries.size() == 0 ) {
@@ -73,6 +81,9 @@ public class UiPagination {
 			return;
 		}
 		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
+		if ( pageContent.size() == 0 ) { // division by 0
+			return;
+		}
 		selection %= pageContent.size();
 		if ( selection < 0 ) {
 			selection = pageContent.size()-1;
@@ -84,7 +95,7 @@ public class UiPagination {
 		}
 		currentSelection = selection;
 		myPane = (StackPane) pageContent.get(currentSelection);
-		myPane.getStyleClass().add(UiConstants.STYLE_GRAY_BOX);
+		myPane.getStyleClass().add(selectionStyle);
 	}
 
 	public void addGridToPagination(GridPane theGrid, ArrayList<StackPane> pageEntries) {

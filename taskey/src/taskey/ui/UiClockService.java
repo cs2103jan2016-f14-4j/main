@@ -9,10 +9,9 @@ import javafx.scene.control.Label;
 import javafx.util.Duration;
 
 /**
- * This class performs a background service, which updates the UI clock
- * 
- * @author JunWei
+ * This class performs a background service, which updates the UI clock.
  *
+ * @author JunWei
  */
 public class UiClockService extends ScheduledService<Void> {
 
@@ -57,17 +56,5 @@ public class UiClockService extends ScheduledService<Void> {
 		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? UiConstants.PM_SUFFIX : UiConstants.AM_SUFFIX); // AM or PM
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
-	}
-
-	public int getDayOfMonth() {
-		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-	}
-
-	public int getMonthOfYear() {
-		return Calendar.getInstance().get(Calendar.MONTH);
-	}
-
-	public int getYear() {
-		return Calendar.getInstance().get(Calendar.MONTH);
 	}
 }

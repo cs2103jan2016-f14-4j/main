@@ -2,34 +2,36 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
 import taskey.ui.UiConstants;
 
 /**
- * This class provides a way to configure different styles given a string
- * 
- * @author Junwei
+ * This class provides a way to configure different styles given a string as input.
+ * It builds an array of Text objects to be returned 
  *
+ * @author Junwei
  */
 public class UiTextBuilder {
-
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
-	private char symbol;
+	private char symbol; 
 	
 	public UiTextBuilder() {
 		initVariables();
 	}
+	
 	public UiTextBuilder(String ...styles) { // for quick styling (primarily for building by symbol
 		initVariables();
 		addMarkers(styles);
 	}
+	
 	public void initVariables() {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
 	}
+
 	public void setSymbol(char _symbol) {
 		symbol = _symbol;
 	}
@@ -49,7 +51,19 @@ public class UiTextBuilder {
 		styleMarkers.clear();
 	}
 	
-	public ArrayList<Text> build(String line) {
+	public TextFlow convertTextArray(ArrayList<Text> theText) {
+		TextFlow element = new TextFlow();
+		element.getChildren().addAll(theText);
+		return element;
+	}
+	/**
+	 * Builds the textFlow object based on the markers, which mark out certain segments of a text
+	 * so that styles can be switched then
+	 *
+	 * @param line - the line to process
+	 * @return -TextFlow object
+	 */
+	public TextFlow build(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		int currentStart = styleMarkers.get(0).getKey();
 		int currentEnd = 0;
@@ -78,17 +92,18 @@ public class UiTextBuilder {
 			myTexts.add(newText);
 			currentStart = currentEnd;
 		}
-		return myTexts;
+		return convertTextArray(myTexts);
 	}
 	
 	/**
 	 * Using a symbol like #, etc to build, reuse markers but not using indexes
-	 * Markers are ignored in a queue-like fashion for each symbol encountered
-	 * @param symbol - #, $ etc
+	 * Markers are ignored in a queue-like fashion for each symbol encountered.
+	 * This is very slow because it goes through each character
+	 *
 	 * @param line - line to build text objects from
-	 * @return
+	 * @return - the text flow object
 	 */
-	public ArrayList<Text> buildBySymbol(String line) {
+	public TextFlow buildBySymbol(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
 		String segment = "";
 		int styleIndex = 0;
@@ -110,6 +125,6 @@ public class UiTextBuilder {
 				segment = "";
 			}
 		}
-		return myTexts;
+		return convertTextArray(myTexts);
 	}
 }

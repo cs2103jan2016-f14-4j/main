@@ -2,25 +2,23 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.logging.Level;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
-import taskey.logic.Logic;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionMode;
 
-// TODO: Auto-generated Javadoc
 /**
  * This class is the main entry point for Taskey. 
  * It performs the main setups for the UI.
@@ -30,12 +28,10 @@ import taskey.ui.UiConstants.ActionMode;
 
 public class UiMain extends Application {
 
-	/** The my controller. */
 	private UiController myController;
-	
-	/** The root. */
 	private Parent root = null;
-
+	private UiTrayModule trayModule;
+	
 	/**
 	 * This method loads the .fxml file and set ups the scene
 	 *
@@ -55,10 +51,10 @@ public class UiMain extends Application {
 	}
 
 	/**
-	 * This method adds pre-defined style sheets to the scene, setups the nodes
-	 * in the scene and registers event handlers to them.
+	 * This method setups the main scene window, calls UiController to
+	 * set up nodes
 	 * 
-	 * @param primaryStage - The main stage from start
+	 * @param primaryStage - The main stage from start()
 	 * @param root which is obtained after loading the .fxml file
 	 *             
 	 */
@@ -70,11 +66,17 @@ public class UiMain extends Application {
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 		primaryStage.setScene(newScene);
 		primaryStage.setResizable(false);
+		trayModule = new UiTrayModule(primaryStage);
+		
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		//testUI();
+		
+		testUI();
+		
+		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
+		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
 	}
 
 	/**
@@ -85,12 +87,7 @@ public class UiMain extends Application {
 		myController.cleanUp();
 		UiImageManager.getInstance().cleanUp();
 	}
-
-	/**
-	 * The main method.
-	 *
-	 * @param args the arguments
-	 */
+	
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
 	}
@@ -111,36 +108,5 @@ public class UiMain extends Application {
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
 		myController.displayTabContents(ContentBox.ACTION);
-	}
-
-	/**
-	 * Do hash.
-	 *
-	 * @param line the line
-	 * @param offsest the offsest
-	 * @return the string
-	 */
-	public static String doHash(String line, int offsest) {
-		int encode = 7; // prime
-		String temp = line.replace("[^A-Za-z0-9]", ""); // replace non-alphanumeric
-		for (int i = 0; i < temp.length(); i++)
-			encode = encode * offsest + temp.charAt(i);
-		return String.valueOf(encode);
-	}
-
-	/**
-	 * Random input.
-	 *
-	 * @param line the line
-	 * @param maxItems the max items
-	 * @return the array list
-	 */
-	public static ArrayList<String> randomInput(String line, int maxItems) {
-		int test = (int) (Math.random() * maxItems) + 1;
-		ArrayList<String> tempList = new ArrayList<String>();
-		for (int i = 0; i < test; i++) {
-			tempList.add(doHash(line, 5 * (i + 1)));
-		}
-		return tempList;
 	}
 }

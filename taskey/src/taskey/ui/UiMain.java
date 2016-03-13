@@ -3,6 +3,10 @@ package taskey.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +17,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
 import taskey.logic.Task;
 import taskey.ui.UiConstants.ContentBox;
@@ -75,6 +81,9 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		testUI();
+		
+		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
+		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
 	}
 
 	/**
@@ -111,36 +120,5 @@ public class UiMain extends Application {
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
 		myController.displayTabContents(ContentBox.ACTION);
-	}
-
-	/**
-	 * Do hash.
-	 *
-	 * @param line the line
-	 * @param offsest the offsest
-	 * @return the string
-	 */
-	public static String doHash(String line, int offsest) {
-		int encode = 7; // prime
-		String temp = line.replace("[^A-Za-z0-9]", ""); // replace non-alphanumeric
-		for (int i = 0; i < temp.length(); i++)
-			encode = encode * offsest + temp.charAt(i);
-		return String.valueOf(encode);
-	}
-
-	/**
-	 * Random input.
-	 *
-	 * @param line the line
-	 * @param maxItems the max items
-	 * @return the array list
-	 */
-	public static ArrayList<String> randomInput(String line, int maxItems) {
-		int test = (int) (Math.random() * maxItems) + 1;
-		ArrayList<String> tempList = new ArrayList<String>();
-		for (int i = 0; i < test; i++) {
-			tempList.add(doHash(line, 5 * (i + 1)));
-		}
-		return tempList;
 	}
 }

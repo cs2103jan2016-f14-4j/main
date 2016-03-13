@@ -58,16 +58,4 @@ public class UiClockService extends ScheduledService<Void> {
 		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
 		return myTime;
 	}
-
-	public int getDayOfMonth() {
-		return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-	}
-
-	public int getMonthOfYear() {
-		return Calendar.getInstance().get(Calendar.MONTH);
-	}
-
-	public int getYear() {
-		return Calendar.getInstance().get(Calendar.MONTH);
-	}
 }

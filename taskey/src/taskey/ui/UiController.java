@@ -233,7 +233,7 @@ public class UiController {
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
 				if ( event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
-					myDropDown.updateMenuItems(UiMain.randomInput("TEST" + Math.random(), 4));
+					myDropDown.updateMenuItems(new ArrayList<String>(Arrays.asList("PLACEHOLDER" + Math.random(),"PLACEHOLDER" + Math.random())));
 					myDropDown.updateMenu();
 				}
 				if (event.getCode() == KeyCode.ENTER) {

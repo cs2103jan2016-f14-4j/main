@@ -1,12 +1,9 @@
 package taskey.ui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -23,28 +20,24 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
-import taskey.logic.Task;
-import taskey.logic.LogicConstants.ListID;
-import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.IMAGE_ID;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.content.UiContentManager;
-import taskey.ui.utility.UiAnimationManager;
-import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiPopupManager;
 import taskey.logic.Logic;
+import taskey.logic.LogicConstants.ListID;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
+import taskey.logic.Task;
+import taskey.ui.UiConstants.ActionMode;
+import taskey.ui.UiConstants.ContentBox;
+import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.ui.content.UiContentManager;
+import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiPopupManager;
 
 /**
- * This class is the main class that handles all of the Ui nodes The
- * UiController interfaces with all the major components
- * 
- * @author JunWei
+ * This class is the main class that handles all of the Ui nodes. 
+ * UiController is the only interface between Ui and Logic
  *
+ * @author JunWei
  */
 public class UiController {
 
@@ -60,18 +53,21 @@ public class UiController {
 	private ScrollPane categoryPane;
 	@FXML
 	private ImageView crossButton;
-	
 	private int mouseX, mouseY;
 	private Stage stage;
-	
 	private Logic logic;
-	
 	private UiClockService clockService;
 	private UiDropDown myDropDown;
 	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
 	
+	/**
+	 * Sets the up nodes.
+	 *
+	 * @param primaryStage the primary stage
+	 * @param root the root
+	 */
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		assert(primaryStage != null);
 		assert(root != null);
@@ -87,7 +83,10 @@ public class UiController {
 		updateAll(logic.getAllTaskLists());
 	}
 
-	// nodes or classes that need layout bounds are initialized here
+	/**
+	 * Sets up nodes which need bounds.
+	 * nodes or classes that need layout bounds are initialized here
+	 */
 	public void setUpNodesWhichNeedBounds() {
 		assert(myDropDown != null);
 		myDropDown.createMenu(stage, input);
@@ -109,7 +108,7 @@ public class UiController {
 		input.requestFocus();
 		displayTabContents(ContentBox.THIS_WEEK);
 	}
-
+	
 	private void registerEventHandlersToNodes(Parent root) {
 		registerInputEventHandler();
 		registerRootEventHandler(root);
@@ -122,7 +121,6 @@ public class UiController {
 		selectionModel.select(toContent.getValue());
 		currentContent = toContent;
 	}
-
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
@@ -132,20 +130,21 @@ public class UiController {
 		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
-	public void updateCategoryDisplay(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		assert(myCategoryList != null);
+
+	public void updateCategoryDisplay(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		assert(categoryNames != null);
 		assert(categoryNums != null);
 		assert(categoryColors != null);
-		myContentManager.updateCategoryContentBox(myCategoryList,categoryNums,categoryColors);
+		myContentManager.updateCategoryContentBox(categoryNames,categoryNums,categoryColors);
 	}
 
 	/**
-	 * Sets scene style sheets, input is assumed to be checked before calling
-	 * this method
-	 * 
+	 * Sets scene style sheets, input is assumed to be valid before calling
+	 * this method, if input is invalid, throws an exception
+	 *
 	 * @param styleSheets - style sheets to use for the display as an Array List
 	 */
-	void setStyleSheets(ArrayList<String> styleSheets) {
+	public void setStyleSheets(ArrayList<String> styleSheets) {
 		assert(styleSheets != null);
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
 		myStyleSheets.clear();
@@ -162,6 +161,7 @@ public class UiController {
 		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
 		return currentContent;
 	}
+	
 	private void handleFeedback( LogicFeedback feedback ) {
 		Exception statusCode = feedback.getException();
 		//System.out.println(statusCode);
@@ -227,7 +227,9 @@ public class UiController {
 		UiPopupManager.getInstance().cleanUp();
 	}
 	
-	/************************************ EVENT HANDLERS  *******************************************/
+	/**
+	 * ********************************** EVENT HANDLERS  ******************************************.
+	 */
 	private void registerInputEventHandler() {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
@@ -280,8 +282,8 @@ public class UiController {
 	 * This method is for key inputs anywhere in main window, NOTE THIS HAS
 	 * ISSUES, not sure if scene root gets different intervals for updates and
 	 * displays Therefore anything that requires a small or instant display
-	 * tweak don't put here
-	 * 
+	 * tweak don't put here.
+	 *
 	 * @param root - root object of scene
 	 */
 	private void registerRootEventHandler(Parent root) {

@@ -15,23 +15,30 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.ui.UiConstants;
 
+/**
+ * This class contains methods to manipulate a GridPane,
+ * It is used by all the UiFormatter objects
+ * 
+ * @author junwei
+ */
 public class UiGridHelper {
-	private String defaultWrapperStyle; // per cell if getWrapper does not exist
+	
+	private String defaultWrapperStyle; // use the style the StackPane in a cell on creation if it does not exist
 	
 	public UiGridHelper(String wrapperStyle) {
 		defaultWrapperStyle = wrapperStyle;
 	}
-	// All helper methods for manipulating a GridPane below
+
 	/**
 	 * This sets up the grid using predefined GridSettings which only set for column constraints
-	 * Row constraints have to be set manually
+	 * Row constraints have to be set manually.
+	 *
 	 * @param settings - the UiGridSettings
-	 * @return
+	 * @return - the grid pane
 	 */
 	public GridPane setUpGrid(UiGridSettings settings) {
 		assert(settings != null);
 		GridPane gridPane = new GridPane();
-		//gridPane.setGridLinesVisible(true);
 		gridPane.setPadding(settings.getPaddings());
 		gridPane.setHgap(settings.getHGap());
 		gridPane.setVgap(settings.getVGap());
@@ -44,6 +51,7 @@ public class UiGridHelper {
 		return gridPane;
 	}
 	
+
 	public StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane styledCell = new StackPane();
@@ -52,6 +60,15 @@ public class UiGridHelper {
 		return styledCell;
 	}
 	
+	/**
+	 * Gets the wrapper at cell. Note that the wrapper is a StackPane object which will be auto created 
+	 * by createStyledCell if it does not exist
+	 *
+	 * @param col - the col
+	 * @param row - the row
+	 * @param gridPane - the grid pane
+	 * @return - the wrapper at cell
+	 */
 	public StackPane getWrapperAtCell(int col, int row, GridPane gridPane ) {
 		assert(gridPane != null);
 		Node theNode = null;
@@ -72,6 +89,7 @@ public class UiGridHelper {
 		}
 		return (StackPane)theNode;
 	}
+	
 	public void addTextFlowToCell(int col, int row, TextFlow textFlow, TextAlignment align, GridPane gridPane ) {
 		assert(gridPane != null);
 		assert(textFlow != null);
@@ -79,12 +97,13 @@ public class UiGridHelper {
 		cellWrapper.getChildren().add(textFlow);
 		textFlow.setTextAlignment(align);	
 	}
+	
 	public void addCircleToCell(int col, int row, Circle circle, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
 		cellWrapper.getChildren().add(circle);
 	}
-	
+
 	public ImageView createImageInCell( int col, int row, Image img, int width, int height, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane imageWrapper = getWrapperAtCell(col,row,gridPane);
@@ -106,8 +125,15 @@ public class UiGridHelper {
 		return myLabel;
 	}		
 	
-	// Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
-	// formatters, methods for the single wrapper can still be used, but switch the parents
+	/**
+	 * Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
+	 * formatters, methods for the single wrapper can still be used, but switch the parents
+	 * @param col - the col
+	 * @param row - the row
+	 * @param paneStyle - the pane style
+	 * @param gridPane - the grid pane
+	 * @return - the stack pane
+	 */ 
 	public StackPane createStackPaneInCell( int col, int row, String paneStyle, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);

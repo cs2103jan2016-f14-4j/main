@@ -2,31 +2,23 @@ package taskey.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.Constants;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.logic.Logic;
 import taskey.logic.Task;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.UiConstants.ActionMode;
 
-// TODO: Auto-generated Javadoc
 /**
  * This class is the main entry point for Taskey. 
  * It performs the main setups for the UI.
@@ -36,10 +28,7 @@ import taskey.ui.UiConstants.ActionMode;
 
 public class UiMain extends Application {
 
-	/** The my controller. */
 	private UiController myController;
-	
-	/** The root. */
 	private Parent root = null;
 
 	/**
@@ -61,10 +50,10 @@ public class UiMain extends Application {
 	}
 
 	/**
-	 * This method adds pre-defined style sheets to the scene, setups the nodes
-	 * in the scene and registers event handlers to them.
+	 * This method setups the main scene window, calls UiController to
+	 * set up nodes
 	 * 
-	 * @param primaryStage - The main stage from start
+	 * @param primaryStage - The main stage from start()
 	 * @param root which is obtained after loading the .fxml file
 	 *             
 	 */
@@ -95,12 +84,7 @@ public class UiMain extends Application {
 		myController.cleanUp();
 		UiImageManager.getInstance().cleanUp();
 	}
-
-	/**
-	 * The main method.
-	 *
-	 * @param args the arguments
-	 */
+	
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
 	}

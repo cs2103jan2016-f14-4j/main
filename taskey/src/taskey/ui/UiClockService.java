@@ -9,10 +9,9 @@ import javafx.scene.control.Label;
 import javafx.util.Duration;
 
 /**
- * This class performs a background service, which updates the UI clock
- * 
- * @author JunWei
+ * This class performs a background service, which updates the UI clock.
  *
+ * @author JunWei
  */
 public class UiClockService extends ScheduledService<Void> {
 

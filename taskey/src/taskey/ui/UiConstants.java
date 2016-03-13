@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.scene.text.Font;
 import taskey.ui.content.UiGridSettings;
 
 /**
@@ -54,6 +53,7 @@ public class UiConstants {
 		}
 	}
 	
+	// Images
 	public enum IMAGE_ID {
 		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, INBOX,
 		ADD_FLOAT, ADD_DEADLINE, ADD_DEADLINE_DATE, ADD_EVENT, ADD_LAST,
@@ -76,7 +76,6 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 25, 0, 20, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT_STACKPANE = new UiGridSettings(0, 0, 0, 80, 20);
 	
 	// Resources 
 	// Not that getResourceByStream uses relative Package directory. 
@@ -85,7 +84,7 @@ public class UiConstants {
 	public static final String UI_IMAGE_HELP_PATH_OFFSET = "help/";
 	public static final String UI_CSS_PATH_OFFSET = "css/";
 	
-	// Use of TextFlow for text, setting style of textflow only affects the container
+	// Use of TextFlow for text, setting style of TextFlow only affects the container
 	// every Text node has to have its own style (with other options besides Color)
 	public static final String STYLE_TEXT_ALL = "textAll";
 	public static final String STYLE_TEXT_RED = "textRed";
@@ -107,15 +106,9 @@ public class UiConstants {
 			Arrays.asList("sharedStyles.css", "lightStyle.css", "lightTab.css" ));
 	
 	// Others
-	public static final int CHAR_LIMIT_WEEKLIST = 10;
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
-
 	public static final int ClOCK_UPDATE_INTERVAL = 1000; // in milliseconds
 	public static final String PM_SUFFIX = "PM";
 	public static final String AM_SUFFIX = "AM";
-
-	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation
-
-	
-	
+	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation (mostly for feedback pop up)
 }

@@ -9,8 +9,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
-import taskey.ui.UiConstants;
 
+/**
+ * This class is used to provide pagination support with extensions.
+ * Such as selecting of elements
+ * 
+ * @author junwei
+ */
 public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;
@@ -18,9 +23,11 @@ public class UiPagination {
 	private int currentSelection;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	private String selectionStyle;
+	
 	public Pagination getPagination() {
 		return myPages;
 	}
+	
 	public UiPagination(String _selectionStyle) {
 		selectionStyle = _selectionStyle;
 		myPages = new Pagination(); 
@@ -28,6 +35,12 @@ public class UiPagination {
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
 		myPages.setVisible(false);
 	}
+	
+	/**
+	 * Initialize, sets the display for Pagination with totalPages.
+	 * Then binds the method for create pages
+	 * @param totalPages - the total pages
+	 */
 	public void initialize( int totalPages ) {
 		currentSelection = 0;
 		if ( totalPages == 0 ) {// for formatting
@@ -46,6 +59,7 @@ public class UiPagination {
         });
 		myPages.setVisible(true);
 	}
+	
 	public int getSelection() { 
 		if ( totalEntries.size() == 0 ) {
 			return -1;
@@ -61,6 +75,13 @@ public class UiPagination {
 		}
 		return currentIndex;
 	}
+	
+	/**
+	 * Process arrow key, for the selection to be handled
+	 * Needs to be called by the UiFormatters in order to interact with the page
+	 *
+	 * @param - event the event
+	 */
 	public void processArrowKey(KeyEvent event) {
 		if ( totalEntries.size() == 0 ) {
 			return;
@@ -98,12 +119,24 @@ public class UiPagination {
 		myPane.getStyleClass().add(selectionStyle);
 	}
 
+	/**
+	 * Adds the grid to pagination, and provides an arraylist of stackpanes
+	 * Which will be handled by UiPagination to do selection
+	 *
+	 * @param theGrid - the grid
+	 * @param pageEntries - the page entries
+	 */
 	public void addGridToPagination(GridPane theGrid, ArrayList<StackPane> pageEntries) {
 		totalEntries.add(pageEntries);
 		myGrids.add(theGrid);	
 	}
 	
-	// Note this methods creates the whole page by default, therefore we modify it
+	/**
+	 * Creates the page.
+	 * Note this method creates the whole page by default, therefore we keep an arraylist of grids instead
+	 * @param pageIndex the page index
+	 * @return the grid pane
+	 */
 	private GridPane createPage(int pageIndex) {
 		if ( pageIndex >= myGrids.size() ) {
 			return null; // grid has not been initialized

@@ -64,6 +64,8 @@ public class UiController {
 	private int mouseX, mouseY;
 	private Stage stage;
 	
+	private Logic logic;
+	
 	private UiClockService clockService;
 	private UiDropDown myDropDown;
 	private UiContentManager myContentManager;
@@ -80,8 +82,9 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
+		logic = new Logic();
 		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
-		updateAll(Logic.getInstance().getAllTaskLists());
+		updateAll(logic.getAllTaskLists());
 	}
 
 	// nodes or classes that need layout bounds are initialized here
@@ -237,7 +240,7 @@ public class UiController {
 					String line = input.getText();
 					if ( line.isEmpty() == false ) {
 						input.clear();	
-						handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),line));
+						handleFeedback(logic.executeCommand(getCurrentContent(),line));
 						event.consume();
 						myDropDown.closeMenu();
 					} else {
@@ -265,7 +268,7 @@ public class UiController {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
 	        			  int id = myContentManager.processDelete(getCurrentContent()); 
 	        			  if ( id != -1 ) {
-	        				  handleFeedback(Logic.getInstance().executeCommand(getCurrentContent(),"del " + id));
+	        				  handleFeedback(logic.executeCommand(getCurrentContent(),"del " + id));
 	        			  }
 	        		  }
 	        	  }

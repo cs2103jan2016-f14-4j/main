@@ -13,33 +13,33 @@ import taskey.logic.Task;
  */
 @SuppressWarnings("serial")
 public class StorageException extends IOException {
-	private ArrayList<Task> lastModified_Tasklist;
+	ArrayList<ArrayList<Task>> lastModifiedSuperlist;
 
-	public StorageException(ArrayList<Task> lastModifiedTasklist) {
+	public StorageException(ArrayList<ArrayList<Task>> superlist) {
 		super();
-		lastModified_Tasklist = lastModifiedTasklist;
+		lastModifiedSuperlist = superlist;
 	}
 
-	public StorageException(String message, ArrayList<Task> lastModifiedTasklist) {
+	public StorageException(String message, ArrayList<ArrayList<Task>> superlist) {
 		super(message);
-		lastModified_Tasklist = lastModifiedTasklist;
+		lastModifiedSuperlist = superlist;
 	}
 
-	public StorageException(Throwable cause, ArrayList<Task> lastModifiedTasklist) {
+	public StorageException(Throwable cause, ArrayList<ArrayList<Task>> superlist) {
 		super(cause);
-		lastModified_Tasklist = lastModifiedTasklist;
+		lastModifiedSuperlist = superlist;
 	}
 
-	public StorageException(String message, Throwable cause, ArrayList<Task> lastModifiedTasklist) {
+	public StorageException(String message, Throwable cause, ArrayList<ArrayList<Task>> superlist) {
 		super(message, cause);
-		lastModified_Tasklist = lastModifiedTasklist;
+		lastModifiedSuperlist = superlist;
 	}
 
 	/**
-	 * Returns the last task list that was successfully saved by Storage.
-	 * @return the last modified tasklist
+	 * Returns the list of tasklists that were last successfully saved by Storage.
+	 * @return the last modified superlist
 	 */
-	public ArrayList<Task> getLastModifiedTasklist() {
-		return lastModified_Tasklist;
+	public ArrayList<ArrayList<Task>> getLastModifiedTasklists() {
+		return lastModifiedSuperlist;
 	}
 }

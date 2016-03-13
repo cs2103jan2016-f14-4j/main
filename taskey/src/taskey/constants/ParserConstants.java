@@ -23,6 +23,7 @@ public class ParserConstants {
 	
 	/*Date Handling Constants*/
 	public static final String DAY_END = "23:59:59"; 
+	public static final String DAY_END_SHORT = "23:59"; 
 	
 	public static final long ONE_DAY = 86400; 
 	public static final long TWO_DAYS = 2*ONE_DAY; 

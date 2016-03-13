@@ -74,7 +74,7 @@ public class UiMain extends Application {
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		testUI();
+		//testUI();
 	}
 
 	/**

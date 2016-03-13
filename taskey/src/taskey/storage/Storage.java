@@ -7,27 +7,28 @@ import java.util.HashMap;
 import taskey.logic.Task;
 
 /**
+ * This is a facade class.
  * @author Dylan
  */
 public class Storage {
-	private static Storage instance; //DONT USE
+	private static Storage instance; //DEPRECATED - DO NOT USE
 	private StorageLoader loader;
 	private StorageSaver saver;
 	private History history;
 	private File directory;
+
 	private static final String DEFAULT_DIRECTORY = "Taskey savefiles";
-	public static class Constants {
-		public static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
-		public static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
-	};
+	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
+	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 
 	public enum TasklistEnum {
-	    PENDING		("PENDING.taskey", 0),
-	    EXPIRED		("EXPIRED.taskey", 1),
-	    GENERAL		("GENERAL.taskey", 2),
-	    DEADLINE	("DEADLINE.taskey", 3),
-	    EVENT		("EVENT.taskey", 4),
-	    COMPLETED	("COMPLETED.taskey", 5);
+		// Index 0 is to  be ignored
+	    PENDING		("PENDING.taskey", 1),
+	    EXPIRED		("EXPIRED.taskey", 2),
+	    GENERAL		("GENERAL.taskey", 3),
+	    DEADLINE	("DEADLINE.taskey", 4),
+	    EVENT		("EVENT.taskey", 5),
+	    COMPLETED	("COMPLETED.taskey", 6);
 
 	    private final String filename;
 	    private final int index;
@@ -43,7 +44,7 @@ public class Storage {
 	    public int index() {
 	    	return index;
 	    }
-	};
+	}
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
@@ -66,23 +67,20 @@ public class Storage {
 		HashMap<String, Integer> loadedTags = storage.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 
-
 		// Load after save - tasklist
 		System.out.println("\n\nLoad after save ===================================");
+		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
+		ArrayList<Task> ignoredList = new ArrayList<Task>();
 		ArrayList<Task> pendingList = new ArrayList<Task>();
 		pendingList.add(new Task("1. This is a test task"));
 		pendingList.add(new Task("2. This is a test task"));
 		pendingList.add(new Task("3. This is a test task"));
-		ArrayList<Task> expiredList = new ArrayList<Task>();
-		expiredList.add(new Task("a. This is a test task"));
-		expiredList.add(new Task("b. This is a test task"));
-		expiredList.add(new Task("c. This is a test task"));
-		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
-		superlist.add(pendingList); superlist.add(expiredList);
+		superlist.add(ignoredList);
+		superlist.add(pendingList);
 		try {
 			storage.saveAllTasklists(superlist);
 		} catch (StorageException e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			print(e.getLastModifiedTasklists());
 		}
 		loadedLists = storage.loadAllTasklists();
@@ -116,8 +114,9 @@ public class Storage {
     		loader = new StorageLoader();
     		saver = new StorageSaver();
     		history = History.getInstance();
+    		directory = loader.loadDirectory(FILENAME_CONFIG);
 
-    		if ((directory = loader.loadDirectory()) == null) {
+    		if (directory == null) {
         		System.out.println("{Setting default directory}"); //log info
         		this.setDirectory(DEFAULT_DIRECTORY);
     		} else {
@@ -127,7 +126,8 @@ public class Storage {
     }
 
 	/**
-	 * DO NOT USE THIS ANY MORE. THIS IS HERE IN CASE PARSER STLL CALLS THIS.
+	 * DEPRECATED -- DO NOT USE.
+	 * This is here in case Parser needs to call Storage directly to save the user tags database.
 	 * @return The Storage singleton.
 	 */
     public static Storage getInstance() {
@@ -137,7 +137,7 @@ public class Storage {
     		instance.saver = new StorageSaver();
     		instance.history = History.getInstance();
 
-    		if ((instance.directory = instance.loader.loadDirectory()) == null) {
+    		if ((instance.directory = instance.loader.loadDirectory(FILENAME_CONFIG)) == null) {
         		System.out.println("{Setting default directory}"); //log info
         		instance.setDirectory(DEFAULT_DIRECTORY);
     		} else {
@@ -151,63 +151,71 @@ public class Storage {
     /*======================*
      * Load/Save task lists *
      *======================*/
-	/**
-	 * Returns the superlist of tasks.
+
+    /**
+	 * Returns the superlist of tasklists.
 	 * Logic calls this on program startup.
-	 * Post-cond: the lists in superlist are in the same order as in the enum TasklistEnum.
+	 * Post-cond: the lists in superlist are in the same order as the enum constants in TasklistEnum.
 	 *            These lists are read from disk and hence do not include the THIS_WEEK list.
-	 * @return the arraylist of arraylists of tasks
+	 * @return the list of tasklists
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
 		for (TasklistEnum e : TasklistEnum.values()) {
-			File file = new File(directory, e.filename());
-			ArrayList<Task> tasklist = loader.loadTasklist(file);
-			superlist.add(tasklist);
+			File src = new File(directory, e.filename());
+			ArrayList<Task> loadedList = loader.loadTasklist(src);
+			superlist.add(loadedList);
 		}
-		
+
 		return superlist;
 	}
 
 	/**
-	 * Saves the superlist of tasks.
-	 * Pre-cond: Starting from index 1, the lists in superlist are in the same order as in the enum 
-	 *           TasklistEnum. Index 0 is reserved for THIS_WEEK list and is not saved to disk because
-	 *           it is time dependent.
-	 *           
-	 * @param superlist
+	 * Saves the superlist of tasklists to disk.
+	 * Pre-cond: Starting from index 1, the lists in superlist are in the same order as the enum constants in TasklistEnum.
+	 * 			 Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
+	 * @param superlist the taskLists field passed directly from Logic
 	 * @throws StorageException
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == 7);
-		
+		assert (superlist.size() == 7); //TODO assert(false) doesn't work
+
 		for (TasklistEnum e : TasklistEnum.values()) {
-			if (e.index() >= superlist.size() - 1) { //check for when testing in main method
+			if (e.index() >= superlist.size()) { //check for when testing in main method
 				break;
 			}
-			ArrayList<Task> tasklist = superlist.get(e.index() + 1);
-			File file = new File(directory, e.filename());
-			saver.saveTasklist(tasklist, file);
+			ArrayList<Task> listToSave = superlist.get(e.index());
+			File dest = new File(directory, e.filename());
+			saver.saveTasklist(listToSave, dest);
 		}
-		
-		history.add(superlist); //Only if all the lists were successfully saved
+
+		history.add(superlist); //only if all the lists were successfully saved
 	}
 
     /*================*
      * Save/load tags *
      *================*/
 
+	/**
+     * Returns the HashMap containing the user-defined tags read from file.
+     * An empty HashMap is returned if the tags file was not found.
+     * @return the HashMap read from file, or an empty HashMap if the file was not found.
+     */
     public HashMap<String, Integer> loadTags() {
-    	File file = new File(directory, Constants.FILENAME_TAGS);
-    	return loader.loadTags(file);
+    	File src = new File(directory, FILENAME_TAGS);
+    	return loader.loadTags(src);
     }
 
+    /**
+     * Saves the given HashMap containing user-defined tags to JSON file.
+     * @param tags HashMap that maps the tag strings to their corresponding multiplicities
+     * @return true if successful; false otherwise.
+     */
     public boolean saveTags(HashMap<String, Integer> tags) {
-    	File file = new File(directory, Constants.FILENAME_TAGS);
-    	return saver.saveTags(tags, file);
+    	File dest = new File(directory, FILENAME_TAGS);
+    	return saver.saveTags(tags, dest);
     }
-
 
     /*=====================*
      * Get/set directories *
@@ -240,7 +248,7 @@ public class Storage {
 			directory = dir;
 			System.out.println("{Storage directory set} " + getDirectory()); //debug info
 			if (shouldSave) {
-	    		saver.saveDirectory(directory);
+	    		saver.saveDirectory(directory, FILENAME_CONFIG);
 	    	}
 			return true;
 		} else {

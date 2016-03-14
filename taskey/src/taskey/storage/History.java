@@ -2,13 +2,14 @@ package taskey.storage;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import taskey.logic.Task;
 
 /**
- * This class is to allow Storage to easily retrieve the last successfully saved tasklist from memory
+ * This class is to allow Storage to easily retrieve the last successfully saved tasklist/tagmap from memory
  * so that Storage can throw it to Logic when an error is encountered during saving.
- * This will in turn allow Logic to easily undo the last operation so that its data remains in sync with Storage.
+ * This will in turn allow Logic to undo the last operation so that its data remains in sync with Storage.
  *
  * For now, this class is only meant to be used by Storage for the above purpose.
  * But, in the future, if more methods are added to this class, Logic could also use this for the undo command.
@@ -17,11 +18,13 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
-	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;
+	private ArrayDeque<ArrayList<ArrayList<Task>>> taskStack; //tasklist history
+	private ArrayDeque<HashMap<String, Integer>> tagStack; //tagmap history
 	private static History instance;
 
 	public History() {
-		stack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
+		taskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
+		tagStack = new ArrayDeque<HashMap<String, Integer>>();
 	}
 
 	/**
@@ -35,59 +38,66 @@ public class History {
 		return instance;
 	}
 
+
+	/*========*
+	 * Adders *
+	 *========*/
 	/**
-	 * Adds a superlist to History.
-	 * @param superlist
+	 * Pushes a superlist to History.
+	 * @param superlist to be added
 	 */
 	public void add(ArrayList<ArrayList<Task>> superlist) {
-		stack.push(superlist);
+		taskStack.push(superlist);
 	}
 
 	/**
-	 * Pops the last saved superlist from History.
-	 * @return
+	 * Pushes a tagmap to History.
+	 * @param tagmap to be added
 	 */
-	public ArrayList<ArrayList<Task>> pop() {
-		return stack.pop();
+	public void add(HashMap<String, Integer> tagmap) {
+		tagStack.push(tagmap);
 	}
-	
+
+
+	/*=========*
+	 * Getters *
+	 *=========*/
 	/**
-	 * Gets the last saved superlist from History.
-	 * @return
+	 * Peeks at the last added superlist in History.
+	 * @return the last added superlist to History
 	 */
-	public ArrayList<ArrayList<Task>> peek() {
-		return stack.peek();
-	}
-
-
-	// Old implementation - ignore
-	//private HashMap<TasklistEnum, ArrayList<Task>> lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();
-	/**
-	 * Sets History to map the category specified by filename to tasklist.
-	 * If the filename does not correspond to any type (is INVALID),
-	 * the tasklist will not be added to History.
-	 * Storage will invoke this method for every call to saveTaskList,
-	 * so Logic should not need to use this.
-	 * @param filename category of the tasklist to be saved
-	 * @param tasklist ArrayList of tasks to be saved
-
-	public void set(TasklistEnum tasklistType, ArrayList<Task> tasklist) {
-		lastSavedTasklists.put(tasklistType, tasklist);
+	public ArrayList<ArrayList<Task>> getLastSuperlist() {
+		return taskStack.peek();
 	}
 
 	/**
-	 * Gets the last-saved tasklist specified by filename.
-	 * An empty ArrayList is returned if the tasklist specified by filename
-	 * has not been added to History yet,
-	 * or if the tasklist category specified by filename is invalid.
-	 * @param filename category of the last-saved tasklist
-	 * @return the last-saved tasklist specified by filename
+	 * Peeks at the last added tagmap in History.
+	 * @return the last added tagmap to History
+	 */
+	public HashMap<String, Integer> getLastTagmap() {
+		return tagStack.peek();
+	}
 
-	public ArrayList<Task> get(TasklistEnum tasklistType) {
-		ArrayList<Task> ret = lastSavedTasklists.get(tasklistType);
-		if (ret == null) {
-			ret = new ArrayList<Task>();
-		}
-		return ret;
-	} */
+
+	/*==========*
+	 * For undo *
+	 *==========*/
+	/**
+	 * Pop the last added superlist from History.
+	 * Used for undo.
+	 * @return the removed superlist
+	 */
+	public ArrayList<ArrayList<Task>> popSuperlist() {
+		return taskStack.pop();
+	}
+
+	/**
+	 * Pop the last added tagmap from History.
+	 * Used for undo.
+	 * @return the removed tagmap
+	 */
+	public HashMap<String, Integer> popTagmap() {
+		return tagStack.pop();
+	}
+
 }

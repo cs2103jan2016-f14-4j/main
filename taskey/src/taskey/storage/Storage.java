@@ -11,9 +11,8 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class Storage {
-	private static Storage instance; //DEPRECATED - DO NOT USE
-	private StorageLoader loader;
-	private StorageSaver saver;
+	private StorageReader storageReader;
+	private StorageWriter storageWriter;
 	private History history;
 	private File directory;
 
@@ -48,7 +47,6 @@ public class Storage {
 
 	/**
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
-	 * @param args
 	 */
 	public static void main(String args[]) {
 		// Get the Storage singleton instance
@@ -89,7 +87,12 @@ public class Storage {
 		// Load after save - tagsmap
 		HashMap<String, Integer> tags = new HashMap<String, Integer>();
 		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
-		storage.saveTags(tags);
+		try {
+			storage.saveTags(tags);
+		} catch (StorageException e) {
+			System.err.println(e.getMessage());
+			System.out.println(e.getLastModifiedTagMap());
+		}
 		loadedTags = storage.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 	}
@@ -104,127 +107,108 @@ public class Storage {
     /*=============*
      * Constructor *
      *=============*/
-
 	/**
 	 * Storage constructor and initializer.
-	 * Attempts to load the last used directory after Storage is newly instantiated.
-	 * If none was found, the DEFAULT_DIRECTORY will be used instead.
+	 * Attempts to load and set the last used directory.
+	 * If none was found, DEFAULT_DIRECTORY will be set instead.
+	 * Post-condition: all the member fields of Storage have been instantiated.
 	 */
 	public Storage() {
-    		loader = new StorageLoader();
-    		saver = new StorageSaver();
+    		storageReader = new StorageReader();
+    		storageWriter = new StorageWriter();
     		history = History.getInstance();
-    		directory = loader.loadDirectory(FILENAME_CONFIG);
+    		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
     		if (directory == null) {
-        		System.out.println("{Setting default directory}"); //log info
-        		this.setDirectory(DEFAULT_DIRECTORY);
+        		System.out.println("{Setting default directory}"); //debug info
+        		setDirectory(DEFAULT_DIRECTORY);
     		} else {
-        		System.out.println("{Storage directory loaded}"); //log info
-    			this.setDirectory(directory.getPath()); //need to explicitly set directory after loading it
+        		System.out.println("{Storage directory loaded}"); //debug info
+    			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
     		}
     }
 
-	/**
-	 * DEPRECATED -- DO NOT USE.
-	 * This is here in case Parser needs to call Storage directly to save the user tags database.
-	 * @return The Storage singleton.
-	 */
-    public static Storage getInstance() {
-    	if (instance == null) {
-    		instance = new Storage();
-    		instance.loader = new StorageLoader();
-    		instance.saver = new StorageSaver();
-    		instance.history = History.getInstance();
-
-    		if ((instance.directory = instance.loader.loadDirectory(FILENAME_CONFIG)) == null) {
-        		System.out.println("{Setting default directory}"); //log info
-        		instance.setDirectory(DEFAULT_DIRECTORY);
-    		} else {
-        		System.out.println("{Storage directory loaded}"); //log info
-        		instance.setDirectory(instance.directory.getPath()); //need to explicitly set directory after loading it
-    		}
-    	}
-    	return instance;
-    }
-
-    /*======================*
-     * Load/Save task lists *
-     *======================*/
-
+    /*=====================*
+     * Load/Save tasklists *
+     *=====================*/
     /**
-	 * Returns the superlist of tasklists.
+	 * Returns the superlist of tasklists loaded from Storage.
 	 * Logic calls this on program startup.
-	 * Post-cond: the lists in superlist are in the same order as the enum constants in TasklistEnum.
-	 *            These lists are read from disk and hence do not include the THIS_WEEK list.
-	 * @return the list of tasklists
+	 * <p>Post-conditions:
+	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
+	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK list.
+	 * @return the list of tasklists read from disk
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
 		for (TasklistEnum e : TasklistEnum.values()) {
 			File src = new File(directory, e.filename());
-			ArrayList<Task> loadedList = loader.loadTasklist(src);
+			ArrayList<Task> loadedList = storageReader.loadTasklist(src);
 			superlist.add(loadedList);
 		}
 
+		//history.add(superlist); //Logic will add the initial loaded list to History
 		return superlist;
 	}
 
 	/**
-	 * Saves the superlist of tasklists to disk.
-	 * Pre-cond: Starting from index 1, the lists in superlist are in the same order as the enum constants in TasklistEnum.
-	 * 			 Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
-	 * @param superlist the taskLists field passed directly from Logic
-	 * @throws StorageException
+	 * Saves the superlist of tasklists to Storage.
+	 * Logic calls this after every operation.
+	 * <p>Pre-conditions:
+	 * <br>- Starting from index 1, the lists in the given superlist
+	 * 		 are in the same order as the enum constants in TasklistEnum.
+	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
+	 * @param superlist the list of tasklists to be saved
+	 * @throws StorageException contains the last saved tasklist
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
 		assert (superlist.size() == 7); //TODO assert(false) doesn't work
 
 		for (TasklistEnum e : TasklistEnum.values()) {
-			if (e.index() >= superlist.size()) { //check for when testing in main method
+			if (e.index() == superlist.size()) { //check for when testing in main method
 				break;
 			}
 			ArrayList<Task> listToSave = superlist.get(e.index());
 			File dest = new File(directory, e.filename());
-			saver.saveTasklist(listToSave, dest);
+			storageWriter.saveTasklist(listToSave, dest);
 		}
 
 		history.add(superlist); //only if all the lists were successfully saved
 	}
 
-    /*================*
-     * Save/load tags *
-     *================*/
 
+    /*================*
+     * Load/Save tags *
+     *================*/
 	/**
-     * Returns the HashMap containing the user-defined tags read from file.
+     * Returns a HashMap the containing user-defined tags loaded from Storage.
      * An empty HashMap is returned if the tags file was not found.
-     * @return the HashMap read from file, or an empty HashMap if the file was not found.
+     * @return the HashMap read from file, or an empty HashMap if the file was not found
      */
     public HashMap<String, Integer> loadTags() {
     	File src = new File(directory, FILENAME_TAGS);
-    	return loader.loadTags(src);
+    	return storageReader.loadTags(src);
     }
 
     /**
-     * Saves the given HashMap containing user-defined tags to JSON file.
-     * @param tags HashMap that maps the tag strings to their corresponding multiplicities
-     * @return true if successful; false otherwise.
+     * Saves the given HashMap containing user-defined tags to Storage.
+     * @param tags the HashMap that maps tag strings to their corresponding multiplicities
+     * @throws StorageException contains the last saved tagmap
      */
-    public boolean saveTags(HashMap<String, Integer> tags) {
+    public void saveTags(HashMap<String, Integer> tags) throws StorageException {
     	File dest = new File(directory, FILENAME_TAGS);
-    	return saver.saveTags(tags, dest);
+    	storageWriter.saveTags(tags, dest);
+    	history.add(tags);
     }
 
     /*=====================*
-     * Get/set directories *
+     * Set/get directories *
      *=====================*/
-
     /**
      * Returns the current storage directory.
      * When the user asks to change directory, Logic can return it as feedback.
-     * @return Absolute path of the default or user-set directory.
+     * @return absolute path of the default or user-set directory
      */
     public String getDirectory() {
     	return directory.getAbsolutePath();
@@ -232,9 +216,11 @@ public class Storage {
 
     /**
      * Sets the storage directory to the given pathname string after checking that the path is valid.
+     * Creates the directory if it does not exist yet.
+     * Saves the new directory if it
      * This method is invoked by Logic, should the end user request to change it.
-     * @return True if the directory already exists or was just created;
-     * 		   false if the path is invalid due to illegal characters (e.g. *) or reserved words (e.g. CON) in Windows.
+     * @return true if successful;
+     * 		   false if the path is invalid due to illegal characters (e.g. *) or reserved words (e.g. CON in Windows)
      * @param pathname can be a relative or absolute path
      */
     public boolean setDirectory(String pathname) {
@@ -244,12 +230,14 @@ public class Storage {
 		}
 
 		if (dir.isDirectory()) {
-			boolean shouldSave = isNewDirectory(dir);
+			boolean shouldSave = isNewDirectory(dir); //compares the new directory with the old to see if it should be saved
 			directory = dir;
 			System.out.println("{Storage directory set} " + getDirectory()); //debug info
 			if (shouldSave) {
-	    		saver.saveDirectory(directory, FILENAME_CONFIG);
+	    		storageWriter.saveDirectory(directory, FILENAME_CONFIG);
+	    		System.out.println("{Storage directory saved}"); //debug info
 	    	}
+			//TODO method to move files
 			return true;
 		} else {
 			return false;
@@ -260,17 +248,13 @@ public class Storage {
      * Private helper method. Checks whether dir is a new/different directory that should be saved.
      * This check is done to avoid unnecessary calls to saveDirectory().
      * @param dir the new candidate directory
-     * @return true if dir is a new directory; false otherwise.
+     * @return true if dir is a new directory; false otherwise
      */
     private boolean isNewDirectory(File dir) {
-    	// Disregard dir if it's the default directory
-    	if (!dir.getAbsolutePath().equals( new File(DEFAULT_DIRECTORY).getAbsolutePath() )) {
-    		// If directory hasn't been set
-    		if (directory == null) {
-    			return true;
-    		}
-    		// If the new dir is not the same as the old directory
-    		else if (!dir.getAbsolutePath().equals(directory.getAbsolutePath())) {
+    	// If directory == null, then dir must be the default directory, which we do not want to save
+    	if (directory != null) {
+			// If the new dir is different from the old directory
+    		if (! dir.getAbsolutePath().equals(directory.getAbsolutePath()) ) {
     			return true;
     		}
     	}

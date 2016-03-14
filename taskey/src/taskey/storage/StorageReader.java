@@ -14,17 +14,16 @@ import taskey.logic.Task;
 /**
  * @author Dylan
  */
-class StorageLoader {
+class StorageReader {
     /**
-     * Generic read method.
-     * Deserializes the JSON specified by the File into an object of the specified type.
-     * @param file JSON file to be read
+     * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
+     * @param src JSON file to be read
      * @param typeToken represents the generic type T of the desired object; this is obtained from the Gson TypeToken class
      * @return An object of type T generated from the JSON file.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if FileReader constructor fails
      */
-    private <T> T readFromFile(File file, TypeToken<T> typeToken) throws FileNotFoundException {
-    	FileReader reader = new FileReader(file);
+    private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException {
+    	FileReader reader = new FileReader(src);
     	Gson gson = new Gson();
 		T object = gson.fromJson(reader, typeToken.getType()); //TODO Handle type safety
 		return object;
@@ -34,9 +33,9 @@ class StorageLoader {
      * Load directory *
      *================*/
     /**
-     * Attempts to load the last-saved directory from file in System.getProperty("user.dir")
+     * Tries to load the last-saved directory from a config file located in System.getProperty("user.dir").
      * @param filename name of the config file to be read
-     * @return the File representing the last-saved directory, or null if it was not found.
+     * @return the File representing the last-saved directory, or null if it was not found
      */
     File loadDirectory(String filename) {
     	File src = new File(filename);
@@ -52,17 +51,17 @@ class StorageLoader {
      *================*/
     /**
      * Returns an ArrayList of Task objects read from the File src.
-     * An empty ArrayList is returned if the file was not found.
-     * @param src represents the file to be read
-     * @return The task list loaded from file; or an empty list if the file does not exist.
+     * An empty ArrayList is returned if src was not found.
+     * @param src the source file to be read from
+     * @return the tasklist read from file; or an empty list if the file was not found
      */
     ArrayList<Task> loadTasklist(File src) {
     	ArrayList<Task> tasks;
 		try {
 			tasks = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-			System.out.println("{Tasklist loaded} " + src.getName()); //log info
+			System.out.println("{Tasklist loaded} " + src.getName()); //debug info
 		} catch (FileNotFoundException e) {
-			System.out.println("{Tasklist not found} " + src.getName()); //log info
+			System.out.println("{Tasklist not found} " + src.getName()); //debug info
 			tasks = new ArrayList<Task>();
 		}
     	return tasks;
@@ -72,18 +71,18 @@ class StorageLoader {
      * Load tags *
      *===========*/
     /**
-     * Returns the HashMap containing the user-defined tags read from file.
-     * An empty HashMap is returned if the tags file was not found.
-     * @param src represents the file to be read
-     * @return the HashMap read from file, or an empty HashMap if the file was not found.
+     * Returns a HashMap containing the user-defined tags read from the File src.
+     * An empty HashMap is returned if src was not found.
+     * @param src source file to be read
+     * @return the HashMap read from file, or an empty HashMap if the file was not found
      */
     HashMap<String, Integer> loadTags(File src) {
     	HashMap<String, Integer> tags;
     	try {
     		tags = readFromFile(src, new TypeToken<HashMap<String, Integer>>() {});
-    		System.out.println("{Tags loaded} " + src.getName()); //log info
+    		System.out.println("{Tags loaded} " + src.getName()); //debug info
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName()); //log info
+    		System.out.println("{Tags not found} " + src.getName()); //debug info
     		tags = new HashMap<String, Integer>();
     	}
     	return tags;

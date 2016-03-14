@@ -26,12 +26,14 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
 		
-		//add 2345
+		//disallow task names with only numbers 
+		assertEquals("Command: ERROR\nerror type: Task name cannot consist "
+				+ "entirely of numbers\n",
+				parser.parseInput("add 2345").toString());
 	}
 	
 	@Test
 	public void testDeadline() {
-	
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
@@ -44,7 +46,10 @@ public class ParserTest {
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 		
-		//add meeting222 on 17 feb 
+		//ensure that numbers in meeting name do not affect date output
+		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
+				+ "Feb 2016\n",
+				parser.parseInput("add meeting 222 on 17 Feb").toString());
 	}
 	
 	public void testDeadlineHuman() {
@@ -79,7 +84,11 @@ public class ParserTest {
 				+ "16:00 to 19 Feb 2016 17:00\n",
 				parser.parseInput("add project meeting from 4pm to "
 						+ "5pm on 19 feb").toString());
-		//add mtg2234 from 19 feb 4pm to 5pm 
+		
+		//test events with numbers in task name 
+		assertEquals("Command: ADD_EVENT\nmtg2234, EVENT, from 19 Feb 2016 16:00"
+				+ " to 19 Feb 2016 17:00\n",
+				parser.parseInput("add mtg2234 from 19 feb 4pm to 5pm ").toString());
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
@@ -158,9 +167,15 @@ public class ParserTest {
 				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
 		
 		//test combination
-		//TODO: change to assert 
-		//System.out.println(parser.parseInput("set 2 [16 Feb] \"newName\""));
-		//System.out.println(parser.parseInput("set meeting \"newName\" [19 feb]"));
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
+				+ "Feb 2016\nat index: 1\nnew TaskName: newname\n",
+				parser.parseInput("set 2 [16 Feb] \"newName\"").toString());
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_BOTH\nmeeting, DEADLINE, "
+				+ "due on 19 Feb 2016\nnew TaskName: newname\n",
+				parser.parseInput("set meeting \"newName\" [19 feb]").toString());
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nEVENT, from 14 Mar "
+				+ "2016 to 15 Mar 2016\nat index: 0\nnew TaskName: task 2\n",
+				parser.parseInput("set 1 [14 mar,15 mar] \"task 2\"").toString());
 	}
 	
 	public void testChangesHuman() {

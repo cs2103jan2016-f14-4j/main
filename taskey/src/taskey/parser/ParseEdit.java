@@ -206,9 +206,8 @@ public class ParseEdit {
 		String startDate = dateList[0].trim().toLowerCase();
 		String endDate = dateList[1].trim().toLowerCase();
 		Task changedTask = null; 
-		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH) == 0) {
-			changedTask = processed.getTask(); 
-		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
 			changedTask = processed.getTask(); 
 		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
 			changedTask = processed.getTask();
@@ -216,7 +215,6 @@ public class ParseEdit {
 			changedTask = new Task(); 
 		}
 		changedTask.setTaskType("EVENT");
-		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(startDate);
@@ -258,9 +256,8 @@ public class ParseEdit {
 	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
 		Task changedTask = null; 
-		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH) == 0) {
-			changedTask = processed.getTask(); 
-		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
 			changedTask = processed.getTask(); 
 		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
 			changedTask = processed.getTask();
@@ -292,9 +289,8 @@ public class ParseEdit {
 	 */
 	private ProcessedObject updateToFloating(ProcessedObject processed) {
 		Task changedTask = null; 
-		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH) == 0) {
-			changedTask = processed.getTask(); 
-		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
 			changedTask = processed.getTask(); 
 		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
 			changedTask = processed.getTask();

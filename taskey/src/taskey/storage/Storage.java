@@ -115,7 +115,7 @@ public class Storage {
 	public Storage() {
     		loader = new StorageLoader();
     		saver = new StorageSaver();
-    		history = History.getInstance();
+    		history = new History();
 
     		if ((directory = loader.loadDirectory()) == null) {
         		System.out.println("{Setting default directory}"); //log info
@@ -209,9 +209,13 @@ public class Storage {
     }
 
 
-    /*=====================*
-     * Get/set directories *
-     *=====================*/
+    /*====================== *
+     * Getter/setter methods *
+     *====================== */
+    
+    public History getHistory() {
+    	return history;
+    }
 
     /**
      * Returns the current storage directory.

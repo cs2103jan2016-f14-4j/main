@@ -386,6 +386,9 @@ public class ParseEdit {
 		if (splitString.length > 1) {
 			newName = splitString[1].trim(); 
 		}
+		if (newName.compareTo("") == 0) {
+			return null; 
+		}
 		return newName; 
 	}
 	

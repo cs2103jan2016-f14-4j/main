@@ -107,7 +107,6 @@ public class ParserTest {
 				+ "to 18 Feb 2016\ntags: sua, serious, \n",
 				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
 		
-		System.out.println(parser.parseInput("set 1 \"urgent meeting\""));
 	}
 	
 	@Test 
@@ -160,8 +159,8 @@ public class ParserTest {
 		
 		//test combination
 		//TODO: change to assert 
-		System.out.println(parser.parseInput("set 2 [16 Feb] \"newName\""));
-		System.out.println(parser.parseInput("set meeting \"newName\" [19 feb]"));
+		//System.out.println(parser.parseInput("set 2 [16 Feb] \"newName\""));
+		//System.out.println(parser.parseInput("set meeting \"newName\" [19 feb]"));
 	}
 	
 	public void testChangesHuman() {

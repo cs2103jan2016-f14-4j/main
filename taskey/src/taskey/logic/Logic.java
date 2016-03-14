@@ -190,6 +190,9 @@ public class Logic {
 
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
 				return updateByIndexChangeDate(currentContent, po, taskIndex, task);
+				
+			case "UPDATE_BY_INDEX_CHANGE_BOTH":
+				return updateByIndexChangeBoth(currentContent, po, taskIndex, newTaskName, task);
 
 			case "UPDATE_BY_NAME_CHANGE_NAME":
 				return updateByNameChangeName(currentContent, po, task.getTaskName(), newTaskName);
@@ -472,6 +475,34 @@ public class Logic {
 		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
+		updateAllLists(toUpdate.getTaskName(), changedTask);
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
+
+		return new LogicFeedback(taskLists, po, null);
+	}
+	
+	LogicFeedback updateByIndexChangeBoth(ContentBox currentContent, ProcessedObject po, int taskIndex,
+			                              String newTaskName, Task changedTask) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
+		}
+
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate;
+
+		try {
+			toUpdate = targetList.get(taskIndex);
+		} catch (IndexOutOfBoundsException e) {
+			return new LogicFeedback(taskLists, po, new Exception("Index out of bounds!"));
+		}
+
+		changedTask.setTaskName(newTaskName);
 		updateAllLists(toUpdate.getTaskName(), changedTask);
 		
 		try {

@@ -2,42 +2,36 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
-import javafx.animation.TranslateTransition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.util.Duration;
-import javafx.util.Pair;
 import taskey.logic.Task;
-import taskey.ui.UiClockService;
-import taskey.ui.UiConstants;
+import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.utility.UiAnimationManager;
 
 /**
  * This class acts as the interface for all content display related operations
- * It does the main job of setting up the UiFormatters
- * 
- * @author JunWei
+ * It does the main job of setting up the UiFormatters, and redirecting input from UiController.
  *
+ * @author JunWei
  */
 public class UiContentManager {
+	
 	private ArrayList<UiFormatter> myFormatters; // for each content box
 
 	public UiContentManager() {
 		myFormatters = new ArrayList<UiFormatter>();
 	}
 
+	/**
+	 * Sets up the UiFormatters for each pane
+	 *
+	 * @param pane - the pane
+	 * @param contentID - the content id
+	 */
 	public void setUpContentBox(ScrollPane pane, ContentBox contentID) {
 		assert(pane != null);
 		UiFormatter myFormatter;
@@ -57,7 +51,8 @@ public class UiContentManager {
 
 	/**
 	 * Generic update Content Box method, which would just call format on the formatters, regardless of grid type
-	 * Used if the Content Box only has a single grid 
+	 * Used if the Content Box only has a single grid .
+	 *
 	 * @param myTaskList - list of tasks
 	 * @param contentID - id of content box
 	 */
@@ -68,7 +63,8 @@ public class UiContentManager {
 	}
 
 	/**
-	 * Update contents of action content box, depending on mode given
+	 * Update contents of action content box, depending on mode given.
+	 *
 	 * @param myTaskList - which is the list of tasks
 	 * @param mode - Content LIST, HELP
 	 */
@@ -79,12 +75,19 @@ public class UiContentManager {
 		myFormatter.updateContents(myTaskList,mode);
 	}
 	
-	public void updateCategoryContentBox(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		assert(myCategoryList != null);
+	/**
+	 * Update category content box.
+	 *
+	 * @param myCategoryList - the category list
+	 * @param categoryNums - the category nums
+	 * @param categoryColors - the category colors
+	 */
+	public void updateCategoryContentBox(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+		assert(categoryNames != null);
 		assert(categoryNums != null);
 		int arrayIndex = ContentBox.CATEGORY.getValue();
 		UiCategoryFormatter myFormatter = (UiCategoryFormatter) myFormatters.get(arrayIndex);
-		myFormatter.updateCategories(myCategoryList,categoryNums,categoryColors);
+		myFormatter.updateCategories(categoryNames,categoryNums,categoryColors);
 	}
 
 	public void cleanUp() {

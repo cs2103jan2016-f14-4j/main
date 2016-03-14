@@ -20,6 +20,7 @@ public class LogicTest {
 	
 	public static int NUM_SECONDS_1_DAY = 86400;
 	public static int NUM_SECONDS_1_WEEK = 604800;
+	public static int NUM_SECONDS_BUFFER_TIME = 100;
 	
 	@BeforeClass
 	public static void testClear() {
@@ -1185,6 +1186,37 @@ public class LogicTest {
 		}
 		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
 		temp.get(ListID.GENERAL.getIndex()).add(afterUpdate);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUpdateTaskByIndexChangeBoth() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  ";
+		ProcessedObject po = parser.parseInput(input);
+		Task beforeUpdate = po.getTask();
+		logic.addFloating(beforeUpdate, po);
+		po = parser.parseInput("set 0 " + "\"ayy lmao\" " + "[" + timeConverter.getDate(currTime) 
+		                       + ", " + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
+		                       + NUM_SECONDS_BUFFER_TIME) + "]");
+		Task afterUpdate = po.getTask();
+		LogicFeedback actual = logic.updateByIndexChangeBoth(ContentBox.PENDING, po, 0, "ayy lmao",
+				                                             afterUpdate);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		afterUpdate.setTaskName(beforeUpdate.getTaskName());
+		temp.get(ListID.PENDING.getIndex()).add(afterUpdate);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(afterUpdate);
+		temp.get(ListID.EVENT.getIndex()).add(afterUpdate);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertTrue(actual.equals(expected));

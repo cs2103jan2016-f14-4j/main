@@ -106,30 +106,34 @@ public class ParserTest {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 "
 				+ "to 18 Feb 2016\ntags: sua, serious, \n",
 				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
+		
+		System.out.println(parser.parseInput("set 1 \"urgent meeting\""));
 	}
 	
-	@Test
+	@Test 
 	public void testChanges() {
 		//set <task name>/<id> "new task name" 
 		//by task id
-		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 0",
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 0\n"
+				+ "new TaskName: urgent meeting\n",
 				parser.parseInput("set 1 \"urgent meeting\"").toString());
-		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 1",
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 1\n",
 				parser.parseInput("set 2 [none]").toString());
-		assertEquals("Command: ERROR\nerror type: invalid input\n",
+		assertEquals("Command: ERROR\nerror type: Wrong format for new task name/date\n",
 				parser.parseInput("set 2 []").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, "
-				+ "due on 17 Feb 2016\nat index: 1",
+				+ "due on 17 Feb 2016\nat index: 1\n",
 				parser.parseInput("set 2 [17 feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
-				+ "to 17 Feb 2016\nat index: 1",
+				+ "to 17 Feb 2016\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb, 17 Feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
-				+ "to 17 Feb 2016\nat index: 1",
+				+ "to 17 Feb 2016\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
 		
 		//by task name
-		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n",
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n"
+				+ "new TaskName: urgent meeting\n",
 				parser.parseInput("set meeting \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
 				parser.parseInput("set meeting [none]").toString());
@@ -147,12 +151,17 @@ public class ParserTest {
 		
 		//test time usage
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
-				+ "Feb 2016 15:00\nat index: 1",
+				+ "Feb 2016 15:00\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb 3pm]").toString());
 		
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016"
-				+ " 15:00 to 19 Feb 2016 17:00\nat index: 1",
+				+ " 15:00 to 19 Feb 2016 17:00\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
+		
+		//test combination
+		//TODO: change to assert 
+		System.out.println(parser.parseInput("set 2 [16 Feb] \"newName\""));
+		System.out.println(parser.parseInput("set meeting \"newName\" [19 feb]"));
 	}
 	
 	public void testChangesHuman() {
@@ -162,7 +171,7 @@ public class ParserTest {
 	
 	@Test
 	public void testDelete() {
-		assertEquals("Command: DELETE_BY_INDEX\nat index: 4",
+		assertEquals("Command: DELETE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
@@ -179,7 +188,7 @@ public class ParserTest {
 	
 	@Test
 	public void testDone() {
-		assertEquals("Command: DONE_BY_INDEX\nat index: 4",
+		assertEquals("Command: DONE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("done 5").toString());
 		assertEquals("Command: DONE_BY_NAME\nhello world, \n",
 				parser.parseInput("done hello world").toString());

@@ -422,22 +422,6 @@ public class ParseAdd {
 	 * @return
 	 */
 	public String removeTimeFromName(String taskName) {
-		boolean hasTime = false; 
-		
-		if (taskName.contains("am")) {
-			hasTime = true; 
-		} else if (taskName.contains("a.m.")) {
-			hasTime = true; 
-		} else if (taskName.contains("pm")) {
-			hasTime = true;
-		} else if (taskName.contains("p.m.")) {
-			hasTime = true; 
-		}
-		
-		if (!hasTime) {
-			return taskName; 
-		}
-		
 		String stringRep = ""; 
 		String[] splitName = taskName.split(" "); 
 		int size = splitName.length; 
@@ -460,7 +444,6 @@ public class ParseAdd {
 						//so add it to the task name 
 						stringRep += word + " " + time + " ";
 						i += 2; 
-						System.out.println("place "+ stringRep);
 					}
 				}
 			} else if (word.compareTo("from") == 0) {
@@ -471,7 +454,6 @@ public class ParseAdd {
 				break; 
 			} else {
 				stringRep += word + " "; 
-				System.out.println("else " + stringRep);
 				i += 1; 
 			}
 		}	

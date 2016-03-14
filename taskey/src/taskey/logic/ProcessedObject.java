@@ -13,15 +13,17 @@ package taskey.logic;
  * 6. DELETE_BY_NAME 
  * 7. UPDATE_BY_INDEX_CHANGE_NAME
  * 8. UPDATE_BY_INDEX_CHANGE_DATE
- * 9. UPDATE_BY_NAME_CHANGE_NAME
- * 10. UPDATE_BY_NAME_CHANGE_DATE
- * 11. VIEW 
- * 12. ERROR 
- * 13. DONE_BY_INDEX
- * 14. DONE_BY_NAME
- * 15. SEARCH
- * 16. UNDO 
- * 17. CHANGE_FILE_LOC
+ * 9. UPDATE_BY_INDEX_CHANGE_BOTH
+ * 10. UPDATE_BY_NAME_CHANGE_NAME
+ * 11. UPDATE_BY_NAME_CHANGE_DATE
+ * 12. UPDATE_BY_NAME_CHANGE_BOTH
+ * 13. VIEW 
+ * 14. ERROR 
+ * 15. DONE_BY_INDEX
+ * 16. DONE_BY_NAME
+ * 17. SEARCH
+ * 18. UNDO 
+ * 19. CHANGE_FILE_LOC
  * 
  * @author Xue Hui
  *
@@ -229,7 +231,7 @@ public class ProcessedObject {
 		}
 		
 		if (index != -1) {
-			stringRep += "at index: " + String.valueOf(index); 
+			stringRep += "at index: " + String.valueOf(index) + "\n"; 
 		}
 		
 		if (viewType != null) {
@@ -242,6 +244,10 @@ public class ProcessedObject {
 		
 		if (searchPhrase != null) {
 			stringRep += "search phrase: " + searchPhrase + "\n"; 
+		} 
+		
+		if (newTaskName != null) {
+			stringRep += "new TaskName: " + newTaskName + "\n"; 		
 		}
 		
 		return stringRep; 

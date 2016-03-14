@@ -181,6 +181,7 @@ public class Storage {
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
 		assert (superlist.size() == 7);
+		assert (!history.isEmpty());
 		
 		for (TasklistEnum e : TasklistEnum.values()) {
 			if (e.index() >= superlist.size() - 1) { //check for when testing in main method
@@ -191,7 +192,14 @@ public class Storage {
 			saver.saveTasklist(tasklist, file, history);
 		}
 		
-		history.add(superlist); //Only if all the lists were successfully saved
+		//Don't add superlist to history if it's identical to the most recent superlist
+		ArrayList<ArrayList<Task>> mostRecentSuperlist = history.peek();
+		for (int i = 0; i < superlist.size(); i++) {
+			if (!(superlist.get(i).equals(mostRecentSuperlist.get(i)))) {
+				history.add(superlist);
+				break;
+			}
+		}
 	}
 
     /*================*

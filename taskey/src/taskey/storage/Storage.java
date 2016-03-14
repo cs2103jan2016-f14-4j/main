@@ -104,6 +104,7 @@ public class Storage {
 		}
 	}
 
+
     /*=============*
      * Constructor *
      *=============*/
@@ -127,6 +128,7 @@ public class Storage {
     			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
     		}
     }
+
 
     /*=====================*
      * Load/Save tasklists *
@@ -201,6 +203,7 @@ public class Storage {
     	storageWriter.saveTags(tags, dest);
     	history.add(tags);
     }
+
 
     /*=====================*
      * Set/get directories *

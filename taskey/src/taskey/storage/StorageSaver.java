@@ -41,12 +41,12 @@ class StorageSaver {
      * @param filename name the file will be saved as
      * @throws StorageException contains the last saved tasklist corresponding to the filename
      */
-    void saveTasklist(ArrayList<Task> tasks, File file) throws StorageException {
+    void saveTasklist(ArrayList<Task> tasks, File file, History history) throws StorageException {
 		try {
 			writeToFile(file, tasks, new TypeToken<ArrayList<Task>>() {});
 		} catch (IOException e) {
 			// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-			throw new StorageException(e, History.getInstance().peek());
+			throw new StorageException(e, history.peek());
 		}
 
     }

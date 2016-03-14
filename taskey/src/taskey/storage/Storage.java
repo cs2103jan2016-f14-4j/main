@@ -188,7 +188,7 @@ public class Storage {
 			}
 			ArrayList<Task> tasklist = superlist.get(e.index() + 1);
 			File file = new File(directory, e.filename());
-			saver.saveTasklist(tasklist, file);
+			saver.saveTasklist(tasklist, file, history);
 		}
 		
 		history.add(superlist); //Only if all the lists were successfully saved

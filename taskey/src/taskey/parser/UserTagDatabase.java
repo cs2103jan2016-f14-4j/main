@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import taskey.storage.Storage;
 
 /**
+ * @@author A0107345L
  * Purpose of this class is to handle the storage and retrieval
  * of userTags, so that they can be displayed by Logic as 
  * categories that users can view their tasks by.

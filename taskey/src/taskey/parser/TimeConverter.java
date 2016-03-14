@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
+/* @@author A0107345L */ 
 public class TimeConverter {
 	
 	//store curr time in seconds 

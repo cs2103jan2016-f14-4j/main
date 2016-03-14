@@ -1255,7 +1255,7 @@ public class LogicTest {
 		assertTrue(actual.equals(expected));
 	}
 	
-	/*@Test
+	@Test
 	public void undoAdd() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
@@ -1265,7 +1265,7 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(t, po);
+		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		
@@ -1288,9 +1288,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(t, po);
+		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
 		po = parser.parseInput("del 0");
-		logic.deleteByIndex(ContentBox.PENDING, po, 0);
+		logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0);
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		
@@ -1316,9 +1316,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(t, po);
+		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
 		po = parser.parseInput("set 0 [none] \"ayy lmao\"");
-		logic.updateByIndexChangeBoth(ContentBox.PENDING, po, 0, "ayy lmao", po.getTask());
+		logic.updateByIndexChangeBoth(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, "ayy lmao", po.getTask());
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		
@@ -1332,5 +1332,5 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertTrue(actual.equals(expected));
-	}*/
+	}
 }

@@ -228,8 +228,7 @@ public class Logic {
 				return updateByNameChangeBoth(copy, currentContent, po, task.getTaskName(), newTaskName, task);
 
 			case "UNDO":
-				//TODO
-				break;
+				return undo(po);
 				
 			case "ERROR":
 				//TODO:
@@ -634,14 +633,28 @@ public class Logic {
 		taskLists = cloneLists(copy);
 		return new LogicFeedback(copy, po, null);
 	}
-	
-	/*LogicFeedback undo(ProcessedObject po) {
-		ArrayList<ArrayList<Task>> currentSuperList = history.peek();
+
+	//Undo the last change to the task lists.
+	LogicFeedback undo(ProcessedObject po) {
+		assert(!history.isEmpty()); //History must always have at least one item, which is the current superlist
+		ArrayList<ArrayList<Task>> currentSuperList = history.pop();
+		ArrayList<ArrayList<Task>> previousSuperList = history.peek();
 		
-		if (history.peek() == null) {
+		if (previousSuperList == null) {
+			history.add(currentSuperList);
 			return new LogicFeedback(taskLists, po, new Exception("Nothing to undo!"));
 		}
-	}*/
+		
+		try {
+			saveAllTasks(previousSuperList);
+		} catch (Exception e) {
+			history.add(currentSuperList);
+			return new LogicFeedback(currentSuperList, po, e);
+		}
+		
+		taskLists = cloneLists(previousSuperList);
+		return new LogicFeedback(previousSuperList, po, null);
+	}
 	
 	//Creates a deep copy of the original list.
 	private ArrayList<Task> cloneList(ArrayList<Task> list) {

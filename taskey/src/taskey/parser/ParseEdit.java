@@ -54,21 +54,23 @@ public class ParseEdit {
 	 * @return appropriate ProcessedObject
 	 */
 	public ProcessedObject processSet(String command, String stringInput) {
-		String taskName = getTaskName(command, stringInput).trim();
+		String strNoCommand = removeCommand(command, stringInput).trim();
 		
 		if (stringInput.split(" ").length > 1) {
-			String rawIndex = stringInput.split(" ")[1];
+			String rawIndex = getTaskName(strNoCommand);
+			String newTaskName = getNewName(strNoCommand);
+			String newDate = getNewDate(strNoCommand); 
 			
 			try {
-				int index = Integer.parseInt(rawIndex);
-				
-				return updateByIndex(taskName, index-1); 
+				int index = Integer.parseInt(rawIndex);	
+				return updateByIndex(index-1, newTaskName, newDate); 
 			} catch (Exception e) {
 				//if the update is not by index, then it's by task name. 
-				return updateByName(taskName); 
+				//here rawIndex == old Task Name 
+				return updateByName(rawIndex, newTaskName, newDate); 
 			}
 		}
-		return parseError.processError("invalid input");
+		return parseError.processError(ParserConstants.ERROR_INVALID_INPUT);
 	}
 	
 	/**
@@ -78,25 +80,30 @@ public class ParseEdit {
 	 * @param index
 	 * @return
 	 */
-	private ProcessedObject updateByIndex(String taskName, int index) {
+	private ProcessedObject updateByIndex(int index, String newTaskName, String newDateRaw) {
 		ProcessedObject processed = null; 
 		
-		//if changing name, check for " " 
-		if (taskName.split("\"").length != 1) {
-			return updateChangeName(processed, taskName, index); 
-		} else if (taskName.split("\\[").length != 1) {
-			//if changing date, check for < >
+		//changing name only
+		if (newTaskName != null && newDateRaw == null) {
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_NAME); 
+			return updateChangeName(processed, index, newTaskName); 
+		} else if (newDateRaw != null && newTaskName == null) {
+			//changing date only 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_DATE, index);
-			taskName = taskName.replace("]", ""); 
-			String[] taskParts = taskName.split("\\["); 
-			
-			if (taskParts.length == 1) {
-				processed = parseError.processError("invalid input");
-				return processed; 
+			 		
+			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+				//change the task to floating
+				return updateToFloating(processed); 
+			} else if (newDateRaw.split(",").length == 2) {
+				//change the task to event
+				return updateToEvent(processed, newDateRaw); 
+			} else {
+				// change the task to deadline
+				return updateToDeadline(processed, newDateRaw);
 			}
-			
-			String newDateRaw = taskParts[1]; 
-			
+		} else if (newDateRaw != null && newTaskName != null) {
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH, index);
+			processed = updateChangeName(processed, index, newTaskName); 
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
 				//change the task to floating
 				return updateToFloating(processed); 
@@ -108,7 +115,7 @@ public class ParseEdit {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
-			processed = parseError.processError("Wrong format for changing task name/date");
+			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
@@ -119,38 +126,45 @@ public class ParseEdit {
 	 * @param taskName
 	 * @return
 	 */
-	private ProcessedObject updateByName(String taskName) {
+	private ProcessedObject updateByName(String oldTaskName, String newTaskName,
+			String newDateRaw) {
 		ProcessedObject processed = null; 
 		
-		//if changing name, check for " " 
-		if (taskName.split("\"").length != 1) {
-			return updateChangeName(processed, taskName); 
-		} else if (taskName.split("\\[").length != 1) {
-			//if changing date, check for < >
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, new Task(taskName)); 
-			taskName = taskName.replace("]", ""); 
-			String[] taskParts = taskName.split("\\["); 
-			String oldTaskName = taskParts[0].trim(); 
-			
-			if (taskParts.length == 1) {
-				processed = parseError.processError("invalid input");
-				return processed; 
-			}
-			
-			String newDateRaw = taskParts[1]; 
+		//if changing name only
+		if (newTaskName != null && newDateRaw == null) {
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_NAME, 
+					new Task(oldTaskName)); 
+			return updateChangeName(processed, newTaskName); 
+		} else if (newDateRaw != null && newTaskName == null) {
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, 
+					new Task(oldTaskName)); 
 			
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
 				//change the task to floating
-				return updateToFloating(processed, oldTaskName); 
+				return updateToFloating(processed); 
 			} else if (newDateRaw.split(",").length == 2) {
 				//change the task to event
-				return updateToEvent(processed, newDateRaw, oldTaskName); 
+				return updateToEvent(processed, newDateRaw); 
 			} else {
 				// change the task to deadline
-				return updateToDeadline(processed, newDateRaw, oldTaskName);
+				return updateToDeadline(processed, newDateRaw);
+			}
+		} else if (newTaskName != null && newDateRaw != null) {
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH,
+					new Task(oldTaskName));
+			processed = updateChangeName(processed, newTaskName); 
+			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+				//change the task to floating
+				return updateToFloating(processed); 
+			} else if (newDateRaw.split(",").length == 2) {
+				//change the task to event
+				return updateToEvent(processed, newDateRaw); 
+			} else {
+				// change the task to deadline
+				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
-			processed = parseError.processError("Wrong format for changing task name/date");
+			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
@@ -161,13 +175,8 @@ public class ParseEdit {
 	 * @param taskName
 	 * @return
 	 */
-	private ProcessedObject updateChangeName(ProcessedObject processed, String taskName) {
-		String[] taskParts = taskName.split("\"");
-		String oldName = taskParts[0].trim();  
-		String newName = taskParts[1].trim(); 
-		processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_NAME, new Task(oldName)); 
-		processed.setNewTaskName(newName);
-		
+	private ProcessedObject updateChangeName(ProcessedObject processed,	String newTaskName) {
+		processed.setNewTaskName(newTaskName);
 		return processed; 
 	}
 	
@@ -178,19 +187,15 @@ public class ParseEdit {
 	 * @param index
 	 * @return
 	 */
-	private ProcessedObject updateChangeName(ProcessedObject processed, String taskName, 
-			int index) {
-		String[] taskParts = taskName.split("\"");
-		String newName = taskParts[1].trim(); 
-		processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_NAME); 
-		processed.setNewTaskName(newName);
+	private ProcessedObject updateChangeName(ProcessedObject processed, int index, String newTaskName) {
+		processed.setNewTaskName(newTaskName);
 		processed.setIndex(index);
 		
 		return processed; 
 	}
 	
 	/**
-	 * Given a task index, we want to we want to change the task type to event. 
+	 * Given a task we want to we want to change the task type to event. 
 	 * @param processed
 	 * @param newDateRaw
 	 * @return
@@ -199,10 +204,17 @@ public class ParseEdit {
 		long epochTime; 
 		String[] dateList = newDateRaw.split(","); 
 		String startDate = dateList[0].trim().toLowerCase();
-		String endDate = dateList[1].trim().toLowerCase(); 
-		Task changedTask = new Task(); 
-		changedTask.setTaskType("EVENT");
+		String endDate = dateList[1].trim().toLowerCase();
+		Task changedTask = null; 
 		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+			changedTask = processed.getTask(); 
+		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
+			changedTask = processed.getTask();
+		} else {
+			changedTask = new Task(); 
+		}
+		changedTask.setTaskType("EVENT");
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(startDate);
@@ -234,60 +246,24 @@ public class ParseEdit {
 		return processed;
 	}
 	
-	/**
-	 * Given a task name, we want to change the task type to event 
-	 * @param processed
-	 * @param newDateRaw
-	 * @param newTaskName
-	 * @return
-	 */
-	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw,
-			String newTaskName) {
-		long epochTime; 
-		String[] dateList = newDateRaw.split(","); 
-		String startDate = dateList[0].trim().toLowerCase();
-		String endDate = dateList[1].trim().toLowerCase(); 
-		Task changedTask = new Task(newTaskName); 
-		changedTask.setTaskType("EVENT");
-		
-		epochTime = getPrettyTime(startDate);
-		if (epochTime != -1) {
-			changedTask.setStartDate(epochTime); 
-		} else if (!specialDays.containsKey(startDate)) {
-			try {
-				epochTime = timeConverter.toEpochTime(startDate);
-				changedTask.setStartDate(epochTime);
-			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
-				return processed; 
-			}
-		}
-		
-		epochTime = getPrettyTime(endDate);
-		if (epochTime != -1) {
-			changedTask.setEndDate(epochTime); 
-		} else if (!specialDays.containsKey(endDate)) {
-			try {
-				epochTime = timeConverter.toEpochTime(endDate);
-				changedTask.setEndDate(epochTime);
-			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
-				return processed; 
-			}
-		}
-		processed.setTask(changedTask);
-		return processed;
-	}
 	
 	/**
-	 * Given a task index, we want to update the task type to deadline
+	 * Given a task we want to update the task type to deadline
 	 * @param processed
 	 * @param newDateRaw
 	 * @return
 	 */
 	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
-		Task changedTask = new Task(); 
+		Task changedTask = null; 
+		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+			changedTask = processed.getTask(); 
+		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
+			changedTask = processed.getTask();
+		} else {
+			changedTask = new Task(); 
+		}
 		changedTask.setTaskType("DEADLINE");
 		
 		epochTime = getPrettyTime(newDateRaw);
@@ -307,71 +283,111 @@ public class ParseEdit {
 	}
 	
 	/**
-	 * Give a task name, we want to update the task type to deadline
-	 * @param processed
-	 * @param newDateRaw
-	 * @param newTaskName
-	 * @return
-	 */
-	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw,
-			String newTaskName) {
-		long epochTime; 
-		Task changedTask = new Task(newTaskName); 
-		changedTask.setTaskType("DEADLINE");
-		
-		epochTime = getPrettyTime(newDateRaw);
-		if (epochTime != -1) {
-			changedTask.setDeadline(epochTime); 
-		} else if (!specialDays.containsKey(newDateRaw.toLowerCase())) {
-			try {
-				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
-				changedTask.setDeadline(epochTime);
-			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
-				return processed; 
-			}
-		}
-		processed.setTask(changedTask);
-		return processed; 
-	}
-	
-	/**
-	 * Given a task index, we want to update task type to floating
+	 * Given a task we want to update task type to floating
 	 * @param processed
 	 * @return
 	 */
 	private ProcessedObject updateToFloating(ProcessedObject processed) {
-		Task changedTask = new Task();
+		Task changedTask = null; 
+		
+		if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH) == 0) {
+			changedTask = processed.getTask(); 
+		} else if (processed.getCommand().compareTo(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE) == 0) {
+			changedTask = processed.getTask();
+		} else {
+			changedTask = new Task(); 
+		}
 		changedTask.setTaskType("FLOATING");
 		processed.setTask(changedTask);
 		return processed;
 	}
 	
 	/**
-	 * Given a task name, we want to update task type to floating 
-	 * @param processed
-	 * @param newTaskName
-	 * @return
-	 */
-	private ProcessedObject updateToFloating(ProcessedObject processed,
-			String newTaskName) {
-		Task changedTask = new Task(newTaskName);
-		changedTask.setTaskType("FLOATING");
-		processed.setTask(changedTask);
-		return processed;
-	}
-	
-	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String command, String stringInput) {
+	public String removeCommand(String command, String stringInput) {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
+	}
+	
+	/**
+	 * Remove new dates and new task name from the stringInput
+	 * ie, just retrieve either the old task name or index of the old task
+	 * @param stringInput
+	 * @return
+	 */
+	public String getTaskName(String stringInput) {
+		int strLen = stringInput.length(); 
+		boolean canAdd = true;
+		String taskName = ""; 
+		
+		for(int i = 0; i < strLen; i++) {
+			char k = stringInput.charAt(i); 
+			if (k == '"') {
+				canAdd = false;
+				break; 
+			} else if (k == '[') {
+				canAdd = false;
+				break;
+			} else if (canAdd == true) {
+				taskName += k; 
+			}
+		}
+		return taskName.trim(); 
+	}
+	
+	/**
+	 * If stringInput has a new date entered, look for the []
+	 * and get the dates 
+	 * @param stringInput
+	 * @return newDate if there is any, else return null 
+	 */
+	public String getNewDate(String stringInput) {
+		int strLen = stringInput.length(); 
+		boolean canAdd = false; 
+		String date = ""; 
+		
+		for(int i = 0; i < strLen; i++) {
+			char k = stringInput.charAt(i); 
+			if (k == '[') {
+				canAdd = true; 
+			} else if (k == ']') {
+				canAdd = false;
+				break;
+			} else if (canAdd == true) {
+				date += k; 
+			}
+		}	
+		
+		if (date.compareTo("") == 0) {
+			return null; 
+		}
+		return date.trim(); 
+	}
+	
+	/**
+	 * Given a raw input string, look for the new name of
+	 * the task if there is any
+	 * @param stringInput
+	 * @return new task name if there is, else return null. 
+	 */
+	public String getNewName(String stringInput) {
+		String newName = null;
+		String[] splitString = stringInput.split("\""); 
+		//TODO: settle empty "" 
+		if (splitString.length > 1) {
+			newName = splitString[1].trim(); 
+		}
+		if (newName != null) { 
+			if (newName.compareTo("") == 0) {
+				return null; 
+			}
+		}
+		return newName; 
 	}
 	
 	/**

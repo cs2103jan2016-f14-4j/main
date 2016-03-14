@@ -360,7 +360,7 @@ public class Task implements Comparable<Task> {
 		
 		if (taskTags != null) { 
 			stringRep += "tags: ";
-			for(int i  =0; i < taskTags.size(); i++) {
+			for(int i = 0; i < taskTags.size(); i++) {
 				stringRep += taskTags.get(i) + ", "; 
 			}
 			stringRep += "\n";

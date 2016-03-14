@@ -58,7 +58,10 @@ public class History {
 	public ArrayList<ArrayList<Task>> peek() {
 		return stack.peek();
 	}
-
+	
+	public boolean isEmpty() {
+		return stack.isEmpty();
+	}
 
 	// Old implementation - ignore
 	//private HashMap<TasklistEnum, ArrayList<Task>> lastSavedTasklists = new HashMap<FileType, ArrayList<Task>>();

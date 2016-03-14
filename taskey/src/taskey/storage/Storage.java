@@ -115,7 +115,7 @@ public class Storage {
 	public Storage() {
     		loader = new StorageLoader();
     		saver = new StorageSaver();
-    		history = History.getInstance();
+    		history = new History();
 
     		if ((directory = loader.loadDirectory()) == null) {
         		System.out.println("{Setting default directory}"); //log info
@@ -181,6 +181,7 @@ public class Storage {
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
 		assert (superlist.size() == 7);
+		assert (!history.isEmpty());
 		
 		for (TasklistEnum e : TasklistEnum.values()) {
 			if (e.index() >= superlist.size() - 1) { //check for when testing in main method
@@ -188,10 +189,17 @@ public class Storage {
 			}
 			ArrayList<Task> tasklist = superlist.get(e.index() + 1);
 			File file = new File(directory, e.filename());
-			saver.saveTasklist(tasklist, file);
+			saver.saveTasklist(tasklist, file, history);
 		}
 		
-		history.add(superlist); //Only if all the lists were successfully saved
+		//Don't add superlist to history if it's identical to the most recent superlist
+		ArrayList<ArrayList<Task>> mostRecentSuperlist = history.peek();
+		for (int i = 0; i < superlist.size(); i++) {
+			if (!(superlist.get(i).equals(mostRecentSuperlist.get(i)))) {
+				history.add(superlist);
+				break;
+			}
+		}
 	}
 
     /*================*
@@ -209,9 +217,13 @@ public class Storage {
     }
 
 
-    /*=====================*
-     * Get/set directories *
-     *=====================*/
+    /*====================== *
+     * Getter/setter methods *
+     *====================== */
+    
+    public History getHistory() {
+    	return history;
+    }
 
     /**
      * Returns the current storage directory.

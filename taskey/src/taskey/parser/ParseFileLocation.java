@@ -4,6 +4,7 @@ import taskey.logic.ProcessedObject;
 import taskey.constants.ParserConstants; 
 
 /**
+ * @@author A0107345L
  * Purpose of this class is to Parse a new directory location
  * for storing files in other locations. 
  * @author Xue Hui

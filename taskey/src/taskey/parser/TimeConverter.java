@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
+/* @@author A0107345L */ 
 public class TimeConverter {
 	
 	//store curr time in seconds 
@@ -105,6 +106,7 @@ public class TimeConverter {
 	 */
 	public boolean isSameWeek(long epochTime1, long epochTime2) {
 		Calendar c1 = Calendar.getInstance();
+		c1.setFirstDayOfWeek(Calendar.MONDAY);
 		c1.set(getYear(epochTime1),
 				getMonth(epochTime1)-1,
 				getDay(epochTime1));
@@ -112,6 +114,7 @@ public class TimeConverter {
 		int week1 = c1.get(c1.WEEK_OF_YEAR);
 
 		Calendar c2 = Calendar.getInstance();
+		c2.setFirstDayOfWeek(Calendar.MONDAY);
 		c2.set(getYear(epochTime2),
 				getMonth(epochTime2)-1,
 				getDay(epochTime2));
@@ -219,4 +222,16 @@ public class TimeConverter {
 		
 		return days[day-1]; 
 	}
+	
+	/* 
+	public static void main(String[] args) {
+		TimeConverter tc = new TimeConverter();
+		try {
+			long epochTime1 = tc.toEpochTime("20 Mar");
+			long epochTime2 = tc.toEpochTime("21 Mar"); 
+			System.out.println(tc.isSameWeek(epochTime1, epochTime2));
+		} catch (Exception e) {
+			
+		}
+	} */ 
 }

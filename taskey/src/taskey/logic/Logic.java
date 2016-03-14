@@ -199,6 +199,9 @@ public class Logic {
 
 			case "UPDATE_BY_NAME_CHANGE_DATE":
 				return updateByNameChangeDate(currentContent, po, task.getTaskName(), task);
+				
+			case "UPDATE_BY_NAME_CHANGE_BOTH":
+				return updateByNameChangeBoth(currentContent, po, task.getTaskName(), newTaskName, task);
 
 			case "UNDO":
 				//TODO
@@ -486,6 +489,8 @@ public class Logic {
 		return new LogicFeedback(taskLists, po, null);
 	}
 	
+	//Updates an indexed task's name and date on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
 	LogicFeedback updateByIndexChangeBoth(ContentBox currentContent, ProcessedObject po, int taskIndex,
 			                              String newTaskName, Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
@@ -567,8 +572,35 @@ public class Logic {
 
 		return new LogicFeedback(taskLists, po, null);
 	}
+	
+	//Updates an named task's name and date on the current tab and saves the updated lists to disk.
+	//TODO: support "set" from the "ACTION" tab. 
+	LogicFeedback updateByNameChangeBoth(ContentBox currentContent, ProcessedObject po, String oldTaskName,
+			                             String newTaskName, Task changedTask) {
+		//"set" command is not allowed in tabs other than "this week" or "pending"
+		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+			return new LogicFeedback(taskLists, po, new Exception("Cannot use \"set\" command from this tab!"));
+		}
 
+		ArrayList<Task> targetList = getListFromContentBox(currentContent);
+		Task toUpdate = new Task(oldTaskName);
 
+		if (!targetList.contains(toUpdate)) {
+			return new LogicFeedback(taskLists, po, new Exception(oldTaskName + " not found in this list!"));
+		}
+
+		changedTask.setTaskName(newTaskName);
+		updateAllLists(oldTaskName, changedTask);
+		
+		try {
+			saveAllTasks();
+		} catch (Exception e) {
+			return new LogicFeedback(taskLists, po, e);
+		}
+
+		return new LogicFeedback(taskLists, po, null);
+	}
+	
 	//Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ContentBox currentContent) {
 		ArrayList<Task> targetList = null;

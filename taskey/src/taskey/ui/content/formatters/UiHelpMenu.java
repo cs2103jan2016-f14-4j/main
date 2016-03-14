@@ -16,7 +16,15 @@ import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
 
+/**
+ * This class is used to seperate help menu from UiActionFormatter,
+ * in order to make UiActionFormatter cleaner
+ * 
+ * @author junwei
+ */
+
 public class UiHelpMenu {
+	
 	private UiGridHelper gridHelper;
 	private UiPagination helpView;
 	private ArrayList<UiPagination> commandViews;
@@ -31,6 +39,7 @@ public class UiHelpMenu {
 		setUpHelpView();
 		currentView = helpView;
 	}
+	
 	public void processEnterKey() {
 		if ( currentView == helpView ) {
 			currentView = commandViews.get(helpView.getSelection());
@@ -38,12 +47,15 @@ public class UiHelpMenu {
 			currentView = helpView;
 		}
 	}
+	
 	public void resetView() {
 		currentView = helpView;
 	}
+	
 	public UiPagination getView() {
 		return currentView;
 	}
+
 	private void addMainMenu() {
 		ArrayList<String> headers = new ArrayList<String>(Arrays.asList("Taskey Help","Adding Tasks",
 				"Deleting Tasks","Set Tasks", "Done Tasks", "Search Tasks", "Undo Tasks", "Tagging Task"));
@@ -76,13 +88,11 @@ public class UiHelpMenu {
 				if ( entryNo > 0 ) {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
-				UiTextBuilder myConfig = new UiTextBuilder();
-				TextFlow element = new TextFlow();
-				myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+				UiTextBuilder myBuilder = new UiTextBuilder();
+				myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 				String line = info.get(entryNo);
-				element.getChildren().addAll(myConfig.build(line));
 				gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
-				gridHelper.addTextFlowToCell(1, j, element,TextAlignment.CENTER, newGrid);
+				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
 				entryNo++;
 			}
@@ -90,6 +100,7 @@ public class UiHelpMenu {
 		}	
 		helpView.initialize(totalPages); // update UI and bind call back
 	}
+	
 	private void addMenu(ArrayList<IMAGE_ID> images, ArrayList<String> info ) {
 		UiPagination menu = new UiPagination("");
 		commandViews.add(menu);
@@ -97,18 +108,16 @@ public class UiHelpMenu {
 		for ( int i = 0 ; i < totalPages; i++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP_MENU);
 			gridHelper.createImageInCell(0,0,UiImageManager.getInstance().getImage(images.get(i)),imageWidth,0,newGrid);
-			UiTextBuilder myConfig = new UiTextBuilder();
-			TextFlow element = new TextFlow();
-			myConfig.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+			UiTextBuilder myBuilder = new UiTextBuilder();
+			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
 			String line = info.get(i);
-			element.getChildren().addAll(myConfig.build(line));
 			gridHelper.createStyledCell(0, 1, UiConstants.STYLE_NUMBER_ICON, newGrid);
-			gridHelper.addTextFlowToCell(0, 1, element,TextAlignment.CENTER, newGrid);
+			gridHelper.addTextFlowToCell(0, 1, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 			menu.addGridToPagination(newGrid,new ArrayList<StackPane>()); // no interactions	
 		}
 		menu.initialize(totalPages); // update UI and bind call back
 	}
-	
+
 	private void setUpHelpView() {
 		addMainMenu();
 		ArrayList<IMAGE_ID> images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.ADD_FLOAT,IMAGE_ID.ADD_DEADLINE,

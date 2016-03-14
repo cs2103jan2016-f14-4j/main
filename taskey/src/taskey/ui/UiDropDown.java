@@ -21,9 +21,11 @@ import javafx.stage.Window;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiPopupManager;
 
+/**
+ * The Class UiDropDown.
+ */
 public class UiDropDown {
 	private static final int MAX_ITEMS = 4;
-	
 	private TextField myInput;
 	private Popup myMenu = null;
 	private FadeTransition fade;
@@ -67,6 +69,9 @@ public class UiDropDown {
 		select(0);
 	}
 	
+	/**
+	 * Update menu, called to update position and correct the display issues.
+	 */
 	public void updateMenu() {
 		if (myWindow == null || myMenu == null) { // if not initialized yet and received input
 			return;
@@ -90,7 +95,8 @@ public class UiDropDown {
 
 	/**
 	 * This method creates a Text object to approximate the bounds of a text
-	 * field input
+	 * field input.
+	 *
 	 * @param field - TextField to approximate from
 	 * @return width
 	 */
@@ -102,6 +108,7 @@ public class UiDropDown {
 		return width;
 
 	}
+	
 	public String getSelectedItem() {
 		assert(myMenu.getContent().get(0) != null);
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
@@ -123,7 +130,7 @@ public class UiDropDown {
 	/**
 	 * Most of the time after switching styles or setting visibility
 	 * The popup window has some tears, probably because it renders separately from the main program
-	 * This fixes that issue, and also sets opacity full for display
+	 * This fixes that issue, and also sets opacity full for display.
 	 */
 	private void refresh() {
 		assert(myMenu != null);
@@ -153,6 +160,7 @@ public class UiDropDown {
 		
 		refresh();	
 	}
+	
 	public void processArrowKey(KeyEvent event) {
 		assert(event != null);
 		if ( currentItemSize == 0 ) {

@@ -10,13 +10,18 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
 import taskey.ui.UiConstants;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiTextBuilder;
 
+/**
+ * This class is responsible for formatting the Category box
+ * 
+ * @author junwei
+ */
 public class UiCategoryFormatter extends UiFormatter {
+	
 	public static final int BULLET_RADIUS = 5;
 	
 	public UiCategoryFormatter(ScrollPane thePane) {
@@ -25,25 +30,22 @@ public class UiCategoryFormatter extends UiFormatter {
 		mainPane.setContent(currentGrid);
 	}
 
-	public void updateCategories(ArrayList<String> myCategoryList, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	public void updateCategories(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
 		clearCurrentGridContents();
-		UiTextBuilder myConfig = new UiTextBuilder();
-		myConfig.addMarker(0,"textCategory");
-		for ( int i = 0; i < myCategoryList.size(); i ++ ) {
+		UiTextBuilder myBuilder = new UiTextBuilder();
+		myBuilder.addMarker(0,"textCategory");
+		for ( int i = 0; i < categoryNames.size(); i ++ ) {
 			// add bullet
 			gridHelper.addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
 			
 			// add tag name
-			TextFlow element = new TextFlow();
-			element.getChildren().addAll(myConfig.build(myCategoryList.get(i)));
-			gridHelper.addTextFlowToCell(1,i,element,TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryNames.get(i)),TextAlignment.CENTER,currentGrid);
 			
 			// add tag numbers
-			element = new TextFlow();
-			element.getChildren().addAll(myConfig.build(""+ categoryNums.get(i) ));
-			gridHelper.addTextFlowToCell(2,i,element,TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryNums.get(i)),TextAlignment.CENTER,currentGrid);
 		}
 	}
+	
 	private Circle createBullet(int radius, Color theCenter) {
 		assert(theCenter != null);
 		Circle myCircle = new Circle(radius);

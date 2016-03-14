@@ -1,50 +1,43 @@
 package taskey.ui.utility;
 
-import java.util.ArrayList;
-
-import javafx.animation.Animation;
-import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.stage.Popup;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import taskey.ui.UiConstants.ActionMode;
 
 /**
  * This class provides modified abstractions for some basic animations in javafx
- * as well as custom ones
- * @author JunWei
+ * as well as custom ones.
  *
+ * @author JunWei
  */
 
 public class UiAnimationManager {
 
 	private static UiAnimationManager instance = null;
-	
 	public static UiAnimationManager getInstance() {
 		if ( instance == null ) {
 			instance = new UiAnimationManager();
 		}
 		return instance;
 	}
+	
 	/**
-	 * This method creates fade transitions for a node
-	 * 
+	 * This method creates fade transitions for a node.
+	 *
 	 * @param theNode - node object to place animation on
 	 * @param startDelay - delay before animation starts
 	 * @param animDuration - how long to play the animation
 	 * @param fromAlpha - start opacity
 	 * @param toAlpha - end opacity
-	 * @return FadeTransition object for custom handling
+	 * @return - FadeTransition object for custom handling
 	 */
 	public FadeTransition createFadeTransition(Node theNode, int startDelay, int animDuration, double fromAlpha, double toAlpha) {
 		assert(theNode != null);
@@ -56,6 +49,15 @@ public class UiAnimationManager {
 		return ft;
 	}
 	
+	/**
+	 * Creates the translate transition.
+	 *
+	 * @param theNode - the node
+	 * @param source - the source x y
+	 * @param dest - the dest x y
+	 * @param animDuration - the anim duration
+	 * @return - the translate transition
+	 */
 	public TranslateTransition createTranslateTransition(Node theNode, Pair<Double,Double> source, Pair<Double,Double> dest,
 														 int animDuration) {
 		assert(theNode != null);
@@ -69,8 +71,19 @@ public class UiAnimationManager {
 		return shift;	
 	}
 	
+	/**
+	 * Creates the timeline animation for shifting text around based on frames
+	 * This is a little choppy at the moment, a better alternative is based on translation
+	 * if getting bounds is not an issue
+	 *
+	 * @param theLabel- the label
+	 * @param interval -the interval
+	 * @param charsToSkip - chars to skip
+	 * @param filler -the filler
+	 * @return - the timeline
+	 */
 	public Timeline createTimelineAnimation( Label theLabel, int interval, int charsToSkip, String filler ) {
-			//theLabel.setText(theLabel.getText() + filler);
+
 	        Timeline timeline = new Timeline();
 	        timeline.setCycleCount(Timeline.INDEFINITE);
 	        timeline.setAutoReverse(true);

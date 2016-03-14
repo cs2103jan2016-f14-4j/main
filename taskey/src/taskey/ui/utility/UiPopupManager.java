@@ -65,6 +65,13 @@ public class UiPopupManager {
 		return newPopup;
 	}
 
+	
+	/**
+	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems
+	 * To provide more customization
+	 * @param numRows
+	 * @return
+	 */
 	public Popup createPopupMenu(int numRows) {
 		assert(numRows >= 0);
 		Popup newPopup = new Popup();

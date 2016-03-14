@@ -3,12 +3,16 @@ package taskey.ui.content.formatters;
 import java.util.ArrayList;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
@@ -95,6 +99,8 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
+		assert(theTask.getTaskType() != null);
+		
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
@@ -132,8 +138,17 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 
-		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
+		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.URGENT_MARK),
 				30,30,newGrid);
 		img.setTranslateX(150);
+		/*int gap = 1;
+		for ( int i = 0; i < 7; i ++ ) {
+			Rectangle rect = new Rectangle(0,0,7,7);
+			rect.setFill(Paint.valueOf(Color.rgb(255,i*(255/7), 0).toString()));
+			StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
+			pane.getChildren().add(rect);
+			StackPane.setAlignment(rect, Pos.CENTER_RIGHT);
+			rect.setTranslateX(-7*i + gap);
+		}*/
 	}
 }

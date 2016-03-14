@@ -304,7 +304,9 @@ public class UiController {
 				} else if (event.isControlDown() && event.getCode() == KeyCode.W){
 					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
 					stage.close();
-				} else if (event.getCode() == KeyCode.BACK_QUOTE) {
+				} else if (event.getCode() == KeyCode.F1) {
+					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
+				} else if (event.getCode() == KeyCode.F2) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
 				}
 			}

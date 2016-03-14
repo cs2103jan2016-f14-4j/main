@@ -86,19 +86,13 @@ public class UiActionFormatter extends UiFormatter {
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			//newGrid.setGridLinesVisible(true);
-			for (int k = 0; k < entriesPerPage; k++) {
-				RowConstraints row = new RowConstraints();
-				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
-				newGrid.getRowConstraints().add(row);
-			}
-			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {
 				if ( entryNo >= myTaskList.size() ) {
 					break;
 				}
 				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
-				pageEntries.add(entryPane);
+				//pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
 				addTaskDescription(theTask, j,newGrid);
@@ -120,11 +114,14 @@ public class UiActionFormatter extends UiFormatter {
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
+		assert(theTask.getTaskType() != null);
+		
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
 		line += "$Name: "; 
 		line += theTask.getTaskName() + "\n";
+		System.out.println(theTask.getTaskType());
 		switch ( theTask.getTaskType() ) {
 			case "EVENT": 
 				String [] timings = theTask.getEventTime();

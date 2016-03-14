@@ -36,6 +36,8 @@ public class UiImageManager {
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusDefault.png")));
 			myImageContainer.put(IMAGE_ID.MINUS_SELECT, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusSelect.png")));
+			myImageContainer.put(IMAGE_ID.URGENT_MARK, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "urgentMark.png")));
 			myImageContainer.put(IMAGE_ID.INBOX, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
 			loadHelpMenuImages();

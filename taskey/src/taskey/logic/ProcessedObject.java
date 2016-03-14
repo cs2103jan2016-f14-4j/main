@@ -1,6 +1,7 @@
 package taskey.logic;
 
 /**
+ * @@author A0107345L
  * This class will be used for facilitating transfer of a processed task from 
  * Parser to Logic. 
  * 

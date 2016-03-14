@@ -60,12 +60,12 @@ public class ParseAdd {
 		String simpString = getTaskName(command, stringInput);  
 		
 		if (isEmptyAdd(simpString)) {
-			processed = parseError.processError("empty add");
+			processed = parseError.processError(ParserConstants.ERROR_ADD_EMPTY);
 			return processed;
 		}
 		
 		if(isOnlyNumbers(simpString)) {
-			processed = parseError.processError("task name cannot consist entirely of numbers");
+			processed = parseError.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 
 		
@@ -73,7 +73,7 @@ public class ParseAdd {
 		processed = processNormally(command, processed, task, simpString);
 		
 		//if there's error, don't continue to process tags
-		if (processed.getCommand().compareTo("ERROR") == 0) {
+		if (processed.getCommand().compareTo(ParserConstants.ERROR) == 0) {
 			return processed;
 		}
 		//process tags now: if there are tags, add it in.
@@ -178,19 +178,21 @@ public class ParseAdd {
 		ProcessedObject processed;
 		String taskName;
 		String withoutTagList = simpString.split("#")[0].trim();
-		
+	
 		String simpString2 = simpString.replace("today", "2day"); 
 		simpString2 = simpString2.replace("tomorrow", "tmr"); 
 		String[] inputList = withoutTagList.split("from");
 		String[] dateList = inputList[1].split("to"); 
-		taskName = inputList[0].trim(); 
+		taskName = removeTimeFromName(withoutTagList);
+		String dateForPrettyParser = withoutTagList.replace(taskName, "");
+		
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
 		
 		//if date contains am or pm or morning or night, 
 		//call pretty parser to process the time and return. 
 		try {
-			long[] epochTimeEvent = getPrettyTimeEvent(withoutTagList);
+			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
 			task.setStartDate(epochTimeEvent[0]);
 			task.setEndDate(epochTimeEvent[1]);
 			task.setTaskName(taskName);
@@ -251,11 +253,12 @@ public class ParseAdd {
 		String[] inputList = withoutTagList.split("by");
 		taskName = inputList[0].trim(); 
 		taskName = removeTimeFromName(taskName); 
+		String dateForPrettyParser = withoutTagList.replace(taskName, "");
 		String rawDate = inputList[1].trim().toLowerCase(); 
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(withoutTagList);
+		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -293,11 +296,12 @@ public class ParseAdd {
 		String[] inputList = withoutTagList.split("on"); 
 		taskName = inputList[0].trim(); 
 		taskName = removeTimeFromName(taskName); 
+		String dateForPrettyParser = withoutTagList.replace(taskName, ""); 
 		String rawDate = inputList[1].trim().toLowerCase();
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
-		epochTime = getPrettyTime(withoutTagList);
+		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
 		} else if (!specialDays.containsKey(rawDate)) {
@@ -418,27 +422,11 @@ public class ParseAdd {
 	 * @return
 	 */
 	public String removeTimeFromName(String taskName) {
-		boolean hasTime = false; 
-		
-		if (taskName.contains("am")) {
-			hasTime = true; 
-		} else if (taskName.contains("a.m.")) {
-			hasTime = true; 
-		} else if (taskName.contains("pm")) {
-			hasTime = true;
-		} else if (taskName.contains("p.m.")) {
-			hasTime = true; 
-		}
-		
-		if (!hasTime) {
-			return taskName; 
-		}
-		
 		String stringRep = ""; 
 		String[] splitName = taskName.split(" "); 
 		int size = splitName.length; 
 		
-		for(int i = 0; i < size; i++) {
+		for(int i = 0; i < size; ) {
 			String word = splitName[i]; 
 			if (word.compareTo("at") == 0) {
 				if (i+1 < size) {
@@ -458,8 +446,15 @@ public class ParseAdd {
 						i += 2; 
 					}
 				}
+			} else if (word.compareTo("from") == 0) {
+				break; 
+			} else if (word.compareTo("on") == 0) {
+				break;
+			} else if (word.compareTo("by") == 0) {
+				break; 
 			} else {
 				stringRep += word + " "; 
+				i += 1; 
 			}
 		}	
 		return stringRep.trim(); 

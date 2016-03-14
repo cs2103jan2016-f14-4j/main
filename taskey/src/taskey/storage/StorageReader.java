@@ -33,7 +33,7 @@ class StorageReader {
      * Load directory *
      *================*/
     /**
-     * Tries to load the last-saved directory from a config file located in System.getProperty("user.dir").
+     * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
      * @param filename name of the config file to be read
      * @return the File representing the last-saved directory, or null if it was not found
      */

@@ -15,7 +15,7 @@ import taskey.logic.Task;
 @SuppressWarnings("serial")
 public class StorageException extends IOException {
 	ArrayList<ArrayList<Task>> lastModifiedSuperlist;
-	HashMap<String, Integer> lastModifiedTagMap;
+	HashMap<String, Integer> lastModifiedTagMap; //not in use
 
 	public StorageException(Throwable cause, ArrayList<ArrayList<Task>> superlist) {
 		super(cause.getMessage(), cause);

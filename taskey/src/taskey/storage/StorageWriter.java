@@ -34,14 +34,14 @@ class StorageWriter {
      * Save directory *
      *================*/
     /**
-     * Saves the given directory as a config file located in System.getProperty("user.dir").
-     * @param toSave the File representing the directory to be saved
+     * Writes the given directory to a config file located in System.getProperty("user.dir").
+     * @param dir the File representing the directory to be saved
      * @param filename name of the destination file
      */
-    void saveDirectory(File toSave, String filename) {
+    void saveDirectory(File dir, String filename) {
     	File dest = new File(filename);
     	try {
-    		writeToFile(dest, toSave, new TypeToken<File>() {});
+    		writeToFile(dest, dir, new TypeToken<File>() {});
     	} catch (IOException e) {
     		e.printStackTrace();
     	}
@@ -51,19 +51,18 @@ class StorageWriter {
      * Save task list *
      *================*/
     /**
-     * Saves an ArrayList of Task objects to the File dest.
+     * Writes an ArrayList of Task objects to the File dest.
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
      * @param tasks the tasklist to be saved
      * @param dest the destination file to be written to
-     * @throws StorageException contains the last saved tasklists
+     * @throws IOException when there is error writing to file
      */
-    void saveTasklist(ArrayList<Task> tasks, File dest) throws StorageException {
+    void saveTasklist(ArrayList<Task> tasks, File dest) throws IOException {
 		try {
 			writeToFile(dest, tasks, new TypeToken<ArrayList<Task>>() {});
 		} catch (IOException e) {
 			e.printStackTrace();
-			// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-			throw new StorageException(e, History.getInstance().getLastSuperlist());
+			throw e;
 		}
     }
 
@@ -75,14 +74,14 @@ class StorageWriter {
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
      * @param tags HashMap that maps tag strings to their corresponding multiplicities
      * @param dest the destination file to be written to
-     * @throws StorageException contains the last saved tagmap
+     * @throws IOException when there is error writing to file
      */
-    void saveTags(HashMap<String, Integer> tags, File dest) throws StorageException {
+    void saveTags(HashMap<String, Integer> tags, File dest) throws IOException {
     	try {
     		writeToFile(dest, tags, new TypeToken<HashMap<String, Integer>>() {});
     	} catch (IOException e) {
     		e.printStackTrace();
-    		throw new StorageException(e, History.getInstance().getLastTagmap());
+    		throw e;
     	}
     }
 }

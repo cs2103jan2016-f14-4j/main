@@ -1,13 +1,13 @@
 package taskey.storage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.logic.Task;
 
 /**
- * This is a facade class.
  * @author Dylan
  */
 public class Storage {
@@ -65,7 +65,7 @@ public class Storage {
 		HashMap<String, Integer> loadedTags = storage.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 
-		// Load after save - tasklist
+		// Load after save - tasklists
 		System.out.println("\n\nLoad after save ===================================");
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 		ArrayList<Task> ignoredList = new ArrayList<Task>();
@@ -75,6 +75,9 @@ public class Storage {
 		pendingList.add(new Task("3. This is a test task"));
 		superlist.add(ignoredList);
 		superlist.add(pendingList);
+		for (int i=0; i<5; i++) {
+			superlist.add(new ArrayList<Task>());
+		}
 		try {
 			storage.saveAllTasklists(superlist);
 		} catch (StorageException e) {
@@ -87,12 +90,7 @@ public class Storage {
 		// Load after save - tagsmap
 		HashMap<String, Integer> tags = new HashMap<String, Integer>();
 		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
-		try {
-			storage.saveTags(tags);
-		} catch (StorageException e) {
-			System.err.println(e.getMessage());
-			System.out.println(e.getLastModifiedTagMap());
-		}
+		storage.saveTags(tags);
 		loadedTags = storage.loadTags();
 		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 	}
@@ -115,18 +113,22 @@ public class Storage {
 	 * Post-condition: all the member fields of Storage have been instantiated.
 	 */
 	public Storage() {
-    		storageReader = new StorageReader();
-    		storageWriter = new StorageWriter();
-    		history = History.getInstance();
-    		directory = storageReader.loadDirectory(FILENAME_CONFIG);
+		storageReader = new StorageReader();
+		storageWriter = new StorageWriter();
+		history = new History();
+		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
-    		if (directory == null) {
-        		System.out.println("{Setting default directory}"); //debug info
-        		setDirectory(DEFAULT_DIRECTORY);
-    		} else {
-        		System.out.println("{Storage directory loaded}"); //debug info
-    			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
-    		}
+		if (directory == null) {
+    		System.out.println("{Setting default directory}"); //debug info
+    		setDirectory(DEFAULT_DIRECTORY);
+		} else {
+    		System.out.println("{Storage directory loaded}"); //debug info
+			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
+		}
+    }
+
+    public History getHistory() {
+    	return history;
     }
 
 
@@ -151,6 +153,7 @@ public class Storage {
 		}
 
 		//history.add(superlist); //Logic will add the initial loaded list to History
+		//TODO: can move to here, as long as this method is only called once
 		return superlist;
 	}
 
@@ -159,24 +162,26 @@ public class Storage {
 	 * Logic calls this after every operation.
 	 * <p>Pre-conditions:
 	 * <br>- Starting from index 1, the lists in the given superlist
-	 * 		 are in the same order as the enum constants in TasklistEnum.
+	 * 		 must be in the same order as the enum constants in TasklistEnum.
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
 	 * @param superlist the list of tasklists to be saved
 	 * @throws StorageException contains the last saved tasklist
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == 7); //TODO assert(false) doesn't work
+		assert (superlist.size() == 7);
 
 		for (TasklistEnum e : TasklistEnum.values()) {
-			if (e.index() == superlist.size()) { //check for when testing in main method
-				break;
-			}
 			ArrayList<Task> listToSave = superlist.get(e.index());
 			File dest = new File(directory, e.filename());
-			storageWriter.saveTasklist(listToSave, dest);
+			try {
+				storageWriter.saveTasklist(listToSave, dest);
+			} catch (IOException ioe) {
+				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
+				assert (!history.isEmpty());
+				throw new StorageException(ioe, history.peek());
+			}
 		}
-
-		history.add(superlist); //only if all the lists were successfully saved
+		history.add(superlist); //to Hubert: moved the check to History's add method
 	}
 
 
@@ -196,12 +201,18 @@ public class Storage {
     /**
      * Saves the given HashMap containing user-defined tags to Storage.
      * @param tags the HashMap that maps tag strings to their corresponding multiplicities
-     * @throws StorageException contains the last saved tagmap
+     * @return true if save was successful; false otherwise
      */
-    public void saveTags(HashMap<String, Integer> tags) throws StorageException {
+    public boolean saveTags(HashMap<String, Integer> tags) {
     	File dest = new File(directory, FILENAME_TAGS);
-    	storageWriter.saveTags(tags, dest);
-    	history.add(tags);
+    	try {
+    		storageWriter.saveTags(tags, dest);
+        	history.add(tags);
+        	return true;
+    	} catch (IOException e) {
+    		//throw new StorageException(e, history.peekTags()); //TODO: KIV
+    		return false;
+    	}
     }
 
 

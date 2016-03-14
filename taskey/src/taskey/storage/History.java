@@ -18,24 +18,16 @@ import taskey.logic.Task;
  * @author Dylan
  */
 public class History {
-	private ArrayDeque<ArrayList<ArrayList<Task>>> taskStack; //tasklist history
-	private ArrayDeque<HashMap<String, Integer>> tagStack; //tagmap history
-	private static History instance;
+	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;
+	private ArrayDeque<HashMap<String, Integer>> tagStack; //for exception handling when saving tags
 
 	public History() {
-		taskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
+		stack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
 		tagStack = new ArrayDeque<HashMap<String, Integer>>();
 	}
 
-	/**
-	 * Logic can get the History singleton, if it uses this class in the future.
-	 * @return the history singleton
-	 */
-	public static History getInstance() {
-		if (instance == null) {
-			instance = new History();
-		}
-		return instance;
+	public boolean isEmpty() {
+		return stack.isEmpty();
 	}
 
 
@@ -43,15 +35,29 @@ public class History {
 	 * Adders *
 	 *========*/
 	/**
-	 * Pushes a superlist to History.
+	 * Pushes the given superlist to History.
+	 * Has a check that prevents superlist from being added, if all of its constituent lists
+	 * are equal to those of the most recently added superlist.
 	 * @param superlist to be added
 	 */
 	public void add(ArrayList<ArrayList<Task>> superlist) {
-		taskStack.push(superlist);
+		ArrayList<ArrayList<Task>> mostRecentSuperlist = stack.peek();
+		if (mostRecentSuperlist == null) {
+			stack.push(superlist);
+			return;
+		}
+
+		// Don't add superlist to history if it's identical to the most recent superlist
+		for (int i=0; i<superlist.size(); i++) {
+			if (! superlist.get(i).equals(mostRecentSuperlist.get(i)) ) {
+				stack.push(superlist);
+				break;
+			}
+		}
 	}
 
 	/**
-	 * Pushes a tagmap to History.
+	 * Pushes the given tagmap to History.
 	 * @param tagmap to be added
 	 */
 	public void add(HashMap<String, Integer> tagmap) {
@@ -64,17 +70,18 @@ public class History {
 	 *=========*/
 	/**
 	 * Peeks at the last added superlist in History.
-	 * @return the last added superlist to History
+	 * @return the superlist last added to History
 	 */
-	public ArrayList<ArrayList<Task>> getLastSuperlist() {
-		return taskStack.peek();
+	public ArrayList<ArrayList<Task>> peek() {
+		return stack.peek();
 	}
 
 	/**
 	 * Peeks at the last added tagmap in History.
-	 * @return the last added tagmap to History
+	 * Not in use.
+	 * @return the tagmap last added to History
 	 */
-	public HashMap<String, Integer> getLastTagmap() {
+	public HashMap<String, Integer> peekTags() {
 		return tagStack.peek();
 	}
 
@@ -87,16 +94,16 @@ public class History {
 	 * Used for undo.
 	 * @return the removed superlist
 	 */
-	public ArrayList<ArrayList<Task>> popSuperlist() {
-		return taskStack.pop();
+	public ArrayList<ArrayList<Task>> pop() {
+		return stack.pop();
 	}
 
 	/**
 	 * Pop the last added tagmap from History.
-	 * Used for undo.
+	 * For undo (not in use).
 	 * @return the removed tagmap
 	 */
-	public HashMap<String, Integer> popTagmap() {
+	public HashMap<String, Integer> popTags() {
 		return tagStack.pop();
 	}
 

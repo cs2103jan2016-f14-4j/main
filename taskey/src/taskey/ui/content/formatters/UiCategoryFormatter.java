@@ -4,14 +4,18 @@ import java.util.ArrayList;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import taskey.constants.Triplet;
+import taskey.constants.UiConstants;
 import taskey.logic.Task;
-import taskey.ui.UiConstants;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiTextBuilder;
 
@@ -30,19 +34,22 @@ public class UiCategoryFormatter extends UiFormatter {
 		mainPane.setContent(currentGrid);
 	}
 
-	public void updateCategories(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
+	public void updateCategories(ArrayList<Triplet<Color, String, Integer>> categoryList) {
 		clearCurrentGridContents();
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarker(0,"textCategory");
-		for ( int i = 0; i < categoryNames.size(); i ++ ) {
-			// add bullet
-			gridHelper.addCircleToCell(0,i,createBullet(BULLET_RADIUS,categoryColors.get(i)),currentGrid);
-			
+		
+		for ( int i = 0; i < categoryList.size(); i ++ ) {
+			gridHelper.createStyledCell(1, i, UiConstants.STYLE_HIGHLIGHT_BOX, currentGrid);
+			// add Rect
+			gridHelper.createStyledCell(0, i, "", currentGrid);
+			gridHelper.createScaledRectInCell(0, i, categoryList.get(i).getA(), currentGrid);
 			// add tag name
-			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryNames.get(i)),TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryList.get(i).getB()),TextAlignment.CENTER,currentGrid);
 			
+			gridHelper.createStyledCell(2, i, UiConstants.STYLE_HIGHLIGHT_BOX, currentGrid);
 			// add tag numbers
-			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryNums.get(i)),TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryList.get(i).getC()),TextAlignment.CENTER,currentGrid);
 		}
 	}
 	

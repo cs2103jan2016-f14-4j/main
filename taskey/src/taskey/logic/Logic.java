@@ -5,12 +5,12 @@ import taskey.parser.TimeConverter;
 import taskey.storage.History;
 import taskey.storage.Storage;
 import taskey.storage.StorageException;
-import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
 
 import taskey.logic.LogicConstants.ListID;
+import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.ProcessedObject;
 
 /**

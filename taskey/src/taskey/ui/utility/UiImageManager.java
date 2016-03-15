@@ -3,8 +3,8 @@ package taskey.ui.utility;
 import java.util.HashMap;
 
 import javafx.scene.image.Image;
-import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.IMAGE_ID;
 
 /**
  * This class handles loading of image resources 

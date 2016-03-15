@@ -3,6 +3,7 @@ package taskey.ui.content.formatters;
 import java.util.ArrayList;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -15,9 +16,9 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Task;
-import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
@@ -30,12 +31,12 @@ import taskey.ui.utility.UiImageManager;
  * @author junwei
  */
 public class UiDefaultFormatter extends UiFormatter {
-	private int entriesPerPage = 5;
+	private int entriesPerPage = 6;
 	private UiPagination myPagination;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
-		myPagination = new UiPagination(UiConstants.STYLE_GRAY_BOX);
+		myPagination = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 		mainPane.setContent(myPagination.getPagination());
 		mainPane.setFitToHeight(true);
 	}
@@ -74,7 +75,7 @@ public class UiDefaultFormatter extends UiFormatter {
 				if ( entryNo >= myTaskList.size() ) {
 					break;
 				}
-				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
+				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_DEFAULT_BOX, newGrid);
 				pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
@@ -90,41 +91,52 @@ public class UiDefaultFormatter extends UiFormatter {
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myBuilder = new UiTextBuilder();
-		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "" + (id + 1);
-		gridHelper.createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, theGrid);
-		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);
+		Color theColor = Color.WHITE;
+		for ( int i = 0; i < categoryList.size(); i ++ ) {
+			String tag = theTask.getTaskType();
+			if ( tag != null ) {
+				if ( tag.equals("FLOATING")) { // testing since no tags yet
+					tag = new String("general");
+				} 
+				tag = tag.toLowerCase();
+			}
+			String categoryTag = categoryList.get(i).getB().toLowerCase();
+			if ( categoryTag.contains(tag)) {
+				theColor = categoryList.get(i).getA();
+				break;
+			}
+		}
+		gridHelper.createStyledCell(0, row, "", theGrid);
+		gridHelper.createScaledRectInCell(0, row, theColor, theGrid);
+		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);	
 	}
-	
+		
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
 		assert(theTask.getTaskType() != null);
 		
 		UiTextBuilder myBuilder = new UiTextBuilder();
-		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		myBuilder.addMarkers(UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "";
-		line += "$Name: "; 
+		line += "Name: "; 
 		line += theTask.getTaskName() + "\n";
 		switch ( theTask.getTaskType() ) {
 			case "EVENT": 
 				String [] timings = theTask.getEventTime();
-				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE,
-						UiConstants.STYLE_TEXT_BLACK_TO_PURPLE, 
-						UiConstants.STYLE_TEXT_BLUE);
-				line += "Event from: $";
-				line += timings[0] + "$ to $" + timings[1];
+				line += "Event from: ";
+				line += timings[0] + " to " + timings[1];
 				break;
 	 		case "DEADLINE":
-				line += "Due by: ";
-				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE);			
-				line += "$" + theTask.getDeadline();
+				line += "Due by: ";	
+				line += "" + theTask.getDeadline();
 				break;
 			default:
 				break;
 		}
 		line += "\n";
-		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
-		line += "$Tags: ";
+		line += "Tags: ";
 		if ( theTask.getTaskTags() != null ) {
 			ArrayList<String> tags = theTask.getTaskTags();
 			for ( String s : tags) {
@@ -133,7 +145,9 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			line += "None";
 		}
-		gridHelper.addTextFlowToCell(1, row, myBuilder.buildBySymbol(line),TextAlignment.LEFT, newGrid);
+		StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
+		pane.setPadding(new Insets(2));
+		gridHelper.addTextFlowToCell(1, row, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 

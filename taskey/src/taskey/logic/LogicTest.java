@@ -43,7 +43,7 @@ public class LogicTest {
 		String input = "add g2 a?b ,  ";
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		LogicFeedback actual = logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		LogicFeedback actual = logic.addFloating(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -66,7 +66,7 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		LogicFeedback actual = logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		LogicFeedback actual = logic.addDeadline(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -91,7 +91,7 @@ public class LogicTest {
 		                + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		LogicFeedback actual = logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		LogicFeedback actual = logic.addDeadline(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -115,7 +115,7 @@ public class LogicTest {
 		                + " to " + timeConverter.getDate(currTime + 10000);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		LogicFeedback actual = logic.addEvent(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		LogicFeedback actual = logic.addEvent(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -141,7 +141,7 @@ public class LogicTest {
 		                + " to " + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 50000);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		LogicFeedback actual = logic.addEvent(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		LogicFeedback actual = logic.addEvent(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -155,15 +155,61 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void testDuplicateTaskName() {
+	public void testAddExpiredDeadlineTask() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		LogicFeedback actual = logic.addDeadline(logic.getAllTaskLists(), t, po);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.EXPIRED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+		
+	}
+	
+	@Test
+	public void testAddExpiredEventTask() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  from " + timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK)
+		                + " to " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		LogicFeedback actual = logic.addEvent(logic.getAllTaskLists(), t, po);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.EXPIRED.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testAddDuplicateTaskName() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		String input = "add g2 a?b ,  ";
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
-		LogicFeedback actual = logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addFloating(logic.getAllTaskLists(), t, po);
+		LogicFeedback actual = logic.addFloating(logic.getAllTaskLists(), t, po);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -171,8 +217,8 @@ public class LogicTest {
 		}
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.GENERAL.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("The task " 
-		                                           + t.getTaskName() + " already exists!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("The task \"" + t.getTaskName() 
+		                                           + "\" already exists!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -188,9 +234,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 0");
-		LogicFeedback actual = logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, 0);
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -211,9 +257,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 0");
-		LogicFeedback actual = logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0);
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -234,9 +280,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,   on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del " + t.getTaskName());
-		LogicFeedback actual = logic.deleteByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, t.getTaskName());
+		LogicFeedback actual = logic.deleteByName(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -257,9 +303,55 @@ public class LogicTest {
 		String input = "add g2 a?b ,   on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del " + t.getTaskName());
-		LogicFeedback actual = logic.deleteByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, t.getTaskName());
+		LogicFeedback actual = logic.deleteByName(logic.getAllTaskLists(), ContentBox.PENDING, po, t.getTaskName());
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDeleteTaskByIndexFromExpiredTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("del 0");
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.EXPIRED, po, 0);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDeleteTaskByNameFromExpiredTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("del " + t.getTaskName());
+		LogicFeedback actual = logic.deleteByName(logic.getAllTaskLists(), ContentBox.EXPIRED, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -280,9 +372,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 0");
-		LogicFeedback actual = logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.EXPIRED, po, 0);
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.ACTION, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -307,9 +399,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 1");
-		LogicFeedback actual = logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 1);
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 1);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -318,7 +410,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -333,9 +425,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,   on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del ayy lmao");
-		LogicFeedback actual = logic.deleteByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, "ayy lmao");
+		LogicFeedback actual = logic.deleteByName(logic.getAllTaskLists(), ContentBox.PENDING, po, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -344,7 +436,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("ayy lmao" 
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"ayy lmao\"" 
 				                                   + " not found in this list!"));
 		
 		assertTrue(actual.equals(expected));
@@ -357,7 +449,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
 		Task t = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addFloating(logic.getAllTaskLists(), t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -366,7 +458,7 @@ public class LogicTest {
 		
 		String searchPhrase = "a?";
 		po = parser.parseInput("search " + searchPhrase);
-		LogicFeedback actual = logic.search(logic.cloneLists(logic.getAllTaskLists()), po, searchPhrase);	
+		LogicFeedback actual = logic.search(logic.getAllTaskLists(), po, searchPhrase);	
 		temp.get(0).add(t);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		assertTrue(actual.equals(expected));
@@ -379,7 +471,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
 		Task t = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addFloating(logic.getAllTaskLists(), t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -388,7 +480,7 @@ public class LogicTest {
 		
 		String searchPhrase = "2a";
 		po = parser.parseInput("search " + searchPhrase);
-		LogicFeedback actual = logic.search(logic.cloneLists(logic.getAllTaskLists()), po, searchPhrase);
+		LogicFeedback actual = logic.search(logic.getAllTaskLists(), po, searchPhrase);
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		assertTrue(actual.equals(expected));
 	}
@@ -400,7 +492,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		ProcessedObject po = parser.parseInput("add g2 a?b ,  ");
 		Task t = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addFloating(logic.getAllTaskLists(), t, po);
 
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -411,7 +503,7 @@ public class LogicTest {
 		
 		String searchPhrase = "";
 		po = parser.parseInput("search " + searchPhrase);
-		LogicFeedback actual = logic.search(logic.cloneLists(logic.getAllTaskLists()), po, searchPhrase);
+		LogicFeedback actual = logic.search(logic.getAllTaskLists(), po, searchPhrase);
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception ("Search phrase cannot be empty!"));
 		assertTrue(actual.equals(expected));
 	}
@@ -426,9 +518,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done 0");
-		LogicFeedback actual = logic.doneByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, 0);
+		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -450,9 +542,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done 0");
-		LogicFeedback actual = logic.doneByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0);
+		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -474,9 +566,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done 0");
-		LogicFeedback actual = logic.doneByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.EXPIRED, po, 0);
+		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.EXPIRED, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -500,9 +592,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done 1");
-		LogicFeedback actual = logic.doneByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 1);
+		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 1);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -511,7 +603,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -526,9 +618,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done " + t.getTaskName());
-		LogicFeedback actual = logic.doneByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, t.getTaskName());
+		LogicFeedback actual = logic.doneByName(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -550,9 +642,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done " + t.getTaskName());
-		LogicFeedback actual = logic.doneByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, t.getTaskName());
+		LogicFeedback actual = logic.doneByName(logic.getAllTaskLists(), ContentBox.PENDING, po, t.getTaskName());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -574,9 +666,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("done " + "ayy lmao");
-		LogicFeedback actual = logic.doneByName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, "ayy lmao");
+		LogicFeedback actual = logic.doneByName(logic.getAllTaskLists(), ContentBox.PENDING, po, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -602,9 +694,9 @@ public class LogicTest {
 		Task beforeUpdate = po.getTask();
 		Task afterUpdate = beforeUpdate.getDuplicate();
 		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByIndexChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, 0, "ayy lmao");
+		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, 0, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -630,9 +722,9 @@ public class LogicTest {
 		Task beforeUpdate = po.getTask();
 		Task afterUpdate = beforeUpdate.getDuplicate();
 		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByIndexChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, "ayy lmao");
+		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -656,9 +748,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("set 0 \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByIndexChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.EXPIRED, po, 0, "ayy lmao");
+		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.EXPIRED, po, 0, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -682,9 +774,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("set 1 \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByIndexChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 1, "ayy lmao");
+		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.PENDING, po, 1, "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -693,7 +785,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -708,10 +800,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + 10) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -736,10 +828,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + 10) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -764,10 +856,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -791,10 +883,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -818,10 +910,10 @@ public class LogicTest {
 		String input = "add g2 a?b";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -846,12 +938,12 @@ public class LogicTest {
 		String input = "add g2 a?b on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "[" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
 				               + 10000) + ", " + timeConverter.getDate(currTime 
 				               + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -876,10 +968,10 @@ public class LogicTest {
 				        + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addEvent(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addEvent(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 [none]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, afterUpdate);
+		LogicFeedback actual = logic.updateByIndexChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -905,9 +997,9 @@ public class LogicTest {
 		Task beforeUpdate = po.getTask();
 		Task afterUpdate = beforeUpdate.getDuplicate();
 		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByNameChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeName(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
 				                                            "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -934,9 +1026,9 @@ public class LogicTest {
 		Task beforeUpdate = po.getTask();
 		Task afterUpdate = beforeUpdate.getDuplicate();
 		afterUpdate.setTaskName("ayy lmao");
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByNameChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeName(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(),
 				                                            "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -959,9 +1051,9 @@ public class LogicTest {
 		String input = "add g2 a?b";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByNameChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.EXPIRED, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeName(logic.getAllTaskLists(), ContentBox.EXPIRED, po, beforeUpdate.getTaskName(),
 				                                            "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -983,9 +1075,9 @@ public class LogicTest {
 		String input = "add g2 a?b";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() +  " \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByNameChangeName(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeName(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
 				                                            "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1010,10 +1102,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + 10) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(),
 				                                            afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1038,10 +1130,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + 10) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(),
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(),
 				                                            afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1066,10 +1158,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(), 
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.THIS_WEEK, po, beforeUpdate.getTaskName(), 
 				                                            afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1093,10 +1185,10 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + 10000) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(), 
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(), 
 				                                            afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1120,10 +1212,10 @@ public class LogicTest {
 		String input = "add g2 a?b";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -1147,12 +1239,12 @@ public class LogicTest {
 		String input = "add g2 a?b on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addDeadline(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [" + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
 				               + 10000) + ", " + timeConverter.getDate(currTime 
 				               + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -1176,10 +1268,10 @@ public class LogicTest {
 				        + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY);
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addEvent(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addEvent(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " [none]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeDate(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
+		LogicFeedback actual = logic.updateByNameChangeDate(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(), afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -1202,12 +1294,12 @@ public class LogicTest {
 		String input = "add g2 a?b ,  ";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set 0 " + "\"ayy lmao\" " + "[" + timeConverter.getDate(currTime) 
 		                       + ", " + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
 		                       + NUM_SECONDS_BUFFER_TIME) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByIndexChangeBoth(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, "ayy lmao",
+		LogicFeedback actual = logic.updateByIndexChangeBoth(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, "ayy lmao",
 				                                             afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1233,13 +1325,13 @@ public class LogicTest {
 		String input = "add g2 a?b ,  ";
 		ProcessedObject po = parser.parseInput(input);
 		Task beforeUpdate = po.getTask();
-		logic.addFloating(logic.cloneLists(logic.getAllTaskLists()), beforeUpdate, po);
+		logic.addFloating(logic.getAllTaskLists(), beforeUpdate, po);
 		po = parser.parseInput("set " + beforeUpdate.getTaskName() + " \"ayy lmao\" " + "[" 
 		                       + timeConverter.getDate(currTime)  + ", " 
 				               + timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK 
 		                       + NUM_SECONDS_BUFFER_TIME) + "]");
 		Task afterUpdate = po.getTask();
-		LogicFeedback actual = logic.updateByNameChangeBoth(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, beforeUpdate.getTaskName(), 
+		LogicFeedback actual = logic.updateByNameChangeBoth(logic.getAllTaskLists(), ContentBox.PENDING, po, beforeUpdate.getTaskName(), 
 				                                            "ayy lmao", afterUpdate);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
@@ -1256,7 +1348,7 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void undoAdd() {
+	public void testUndoAdd() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		TimeConverter timeConverter = new TimeConverter();
@@ -1265,7 +1357,7 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		
@@ -1279,7 +1371,7 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void undoDelete() {
+	public void testUndoDelete() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		TimeConverter timeConverter = new TimeConverter();
@@ -1288,9 +1380,9 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 0");
-		logic.deleteByIndex(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0);
+		logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 0);
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		
@@ -1307,7 +1399,7 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void undoUpdate() {
+	public void testUndoUpdate() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		TimeConverter timeConverter = new TimeConverter();
@@ -1316,9 +1408,37 @@ public class LogicTest {
 		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
-		logic.addDeadline(logic.cloneLists(logic.getAllTaskLists()), t, po);
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("set 0 [none] \"ayy lmao\"");
-		logic.updateByIndexChangeBoth(logic.cloneLists(logic.getAllTaskLists()), ContentBox.PENDING, po, 0, "ayy lmao", po.getTask());
+		logic.updateByIndexChangeBoth(logic.getAllTaskLists(), ContentBox.PENDING, po, 0, "ayy lmao", po.getTask());
+		po = parser.parseInput("undo");
+		LogicFeedback actual = logic.undo(po);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testUndoDone() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("done 0");
+		logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 0);
 		po = parser.parseInput("undo");
 		LogicFeedback actual = logic.undo(po);
 		

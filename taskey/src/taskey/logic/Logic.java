@@ -14,7 +14,9 @@ import taskey.logic.LogicConstants.ListID;
 import taskey.logic.ProcessedObject;
 
 /**
- * TODO: class description
+ * The Logic class handles the execution of user commands. It contains an internal memory of task lists 
+ * which facilitate the addition, deletion and updating of tasks. Each time a command is executed, these lists
+ * are modified and then saved to disk accordingly.
  *
  * @author Hubert Wong
  */
@@ -380,6 +382,7 @@ public class Logic {
 	}
 	
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
+	//TODO: search list includes expired and completed tasks as well
 	LogicFeedback search(ArrayList<ArrayList<Task>> copy, ProcessedObject po, String searchPhrase) {
 		if (searchPhrase.equals("")) {
 			return new LogicFeedback(copy, po, new Exception("Search phrase cannot be empty!"));

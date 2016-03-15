@@ -7,6 +7,7 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
+import taskey.constants.UiConstants;
 
 /**
  * This class performs a background service, which updates the UI clock.

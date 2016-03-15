@@ -22,14 +22,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import taskey.constants.Triplet;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.ActionMode;
+import taskey.constants.UiConstants.ContentBox;
+import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Logic;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
 import taskey.logic.Task;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
@@ -134,11 +136,9 @@ public class UiController {
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
 
-	public void updateCategoryDisplay(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		assert(categoryNames != null);
-		assert(categoryNums != null);
-		assert(categoryColors != null);
-		myContentManager.updateCategoryContentBox(categoryNames,categoryNums,categoryColors);
+	public void updateCategoryDisplay(ArrayList<Triplet<Color,String,Integer>> categoryList) {
+		assert(categoryList != null);
+		myContentManager.updateCategoryContentBox(categoryList);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class UiController {
 		assert(feedback != null);
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
-			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight()*1.25F,true); // just set pop up to below input
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
@@ -216,17 +216,18 @@ public class UiController {
 	}
 	
 	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryList;
+		categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
+				new Triplet<Color,String,Integer>(Color.RED,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.BLUE,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
+				new Triplet<Color, String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
+				));
+		updateCategoryDisplay(categoryList);
+		
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
-		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);
-		ArrayList<String> categoryList = new ArrayList<String>(
-				Arrays.asList("General","Deadlines","Events","Archive"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
-				Arrays.asList(allLists.get(ListID.GENERAL.getIndex()).size(),allLists.get(ListID.DEADLINE.getIndex()).size(),
-						allLists.get(ListID.EVENT.getIndex()).size(),allLists.get(ListID.COMPLETED.getIndex()).size()));
-		ArrayList<Color> categoryColors = new ArrayList<Color>(
-				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
-		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
+		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
 	}
 	
 	public void cleanUp() {

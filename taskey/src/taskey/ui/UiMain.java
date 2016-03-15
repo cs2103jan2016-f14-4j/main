@@ -10,13 +10,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import taskey.constants.Constants;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.ActionMode;
+import taskey.constants.UiConstants.ContentBox;
+import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.utility.UiImageManager;
 
 /**
@@ -40,12 +40,12 @@ public class UiMain extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		myController = new UiController();
-		FXMLLoader myloader = new FXMLLoader(getClass().getResource(Constants.FXML_PATH));
+		FXMLLoader myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_PATH));
 		myloader.setController(myController);
 		try {
 			root = myloader.load();
 		} catch (IOException e) {
-			System.out.println(Constants.FXML_LOAD_FAIL);
+			System.out.println(UiConstants.FXML_LOAD_FAIL);
 		}
 		setUpScene(primaryStage, root);
 	}
@@ -60,7 +60,7 @@ public class UiMain extends Application {
 	 */
 	private void setUpScene(Stage primaryStage, Parent root) {
 		UiImageManager.getInstance().loadImages();
-		primaryStage.setTitle(Constants.PROGRAM_NAME);
+		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		Scene newScene = new Scene(root);
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));

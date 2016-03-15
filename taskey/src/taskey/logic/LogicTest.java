@@ -8,10 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.LogicConstants.ListID;
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
-import taskey.ui.UiConstants.ContentBox;
 
 /**
  * @author Hubert

@@ -14,10 +14,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import taskey.constants.UiConstants;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiPopupManager;
 
@@ -59,6 +61,7 @@ public class UiDropDown {
 			if (i < items.size()) {
 				Label text = new Label(items.get(i));
 				text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+				text.getStyleClass().add(UiConstants.STYLE_PROMPT);
 				myPane.getChildren().clear();
 				myPane.getChildren().add(text);
 				myPane.setVisible(true);
@@ -151,14 +154,15 @@ public class UiDropDown {
 	
 		// remove previous
 		myPane = (StackPane) menuItems.get(currentSelection);
-		if ( myPane.getStyleClass().size() > 1) {
-			myPane.getStyleClass().remove(1);
-		}
+		Label toStyle = (Label) myPane.getChildren().get(0);
+		toStyle.getStyleClass().remove(2);
+		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT);
 		
 		currentSelection = selection;
 		myPane = (StackPane) menuItems.get(currentSelection);
-		myPane.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
-		
+		toStyle = (Label) myPane.getChildren().get(0);
+		toStyle.getStyleClass().remove(2);
+		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		refresh();	
 	}
 	

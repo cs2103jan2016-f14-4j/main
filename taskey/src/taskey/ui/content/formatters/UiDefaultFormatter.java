@@ -3,12 +3,16 @@ package taskey.ui.content.formatters;
 import java.util.ArrayList;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.logic.Task;
@@ -26,7 +30,7 @@ import taskey.ui.utility.UiImageManager;
  * @author junwei
  */
 public class UiDefaultFormatter extends UiFormatter {
-	
+	private int entriesPerPage = 5;
 	private UiPagination myPagination;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
@@ -59,7 +63,6 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
-		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
@@ -95,6 +98,8 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
+		assert(theTask.getTaskType() != null);
+		
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
 		String line = "";
@@ -132,8 +137,20 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 
-		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.INBOX),
-				30,30,newGrid);
-		img.setTranslateX(150);
+		assert(theTask.getTaskType() != null);
+		IMAGE_ID imgID;
+		switch ( theTask.getTaskType() ) {
+			case "EVENT":
+				imgID = IMAGE_ID.EVENT;
+				break;
+			case "DEADLINE":
+				imgID = IMAGE_ID.DEADLINE;
+				break;
+			default:
+				imgID = IMAGE_ID.FLOATING;
+				break;
+		}
+		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(imgID),30,30,newGrid);
+		img.setTranslateX(200);
 	}
 }

@@ -47,6 +47,7 @@ public class UiPopupManager {
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
 		content.setText(text);
+		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT);
 		newPopup.getContent().add(content);
 		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  
@@ -65,6 +66,13 @@ public class UiPopupManager {
 		return newPopup;
 	}
 
+	
+	/**
+	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems
+	 * To provide more customization
+	 * @param numRows
+	 * @return
+	 */
 	public Popup createPopupMenu(int numRows) {
 		assert(numRows >= 0);
 		Popup newPopup = new Popup();

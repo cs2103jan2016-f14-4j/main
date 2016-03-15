@@ -6,7 +6,7 @@
 
 .tab-pane
 {
-    -fx-tab-min-width:100px;
+    -fx-tab-min-width:110px;
 }
 
 .tab{
@@ -21,7 +21,7 @@
 .tab .tab-label { 
     -fx-alignment: CENTER;
     -fx-text-fill: #828282;
-    -fx-font-size: 15px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-font-family: 'Montserrat';
 }

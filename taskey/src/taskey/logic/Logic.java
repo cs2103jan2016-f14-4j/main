@@ -32,17 +32,16 @@ public class Logic {
 		history = storage.getHistory();
 
 		//Get lists from Storage
-		taskLists = new ArrayList<ArrayList<Task>>();
-		taskLists = storage.loadAllTasklists();
+		taskLists = cloneLists(storage.loadAllTasklists());
 		ArrayList<Task> thisWeek = new ArrayList<Task>();
 		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
 
-		//Update THIS_WEEK list based on the current date and time
+		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		for (Task t : pendingList) {
-			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
-			//the current week
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
+			if (t.getDeadlineEpoch() < timeConverter.getCurrTime() || t.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+			} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
 				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 				thisWeek.add(t);
 			}
@@ -164,10 +163,6 @@ public class Logic {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Task task = po.getTask();
-    	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
-    	String errorType = po.getErrorType(); //Only used for invalid commands
-    	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
-    	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	
     	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(copy);
@@ -192,7 +187,7 @@ public class Logic {
 				return addEvent(copy, task, po);
 
 			case "DELETE_BY_INDEX":
-				return deleteByIndex(copy, currentContent, po, taskIndex);
+				return deleteByIndex(copy, currentContent, po, po.getIndex());
 
 			case "DELETE_BY_NAME":
 				return deleteByName(copy, currentContent, po, task.getTaskName());
@@ -201,31 +196,31 @@ public class Logic {
 				return new LogicFeedback(copy, po, null);
 
 			case "SEARCH":
-				return search(copy, po, searchPhrase);
+				return search(copy, po, po.getSearchPhrase());
 
 			case "DONE_BY_INDEX":
-				return doneByIndex(copy, currentContent, po, taskIndex);
+				return doneByIndex(copy, currentContent, po, po.getIndex());
 
 			case "DONE_BY_NAME":
 				return doneByName(copy, currentContent, po, task.getTaskName());
 
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				return updateByIndexChangeName(copy, currentContent, po, taskIndex, newTaskName);
+				return updateByIndexChangeName(copy, currentContent, po, po.getIndex(), po.getNewTaskName());
 
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				return updateByIndexChangeDate(copy, currentContent, po, taskIndex, task);
+				return updateByIndexChangeDate(copy, currentContent, po, po.getIndex(), task);
 				
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-				return updateByIndexChangeBoth(copy, currentContent, po, taskIndex, newTaskName, task);
+				return updateByIndexChangeBoth(copy, currentContent, po, po.getIndex(), po.getNewTaskName(), task);
 
 			case "UPDATE_BY_NAME_CHANGE_NAME":
-				return updateByNameChangeName(copy, currentContent, po, task.getTaskName(), newTaskName);
+				return updateByNameChangeName(copy, currentContent, po, task.getTaskName(), po.getNewTaskName());
 
 			case "UPDATE_BY_NAME_CHANGE_DATE":
 				return updateByNameChangeDate(copy, currentContent, po, task.getTaskName(), task);
 				
 			case "UPDATE_BY_NAME_CHANGE_BOTH":
-				return updateByNameChangeBoth(copy, currentContent, po, task.getTaskName(), newTaskName, task);
+				return updateByNameChangeBoth(copy, currentContent, po, task.getTaskName(), po.getNewTaskName(), task);
 
 			case "UNDO":
 				return undo(po);
@@ -245,8 +240,8 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
-			return new LogicFeedback(copy, po,  new Exception("The task "
-		                             + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po,  new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
 
 		pendingList.add(task);
@@ -267,15 +262,19 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(copy, po, new Exception("The task "
-		                             + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po, new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
+		
+		if (task.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+			copy.get(ListID.EXPIRED.getIndex()).add(task);
+		} else {
+			pendingList.add(task);
+			copy.get(ListID.DEADLINE.getIndex()).add(task);
 
-		pendingList.add(task);
-		copy.get(ListID.DEADLINE.getIndex()).add(task);
-
-		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-			copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+				copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			}
 		}
 		
 		try {
@@ -293,15 +292,20 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(copy, po, new Exception("The task "
-								     + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po, new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
 
-		pendingList.add(task);
-		copy.get(ListID.EVENT.getIndex()).add(task);
 
-		if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
-			copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+		if (task.getEndDateEpoch() < timeConverter.getCurrTime()) {
+			copy.get(ListID.EXPIRED.getIndex()).add(task);
+		} else {
+			pendingList.add(task);
+			copy.get(ListID.EVENT.getIndex()).add(task);
+
+			if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
+				copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			}
 		}
 
 		try {

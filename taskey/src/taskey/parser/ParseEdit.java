@@ -63,7 +63,7 @@ public class ParseEdit {
 			String rawIndex = getTaskName(strNoCommand);
 			String newTaskName = getNewName(strNoCommand);
 			String newDate = getNewDate(strNoCommand); 
-			
+			System.out.println(newDate);
 			try {
 				int index = Integer.parseInt(rawIndex);	
 				return updateByIndex(index-1, newTaskName, newDate); 
@@ -231,6 +231,10 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(startDate);
+			changedTask.setStartDate(epochTime);
 		}
 		
 		epochTime = getPrettyTime(endDate);
@@ -244,7 +248,12 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(endDate);
+			changedTask.setEndDate(epochTime);
 		}
+		
 		processed.setTask(changedTask);
 		return processed;
 	}
@@ -280,7 +289,12 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(newDateRaw);
+			changedTask.setDeadline(epochTime);
 		}
+		
 		processed.setTask(changedTask);
 		return processed; 
 	}
@@ -369,7 +383,7 @@ public class ParseEdit {
 		if (date.compareTo("") == 0) {
 			return null; 
 		}
-		return date.trim(); 
+		return date.trim().toLowerCase(); 
 	}
 	
 	/**

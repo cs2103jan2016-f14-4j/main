@@ -1333,4 +1333,32 @@ public class LogicTest {
 		
 		assertTrue(actual.equals(expected));
 	}
+	
+	@Test
+	public void undoDone() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("done 0");
+		logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 0);
+		po = parser.parseInput("undo");
+		LogicFeedback actual = logic.undo(po);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		temp.get(ListID.DEADLINE.getIndex()).add(t);
+		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
+		temp.get(ListID.PENDING.getIndex()).add(t);
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
 }

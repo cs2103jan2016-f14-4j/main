@@ -261,12 +261,10 @@ public class Storage {
 		}
 
 		if (dir.isDirectory()) {
-			boolean shouldSave = isNewDirectory(dir); //compares the new directory with the old to see if it should be saved
-			if (shouldSave) {
+			// Compare the new directory with the old to see if it should be saved and moved
+			if (isNewDirectory(dir)) {
 	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
-	    		System.out.println("{New storage directory saved}"); //debug info
 				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
-				System.out.println("{Storage files moved}"); //debug info
 	    	}
 			
 			directory = dir;
@@ -313,10 +311,15 @@ public class Storage {
         		} catch (IOException e) {
         			isSuccessful = false;
         			e.printStackTrace();
-        			System.out.println("Error moving directory");
         		}
         	}
     	}
+    	
+		if (isSuccessful) {
+			System.out.println("{Storage files moved}"); //debug info
+		} else {
+			System.out.println("Error moving directory"); //debug info
+		}
     	return isSuccessful;
     }
 }

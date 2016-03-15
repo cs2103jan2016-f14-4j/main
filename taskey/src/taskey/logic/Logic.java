@@ -198,7 +198,7 @@ public class Logic {
 				return deleteByName(copy, currentContent, po, task.getTaskName());
 
 			case "VIEW":
-				return new LogicFeedback(cloneLists(taskLists), po, null);
+				return new LogicFeedback(copy, po, null);
 
 			case "SEARCH":
 				return search(copy, po, searchPhrase);
@@ -231,8 +231,7 @@ public class Logic {
 				return undo(po);
 				
 			case "ERROR":
-				//TODO:
-				break;
+				return new LogicFeedback(copy, po, new Exception(po.getErrorType()));
 
 			default:
 				break;

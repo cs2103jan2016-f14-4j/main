@@ -2,19 +2,20 @@ package taskey.parser;
 
 import taskey.logic.ProcessedObject;
 
+
 /**
  * @@author A0107345L
- * Purpose of this class is to parse "errors" for any 
- * wrong command formats/etc...
+ * Parent class for all kinds of Parse (eg. ParseAdd, etc..)
+ * This is to ensure that all Parse classes has a means to 
+ * process error. 
  * @author Xue Hui
  *
  */
-public class ParseError {
+public class ParseCommand {
 	
-	public ParseError() {
+	public ParseCommand() {
 		
 	}
-
 	
 	/**
 	 * Process Errors for string formatting/commands/etc... 
@@ -27,4 +28,5 @@ public class ParseError {
 		
 		return processed;
 	}
+
 }

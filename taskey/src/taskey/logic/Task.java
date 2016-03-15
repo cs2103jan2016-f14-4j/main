@@ -7,6 +7,7 @@ import taskey.parser.TimeConverter;
 import static taskey.constants.ParserConstants.DAY_END_SHORT; 
 
 /**
+ * @@author A0107345L
  * Task object holds all the details of the task 
  * 
  * taskType can have the following values:
@@ -55,30 +56,55 @@ public class Task implements Comparable<Task> {
 	
 	
 	//BASIC GET/SET METHODS =====================================
+	
+	/**
+	 * @return Task Name
+	 */
 	public String getTaskName() {
 		return taskName;
 	}
 	
+	/**
+	 * Set the Task Name of the task
+	 * @param taskName
+	 */
 	public void setTaskName(String taskName) {
 		this.taskName = taskName; 
 	}
 	
+	/**
+	 * @return all tags that the task contains as an ArrayList
+	 */
 	public ArrayList<String> getTaskTags() {
 		return taskTags; 
 	}
 	
+	/**
+	 * Set an ArrayList of task tags to a task 
+	 * @param taskTags
+	 */
 	public void setTaskTags(ArrayList<String> taskTags) {
 		this.taskTags = taskTags; 
 	}
 	
+	/**
+	 * @return type of the task (event, floating, deadline)
+	 */
 	public String getTaskType() {
 		return taskType; 
 	}
 	
+	/**
+	 * Set the task type (event, floating, deadline) 
+	 * @param taskType
+	 */
 	public void setTaskType(String taskType) {
 		this.taskType = taskType; 
 	}
 	
+	/**
+	 * @return Start Date of an event, without 23:59
+	 */
 	public String getStartDate() {
 		String date = datesHuman[1]; 
 		
@@ -89,17 +115,22 @@ public class Task implements Comparable<Task> {
 	}
 	
 	/**
-	 * Get the startDate without stripping off 23:59
-	 * @return
+	 * @return startDate of an event without stripping off 23:59
 	 */
 	public String getStartDateFull() {
 		return datesHuman[1]; 
 	}
 	
+	/**
+	 * @return startDate of an event in epoch
+	 */
 	public long getStartDateEpoch() {
 		return datesEpoch[1]; 
 	}
 	
+	/**
+	 * @return end date of an event in human time, without 23:59
+	 */
 	public String getEndDate() {
 		String date = datesHuman[2]; 
 		
@@ -109,14 +140,24 @@ public class Task implements Comparable<Task> {
 		return date.trim(); 
 	}
 	
+	/**
+	 * @return end date of an event in human time,
+	 * without stripping off 23:59 
+	 */
 	public String getEndDateFull() {
 		return datesHuman[2]; 
 	}
 	
+	/**
+	 * @return end date of an event in epoch time
+	 */
 	public long getEndDateEpoch() {
 		return datesEpoch[2]; 
 	}
 	
+	/**
+	 * @return human deadline without 23:59 
+	 */
 	public String getDeadline() {
 		String date = datesHuman[3]; 
 		
@@ -126,10 +167,16 @@ public class Task implements Comparable<Task> {
 		return date.trim(); 
 	}
 	
+	/**
+	 * @return human deadline with 23:59
+	 */
 	public String getDeadlineFull() {
 		return datesHuman[3]; 
 	}
 	
+	/**
+	 * @return deadline in epoch time 
+	 */
 	public long getDeadlineEpoch() {
 		return datesEpoch[3]; 
 	}
@@ -210,17 +257,27 @@ public class Task implements Comparable<Task> {
 	
 	//NON-BASIC METHODS ==========================================
 	
-	
+	/**
+	 * @return Start and End time of an event in human readable
+	 * form, without 23:59 
+	 */
 	public String[] getEventTime() {
 		String[] eventTime = {getStartDate(),getEndDate()};
 		return eventTime; 
 	}
 	
+	/**
+	 * @return Start and End time of an event in human readable
+	 * form, with 23:59 
+	 */
 	public String[] getEventTimeFull() {
 		String[] eventTime = {getStartDateFull(),getEndDateFull()};
 		return eventTime; 
 	}
 	
+	/**
+	 * @return Start and End time of an event in epoch form 
+	 */
 	public long[] getEventTimeEpoch() {
 		long[] eventTime = {datesEpoch[1],datesEpoch[2]}; 
 		return eventTime; 

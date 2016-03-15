@@ -21,6 +21,7 @@ public class ParseDelete {
 	 * If command is delete, check if the deletion is by 
 	 * 1. NAME, or
 	 * 2. INDEX 
+	 * 3. By Category (either by user defined tags or basic categories
 	 * and return the appropriate ProcessedObject
 	 * @param command
 	 * @param stringInput
@@ -31,10 +32,24 @@ public class ParseDelete {
 		String taskName = getTaskName(command, stringInput);
 		
 		if (taskName.compareTo("") == 0) {
-			return parseError.processError("no task has been selected for delete"); 
+			return parseError.processError("No task has been selected for delete"); 
+		}
+		
+		//delete by category
+		if (taskName.contains("#")) {
+			String[] splitArr = taskName.split("#");
+			if (splitArr.length > 1) { 
+				String category = splitArr[1].trim(); 
+				processed = new ProcessedObject(ParserConstants.DELETE_BY_CATEGORY); 
+				processed.setCategory(category);
+				return processed; 
+			} else {
+				return parseError.processError("Cannot delete an empty category"); 
+			}
 		}
 		
 		try {
+			//delete by index
 			int index = Integer.parseInt(taskName);
 			processed = new ProcessedObject(ParserConstants.DELETE_BY_INDEX, index-1); 
 			
@@ -47,7 +62,6 @@ public class ParseDelete {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput

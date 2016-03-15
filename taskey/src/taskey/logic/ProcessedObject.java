@@ -12,19 +12,20 @@ package taskey.logic;
  * 4. ADD_RECURRING
  * 5. DELETE_BY_INDEX
  * 6. DELETE_BY_NAME 
- * 7. UPDATE_BY_INDEX_CHANGE_NAME
- * 8. UPDATE_BY_INDEX_CHANGE_DATE
- * 9. UPDATE_BY_INDEX_CHANGE_BOTH
- * 10. UPDATE_BY_NAME_CHANGE_NAME
- * 11. UPDATE_BY_NAME_CHANGE_DATE
- * 12. UPDATE_BY_NAME_CHANGE_BOTH
- * 13. VIEW 
- * 14. ERROR 
- * 15. DONE_BY_INDEX
- * 16. DONE_BY_NAME
- * 17. SEARCH
- * 18. UNDO 
- * 19. CHANGE_FILE_LOC
+ * 7. DELETE_BY_CATEGORY
+ * 8. UPDATE_BY_INDEX_CHANGE_NAME
+ * 9. UPDATE_BY_INDEX_CHANGE_DATE
+ * 10. UPDATE_BY_INDEX_CHANGE_BOTH
+ * 11. UPDATE_BY_NAME_CHANGE_NAME
+ * 12. UPDATE_BY_NAME_CHANGE_DATE
+ * 13. UPDATE_BY_NAME_CHANGE_BOTH
+ * 14. VIEW 
+ * 15. ERROR 
+ * 16. DONE_BY_INDEX
+ * 17. DONE_BY_NAME
+ * 18. SEARCH
+ * 19. UNDO 
+ * 20. CHANGE_FILE_LOC
  * 
  * @author Xue Hui
  *
@@ -49,6 +50,7 @@ public class ProcessedObject {
 	private String searchPhrase = null; 
 	private String newTaskName = null; 
 	private String newFileLoc = null; 
+	private String category = null; 
 	
 	
 	//CONSTRUCTORS ====================================================
@@ -61,7 +63,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC
+	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC/DELETE_BY_CATEGORY
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -225,6 +227,21 @@ public class ProcessedObject {
 	 */
 	public void setNewFileLoc(String newFileLoc) {
 		this.newFileLoc = newFileLoc; 
+	}
+	
+	/**
+	 * Set category of tasks to delete
+	 * @param category
+	 */
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	
+	/**
+	 * @return category of tasks to delete 
+	 */
+	public String getCategory() {
+		return category; 
 	}
 	
 	@Override

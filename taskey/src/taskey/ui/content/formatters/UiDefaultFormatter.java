@@ -30,7 +30,7 @@ import taskey.ui.utility.UiImageManager;
  * @author junwei
  */
 public class UiDefaultFormatter extends UiFormatter {
-	
+	private int entriesPerPage = 5;
 	private UiPagination myPagination;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
@@ -63,7 +63,6 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
-		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
@@ -138,17 +137,20 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 	
 	private void addImage(Task theTask, int row,  GridPane newGrid) { 
-		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(IMAGE_ID.URGENT_MARK),
-				30,30,newGrid);
-		img.setTranslateX(150);
-		/*int gap = 1;
-		for ( int i = 0; i < 7; i ++ ) {
-			Rectangle rect = new Rectangle(0,0,7,7);
-			rect.setFill(Paint.valueOf(Color.rgb(255,i*(255/7), 0).toString()));
-			StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
-			pane.getChildren().add(rect);
-			StackPane.setAlignment(rect, Pos.CENTER_RIGHT);
-			rect.setTranslateX(-7*i + gap);
-		}*/
+		assert(theTask.getTaskType() != null);
+		IMAGE_ID imgID;
+		switch ( theTask.getTaskType() ) {
+			case "EVENT":
+				imgID = IMAGE_ID.EVENT;
+				break;
+			case "DEADLINE":
+				imgID = IMAGE_ID.DEADLINE;
+				break;
+			default:
+				imgID = IMAGE_ID.FLOATING;
+				break;
+		}
+		ImageView img = gridHelper.createImageInCell(1,row,UiImageManager.getInstance().getImage(imgID),30,30,newGrid);
+		img.setTranslateX(200);
 	}
 }

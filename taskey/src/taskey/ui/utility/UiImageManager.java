@@ -38,8 +38,12 @@ public class UiImageManager {
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusSelect.png")));
 			myImageContainer.put(IMAGE_ID.URGENT_MARK, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "urgentMark.png")));
-			myImageContainer.put(IMAGE_ID.INBOX, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
+			myImageContainer.put(IMAGE_ID.FLOATING, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "floating.png")));
+			myImageContainer.put(IMAGE_ID.DEADLINE, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "deadline.png")));
+			myImageContainer.put(IMAGE_ID.EVENT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "event.png")));
 			loadHelpMenuImages();
 		} catch ( NullPointerException e ) {
 			System.out.println("Images cant be loaded for some reason, please refresh the taskey.ui.images package");

@@ -58,6 +58,7 @@ public class UiDropDown {
 			StackPane myPane = (StackPane) menuItems.get(i);
 			if (i < items.size()) {
 				Label text = new Label(items.get(i));
+				text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 				myPane.getChildren().clear();
 				myPane.getChildren().add(text);
 				myPane.setVisible(true);

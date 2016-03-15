@@ -61,7 +61,7 @@ public class UiHelpMenu {
 				"Deleting Tasks","Set Tasks", "Done Tasks", "Search Tasks", "Undo Tasks", "Tagging Task"));
 		ArrayList<String> info = new ArrayList<String>(Arrays.asList(
 				"Welcome to Taskey's help menu, select the command "
-				+ "you would like to find out more about by use arrow keys and pressing Enter",
+				+ "you would like to find out more about by arrow keys and pressing Enter",
 				"This will guide you through how to add tasks",
 				"This will guide you through how to delete tasks",
 				"This will guide you through how to edit tasks",

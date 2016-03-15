@@ -2,6 +2,7 @@ package taskey.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Stack;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -64,7 +65,7 @@ public class UiController {
 	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
-	
+	private Stack<String> upStack, downStack;
 	/**
 	 * Sets the up nodes.
 	 *
@@ -83,6 +84,7 @@ public class UiController {
 		myDropDown = new UiDropDown();
 		logic = new Logic();
 		updateAll(logic.getAllTaskLists());
+		input.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 	}
 
 	/**
@@ -194,6 +196,8 @@ public class UiController {
 					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("ARCHIVE")) {
 					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
+				} else if (viewType.equals("HELP")) {
+					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.HELP);
 				}
 				displayTabContents(ContentBox.ACTION);
 				break;
@@ -261,16 +265,30 @@ public class UiController {
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 	          public void handle(KeyEvent event) {
 	        	  if ( event.getCode().isArrowKey()) {
+	        		  event.consume();
+	        	  } else if (event.getCode() == KeyCode.TAB) {
+	        		  event.consume();
+	        	  }
+	          };
+	        });	
+	}
+
+	/**
+	 * This method is for key inputs anywhere in main window
+	 *
+	 * @param root - root object of scene
+	 */
+	private void registerRootEventHandler(Parent root) {
+		root.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				input.requestFocus(); // give focus to textfield
+				 if ( event.getCode().isArrowKey()) {
 	        		  if ( myDropDown.isMenuOpen()) {
 	        			  myDropDown.processArrowKey(event);
 	        		  } else {
 	        			  myContentManager.processArrowKey(event, getCurrentContent());
 	        		  }	  
-	        		  event.consume();
-	        	  }
-	        	  if (event.getCode() == KeyCode.TAB) {
-	        		  event.consume();
-	        	  }
+	        	  }  
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
 	        			  int id = myContentManager.processDelete(getCurrentContent()); 
@@ -279,19 +297,9 @@ public class UiController {
 	        			  }
 	        		  }
 	        	  }
-	          };
-	        });	
-	}
-
-	/**
-	 * This method is for key inputs anywhere in main window, NOTE THIS HAS
-	 * ISSUES, not sure if scene root gets different intervals for updates and
-	 * displays Therefore anything that requires a small or instant display
-	 * tweak don't put here.
-	 *
-	 * @param root - root object of scene
-	 */
-	private void registerRootEventHandler(Parent root) {
+			}
+		});
+		
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.TAB) {

@@ -25,6 +25,7 @@ public class UiActionFormatter extends UiFormatter {
 	private UiPagination listView;
 	private UiHelpMenu myHelpMenu;
 	private UiPagination currentView;
+	private int entriesPerPage = 5;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
@@ -80,7 +81,6 @@ public class UiActionFormatter extends UiFormatter {
 	}
 
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
-		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {

@@ -47,6 +47,7 @@ public class UiPopupManager {
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
 		content.setText(text);
+		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT);
 		newPopup.getContent().add(content);
 		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  

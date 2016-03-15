@@ -190,7 +190,8 @@ public class ParserTest {
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
-		
+		assertEquals("Command: DELETE_BY_CATEGORY\ncategory: hello\n",
+				parser.parseInput("del #hello").toString());
 	}
 	
 	@Test

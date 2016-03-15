@@ -330,6 +330,9 @@ public class ProcessedObject {
 			stringRep += "new TaskName: " + newTaskName + "\n"; 		
 		}
 		
+		if (category != null) {
+			stringRep += "category: " + category + "\n";
+		}
 		return stringRep; 
 	}
 }

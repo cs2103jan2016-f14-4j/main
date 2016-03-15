@@ -13,6 +13,7 @@ import taskey.logic.ProcessedObject;
 import taskey.logic.Task; 
 
 /**
+ * @@author A0107345L 
  * Purpose is to parse the "set" command. 
  * @author Xue Hui
  *
@@ -47,8 +48,10 @@ public class ParseEdit {
 	 * If command is SET, categorise into:
 	 * 1. UPDATE_BY_INDEX_CHANGE_NAME
 	 * 2. UPDATE_BY_INDEX_CHANGE_DATE
-	 * 3. UPDATE_BY_NAME_CHANGE_NAME
-	 * 4. UPDATE_BY_NAME_CHANGE_DATE 
+	 * 3. UPDATE_BY_INDEX_CHANGE_BOTH
+	 * 4. UPDATE_BY_NAME_CHANGE_NAME
+	 * 5. UPDATE_BY_NAME_CHANGE_DATE
+	 * 6. UPDATE_BY_NAME_CHANGE_BOTH 
 	 * @param command
 	 * @param stringInput
 	 * @return appropriate ProcessedObject
@@ -60,7 +63,7 @@ public class ParseEdit {
 			String rawIndex = getTaskName(strNoCommand);
 			String newTaskName = getNewName(strNoCommand);
 			String newDate = getNewDate(strNoCommand); 
-			
+			System.out.println(newDate);
 			try {
 				int index = Integer.parseInt(rawIndex);	
 				return updateByIndex(index-1, newTaskName, newDate); 
@@ -228,6 +231,10 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(startDate);
+			changedTask.setStartDate(epochTime);
 		}
 		
 		epochTime = getPrettyTime(endDate);
@@ -241,7 +248,12 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(endDate);
+			changedTask.setEndDate(epochTime);
 		}
+		
 		processed.setTask(changedTask);
 		return processed;
 	}
@@ -277,7 +289,12 @@ public class ParseEdit {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(newDateRaw);
+			changedTask.setDeadline(epochTime);
 		}
+		
 		processed.setTask(changedTask);
 		return processed; 
 	}
@@ -366,7 +383,7 @@ public class ParseEdit {
 		if (date.compareTo("") == 0) {
 			return null; 
 		}
-		return date.trim(); 
+		return date.trim().toLowerCase(); 
 	}
 	
 	/**

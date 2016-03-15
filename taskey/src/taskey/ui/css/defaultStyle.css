@@ -1,30 +1,21 @@
 /* Note: Affects all scroll panes */
 .scroll-pane {
-    -fx-background-color: black;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-padding: 2px;
-    -fx-background-radius: 5px, 5px;
 }
 
 .scroll-pane > .viewport { /* Needed to color scroll pane's view port */
-   -fx-background-color: white;
+   -fx-background-color: #e7e7e7;
 }
 
 /* Bound to fx:id */
 #main {
-	-fx-background-color:
-        linear-gradient(#00ccff, #002222);
+	-fx-background-color: #616a7f;
 }
 
 #dateLabel {
-		/*-fx-background-color: 
-		 linear-gradient(#f0ff35, #a9ff00),
-         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);*/
-    -fx-background-insets: 0px,2px;
-    -fx-padding: 2px;
+	-fx-text-fill: #e7e7e7; 
+    -fx-font-smoothing-type: gray;
     -fx-font-weight: bold;
     -fx-font-family: 'Montserrat';
-    -fx-font-smoothing-type: gray;
 }
 
 #categoryLabel {
@@ -33,44 +24,74 @@
 }
 
 #dragBar {
-	-fx-background-color: 
-		 linear-gradient(#007fff, #007fff);
+	-fx-background-color: #2d3956;
 }
 
+#input {
+	-fx-background-color: #e7e7e7;
+	-fx-text-fill: #2d3956;
+}
 
 /* Switchable styles */
 .prompt {
 	-fx-padding: 2px;
-	-fx-background-color:
-        linear-gradient(#f0ff35, #a9ff00),
-        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+	-fx-background-color: #e7e7e7;
     -fx-background-radius: 5px;
     -fx-background-insets: 0px, 1px;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-text-fill: #395306;
+    -fx-text-fill: #2d3956;
 }
 
 .prompt-select {
 	-fx-padding: 2px;
-	-fx-background-color:
-        linear-gradient(#0066ff, #0066ff),
-        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+	-fx-background-color:#2d3956;
     -fx-background-radius: 5px;
     -fx-background-insets: 0px, 3px;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-text-fill: #395306;
+    -fx-text-fill: #e7e7e7;
 }
 
 .numberIcon {
-	-fx-background-color: 
-        linear-gradient(#ffd65b, #f0ff35),
-        linear-gradient(#ffef84, #f0ff35),
-        linear-gradient(#ffea6a, #f0ff35),
-        linear-gradient(#ffe657 0%, #f8c202 50%, #f0ff35 100%),
-        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); /*alpha */
-    -fx-background-radius: 30px;
-    -fx-background-insets: 0px,1px,2px,3px,0px;
-    -fx-padding: 2px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
+	-fx-background-color: red;
+}
+
+
+.textCategory { 
+	-fx-font-size: 12px;
+	-fx-fill: #e7e7e7;
+}
+
+.textDefault { 
+	-fx-fill: #e7e7e7;
+}
+
+/* Boxes */
+.defaultBox {
+	-fx-background-color: #2d3956;
+}
+
+.highlightBox {
+	-fx-background-color: #455372;
+}
+
+/* Pagination */
+.pagination .pagination-control {
+    -fx-background-color: #e7e7e7;    
+}
+.pagination .pagination-control .bullet-button {
+    -fx-background-color: transparent, #e7e7e7, #2d3956, #e7e7e7, #e7e7e7;
+}
+ 
+.pagination .pagination-control .bullet-button:selected {   
+    -fx-background-color: transparent, #e7e7e7, #2d3956, #e7e7e7, #2d3956;
+}
+ 
+.pagination .pagination-control .left-arrow, .right-arrow{
+    -fx-background-color: #e7e7e7, #2d3956;
+}
+
+.ellipse {
+	-fx-padding: 5px;
+	-fx-background-color: linear-gradient(#e7e7e7, #2d3956);
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0px, 5px;
 }
 

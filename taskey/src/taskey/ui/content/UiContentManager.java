@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import taskey.constants.Triplet;
+import taskey.constants.UiConstants.ActionMode;
+import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.Task;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.UiConstants.ContentBox;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
@@ -19,7 +20,7 @@ import taskey.ui.content.formatters.UiDefaultFormatter;
  * @author JunWei
  */
 public class UiContentManager {
-	
+	private ArrayList<Triplet<Color,String,Integer>> myCategoryList; // for use to set colors
 	private ArrayList<UiFormatter> myFormatters; // for each content box
 
 	public UiContentManager() {
@@ -65,11 +66,10 @@ public class UiContentManager {
 	/**
 	 * Update contents of action content box, depending on mode given.
 	 *
-	 * @param myTaskList - which is the list of tasks
+	 * @param myTaskList - which is the list of tasks if applicable
 	 * @param mode - Content LIST, HELP
 	 */
 	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionMode mode) {
-		assert(myTaskList != null);
 		int arrayIndex = ContentBox.ACTION.getValue();
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
 		myFormatter.updateContents(myTaskList,mode);
@@ -82,12 +82,14 @@ public class UiContentManager {
 	 * @param categoryNums - the category nums
 	 * @param categoryColors - the category colors
 	 */
-	public void updateCategoryContentBox(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		assert(categoryNames != null);
-		assert(categoryNums != null);
+	public void updateCategoryContentBox(ArrayList<Triplet<Color,String,Integer>> categoryList) {
+		assert(categoryList != null);
+		for ( int i = 0; i < myFormatters.size(); i ++ ) {
+			myFormatters.get(i).setCategories(categoryList);
+		}
 		int arrayIndex = ContentBox.CATEGORY.getValue();
 		UiCategoryFormatter myFormatter = (UiCategoryFormatter) myFormatters.get(arrayIndex);
-		myFormatter.updateCategories(categoryNames,categoryNums,categoryColors);
+		myFormatter.updateCategories(categoryList);
 	}
 
 	public void cleanUp() {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
-import taskey.ui.UiConstants;
+import taskey.constants.UiConstants;
 
 /**
  * This class provides a way to configure different styles given a string as input.

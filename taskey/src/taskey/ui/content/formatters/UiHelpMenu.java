@@ -9,8 +9,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
@@ -34,7 +34,7 @@ public class UiHelpMenu {
 	
 	public UiHelpMenu() {
 		gridHelper = new UiGridHelper("");
-		helpView = new UiPagination(UiConstants.STYLE_RED_ELLIPSE);
+		helpView = new UiPagination(UiConstants.STYLE_ELLIPSE);
 		commandViews = new ArrayList<UiPagination>();
 		setUpHelpView();
 		currentView = helpView;
@@ -61,7 +61,7 @@ public class UiHelpMenu {
 				"Deleting Tasks","Set Tasks", "Done Tasks", "Search Tasks", "Undo Tasks", "Tagging Task"));
 		ArrayList<String> info = new ArrayList<String>(Arrays.asList(
 				"Welcome to Taskey's help menu, select the command "
-				+ "you would like to find out more about by use arrow keys and pressing Enter",
+				+ "you would like to find out more about by arrow keys and pressing Enter",
 				"This will guide you through how to add tasks",
 				"This will guide you through how to delete tasks",
 				"This will guide you through how to edit tasks",
@@ -81,7 +81,7 @@ public class UiHelpMenu {
 				if ( entryNo >= numCommmands ) {
 					break;
 				}
-				Label current = gridHelper.createLabelInCell( 0, j, headers.get(entryNo), UiConstants.STYLE_NUMBER_ICON, newGrid);
+				Label current = gridHelper.createLabelInCell( 0, j, headers.get(entryNo), UiConstants.STYLE_PROMPT_SELECTED, newGrid);
 				GridPane.setFillWidth(current.getParent(), false);
 				GridPane.setFillHeight(current.getParent(), false);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
@@ -89,9 +89,9 @@ public class UiHelpMenu {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
 				UiTextBuilder myBuilder = new UiTextBuilder();
-				myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+				myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 				String line = info.get(entryNo);
-				gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
+				gridHelper.createStyledCell(1, j, UiConstants.STYLE_HIGHLIGHT_BOX, newGrid);
 				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
 				entryNo++;
@@ -109,9 +109,9 @@ public class UiHelpMenu {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP_MENU);
 			gridHelper.createImageInCell(0,0,UiImageManager.getInstance().getImage(images.get(i)),imageWidth,0,newGrid);
 			UiTextBuilder myBuilder = new UiTextBuilder();
-			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 			String line = info.get(i);
-			gridHelper.createStyledCell(0, 1, UiConstants.STYLE_NUMBER_ICON, newGrid);
+			gridHelper.createStyledCell(0, 1, UiConstants.STYLE_HIGHLIGHT_BOX, newGrid);
 			gridHelper.addTextFlowToCell(0, 1, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 			menu.addGridToPagination(newGrid,new ArrayList<StackPane>()); // no interactions	
 		}

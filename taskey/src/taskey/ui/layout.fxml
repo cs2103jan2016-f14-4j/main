@@ -13,7 +13,7 @@
 
 <AnchorPane fx:id="main" prefHeight="570.0" prefWidth="740.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TabPane fx:id="myTabs" focusTraversable="false" layoutX="130.0" layoutY="53.0" prefHeight="478.0" prefWidth="592.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="myTabs" focusTraversable="false" layoutX="130.0" layoutY="55.0" prefHeight="472.0" prefWidth="592.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="THIS WEEK">
             <content>
@@ -53,7 +53,8 @@
             </Tab>
         </tabs>
       </TabPane>
-      <TextField fx:id="input" layoutX="1.0" layoutY="544.0" prefHeight="25.0" prefWidth="738.0" promptText="Type 'view help' for a list of commands" />
+      <TextField fx:id="input" layoutX="3.0" layoutY="538.0" prefHeight="25.0" prefWidth="734.0" promptText="Type 'view help' for a list of commands" />
+      <ScrollPane fx:id="categoryPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="14.0" layoutY="77.0" prefHeight="450.0" prefWidth="100.0" />
       <StackPane layoutX="266.0" layoutY="10.0" prefHeight="53.0" prefWidth="208.0">
          <children>
             <Label fx:id="dateLabel" text="WED: 2 MARCH" textAlignment="CENTER">
@@ -63,24 +64,15 @@
             </Label>
          </children>
       </StackPane>
-      <ScrollPane fx:id="categoryPane" focusTraversable="false" hbarPolicy="NEVER" layoutX="14.0" layoutY="81.0" prefHeight="450.0" prefWidth="100.0" />
-      <StackPane layoutX="15.0" layoutY="48.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="31.0" prefWidth="98.0">
-         <children>
-            <Label fx:id="categoryLabel" text="Categories">
-               <font>
-                  <Font name="Montserrat" size="15.0" />
-               </font>
-            </Label>
-         </children>
-      </StackPane>
-      <ImageView fx:id="crossButton" fitHeight="25.0" fitWidth="30.0" layoutX="697.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@utility/images/crossDefault.png" />
-         </image></ImageView>
-      <StackPane fx:id="dragBar" prefHeight="12.0" prefWidth="740.0" AnchorPane.bottomAnchor="558.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <ImageView fx:id="minusButton" fitHeight="25.0" fitWidth="30.0" layoutX="665.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
+      <StackPane fx:id="dragBar" layoutY="-4.0" prefHeight="21.0" prefWidth="740.0" AnchorPane.bottomAnchor="553.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-4.0" />
+      <ImageView fx:id="minusButton" fitHeight="21.0" fitWidth="13.0" layoutX="707.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@utility/images/minusDefault.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="crossButton" fitHeight="13.0" fitWidth="13.0" layoutX="724.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@utility/images/crossDefault.png" />
          </image>
       </ImageView>
    </children>

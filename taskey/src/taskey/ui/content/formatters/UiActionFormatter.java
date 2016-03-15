@@ -2,16 +2,18 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.ActionMode;
 import taskey.logic.Task;
-import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.ActionMode;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
@@ -25,17 +27,20 @@ public class UiActionFormatter extends UiFormatter {
 	private UiPagination listView;
 	private UiHelpMenu myHelpMenu;
 	private UiPagination currentView;
+	private int entriesPerPage = 6;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
-		listView = new UiPagination(UiConstants.STYLE_GRAY_BOX);
+		listView = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 		myHelpMenu = new UiHelpMenu();
 		mainPane.setFitToHeight(true);
 	}
 
 	@Override
 	public void processArrowKey(KeyEvent event) {
-		currentView.processArrowKey(event);
+		if ( currentView != null ) {
+			currentView.processArrowKey(event);
+		}
 	}
 	@Override
 	public int processDeleteKey() {
@@ -80,25 +85,18 @@ public class UiActionFormatter extends UiFormatter {
 	}
 
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
-		int entriesPerPage = 5;
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			//newGrid.setGridLinesVisible(true);
-			for (int k = 0; k < entriesPerPage; k++) {
-				RowConstraints row = new RowConstraints();
-				row.setPercentHeight((100.0-1.0)/entriesPerPage); // 1.0 to prevent cut off due to the pagination bar
-				newGrid.getRowConstraints().add(row);
-			}
-			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {
 				if ( entryNo >= myTaskList.size() ) {
 					break;
 				}
-				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_WHITE_BOX, newGrid);
-				pageEntries.add(entryPane);
+				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_DEFAULT_BOX, newGrid);
+				//pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
 				addTaskDescription(theTask, j,newGrid);
@@ -112,39 +110,52 @@ public class UiActionFormatter extends UiFormatter {
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myBuilder = new UiTextBuilder();
-		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_BLUE);
+		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "" + (id + 1);
-		gridHelper.createStyledCell(0, row, UiConstants.STYLE_NUMBER_ICON, theGrid);
-		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);
+		Color theColor = Color.WHITE;
+		for ( int i = 0; i < categoryList.size(); i ++ ) {
+			String tag = theTask.getTaskType();
+			if ( tag != null ) {
+				if ( tag.equals("FLOATING")) { // testing since no tags yet
+					tag = new String("general");
+				} 
+				tag = tag.toLowerCase();
+			}
+			String categoryTag = categoryList.get(i).getB().toLowerCase();
+			if ( categoryTag.contains(tag)) {
+				theColor = categoryList.get(i).getA();
+				break;
+			}
+		}
+		gridHelper.createStyledCell(0, row, "", theGrid);
+		gridHelper.createScaledRectInCell(0, row, theColor, theGrid);
+		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);	
 	}
 	
 	private void addTaskDescription(Task theTask, int row, GridPane newGrid) {
 		assert(theTask != null);
+		assert(theTask.getTaskType() != null);
+		
 		UiTextBuilder myBuilder = new UiTextBuilder();
-		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
+		myBuilder.addMarkers(UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "";
-		line += "$Name: "; 
+		line += "Name: "; 
 		line += theTask.getTaskName() + "\n";
 		switch ( theTask.getTaskType() ) {
 			case "EVENT": 
 				String [] timings = theTask.getEventTime();
-				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE,
-						UiConstants.STYLE_TEXT_BLACK_TO_PURPLE, 
-						UiConstants.STYLE_TEXT_BLUE);
-				line += "Event from: $";
-				line += timings[0] + "$ to $" + timings[1];
+				line += "Event from: ";
+				line += timings[0] + " to " + timings[1];
 				break;
 	 		case "DEADLINE":
-				line += "Due by: ";
-				myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLUE);			
-				line += "$" + theTask.getDeadline();
+				line += "Due by: ";	
+				line += "" + theTask.getDeadline();
 				break;
 			default:
 				break;
 		}
 		line += "\n";
-		myBuilder.addMarkers(UiConstants.STYLE_TEXT_BLACK_TO_PURPLE);
-		line += "$Tags: ";
+		line += "Tags: ";
 		if ( theTask.getTaskTags() != null ) {
 			ArrayList<String> tags = theTask.getTaskTags();
 			for ( String s : tags) {
@@ -153,6 +164,8 @@ public class UiActionFormatter extends UiFormatter {
 		} else {
 			line += "None";
 		}
-		gridHelper.addTextFlowToCell(1, row, myBuilder.buildBySymbol(line),TextAlignment.LEFT, newGrid);
+		StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
+		pane.setPadding(new Insets(2));
+		gridHelper.addTextFlowToCell(1, row, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 	}
 }

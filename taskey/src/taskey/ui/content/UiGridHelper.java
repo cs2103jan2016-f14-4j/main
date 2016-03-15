@@ -10,10 +10,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import taskey.ui.UiConstants;
+import taskey.constants.UiConstants;
 
 /**
  * This class contains methods to manipulate a GridPane,
@@ -142,4 +145,17 @@ public class UiGridHelper {
 		cellWrapper.getChildren().add(pane);
 		return pane;
 	}
+	
+	public Rectangle createScaledRectInCell( int col, int row, Color theColor, GridPane gridPane) {
+		assert(gridPane != null);
+		StackPane cellWrapper = getWrapperAtCell(col,row,gridPane);
+		Rectangle scaledRect = new Rectangle(0,0,0,0);
+		scaledRect.setFill(Paint.valueOf(theColor.toString()));
+		cellWrapper.getChildren().add(scaledRect);
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty());
+		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
+		return scaledRect;
+	}
+	
+	
 }

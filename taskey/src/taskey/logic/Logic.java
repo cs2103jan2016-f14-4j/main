@@ -5,16 +5,18 @@ import taskey.parser.TimeConverter;
 import taskey.storage.History;
 import taskey.storage.Storage;
 import taskey.storage.StorageException;
-import taskey.ui.UiConstants.ContentBox;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
 
 import taskey.logic.LogicConstants.ListID;
+import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.ProcessedObject;
 
 /**
- * TODO: class description
+ * The Logic class handles the execution of user commands. It contains an internal memory of task lists 
+ * which facilitate the addition, deletion and updating of tasks. Each time a command is executed, these lists
+ * are modified and then saved to disk accordingly.
  *
  * @author Hubert Wong
  */
@@ -32,17 +34,16 @@ public class Logic {
 		history = storage.getHistory();
 
 		//Get lists from Storage
-		taskLists = new ArrayList<ArrayList<Task>>();
-		taskLists = storage.loadAllTasklists();
+		taskLists = cloneLists(storage.loadAllTasklists());
 		ArrayList<Task> thisWeek = new ArrayList<Task>();
 		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
 
-		//Update THIS_WEEK list based on the current date and time
+		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
 		for (Task t : pendingList) {
-			//Add pending deadline or event tasks to the weekly list if they belong to the same week as
-			//the current week
-			if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
+			if (t.getDeadlineEpoch() < timeConverter.getCurrTime() || t.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+			} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
 				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 				thisWeek.add(t);
 			}
@@ -164,10 +165,6 @@ public class Logic {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Task task = po.getTask();
-    	int taskIndex = po.getIndex(); //Only used for commands that specify the index of a task
-    	String errorType = po.getErrorType(); //Only used for invalid commands
-    	String searchPhrase = po.getSearchPhrase(); //Only used for search commands
-    	String newTaskName = po.getNewTaskName(); //Only used for commands that change the name of a task
     	
     	if (input.equalsIgnoreCase("clear")) { //"clear" command is for developer testing only
 			clearAllLists(copy);
@@ -192,47 +189,46 @@ public class Logic {
 				return addEvent(copy, task, po);
 
 			case "DELETE_BY_INDEX":
-				return deleteByIndex(copy, currentContent, po, taskIndex);
+				return deleteByIndex(copy, currentContent, po, po.getIndex());
 
 			case "DELETE_BY_NAME":
 				return deleteByName(copy, currentContent, po, task.getTaskName());
 
 			case "VIEW":
-				return new LogicFeedback(cloneLists(taskLists), po, null);
+				return new LogicFeedback(copy, po, null);
 
 			case "SEARCH":
-				return search(copy, po, searchPhrase);
+				return search(copy, po, po.getSearchPhrase());
 
 			case "DONE_BY_INDEX":
-				return doneByIndex(copy, currentContent, po, taskIndex);
+				return doneByIndex(copy, currentContent, po, po.getIndex());
 
 			case "DONE_BY_NAME":
 				return doneByName(copy, currentContent, po, task.getTaskName());
 
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				return updateByIndexChangeName(copy, currentContent, po, taskIndex, newTaskName);
+				return updateByIndexChangeName(copy, currentContent, po, po.getIndex(), po.getNewTaskName());
 
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				return updateByIndexChangeDate(copy, currentContent, po, taskIndex, task);
+				return updateByIndexChangeDate(copy, currentContent, po, po.getIndex(), task);
 				
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-				return updateByIndexChangeBoth(copy, currentContent, po, taskIndex, newTaskName, task);
+				return updateByIndexChangeBoth(copy, currentContent, po, po.getIndex(), po.getNewTaskName(), task);
 
 			case "UPDATE_BY_NAME_CHANGE_NAME":
-				return updateByNameChangeName(copy, currentContent, po, task.getTaskName(), newTaskName);
+				return updateByNameChangeName(copy, currentContent, po, task.getTaskName(), po.getNewTaskName());
 
 			case "UPDATE_BY_NAME_CHANGE_DATE":
 				return updateByNameChangeDate(copy, currentContent, po, task.getTaskName(), task);
 				
 			case "UPDATE_BY_NAME_CHANGE_BOTH":
-				return updateByNameChangeBoth(copy, currentContent, po, task.getTaskName(), newTaskName, task);
+				return updateByNameChangeBoth(copy, currentContent, po, task.getTaskName(), po.getNewTaskName(), task);
 
 			case "UNDO":
 				return undo(po);
 				
 			case "ERROR":
-				//TODO:
-				break;
+				return new LogicFeedback(copy, po, new Exception(po.getErrorType()));
 
 			default:
 				break;
@@ -246,8 +242,8 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
-			return new LogicFeedback(copy, po,  new Exception("The task "
-		                             + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po,  new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
 
 		pendingList.add(task);
@@ -268,15 +264,19 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(copy, po, new Exception("The task "
-		                             + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po, new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
+		
+		if (task.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+			copy.get(ListID.EXPIRED.getIndex()).add(task);
+		} else {
+			pendingList.add(task);
+			copy.get(ListID.DEADLINE.getIndex()).add(task);
 
-		pendingList.add(task);
-		copy.get(ListID.DEADLINE.getIndex()).add(task);
-
-		if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-			copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			if (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+				copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			}
 		}
 		
 		try {
@@ -294,15 +294,20 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
-			return new LogicFeedback(copy, po, new Exception("The task "
-								     + task.getTaskName() + " already exists!"));
+			return new LogicFeedback(copy, po, new Exception("The task \"" + task.getTaskName() 
+			                         + "\" already exists!"));
 		}
 
-		pendingList.add(task);
-		copy.get(ListID.EVENT.getIndex()).add(task);
 
-		if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
-			copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+		if (task.getEndDateEpoch() < timeConverter.getCurrTime()) {
+			copy.get(ListID.EXPIRED.getIndex()).add(task);
+		} else {
+			pendingList.add(task);
+			copy.get(ListID.EVENT.getIndex()).add(task);
+
+			if (timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime())) {
+				copy.get(ListID.THIS_WEEK.getIndex()).add(task);
+			}
 		}
 
 		try {
@@ -318,8 +323,7 @@ public class Logic {
 	//Removes an indexed task from the current tab and saves the updated lists to disk.
 	//TODO: support removal from the "ACTION" tab.
 	LogicFeedback deleteByIndex(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex) {
-		//"del" command only allowed in THIS_WEEK or PENDING tab
-		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+		if (currentContent.equals(ContentBox.ACTION)) { 
 			return new LogicFeedback(copy, po, new Exception("Cannot delete from this tab!"));
 		}
 
@@ -329,10 +333,12 @@ public class Logic {
 		try {
 			toDelete = targetList.remove(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
-
-		removeFromAllLists(copy, toDelete);
+		
+		if (!currentContent.equals(ContentBox.EXPIRED)) {
+			removeFromAllLists(copy, toDelete);
+		}
 		
 		try {
 			saveAllTasks(copy);
@@ -348,9 +354,8 @@ public class Logic {
 	//Removes an indexed task from the current tab and saves the updated lists to disk.
 	//TODO: support removal from the "ACTION" tab.
 	LogicFeedback deleteByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, 
-			                           String taskName) {
-		//"del" command only allowed in THIS_WEEK or PENDING tab
-		if (!currentContent.equals(ContentBox.THIS_WEEK) && !currentContent.equals(ContentBox.PENDING)) { 
+			                   String taskName) {
+		if (currentContent.equals(ContentBox.ACTION)) { 
 			return new LogicFeedback(copy, po, new Exception("Cannot delete from this tab!"));
 		}
 		
@@ -358,11 +363,13 @@ public class Logic {
 		Task toDelete = new Task(taskName);
 
 		//Named task does not exist in the list
-		if (!targetList.contains(toDelete)) {
-			return new LogicFeedback(copy, po, new Exception(taskName + " not found in this list!"));
+		if (!targetList.remove(toDelete)) {
+			return new LogicFeedback(copy, po, new Exception("\"" + taskName + "\" not found in this list!"));
 		}
-
-		removeFromAllLists(copy, toDelete);
+		
+		if (!currentContent.equals(ContentBox.EXPIRED)) {
+			removeFromAllLists(copy, toDelete);
+		}
 		
 		try {
 			saveAllTasks(copy);
@@ -375,6 +382,7 @@ public class Logic {
 	}
 	
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
+	//TODO: search list includes expired and completed tasks as well
 	LogicFeedback search(ArrayList<ArrayList<Task>> copy, ProcessedObject po, String searchPhrase) {
 		if (searchPhrase.equals("")) {
 			return new LogicFeedback(copy, po, new Exception("Search phrase cannot be empty!"));
@@ -403,13 +411,13 @@ public class Logic {
 			try {
 				toMarkAsDone = copy.get(ListID.THIS_WEEK.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+				return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 			}
 		} else if (currentContent.equals(ContentBox.PENDING)) {
 			try {
 				toMarkAsDone = copy.get(ListID.PENDING.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+				return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 			}
 		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
 			return new LogicFeedback(copy, po, new Exception("Cannot use \"done\" command from this tab!"));
@@ -472,7 +480,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
 
 		updateAllLists(copy, toUpdate.getTaskName(), newTaskName);
@@ -502,7 +510,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
@@ -533,7 +541,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("Index out of bounds!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
 
 		changedTask.setTaskName(newTaskName);

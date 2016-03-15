@@ -8,7 +8,14 @@ import taskey.logic.ProcessedObject;
 import taskey.logic.Task; 
 
 
-
+/**
+ * @@author A0107345L
+ * Logic can only call this class parse inputs from the user.
+ * This Parser is a high level interface that acts as a facade
+ * between the other parts of Parser. 
+ * @author Xue Hui
+ *
+ */
 public class Parser {
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>(); 

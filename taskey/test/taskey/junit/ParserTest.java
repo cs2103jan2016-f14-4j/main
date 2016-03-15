@@ -10,6 +10,7 @@ import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.parser.Parser;
 
+/* @@author A0107345L */
 public class ParserTest {
 	Parser parser = new Parser(); 
 	PrettyTimeParser p = new PrettyTimeParser();
@@ -189,7 +190,8 @@ public class ParserTest {
 				parser.parseInput("del 5").toString());
 		assertEquals("Command: DELETE_BY_NAME\nhello world, \n",
 				parser.parseInput("del hello world").toString());
-		
+		assertEquals("Command: DELETE_BY_CATEGORY\ncategory: hello\n",
+				parser.parseInput("del #hello").toString());
 	}
 	
 	@Test

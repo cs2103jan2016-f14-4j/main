@@ -12,7 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
-import taskey.ui.UiConstants;
+import taskey.constants.UiConstants;
 
 /**
  * This class creates various types of pop up windows, and supports the use of
@@ -47,7 +47,8 @@ public class UiPopupManager {
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
 		content.setText(text);
-		content.getStyleClass().add(UiConstants.STYLE_PROMPT);
+		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		newPopup.getContent().add(content);
 		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  
 		popupList.add(newPopup);
@@ -65,13 +66,19 @@ public class UiPopupManager {
 		return newPopup;
 	}
 
+	
+	/**
+	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems
+	 * To provide more customization
+	 * @param numRows
+	 * @return
+	 */
 	public Popup createPopupMenu(int numRows) {
 		assert(numRows >= 0);
 		Popup newPopup = new Popup();
 		VBox container = new VBox(); // VBox is used only for formatting purposes purposes
 		for (int i = 0; i < numRows; i++) {
 			StackPane row = new StackPane();
-			row.getStyleClass().add(UiConstants.STYLE_PROMPT);
 			container.getChildren().add(row);
 		}
 		newPopup.getContent().add(container);

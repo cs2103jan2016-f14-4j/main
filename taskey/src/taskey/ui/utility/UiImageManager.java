@@ -3,8 +3,8 @@ package taskey.ui.utility;
 import java.util.HashMap;
 
 import javafx.scene.image.Image;
-import taskey.ui.UiConstants;
-import taskey.ui.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.IMAGE_ID;
 
 /**
  * This class handles loading of image resources 
@@ -36,8 +36,14 @@ public class UiImageManager {
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusDefault.png")));
 			myImageContainer.put(IMAGE_ID.MINUS_SELECT, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "minusSelect.png")));
-			myImageContainer.put(IMAGE_ID.INBOX, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "inbox.png")));
+			myImageContainer.put(IMAGE_ID.URGENT_MARK, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "urgentMark.png")));
+			myImageContainer.put(IMAGE_ID.FLOATING, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "floating.png")));
+			myImageContainer.put(IMAGE_ID.DEADLINE, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "deadline.png")));
+			myImageContainer.put(IMAGE_ID.EVENT, 
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "event.png")));
 			loadHelpMenuImages();
 		} catch ( NullPointerException e ) {
 			System.out.println("Images cant be loaded for some reason, please refresh the taskey.ui.images package");

@@ -23,61 +23,8 @@
 .textBlue { 
 	-fx-fill: blue;
 }
-.textGreen { 
-	-fx-fill: green;
-	-fx-font-weight: bold;
-}
 
 .textBlack { 
 	-fx-fill: black;
 }
-
-.textBlackToPurple { 
-    -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, black 0%, purple 50%);
-}
-
-.textCategory { 
-	-fx-font-size: 9px;
-	-fx-fill: black;
-}
-
-/* Pagination */
-.pagination .pagination-control {
-    -fx-background-color: white;    
-}
-.pagination .pagination-control .bullet-button {
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, white;
-}
- 
-.pagination .pagination-control .bullet-button:selected {   
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, #0E5D79;
-}
- 
-.pagination .pagination-control .left-arrow, .right-arrow{
-    -fx-background-color: #DDF1F8, #0E5D79;
-}
-
-/* Boxes */
-.whiteBox {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
-}
-
-.grayBox {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #AAAAAA 50%, #BBBBBB 50%);
-    -fx-padding: 1px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
-}
-
-.redEllipse {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #ff3333 50%, #ff6666 50%);
-    -fx-background-radius: 15px;
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
-}
-
 

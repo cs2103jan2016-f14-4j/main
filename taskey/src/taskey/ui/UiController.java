@@ -2,6 +2,7 @@ package taskey.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Stack;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -21,14 +22,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import taskey.constants.Triplet;
+import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.ActionMode;
+import taskey.constants.UiConstants.ContentBox;
+import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Logic;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
 import taskey.logic.Task;
-import taskey.ui.UiConstants.ActionMode;
-import taskey.ui.UiConstants.ContentBox;
-import taskey.ui.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
@@ -64,7 +67,7 @@ public class UiController {
 	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
-	
+	private Stack<String> upStack, downStack;
 	/**
 	 * Sets the up nodes.
 	 *
@@ -83,6 +86,7 @@ public class UiController {
 		myDropDown = new UiDropDown();
 		logic = new Logic();
 		updateAll(logic.getAllTaskLists());
+		input.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 	}
 
 	/**
@@ -129,15 +133,12 @@ public class UiController {
 	}
 	
 	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionMode mode) {
-		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
 
-	public void updateCategoryDisplay(ArrayList<String> categoryNames, ArrayList<Integer> categoryNums, ArrayList<Color> categoryColors) {
-		assert(categoryNames != null);
-		assert(categoryNums != null);
-		assert(categoryColors != null);
-		myContentManager.updateCategoryContentBox(categoryNames,categoryNums,categoryColors);
+	public void updateCategoryDisplay(ArrayList<Triplet<Color,String,Integer>> categoryList) {
+		assert(categoryList != null);
+		myContentManager.updateCategoryContentBox(categoryList);
 	}
 
 	/**
@@ -168,7 +169,7 @@ public class UiController {
 		assert(feedback != null);
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
-			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight(),true); // just set pop up to below input
+			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight()*1.25F,true); // just set pop up to below input
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
@@ -194,6 +195,8 @@ public class UiController {
 					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("ARCHIVE")) {
 					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
+				} else if (viewType.equals("HELP")) {
+					updateActionDisplay(null, ActionMode.HELP);
 				}
 				displayTabContents(ContentBox.ACTION);
 				break;
@@ -213,17 +216,18 @@ public class UiController {
 	}
 	
 	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryList;
+		categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
+				new Triplet<Color,String,Integer>(Color.RED,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.BLUE,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
+				new Triplet<Color, String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
+				));
+		updateCategoryDisplay(categoryList);
+		
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
-		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);
-		ArrayList<String> categoryList = new ArrayList<String>(
-				Arrays.asList("General","Deadlines","Events","Archive"));
-		ArrayList<Integer> categoryNums = new ArrayList<Integer>(
-				Arrays.asList(allLists.get(ListID.GENERAL.getIndex()).size(),allLists.get(ListID.DEADLINE.getIndex()).size(),
-						allLists.get(ListID.EVENT.getIndex()).size(),allLists.get(ListID.COMPLETED.getIndex()).size()));
-		ArrayList<Color> categoryColors = new ArrayList<Color>(
-				Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.YELLOW));
-		updateCategoryDisplay(categoryList, categoryNums, categoryColors);
+		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
 	}
 	
 	public void cleanUp() {
@@ -261,16 +265,30 @@ public class UiController {
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 	          public void handle(KeyEvent event) {
 	        	  if ( event.getCode().isArrowKey()) {
+	        		  event.consume();
+	        	  } else if (event.getCode() == KeyCode.TAB) {
+	        		  event.consume();
+	        	  }
+	          };
+	        });	
+	}
+
+	/**
+	 * This method is for key inputs anywhere in main window
+	 *
+	 * @param root - root object of scene
+	 */
+	private void registerRootEventHandler(Parent root) {
+		root.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				input.requestFocus(); // give focus to textfield
+				 if ( event.getCode().isArrowKey()) {
 	        		  if ( myDropDown.isMenuOpen()) {
 	        			  myDropDown.processArrowKey(event);
 	        		  } else {
 	        			  myContentManager.processArrowKey(event, getCurrentContent());
 	        		  }	  
-	        		  event.consume();
-	        	  }
-	        	  if (event.getCode() == KeyCode.TAB) {
-	        		  event.consume();
-	        	  }
+	        	  }  
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
 	        			  int id = myContentManager.processDelete(getCurrentContent()); 
@@ -279,19 +297,9 @@ public class UiController {
 	        			  }
 	        		  }
 	        	  }
-	          };
-	        });	
-	}
-
-	/**
-	 * This method is for key inputs anywhere in main window, NOTE THIS HAS
-	 * ISSUES, not sure if scene root gets different intervals for updates and
-	 * displays Therefore anything that requires a small or instant display
-	 * tweak don't put here.
-	 *
-	 * @param root - root object of scene
-	 */
-	private void registerRootEventHandler(Parent root) {
+			}
+		});
+		
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.TAB) {
@@ -304,7 +312,12 @@ public class UiController {
 				} else if (event.isControlDown() && event.getCode() == KeyCode.W){
 					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
 					stage.close();
-				} else if (event.getCode() == KeyCode.BACK_QUOTE) {
+				} else if (event.getCode() == KeyCode.F1) {
+					updateActionDisplay(null, ActionMode.HELP);
+					displayTabContents(ContentBox.ACTION);
+				} else if (event.getCode() == KeyCode.F2) {
+					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
+				} else if (event.getCode() == KeyCode.F3) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
 				}
 			}

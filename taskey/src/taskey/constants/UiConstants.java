@@ -1,4 +1,4 @@
-package taskey.ui;
+package taskey.constants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,19 +9,16 @@ import taskey.ui.content.UiGridSettings;
 
 /**
  * 
- * Temporary file to be merged with Constants package
+ * This file contains all the constants for UI
  * 
  * @author JunWei
  *
  */
 public class UiConstants {
 
-	// Messages
-	public static final ArrayList<String> STATUS_MESSAGES = new ArrayList<String>(
-			Arrays.asList("dummy","View Changed Successfully", "Added Task Successfully", "Delete Task Successfully",
-						  "Updated Task Successfully", "Task marked as done", "Search returns a list of tasks",
-						  "Error changing view", "Error adding task", "Error delete task", "Error updating task",
-						  "Error marking task as done", "Error searching", "Error with undo"));
+	public static final String PROGRAM_NAME = "Taskey";
+	public static final String FXML_PATH = "layout.fxml";
+	public static final String FXML_LOAD_FAIL = "Fxml file not found";
 	
 	// Content Boxes
 	public enum ContentBox {
@@ -55,7 +52,8 @@ public class UiConstants {
 	
 	// Images
 	public enum IMAGE_ID {
-		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, MINUS_DEFAULT, MINUS_SELECT, INBOX,
+		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, MINUS_DEFAULT, MINUS_SELECT, URGENT_MARK, 
+		FLOATING, DEADLINE, EVENT,
 		ADD_FLOAT, ADD_DEADLINE, ADD_DEADLINE_DATE, ADD_EVENT, ADD_LAST,
 		DELETE_ID, DELETE_NAME, DELETE_LAST,
 		SET_ID_DATE, SET_ID_EVENT, SET_LAST,
@@ -71,11 +69,11 @@ public class UiConstants {
 		LIST, HELP;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(5, 5, 0, 2, 98);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_LIST = new UiGridSettings(10, 15, 7, 7, 63, 30);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 25, 0, 20, 80);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 0, 20, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 10,0, 20,55,25);
+	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	
 	// Resources 
 	// Not that getResourceByStream uses relative Package directory. 
@@ -87,16 +85,14 @@ public class UiConstants {
 	// Use of TextFlow for text, setting style of TextFlow only affects the container
 	// every Text node has to have its own style (with other options besides Color)
 	public static final String STYLE_TEXT_ALL = "textAll";
+	public static final String STYLE_TEXT_DEFAULT = "textDefault";
 	public static final String STYLE_TEXT_RED = "textRed";
 	public static final String STYLE_TEXT_BLACK = "textBlack";
 	public static final String STYLE_TEXT_BLUE = "textBlue";
-	public static final String STYLE_TEXT_GREEN = "textGreen";
-	public static final String STYLE_TEXT_BLACK_TO_PURPLE = "textBlackToPurple";
-	
-	public static final String STYLE_NUMBER_ICON = "numberIcon";
-	public static final String STYLE_GRAY_BOX = "grayBox";
-	public static final String STYLE_WHITE_BOX = "whiteBox";
-	public static final String STYLE_RED_ELLIPSE = "redEllipse";
+
+	public static final String STYLE_DEFAULT_BOX = "defaultBox";
+	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
+	public static final String STYLE_ELLIPSE = "ellipse";
 	public static final String STYLE_PROMPT = "prompt";
 	public static final String STYLE_PROMPT_SELECTED = "prompt-select";
 

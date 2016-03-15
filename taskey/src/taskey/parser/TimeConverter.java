@@ -1,10 +1,12 @@
 package taskey.parser;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
+/* @@author A0107345L */ 
 public class TimeConverter {
 	
 	//store curr time in seconds 
@@ -39,21 +41,24 @@ public class TimeConverter {
 	 */
 	public long toEpochTime(String date) throws ParseException { 
 		try {
-			long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
-					date).getTime() / 1000;
+			SimpleDateFormat format = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+			format.setLenient(false); //disallow >=3 numbers for dd <-day of month
+			long epochTime = format.parse(date).getTime() / 1000;
 			return epochTime; 
 		} catch (ParseException e) {
 			try {
 				//date came in dd MMM yyyy
+				SimpleDateFormat format2 = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+				format2.setLenient(false);
 				String date2 = date + " " + ParserConstants.DAY_END; 
-				long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
-						date2).getTime() / 1000;
+				long epochTime = format2.parse(date2).getTime() / 1000;
 				return epochTime; 
 			} catch (ParseException e2) {
 				try {
+					SimpleDateFormat format3 = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+					format3.setLenient(false);
 					String date3 = date + " 2016 " + ParserConstants.DAY_END; 
-					long epochTime = new java.text.SimpleDateFormat("dd MMM yyyy HH:mm:ss").parse(
-							date3).getTime() / 1000;
+					long epochTime = format3.parse(date3).getTime() / 1000;
 					return epochTime; 
 				} catch (ParseException e3) {
 					//System.out.println(e3); 
@@ -105,6 +110,7 @@ public class TimeConverter {
 	 */
 	public boolean isSameWeek(long epochTime1, long epochTime2) {
 		Calendar c1 = Calendar.getInstance();
+		c1.setFirstDayOfWeek(Calendar.MONDAY);
 		c1.set(getYear(epochTime1),
 				getMonth(epochTime1)-1,
 				getDay(epochTime1));
@@ -112,6 +118,7 @@ public class TimeConverter {
 		int week1 = c1.get(c1.WEEK_OF_YEAR);
 
 		Calendar c2 = Calendar.getInstance();
+		c2.setFirstDayOfWeek(Calendar.MONDAY);
 		c2.set(getYear(epochTime2),
 				getMonth(epochTime2)-1,
 				getDay(epochTime2));
@@ -219,4 +226,17 @@ public class TimeConverter {
 		
 		return days[day-1]; 
 	}
+	
+	/*
+	public static void main(String[] args) {
+		TimeConverter tc = new TimeConverter();
+		try {
+			long epochTime1 = tc.toEpochTime("11 Mar");
+			long epochTime2 = tc.toEpochTime("21 Mar"); 
+			System.out.println(tc.toHumanTime(epochTime1));
+			System.out.println(tc.isSameWeek(epochTime1, epochTime2));
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	} */ 
 }

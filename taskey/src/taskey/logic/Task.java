@@ -7,6 +7,7 @@ import taskey.parser.TimeConverter;
 import static taskey.constants.ParserConstants.DAY_END_SHORT; 
 
 /**
+ * @@author A0107345L
  * Task object holds all the details of the task 
  * 
  * taskType can have the following values:

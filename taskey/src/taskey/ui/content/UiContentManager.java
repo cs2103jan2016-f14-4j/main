@@ -65,11 +65,10 @@ public class UiContentManager {
 	/**
 	 * Update contents of action content box, depending on mode given.
 	 *
-	 * @param myTaskList - which is the list of tasks
+	 * @param myTaskList - which is the list of tasks if applicable
 	 * @param mode - Content LIST, HELP
 	 */
 	public void updateActionContentBox(ArrayList<Task> myTaskList, ActionMode mode) {
-		assert(myTaskList != null);
 		int arrayIndex = ContentBox.ACTION.getValue();
 		UiActionFormatter myFormatter = (UiActionFormatter) myFormatters.get(arrayIndex);
 		myFormatter.updateContents(myTaskList,mode);

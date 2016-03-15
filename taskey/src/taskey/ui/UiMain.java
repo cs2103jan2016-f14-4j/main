@@ -73,7 +73,7 @@ public class UiMain extends Application {
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
 		
-		testUI();
+		//testUI();
 		
 		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
 		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);

@@ -131,7 +131,6 @@ public class UiController {
 	}
 	
 	public void updateActionDisplay(ArrayList<Task> myTaskList, ActionMode mode) {
-		assert(myTaskList != null);
 		myContentManager.updateActionContentBox(myTaskList,mode);
 	}
 
@@ -197,7 +196,7 @@ public class UiController {
 				} else if (viewType.equals("ARCHIVE")) {
 					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
 				} else if (viewType.equals("HELP")) {
-					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.HELP);
+					updateActionDisplay(null, ActionMode.HELP);
 				}
 				displayTabContents(ContentBox.ACTION);
 				break;
@@ -313,8 +312,11 @@ public class UiController {
 					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
 					stage.close();
 				} else if (event.getCode() == KeyCode.F1) {
-					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
+					updateActionDisplay(null, ActionMode.HELP);
+					displayTabContents(ContentBox.ACTION);
 				} else if (event.getCode() == KeyCode.F2) {
+					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
+				} else if (event.getCode() == KeyCode.F3) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
 				}
 			}

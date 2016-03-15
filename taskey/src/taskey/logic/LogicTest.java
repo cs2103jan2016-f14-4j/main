@@ -317,6 +317,52 @@ public class LogicTest {
 	}
 	
 	@Test
+	public void testDeleteTaskByIndexFromExpiredTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("del 0");
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.EXPIRED, po, 0);
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
+	public void testDeleteTaskByNameFromExpiredTab() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  on " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		ProcessedObject po = parser.parseInput(input);
+		Task t = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t, po);
+		po = parser.parseInput("del " + t.getTaskName());
+		LogicFeedback actual = logic.deleteByName(logic.getAllTaskLists(), ContentBox.EXPIRED, po, t.getTaskName());
+		
+		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
+		while (temp.size() < 7) {
+			temp.add(new ArrayList<Task>());
+		}
+		LogicFeedback expected = new LogicFeedback(temp, po, null);
+		
+		assertTrue(actual.equals(expected));
+	}
+	
+	@Test
 	public void testDeleteFromWrongTab() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();

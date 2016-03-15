@@ -248,10 +248,11 @@ public class Storage {
      * This method is invoked by Logic, should the end user request to change it.
      * <p>Post-conditions:
      * <br>- Creates the directory if it does not exist yet.
-     * <br>- Saves the new directory to a .taskeyconfig file in "user.dir".
-     * <br>- Moves the .taskey storage files in the existing directory to the new one.
+     * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
+     * <br>- Moves the .taskey storage files from the existing directory to the new one.
      * @return true if the new directory was successfully created and/or set;
-     * 		   false if the path is invalid due to illegal characters (e.g. *) or reserved words (e.g. CON in Windows)
+     * 		   false if the path is invalid due to illegal characters (e.g. *), 
+     * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
      * @param pathname can be a relative or absolute path
      */
     public boolean setDirectory(String pathname) {

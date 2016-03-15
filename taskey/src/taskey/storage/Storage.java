@@ -2,12 +2,17 @@ package taskey.storage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.logic.Task;
 
 /**
+ * This class exposes public IO methods for saving tasklists and tags.
+ * It also manages the storage directory.
  * @author Dylan
  */
 public class Storage {
@@ -19,6 +24,7 @@ public class Storage {
 	private static final String DEFAULT_DIRECTORY = "Taskey savefiles";
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
+	private static final String FILENAME_EXTENSION = ".taskey";
 
 	public enum TasklistEnum {
 		// Index 0 is to  be ignored
@@ -43,6 +49,15 @@ public class Storage {
 	    public int index() {
 	    	return index;
 	    }
+	    
+	    public static boolean contains(String name) {
+	    	for (TasklistEnum e : TasklistEnum.values()) {
+	    		if (e.filename.equals(name)) {
+	    			return true;
+	    		}
+	    	}
+	    	return false;
+	    }
 	}
 
 	/**
@@ -54,7 +69,7 @@ public class Storage {
 		Storage storage = new Storage();
 
 		// Can optionally set the directory again, if requested by user.
-		//storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar");
+		System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
 
 		// Initialize - tasklist
 		System.out.println("\nInitial load ======================================");
@@ -230,10 +245,12 @@ public class Storage {
 
     /**
      * Sets the storage directory to the given pathname string after checking that the path is valid.
-     * Creates the directory if it does not exist yet.
-     * Saves the new directory if it
      * This method is invoked by Logic, should the end user request to change it.
-     * @return true if successful;
+     * <p>Post-conditions:
+     * <br>- Creates the directory if it does not exist yet.
+     * <br>- Saves the new directory to a .taskeyconfig file in "user.dir".
+     * <br>- Moves the .taskey storage files in the existing directory to the new one.
+     * @return true if the new directory was successfully created and/or set;
      * 		   false if the path is invalid due to illegal characters (e.g. *) or reserved words (e.g. CON in Windows)
      * @param pathname can be a relative or absolute path
      */
@@ -245,13 +262,15 @@ public class Storage {
 
 		if (dir.isDirectory()) {
 			boolean shouldSave = isNewDirectory(dir); //compares the new directory with the old to see if it should be saved
+			if (shouldSave) {
+	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+	    		System.out.println("{New storage directory saved}"); //debug info
+				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
+				System.out.println("{Storage files moved}"); //debug info
+	    	}
+			
 			directory = dir;
 			System.out.println("{Storage directory set} " + getDirectory()); //debug info
-			if (shouldSave) {
-	    		storageWriter.saveDirectory(directory, FILENAME_CONFIG);
-	    		System.out.println("{Storage directory saved}"); //debug info
-	    	}
-			//TODO method to move files
 			return true;
 		} else {
 			return false;
@@ -275,4 +294,29 @@ public class Storage {
     	return false;
     }
 
+	/**
+	 * Moves the .taskey savefiles in the existing directory to the new one.
+	 * @param srcDir the source directory
+	 * @param destDir the destination diectory
+	 * @returns TODO: error handling?
+	 */
+    private boolean moveFiles(File srcDir, File destDir) {
+    	boolean isSuccessful = true;
+    	    	
+    	for (File srcFile : srcDir.listFiles()) {
+        	if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
+        		Path srcPath = srcFile.toPath();
+        		Path destPath = destDir.toPath().resolve(srcFile.getName());
+
+            	try {
+        			Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+        		} catch (IOException e) {
+        			isSuccessful = false;
+        			e.printStackTrace();
+        			System.out.println("Error moving directory");
+        		}
+        	}
+    	}
+    	return isSuccessful;
+    }
 }

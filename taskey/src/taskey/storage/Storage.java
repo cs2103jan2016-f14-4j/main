@@ -69,7 +69,7 @@ public class Storage {
 		Storage storage = new Storage();
 
 		// Can optionally set the directory again, if requested by user.
-		System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
+		//System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
 
 		// Initialize - tasklist
 		System.out.println("\nInitial load ======================================");

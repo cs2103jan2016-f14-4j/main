@@ -48,8 +48,10 @@ public class ParseEdit {
 	 * If command is SET, categorise into:
 	 * 1. UPDATE_BY_INDEX_CHANGE_NAME
 	 * 2. UPDATE_BY_INDEX_CHANGE_DATE
-	 * 3. UPDATE_BY_NAME_CHANGE_NAME
-	 * 4. UPDATE_BY_NAME_CHANGE_DATE 
+	 * 3. UPDATE_BY_INDEX_CHANGE_BOTH
+	 * 4. UPDATE_BY_NAME_CHANGE_NAME
+	 * 5. UPDATE_BY_NAME_CHANGE_DATE
+	 * 6. UPDATE_BY_NAME_CHANGE_BOTH 
 	 * @param command
 	 * @param stringInput
 	 * @return appropriate ProcessedObject

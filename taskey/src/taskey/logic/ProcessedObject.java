@@ -79,7 +79,8 @@ public class ProcessedObject {
 	
 	/**
 	 * Constructor for ADD_FLOATING, ADD_DEADLINE, ADD_EVENT, ADD_RECURRING,
-	 * DELETE_BY_NAME, UPDATE_BY_NAME_CHANGE_NAME, UPDATE_BY_NAME_CHANGE_DATE
+	 * DELETE_BY_NAME, UPDATE_BY_NAME_CHANGE_NAME, UPDATE_BY_NAME_CHANGE_DATE,
+	 * UPDATE_BY_NAME_CHANGE_BOTH
 	 * @param command
 	 * @param task
 	 */
@@ -90,7 +91,7 @@ public class ProcessedObject {
 	
 	/**
 	 * Constructor for DELETE_BY_INDEX, UPDATE_BY_INDEX_CHANGE_NAME, 
-	 * UPDATE_BY_INDEX_CHANGE_DATE 
+	 * UPDATE_BY_INDEX_CHANGE_DATE, UPDATE_BY_INDEX_CHANGE_BOTH
 	 * @param command
 	 * @param task
 	 * @param index
@@ -104,71 +105,132 @@ public class ProcessedObject {
 	
 	//Corresponding GET/SET methods ===================================
 	
+	/**
+	 * @return command that the user has keyed in, or error
+	 */
 	public String getCommand() {
 		return command;
 	}
 	
+	/**
+	 * Set the command that the user has keyed in. 
+	 * @param command
+	 */
 	public void setCommand(String command) {
 		this.command = command; 
 	}
 	
+	/**
+	 * @return Task object attached to this ProcessedObject, 
+	 * if there is any
+	 */
 	public Task getTask() {
 		return task;
 	}
 	
+	/**
+	 * Set the task object if required. 
+	 * @param task
+	 */
 	public void setTask(Task task) {
 		this.task = task; 
 	}
 	
+	/**
+	 * @return index of the task to update or delete
+	 */
 	public int getIndex() {
 		return index; 
 	}
 	
+	/**
+	 * set the index of the task to update or delete
+	 * @param index
+	 */
 	public void setIndex(int index) {
 		this.index = index; 
 	}
 	
+	/**
+	 * @return view type of a view command
+	 */
 	public String getViewType() {
 		return viewType; 
 	}
 	
+	/**
+	 * Set view type of a view command
+	 * @param viewType
+	 */
 	public void setViewType(String viewType) {
 		this.viewType = viewType; 
 	}
 	
+	/**
+	 * set the details of an ERROR command
+	 * @param errorType
+	 */
 	public void setErrorType(String errorType) {
 		this.errorType = errorType;
 	}
 	
+	/**
+	 * @return get details of an ERROR command
+	 */
 	public String getErrorType() {
 		return errorType; 
 	}
 	
+	/**
+	 * Set search phrase, if the command is SEARCH
+	 * @param searchPhrase
+	 */
 	public void setSearchPhrase(String searchPhrase) {
 		this.searchPhrase = searchPhrase; 
 	}
 	
+	/**
+	 * @return search phrase, if the command is SEARCH
+	 */
 	public String getSearchPhrase() {
 		return searchPhrase; 
 	}
 	
+	/**
+	 * Set new task name of a task,
+	 * used with a "SET" command
+	 * @param taskName
+	 */
 	public void setNewTaskName(String taskName) {
 		newTaskName = taskName; 
 	}
 	
+	/**
+	 * @return new task name of a task; used with "SET" command
+	 */
 	public String getNewTaskName() {
 		return newTaskName; 
 	}
 	
+	/**
+	 * @return directory of new file location to be used
+	 */
 	public String getNewFileLoc() {
 		return newFileLoc; 
 	}
 	
+	/**
+	 * Set new directory of new file location to be used 
+	 * @param newFileLoc
+	 */
 	public void setNewFileLoc(String newFileLoc) {
 		this.newFileLoc = newFileLoc; 
 	}
 	
 	@Override
+	/**
+	 * Compare if a ProcessedObject is equal to another ProcessedObject
+	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ProcessedObject)) {
 		    return false;

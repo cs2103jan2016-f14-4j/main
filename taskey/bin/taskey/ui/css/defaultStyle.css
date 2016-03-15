@@ -13,7 +13,7 @@
 
 #dateLabel {
 	-fx-text-fill: #e7e7e7; 
-
+    -fx-font-smoothing-type: gray;
     -fx-font-weight: bold;
     -fx-font-family: 'Montserrat';
 }

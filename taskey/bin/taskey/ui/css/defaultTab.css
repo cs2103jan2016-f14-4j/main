@@ -17,6 +17,7 @@
     -fx-alignment: CENTER;
     -fx-text-fill: #e7e7e7;
     -fx-font-size: 17px;
+    -fx-font-smoothing-type: gray;
     -fx-font-family: 'Montserrat';
 }
 

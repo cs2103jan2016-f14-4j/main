@@ -374,7 +374,7 @@ public class LogicTest {
 		Task t = po.getTask();
 		logic.addDeadline(logic.getAllTaskLists(), t, po);
 		po = parser.parseInput("del 0");
-		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.EXPIRED, po, 0);
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.ACTION, po, 0);
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -410,7 +410,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -436,7 +436,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("ayy lmao" 
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"ayy lmao\"" 
 				                                   + " not found in this list!"));
 		
 		assertTrue(actual.equals(expected));
@@ -603,7 +603,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -785,7 +785,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("Index out of bounds!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}

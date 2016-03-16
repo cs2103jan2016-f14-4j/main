@@ -50,9 +50,9 @@ public class Storage {
 	    	return index;
 	    }
 	    
-	    public static boolean contains(String name) {
+	    public static boolean contains(String filename) {
 	    	for (TasklistEnum e : TasklistEnum.values()) {
-	    		if (e.filename.equals(name)) {
+	    		if (e.filename.equals(filename)) {
 	    			return true;
 	    		}
 	    	}
@@ -250,8 +250,8 @@ public class Storage {
      * <br>- Creates the directory if it does not exist yet.
      * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
      * <br>- Moves the .taskey storage files from the existing directory to the new one.
-     * @return true if the new directory was successfully created and/or set;
-     * 		   false if the path is invalid due to illegal characters (e.g. *), 
+     * @return True if the new directory was successfully created and/or set;
+     * 		   <br>False if the path is invalid due to illegal characters (e.g. *), 
      * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
      * @param pathname can be a relative or absolute path
      */

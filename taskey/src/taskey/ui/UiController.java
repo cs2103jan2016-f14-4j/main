@@ -180,7 +180,9 @@ public class UiController {
 			case "ADD_DEADLINE": // update 2 lists
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
-				displayTabContents(ContentBox.PENDING);
+				if ( getCurrentContent() == ContentBox.EXPIRED || getCurrentContent() == ContentBox.ACTION) {
+					displayTabContents(ContentBox.PENDING);
+				}
 				updateAll(allLists);
 				break;
 			case "DELETE_BY_INDEX":
@@ -203,7 +205,7 @@ public class UiController {
 				displayTabContents(ContentBox.ACTION);
 				break;
 			case "SEARCH":
-				updateActionDisplay(allLists.get(0), ActionMode.LIST);
+				updateActionDisplay(allLists.get(ListID.SEARCH.getIndex()), ActionMode.LIST);
 				displayTabContents(ContentBox.ACTION);
 				break;	
 			case "DONE_BY_INDEX":
@@ -257,6 +259,7 @@ public class UiController {
 					String line = input.getText();
 					if ( line.isEmpty() == false ) {
 						input.clear();	
+						System.out.println(getCurrentContent().toString());
 						handleFeedback(logic.executeCommand(getCurrentContent(),line));
 						event.consume();
 						myDropDown.closeMenu();

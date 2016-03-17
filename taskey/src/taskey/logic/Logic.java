@@ -362,15 +362,17 @@ public class Logic {
 		}
 		
     	ArrayList<Task> targetList = getListFromContentBox(copy, currentContent);
-		Task toDelete = new Task(taskName);
+		Task toDelete = getTaskByName(targetList, taskName);
 
 		//Named task does not exist in the list
-		if (!targetList.remove(toDelete)) {
+		if (toDelete == null) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskName + "\" not found in this list!"));
 		}
 		
 		if (!currentContent.equals(ContentBox.EXPIRED)) {
 			removeFromAllLists(copy, toDelete);
+		} else {
+			targetList.remove(toDelete);
 		}
 		
 		try {
@@ -442,15 +444,16 @@ public class Logic {
 	//Marks an named task from the current tab as done and saves the updated lists to disk.
 	//TODO: support "done" from the "ACTION" tab. 
 	LogicFeedback doneByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName) {
-		Task toMarkAsDone = new Task(taskName);
-
 		//"done" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
 			return new LogicFeedback(copy, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
-
+		
+		ArrayList<Task> targetList = getListFromContentBox(copy, currentContent);
+		Task toMarkAsDone = getTaskByName(targetList, taskName);
+		
 		//Named task does not exist in the list
-		if (!copy.get(ListID.PENDING.getIndex()).contains(toMarkAsDone)) {
+		if (toMarkAsDone == null) {
 			return new LogicFeedback(copy, po, new Exception(taskName + " does not exist in this tab!"));
 		}
 
@@ -714,8 +717,8 @@ public class Logic {
 	//Removes the given Task from all existing lists except the "EXPIRED" and "COMPLETED" lists.
 	//The intended Task may not be removed if duplicate Task names are allowed.
 	private void removeFromAllLists(ArrayList<ArrayList<Task>> taskLists, Task toRemove) {
-		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
 		taskLists.get(ListID.PENDING.getIndex()).remove(toRemove);
+		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
 		taskLists.get(ListID.GENERAL.getIndex()).remove(toRemove);
 		taskLists.get(ListID.DEADLINE.getIndex()).remove(toRemove);
 		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
@@ -772,6 +775,18 @@ public class Logic {
 		}
 
 		return false; //Stub
+	}
+	
+	//Returns the first Task whose name matches taskName. If no such Task is found, this method
+	//returns null.
+	private Task getTaskByName(ArrayList<Task> list, String taskName) {
+		for (Task t : list) {
+			if (t.getTaskName().equals(taskName)) {
+				return t;
+			}
+		}
+		
+		return null;
 	}
 
 	//Save all task lists to Storage. If the save failed, the task lists will be reverted to the states

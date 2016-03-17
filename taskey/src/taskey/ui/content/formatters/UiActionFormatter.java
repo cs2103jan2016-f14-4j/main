@@ -43,8 +43,10 @@ public class UiActionFormatter extends UiFormatter {
 		}
 	}
 	@Override
-	public int processDeleteKey() {
-		//currentView.processDeleteKey()
+	public int processDeleteKey() {	
+		if ( currentView == listView ) {
+			return currentView.getSelection();
+		}
 		return -1;
 	}
 	@Override
@@ -96,7 +98,7 @@ public class UiActionFormatter extends UiFormatter {
 					break;
 				}
 				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_DEFAULT_BOX, newGrid);
-				//pageEntries.add(entryPane);
+				pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
 				addTaskDescription(theTask, j,newGrid);

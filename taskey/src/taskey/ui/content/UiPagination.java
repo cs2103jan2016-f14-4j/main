@@ -42,6 +42,9 @@ public class UiPagination {
 	 * @param totalPages - the total pages
 	 */
 	public void initialize( int totalPages ) {
+		if ( currentSelection != 0 ) {
+			select(currentSelection - 1); // try to select previous one
+		}
 		currentSelection = 0;
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);

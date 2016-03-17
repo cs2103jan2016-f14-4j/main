@@ -3,12 +3,14 @@ package taskey.ui.content;
 import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -152,7 +154,9 @@ public class UiGridHelper {
 		Rectangle scaledRect = new Rectangle(0,0,0,0);
 		scaledRect.setFill(Paint.valueOf(theColor.toString()));
 		cellWrapper.getChildren().add(scaledRect);
-		scaledRect.widthProperty().bind(cellWrapper.widthProperty());
+		StackPane.setAlignment(scaledRect, Pos.CENTER_LEFT);
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1)); // problem with precision which shifts the whole row
+		scaledRect.setTranslateX(0.5f); // this mitigates the issue
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;
 	}

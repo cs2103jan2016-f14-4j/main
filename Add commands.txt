@@ -45,6 +45,8 @@ add <task name> from <DateTime> to <DateTime>		//Event
 
 ----------EXAMPLE CASES that work-------
 add learn cooking
+add sing lullaby (make sure it doesnt split by by)
+add buy baygon  (make sure it doesnt split by on)
 add do homework 2 by tomorrow
 add do homework on fri
 add do homework on this fri 

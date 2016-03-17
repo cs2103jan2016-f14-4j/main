@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * @@author A0107345L
  * This class will check the date/time pattern of the user's input
  * and decide if the format falls into its blacklist, as specified
  * by a regex (regular expression). If it does,
@@ -14,7 +15,8 @@ import java.util.regex.Pattern;
  */
 public class DateTimePatternMatcher {
 	private String pattern1 = "by \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) on"; 
-	private String pattern2 = "on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) to \\d{1,2}(:|.)?\\d{0,2}(am|pm)";
+	private String pattern2 = "on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) "
+			+ "to \\d{1,2}(:|.)?\\d{0,2}(am|pm)";
 	private String pattern3 = "at \\d{1,2}(:|.)?\\d{0,2}(am|pm) by"; 
 	
 	public DateTimePatternMatcher() {

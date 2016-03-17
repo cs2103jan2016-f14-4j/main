@@ -61,7 +61,6 @@ public class ParseEdit {
 			String rawIndex = getTaskName(strNoCommand);
 			String newTaskName = getNewName(strNoCommand);
 			String newDate = getNewDate(strNoCommand); 
-			System.out.println(newDate);
 			try {
 				int index = Integer.parseInt(rawIndex);	
 				return updateByIndex(index-1, newTaskName, newDate); 

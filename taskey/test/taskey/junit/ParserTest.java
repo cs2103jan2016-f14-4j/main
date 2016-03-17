@@ -16,11 +16,7 @@ public class ParserTest {
 	PrettyTimeParser p = new PrettyTimeParser();
 	
 	@Test
-	public void testFloating() {
-		assertEquals("add", parser.getCommand("add a string")); 
-		assertEquals("do homework", parser.getTaskName("add", "add do homework"));
-		assertEquals("add a song", parser.getTaskName("add", "add add a song"));
-		
+	public void testFloating() {		
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		

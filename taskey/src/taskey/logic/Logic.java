@@ -400,7 +400,7 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 		for (Task t : pendingList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				matches.get(0).add(t);
+				matches.get(ListID.SEARCH.getIndex()).add(t);
 			}
 		}
 

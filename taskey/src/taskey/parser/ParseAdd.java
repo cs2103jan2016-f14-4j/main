@@ -25,6 +25,7 @@ public class ParseAdd {
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	private PrettyTimeParser prettyParser = new PrettyTimeParser();
+	private DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 	
 	private ParseError parseError = new ParseError(); 
 	
@@ -36,9 +37,7 @@ public class ParseAdd {
 		keywordsList.put("to", "to");
 		
 		timeWords.add("am");
-		timeWords.add("a.m.");
 		timeWords.add("pm");
-		timeWords.add("p.m.");
 		//PrettyTime's default time for morning/night is 8am/8pm
 		timeWords.add("morning"); 
 		timeWords.add("night"); //can be tonight, tomorrow night, etc
@@ -58,7 +57,8 @@ public class ParseAdd {
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = getTaskName(command, stringInput);  
+		String simpString = stringNoCommand(command, stringInput);
+		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		
 		if (isEmptyAdd(simpString)) {
 			processed = parseError.processError(ParserConstants.ERROR_ADD_EMPTY);
@@ -77,6 +77,7 @@ public class ParseAdd {
 		if (processed.getCommand().compareTo(ParserConstants.ERROR) == 0) {
 			return processed;
 		}
+		
 		//process tags now: if there are tags, add it in.
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
@@ -97,43 +98,35 @@ public class ParseAdd {
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {
-		String[] splitString = simpString.split(" ");
-		boolean isSet = false; 
-		
-		for (int i = 0; i < splitString.length; i++) { 
-			String word = splitString[i]; 
-			switch (word) {
-				case "from": 
-					if (simpString.split("from").length != 1) {
-						//event
-						processed = handleEvent(task, simpString);
-						isSet = true; 
-					}
-					break;
-				case "by":
-					if (simpString.split("by").length != 1) {
-						//deadline 
-						processed = handleDeadlineBy(task, simpString);
-						isSet = true;
-					} 
-					break; 
-				case "on":
-					if (simpString.split("on").length != 1) {
-						//deadline
-						processed = handleDeadlineOn(task, simpString);	
-						isSet = true;
-					}
-					break;
-				default:
-					break; 
-			}
-			
-			if (isSet) {
-				break; //prematurely end loop once processing done
-			}
+		String taskName = removeTimeFromName(simpString); 
+		String rawDate = simpString.replace(taskName, "").trim();
+		rawDate = rawDate.split("#")[0].trim();//remove tags
+		//do pattern matching on raw date here. 
+		if (pm.hasPattern(rawDate)) {
+			processed = parseError.processError("Unable to process grammatically incorrect date");
+			return processed; 
 		}
-		
-		if (!isSet) {
+		if (rawDate.contains("from")) {
+			if (simpString.split("from").length != 1) {
+				//event
+				processed = handleEvent(task, taskName, rawDate);
+			}
+		} else if (rawDate.contains("by")) {
+			if (simpString.split("by").length != 1) {
+				//deadline 
+				processed = handleDeadline(task, taskName, rawDate);
+			} 
+		} else if (rawDate.contains("on")) {
+			if (simpString.split("on").length != 1) {
+				//deadline
+				processed = handleDeadline(task, taskName, rawDate);	
+			}
+		} else if (rawDate.contains("at")) {
+			if (simpString.split("at").length != 1) {
+				//handle as deadline 
+				processed = handleDeadline(task, taskName, rawDate);
+			}
+		} else {
 			//set as floating task 
 			processed = handleFloating(command, simpString);
 		}
@@ -174,18 +167,15 @@ public class ParseAdd {
 	 * @param simpString
 	 * @return
 	 */
-	private ProcessedObject handleEvent(Task task, String simpString) {
+	private ProcessedObject handleEvent(Task task, String taskName, String rawDate) {
 		long epochTime;
 		ProcessedObject processed;
-		String taskName;
-		String withoutTagList = simpString.split("#")[0].trim();
 	
-		String simpString2 = simpString.replace("today", "2day"); 
+		String simpString2 = rawDate.replace("today", "2day"); 
 		simpString2 = simpString2.replace("tomorrow", "tmr"); 
-		String[] inputList = withoutTagList.split("from");
-		String[] dateList = inputList[1].split("to"); 
-		taskName = removeTimeFromName(withoutTagList);
-		String dateForPrettyParser = withoutTagList.replace(taskName, "");
+		simpString2 = simpString2.replace("from", "").trim();
+		String[] dateList = simpString2.split("to"); 
+		String dateForPrettyParser = rawDate;
 		
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
@@ -241,22 +231,18 @@ public class ParseAdd {
 	}
 	
 	/**
-	 * ADD: process deadlines with the keyword "by"
+	 * ADD: process deadlines with the keyword "by", "on" and "at" 
 	 * @param task
 	 * @param simpString
 	 * @return
 	 */
-	private ProcessedObject handleDeadlineBy(Task task, String simpString) {
+	private ProcessedObject handleDeadline(Task task, String taskName, String rawDate) {
 		long epochTime;
 		ProcessedObject processed;
-		String taskName;
-		String withoutTagList = simpString.split("#")[0].trim(); 
-		String[] inputList = withoutTagList.split("by");
-		taskName = inputList[0].trim(); 
-		taskName = removeTimeFromName(taskName); 
-		String dateForPrettyParser = withoutTagList.replace(taskName, "");
-		String rawDate = inputList[1].trim().toLowerCase(); 
-		
+		String dateForPrettyParser = rawDate;
+		rawDate = rawDate.replace("by", ""); 
+		rawDate = rawDate.replace("on", ""); 
+		rawDate = rawDate.replace("at", ""); 
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(dateForPrettyParser);
@@ -268,48 +254,6 @@ public class ParseAdd {
 				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
-				return processed; 
-			}
-		} else {
-			//process the special day
-			epochTime = specialDays.get(rawDate);
-			task.setDeadline(epochTime);
-		}
-		
-		task.setTaskName(taskName);
-		task.setTaskType("DEADLINE");
-		processed = new ProcessedObject("ADD_DEADLINE",task);
-		return processed;
-	}
-
-	/**
-	 * Add: Process deadlines with the keyword "on"
-	 * @param task
-	 * @param simpString
-	 * @return
-	 */
-	private ProcessedObject handleDeadlineOn(Task task, String simpString) {
-		long epochTime;
-		ProcessedObject processed;
-		String taskName;
-		String withoutTagList = simpString.split("#")[0].trim(); 
-		String[] inputList = withoutTagList.split("on"); 
-		taskName = inputList[0].trim(); 
-		taskName = removeTimeFromName(taskName); 
-		String dateForPrettyParser = withoutTagList.replace(taskName, ""); 
-		String rawDate = inputList[1].trim().toLowerCase();
-		
-		//if time contains am or pm or morning or night, 
-		//call pretty parser to process the time.
-		epochTime = getPrettyTime(dateForPrettyParser);
-		if (epochTime != -1) {
-			task.setDeadline(epochTime); 
-		} else if (!specialDays.containsKey(rawDate)) {
-			try {
-				epochTime = timeConverter.toEpochTime(rawDate);
-				task.setDeadline(epochTime);
-			} catch (Exception error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -349,7 +293,7 @@ public class ParseAdd {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String command, String stringInput) {
+	public String stringNoCommand(String command, String stringInput) {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
@@ -423,36 +367,52 @@ public class ParseAdd {
 	 * @return
 	 */
 	public String removeTimeFromName(String taskName) {
+		String keyword = "(at|from|on|by)";
+		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm)";
+		String timeSpecifier = "(am|pm)";
+		String timePattern = "\\d{1,2}(:|.)?\\d{0,2}"; //regex
+		String specialDaysKeywords = "(this|next)";
 		String stringRep = ""; 
 		String[] splitName = taskName.split(" "); 
 		int size = splitName.length; 
 		
 		for(int i = 0; i < size; ) {
 			String word = splitName[i]; 
-			if (word.compareTo("at") == 0) {
+			if (word.matches(keyword)) {
 				if (i+1 < size) {
 					String time = splitName[i+1];
-					if (time.contains("am")) {
+					if (time.matches(combinedTime) || specialDays.containsKey(time)) {
+						//eg. 3pm or today/tomorrow/fri
 						i += 2; 
-					} else if (time.contains("pm")) {
-						i += 2; 
-					} else if (time.contains("p.m.")) {
-						i += 2; 
-					} else if (time.contains("a.m.")) {
-						i += 2; 
+						break;
+					} else if (time.matches(timePattern) || time.matches(specialDaysKeywords)) {
+						//eg. only a number or contains "this/next" 
+						if (i+2 < size) {
+							String time2 = splitName[i+2];
+							String time3 = time + " " + time2; 
+							if (time2.matches(timeSpecifier) || time2.length() == 3) {
+								//eg. 3 pm or a month like feb (assume v. few words len(3) after num) 
+								i += 2;
+								break;								
+							} else if (specialDays.containsKey(time3)) {
+								//eg. this fri or next fri
+								i += 2;
+								break; 							
+							} else {
+								//probably a place and not time
+								stringRep += word + " " + time + " " + time2 + " ";
+								i += 3; 
+								continue; 
+							}
+						}
 					} else {
 						//probably a place and not time,
 						//so add it to the task name 
 						stringRep += word + " " + time + " ";
 						i += 2; 
+						continue; 
 					}
 				}
-			} else if (word.compareTo("from") == 0) {
-				break; 
-			} else if (word.compareTo("on") == 0) {
-				break;
-			} else if (word.compareTo("by") == 0) {
-				break; 
 			} else {
 				stringRep += word + " "; 
 				i += 1; 

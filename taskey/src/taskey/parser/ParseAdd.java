@@ -40,8 +40,7 @@ public class ParseAdd {
 		timeWords.add("pm");
 		//PrettyTime's default time for morning/night is 8am/8pm
 		timeWords.add("morning"); 
-		timeWords.add("night"); //can be tonight, tomorrow night, etc
-		
+		timeWords.add("night"); //can be tonight, tomorrow night, etc	
 	}
 	
 	/**
@@ -246,7 +245,6 @@ public class ParseAdd {
 		rawDate = rawDate.replaceFirst("on", "").trim(); 
 		rawDate = rawDate.replaceFirst("at", "").trim(); 
 		
-		System.out.println(rawDate);
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(dateForPrettyParser);

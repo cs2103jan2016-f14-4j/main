@@ -1,0 +1,72 @@
+---------  Valid Commands for date and time -------
+
+8pm
+8 pm
+8:00am
+8:00 am
+8.30am
+8.30 am
+
+this sun
+sun
+next sun
+next week
+
+today 
+tmr
+tomorrow
+morning (8am)
+night (8pm)
+
+17 feb 2016
+17 feb
+
+8pm	<date/ day>
+8 pm	<date/ day>
+8:00am	<date/ day>
+8:00 am	<date/ day>
+8.30pm	<date/ day>
+8.30 pm	<date/ day>
+
+
+<date/ day> 8pm
+<date/ day> 8 pm
+<date/ day> 8:00am
+<date/ day> 8:00 am
+<date/ day> 8.00pm
+<date/ day> 12.00am
+
+
+-------- Valid Commands for add--------
+
+add <task name>						//Floating task
+add <task name>	by/on <category name>	//deadline task		
+add <task name> from <DateTime> to <DateTime>		//Event
+
+----------EXAMPLE CASES that work-------
+add learn cooking
+add do homework 2 by tomorrow
+add do homework on fri
+add do homework on this fri 
+add meet friends on 20 feb 2016
+add meet friends on 3pm 
+add project meeting from 4pm to 5pm on 19 feb
+add project meeting from 19 feb 3pm to 4pm
+add do homework at 3pm on tomorrow 
+
+
+
+---------- Known cases that do not work: -------
+add project meeting by 3pm on 17 feb 2016 (returns today's date)
+add project meeting by 3pm on 17 feb
+regex: by \\d{1,2}(:|.)?\\d{0,2}(am|pm) on
+
+add project meeting on 19 feb from 4pm to 5pm (returns wrong time)
+regex: on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) to \\d{1,2}(:|.)?\\d{0,2}(am|pm)
+
+add do homework at 3pm by tomorrow (correct time, return today's date)
+regex: at \\d{1,2}(:|.)?\\d{0,2}(am|pm) by
+
+add do homework at 3pm (classified as floating task)
+add project meeting on cells from 4pm to 5pm (splits wrongly, goes to deadline)
+add do homework by the park on fri

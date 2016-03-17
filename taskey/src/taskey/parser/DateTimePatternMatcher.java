@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
  */
 public class DateTimePatternMatcher {
 	private String pattern1 = "by \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) on"; 
+	private String pattern2 = "on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) to \\d{1,2}(:|.)?\\d{0,2}(am|pm)";
+	private String pattern3 = "at \\d{1,2}(:|.)?\\d{0,2}(am|pm) by"; 
 	
 	public DateTimePatternMatcher() {
 		
@@ -24,10 +26,27 @@ public class DateTimePatternMatcher {
 		Pattern p = Pattern.compile(pattern1);
 		Matcher m = p.matcher(input);
 		
+		Pattern p2 = Pattern.compile(pattern2);
+		Matcher m2 = p2.matcher(input);
+		
+		Pattern p3 = Pattern.compile(pattern3);
+		Matcher m3 = p3.matcher(input);
+		
 		while (m.find()) {
 			System.out.println("Found a match.");
 			return true;
 		}
+		
+		while (m2.find()) {
+			System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m3.find()) {
+			System.out.println("Found a match.");
+			return true;
+		}
+		
 		return false; 
 	}
 	

@@ -40,12 +40,22 @@ public class Logic {
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (Task t : pendingList) {
-			if (!t.getTaskType().equals("FLOATING")) {
-				if (t.getDeadlineEpoch() < timeConverter.getCurrTime() || t.getEndDateEpoch() < timeConverter.getCurrTime()) {
+		for (int i = 0; i < pendingList.size(); i++) {
+			Task t = pendingList.get(i);
+			if (t.getTaskType().equals("DEADLINE")) {
+				if (t.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+					removeFromAllLists(taskLists, t);
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
-				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
-						   || timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
+				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+					thisWeek.add(t);
+				}
+			}
+			
+			if (t.getTaskType().equals("EVENT")) {
+				if (t.getEndDateEpoch() < timeConverter.getCurrTime()) {
+					removeFromAllLists(taskLists, t);
+					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 					thisWeek.add(t);
 				}
 			}

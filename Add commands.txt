@@ -83,16 +83,16 @@ FIXED: add bar by tmr at 11pm (does not read tmr)
 
 
 ------ ALL POSSIBLE PERMUTATIONS -----
-add do homework
-add do homework on mon
-add do homework by the park
-add do homework on cells
-add do homework by the park on 17 feb
-add do homework on cells by tomorrow
-add do homework on cells by tmr
-add do homework on cells by today
-add do homework by the park by this fri
+x add do homework
+x add do homework on mon
+x add do homework by the park
+x add do homework on cells
+x add do homework by the park on 17 feb
+x add do homework on cells by tomorrow
+x add do homework on cells by tmr
+x add do homework on cells by today
+x add do homework by the park by this fri
 
 error handling: make sure they don't go to floating
-add do homework by the park on 17 fbr
-add do homework on 17 fbr 
+x add do homework by the park on 17 fbr
+x add do homework on 17 fbr 

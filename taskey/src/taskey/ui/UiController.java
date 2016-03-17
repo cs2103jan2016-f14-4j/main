@@ -58,6 +58,8 @@ public class UiController {
 	private ImageView crossButton;
 	@FXML
 	private ImageView minusButton;
+	@FXML
+	private Label expiredIcon;
 	
 	private int mouseX, mouseY;
 	private Stage stage;
@@ -67,7 +69,6 @@ public class UiController {
 	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
-	private Stack<String> upStack, downStack;
 	/**
 	 * Sets the up nodes.
 	 *
@@ -172,8 +173,7 @@ public class UiController {
 			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight()*1.25F,true); // just set pop up to below input
 		}
 		
-		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();
-		updateAll(allLists);
+		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	
 		ProcessedObject processed = feedback.getPo();
 		String command = processed.getCommand();
 		switch (command) {		// change display based on which command was inputted
@@ -181,9 +181,11 @@ public class UiController {
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
 				displayTabContents(ContentBox.PENDING);
+				updateAll(allLists);
 				break;
 			case "DELETE_BY_INDEX":
 			case "DELETE_BY_NAME":
+				updateAll(allLists);
 				break;	
 			case "VIEW":
 				String viewType = processed.getViewType();
@@ -201,13 +203,16 @@ public class UiController {
 				displayTabContents(ContentBox.ACTION);
 				break;
 			case "SEARCH":
-				//displayTabContents(ContentBox.ACTION);
+				updateActionDisplay(allLists.get(0), ActionMode.LIST);
+				displayTabContents(ContentBox.ACTION);
 				break;	
 			case "DONE_BY_INDEX":
 			case "DONE_BY_NAME":
+				updateAll(allLists);
 				break;	
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				updateAll(allLists);
 				break;
 			default:
 				System.out.println("Command not defined");
@@ -218,8 +223,8 @@ public class UiController {
 	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
 		ArrayList<Triplet<Color,String,Integer>> categoryList;
 		categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
-				new Triplet<Color,String,Integer>(Color.RED,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
-				new Triplet<Color,String,Integer>(Color.BLUE,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
+				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
 				new Triplet<Color, String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
 				));
@@ -228,6 +233,7 @@ public class UiController {
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
+		expiredIcon.setText(String.valueOf(allLists.get(ListID.EXPIRED.getIndex()).size()));
 	}
 	
 	public void cleanUp() {

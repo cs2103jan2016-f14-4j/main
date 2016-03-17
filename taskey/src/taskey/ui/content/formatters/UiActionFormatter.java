@@ -113,6 +113,7 @@ public class UiActionFormatter extends UiFormatter {
 		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "" + (id + 1);
 		Color theColor = Color.WHITE;
+		System.out.println(theTask.getTaskType());
 		for ( int i = 0; i < categoryList.size(); i ++ ) {
 			String tag = theTask.getTaskType();
 			if ( tag != null ) {

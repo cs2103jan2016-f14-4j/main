@@ -68,7 +68,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
-			//newGrid.setGridLinesVisible(true);
+			newGrid.setGridLinesVisible(true);
 			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {

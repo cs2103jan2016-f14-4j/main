@@ -32,6 +32,14 @@
 	-fx-text-fill: #2d3956;
 }
 
+#expiredIcon {
+	-fx-text-fill: white;
+	-fx-background-color: red;
+	-fx-background-radius: 15px;
+	-fx-padding: 2px;
+	-fx-font-family: 'Montserrat';
+}
+
 /* Switchable styles */
 .prompt {
 	-fx-padding: 2px;
@@ -48,11 +56,6 @@
     -fx-background-insets: 0px, 3px;
     -fx-text-fill: #e7e7e7;
 }
-
-.numberIcon {
-	-fx-background-color: red;
-}
-
 
 .textCategory { 
 	-fx-font-size: 12px;

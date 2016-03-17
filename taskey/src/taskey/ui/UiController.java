@@ -180,15 +180,13 @@ public class UiController {
 			case "ADD_DEADLINE": // update 2 lists
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
-				if ( getCurrentContent() == ContentBox.EXPIRED || getCurrentContent() == ContentBox.ACTION) {
-					displayTabContents(ContentBox.PENDING);
-				}
+				displayTabContents(ContentBox.PENDING);
 				updateAll(allLists);
 				break;
 			case "DELETE_BY_INDEX":
 			case "DELETE_BY_NAME":
 				updateAll(allLists);
-				break;	
+				break;		
 			case "VIEW":
 				String viewType = processed.getViewType();
 				if (viewType.equals("GENERAL")) {
@@ -217,7 +215,7 @@ public class UiController {
 				updateAll(allLists);
 				break;
 			default:
-				System.out.println("Command not defined");
+				updateAll(allLists);
 				break;
 		}
 	}

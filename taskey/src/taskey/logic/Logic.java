@@ -281,7 +281,8 @@ public class Logic {
 		}
 		
 		if (task.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-			copy.get(ListID.EXPIRED.getIndex()).add(task);
+			return new LogicFeedback(copy, po, new Exception("The date " + task.getDeadline()
+			                                                 + " is already past!"));
 		} else {
 			pendingList.add(task);
 			copy.get(ListID.DEADLINE.getIndex()).add(task);
@@ -312,7 +313,8 @@ public class Logic {
 
 
 		if (task.getEndDateEpoch() < timeConverter.getCurrTime()) {
-			copy.get(ListID.EXPIRED.getIndex()).add(task);
+			return new LogicFeedback(copy, po, new Exception("The date " + task.getEndDate()
+            						 + " is already past!"));
 		} else {
 			pendingList.add(task);
 			copy.get(ListID.EVENT.getIndex()).add(task);

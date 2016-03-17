@@ -75,6 +75,11 @@
             <Image url="@utility/images/crossDefault.png" />
          </image>
       </ImageView>
+      <StackPane layoutX="466.0" layoutY="43.0" prefHeight="25.0" prefWidth="34.0">
+         <children>
+            <Label fx:id="expiredIcon" alignment="CENTER" contentDisplay="CENTER" text="10+" />
+         </children>
+      </StackPane>
    </children>
 
 </AnchorPane>

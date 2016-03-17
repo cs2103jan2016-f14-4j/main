@@ -37,7 +37,7 @@ public class UiCategoryFormatter extends UiFormatter {
 	public void updateCategories(ArrayList<Triplet<Color, String, Integer>> categoryList) {
 		clearCurrentGridContents();
 		UiTextBuilder myBuilder = new UiTextBuilder();
-		myBuilder.addMarker(0,"textCategory");
+		myBuilder.addMarker(0,UiConstants.STYLE_TEXT_CATEGORY);
 		
 		for ( int i = 0; i < categoryList.size(); i ++ ) {
 			gridHelper.createStyledCell(1, i, UiConstants.STYLE_HIGHLIGHT_BOX, currentGrid);
@@ -53,15 +53,6 @@ public class UiCategoryFormatter extends UiFormatter {
 		}
 	}
 	
-	private Circle createBullet(int radius, Color theCenter) {
-		assert(theCenter != null);
-		Circle myCircle = new Circle(radius);
-		Stop[] stops = new Stop[] { new Stop(0, Color.BLACK), new Stop(0.25f, theCenter),new Stop(0.75f, theCenter), new Stop(1, Color.BLACK)};
-		LinearGradient myGradiant = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
-		myCircle.setFill(myGradiant);
-		return myCircle;
-	}
-
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
 	}

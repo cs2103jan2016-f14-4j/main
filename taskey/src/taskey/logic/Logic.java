@@ -767,7 +767,7 @@ public class Logic {
 		}
 	}
 
-	//Returns true if and only if a given task should be classified under the list specified by listIndex.
+	//Returns true if and only if a given pending task should be classified under the list specified by listIndex.
 	private boolean belongsToList(Task task, int listIndex) {
 		String taskType = task.getTaskType();
 
@@ -777,11 +777,11 @@ public class Logic {
 		} else if (listIndex == ListID.PENDING.getIndex()) {
 			return true;
 		} else if (listIndex == ListID.GENERAL.getIndex()) {
-			return (taskType == "FLOATING");
+			return (taskType.equals("FLOATING"));
 		} else if (listIndex == ListID.DEADLINE.getIndex()) {
-			return (taskType == "DEADLINE");
+			return (taskType.equals("DEADLINE"));
 		} else if (listIndex == ListID.EVENT.getIndex()) {
-			return (taskType == "EVENT");
+			return (taskType.equals("EVENT"));
 		}
 
 		return false; //Stub

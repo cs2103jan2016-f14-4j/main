@@ -22,10 +22,10 @@ public class ParseAdd {
 	ArrayList<String> timeWords = new ArrayList<String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
-	private HashMap<String,String> months = new HashMap<String,String>(); 
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	private PrettyTimeParser prettyParser = new PrettyTimeParser();
+	private DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 	
 	private ParseError parseError = new ParseError(); 
 	
@@ -35,19 +35,6 @@ public class ParseAdd {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		months.put("jan", "jan");
-		months.put("feb", "feb");
-		months.put("mar", "mar");
-		months.put("apr", "apr");
-		months.put("may", "may");
-		months.put("jun", "jun");
-		months.put("jul", "jul");
-		months.put("aug", "aug");
-		months.put("sep", "sep");
-		months.put("oct", "oct");
-		months.put("nov", "nov");
-		months.put("dec", "dec");
 		
 		timeWords.add("am");
 		timeWords.add("pm");
@@ -70,7 +57,8 @@ public class ParseAdd {
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = stringNoCommand(command, stringInput);  
+		String simpString = stringNoCommand(command, stringInput);
+		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		
 		if (isEmptyAdd(simpString)) {
 			processed = parseError.processError(ParserConstants.ERROR_ADD_EMPTY);
@@ -113,8 +101,11 @@ public class ParseAdd {
 		String taskName = removeTimeFromName(simpString); 
 		String rawDate = simpString.replace(taskName, "").trim();
 		rawDate = rawDate.split("#")[0].trim();//remove tags
-		//TODO: do pattern matching on raw date here. 
-
+		//do pattern matching on raw date here. 
+		if (pm.hasPattern(rawDate)) {
+			processed = parseError.processError("Unable to process grammatically incorrect date");
+			return processed; 
+		}
 		if (rawDate.contains("from")) {
 			if (simpString.split("from").length != 1) {
 				//event
@@ -138,7 +129,6 @@ public class ParseAdd {
 			//set as floating task 
 			processed = handleFloating(command, simpString);
 		}
-		
 		return processed;
 	}
 	

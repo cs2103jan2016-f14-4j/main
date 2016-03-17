@@ -15,9 +15,13 @@ import java.util.regex.Pattern;
  */
 public class DateTimePatternMatcher {
 	private String pattern1 = "by \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) on"; 
-	private String pattern2 = "on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) "
-			+ "to \\d{1,2}(:|.)?\\d{0,2}(am|pm)";
-	private String pattern3 = "at \\d{1,2}(:|.)?\\d{0,2}(am|pm) by"; 
+	private String pattern2 = "on \\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) "
+			+ "from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to";
+	private String pattern3 = "on \\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) "
+			+ "\\d{4} from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to";
+	private String pattern4 = "on (this|next)? (mon|tue|wed|thu|fri|sat|sun) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to"; 
+	private String pattern5 = "on (tmr|tomorrow|today) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to"; 
+	private String pattern6 = "at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by"; 
 	
 	public DateTimePatternMatcher() {
 		
@@ -34,6 +38,15 @@ public class DateTimePatternMatcher {
 		Pattern p3 = Pattern.compile(pattern3);
 		Matcher m3 = p3.matcher(input);
 		
+		Pattern p4 = Pattern.compile(pattern4);
+		Matcher m4 = p4.matcher(input);
+		
+		Pattern p5 = Pattern.compile(pattern5);
+		Matcher m5 = p5.matcher(input);
+		
+		Pattern p6 = Pattern.compile(pattern6);
+		Matcher m6 = p6.matcher(input);
+		
 		while (m.find()) {
 			System.out.println("Found a match.");
 			return true;
@@ -49,14 +62,32 @@ public class DateTimePatternMatcher {
 			return true;
 		}
 		
+		while (m4.find()) {
+			System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m5.find()) {
+			System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m6.find()) {
+			System.out.println("Found a match.");
+			return true;
+		}	
 		return false; 
 	}
 	
 	public static void main(String[] args) {
 		DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
-		String myString = "add project meeting by 20 pm on 17 feb";
+		String string1 = "add project meeting by 3 pm on 17 feb";
+		String string2 = "add project meeting on 19 feb from 4pm to 5pm";
+		String string3 = "add do homework at 3pm by tomorrow";
 		
-		System.out.println(pm.hasPattern(myString));
+		System.out.println(pm.hasPattern(string1));
+		System.out.println(pm.hasPattern(string2));
+		System.out.println(pm.hasPattern(string3));
 	}
 	
 	

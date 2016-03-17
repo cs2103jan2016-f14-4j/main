@@ -59,16 +59,40 @@ add do homework at 3pm on tomorrow
 
 
 ---------- Known cases that do not work: -------
-add project meeting by 3pm on 17 feb 2016 (returns today's date)
-add project meeting by 3pm on 17 feb
-regex: by \\d{1,2}(:|.)?\\d{0,2}(am|pm) on
+FIXED: add project meeting by 3pm on 17 feb 2016 (returns today's date)
+	add project meeting by 3pm on 17 feb
+	regex: by \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) on
 
-add project meeting on 19 feb from 4pm to 5pm (returns wrong time)
-regex: on \\w{1,3} from \\d{1,2}(:|.)?\\d{0,2}(am|pm) to \\d{1,2}(:|.)?\\d{0,2}(am|pm)
+FIXED: add project meeting on 19 feb from 4pm to 5pm (returns wrong time)
+	regex: on \\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to \\d{1,2}(:|.)?\\d{0,2} ?(am|pm)
+	regex: on \\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) \\d{4} from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to \\d{1,2}(:|.)?\\d{0,2} ?(am|pm)
+	regex: on (this|next)? (mon|tue|wed|thu|fri|sat|sun) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to \\d{1,2}(:|.)?\\d{0,2} ?(am|pm)
+	regex: on (tmr|tomorrow|today) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to \\d{1,2}(:|.)?\\d{0,2} ?(am|pm)
 
-add do homework at 3pm by tomorrow (correct time, return today's date)
-regex: at \\d{1,2}(:|.)?\\d{0,2}(am|pm) by
+
+
+FIXED: add do homework at 3pm by tomorrow (correct time, return today's date)
+	regex: at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by
 
 add do homework at 3pm (classified as floating task)
-add project meeting on cells from 4pm to 5pm (splits wrongly, goes to deadline)
-add do homework by the park on fri
+FIXED: add project meeting on cells from 4pm to 5pm (splits wrongly, goes to deadline)
+FIXED: add do homework by the park on fri
+
+FIXED: add foo by tmr 11pm (does not read tmr)
+FIXED: add bar by tmr at 11pm (does not read tmr)
+
+
+------ ALL POSSIBLE PERMUTATIONS -----
+add do homework
+add do homework on mon
+add do homework by the park
+add do homework on cells
+add do homework by the park on 17 feb
+add do homework on cells by tomorrow
+add do homework on cells by tmr
+add do homework on cells by today
+add do homework by the park by this fri
+
+error handling: make sure they don't go to floating
+add do homework by the park on 17 fbr
+add do homework on 17 fbr 

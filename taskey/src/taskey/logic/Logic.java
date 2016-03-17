@@ -529,6 +529,20 @@ public class Logic {
 		} catch (IndexOutOfBoundsException e) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
 		updateAllLists(copy, toUpdate.getTaskName(), changedTask);
@@ -560,7 +574,21 @@ public class Logic {
 		} catch (IndexOutOfBoundsException e) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
-
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
+		
 		changedTask.setTaskName(newTaskName);
 		updateAllLists(copy, toUpdate.getTaskName(), changedTask);
 		
@@ -617,6 +645,20 @@ public class Logic {
 		if (!targetList.contains(toUpdate)) {
 			return new LogicFeedback(copy, po, new Exception(taskName + " not found in this list!"));
 		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
 
 		updateAllLists(copy, taskName, changedTask);
 		
@@ -644,6 +686,20 @@ public class Logic {
 
 		if (!targetList.contains(toUpdate)) {
 			return new LogicFeedback(copy, po, new Exception(oldTaskName + " not found in this list!"));
+		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
 		}
 
 		changedTask.setTaskName(newTaskName);

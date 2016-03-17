@@ -33,7 +33,9 @@ import taskey.ui.utility.UiImageManager;
 public class UiDefaultFormatter extends UiFormatter {
 	private int entriesPerPage = 6;
 	private UiPagination myPagination;
-	
+	private int stackPanePadding = 2;
+	private int lastNum = -1;
+	private int totalPages;
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
 		myPagination = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
@@ -61,15 +63,17 @@ public class UiDefaultFormatter extends UiFormatter {
 		assert(myTaskList != null);	
 		myPagination.clear();
 		createPaginationGrids(myTaskList);
+		if ( lastNum != -1 && myTaskList.size() > lastNum ) { // addition of a task
+			myPagination.selectInPage(totalPages-1, entriesPerPage); // select last
+		} 
+		lastNum = myTaskList.size();
 	}
 
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
-		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
+		totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
-			//newGrid.setGridLinesVisible(true);
-			
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
 			for ( int j = 0; j < entriesPerPage; j ++ ) {
 				if ( entryNo >= myTaskList.size() ) {
@@ -146,7 +150,7 @@ public class UiDefaultFormatter extends UiFormatter {
 			line += "None";
 		}
 		StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
-		pane.setPadding(new Insets(2));
+		pane.setPadding(new Insets(stackPanePadding));
 		gridHelper.addTextFlowToCell(1, row, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 	}
 	

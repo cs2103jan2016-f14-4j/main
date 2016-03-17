@@ -298,7 +298,7 @@ public class UiController {
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
 	        		  if ( myDropDown.isMenuOpen() == false ) {
 	        			  int id = myContentManager.processDelete(getCurrentContent()); 
-	        			  if ( id != -1 ) {
+	        			  if ( id != 0 ) {
 	        				  handleFeedback(logic.executeCommand(getCurrentContent(),"del " + id));
 	        			  }
 	        		  }

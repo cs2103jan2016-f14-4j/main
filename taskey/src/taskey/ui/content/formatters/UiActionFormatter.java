@@ -28,6 +28,7 @@ public class UiActionFormatter extends UiFormatter {
 	private UiHelpMenu myHelpMenu;
 	private UiPagination currentView;
 	private int entriesPerPage = 6;
+	private int stackPanePadding = 2;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
@@ -168,7 +169,7 @@ public class UiActionFormatter extends UiFormatter {
 			line += "None";
 		}
 		StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
-		pane.setPadding(new Insets(2));
+		pane.setPadding(new Insets(stackPanePadding));
 		gridHelper.addTextFlowToCell(1, row, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 	}
 }

@@ -21,8 +21,10 @@ public class UiPagination {
 	private ArrayList<GridPane> myGrids;
 	private int currentPage;
 	private int currentSelection;
+	private int selectionInPage;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	private String selectionStyle;
+	private StackPane selectedPane = null;
 	
 	public Pagination getPagination() {
 		return myPages;
@@ -34,6 +36,8 @@ public class UiPagination {
 		myGrids = new ArrayList<GridPane>();	
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
 		myPages.setVisible(false);
+		currentSelection = 0;
+		selectionInPage = 0;
 	}
 	
 	/**
@@ -41,11 +45,7 @@ public class UiPagination {
 	 * Then binds the method for create pages
 	 * @param totalPages - the total pages
 	 */
-	public void initialize( int totalPages ) {
-		if ( currentSelection != 0 ) {
-			select(currentSelection - 1); // try to select previous one
-		}
-		currentSelection = 0;
+	public void initialize( int totalPages ) {	
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);
 			myPages.setMaxPageIndicatorCount(1);
@@ -67,16 +67,45 @@ public class UiPagination {
 		if ( totalEntries.size() == 0 ) {
 			return -1;
 		}
+		return currentSelection;
+	}
+	
+	private void setCurrentToSelectionInPage() {  // map current selection to the selection in a page
 		int currentIndex = 0; 
 		for ( int i = 0; i < totalEntries.size(); i++ ) {
 			if ( i != currentPage ) {
 				currentIndex += totalEntries.get(i).size();
 			} else {
-				currentIndex += currentSelection;
+				selectionInPage = Math.max(selectionInPage,0);
+				selectionInPage = Math.min(selectionInPage,totalEntries.get(i).size()-1);
+				currentIndex += selectionInPage;
 				break;
 			}
 		}
-		return currentIndex;
+		currentSelection = currentIndex;
+	}
+	
+	public void selectInPage(int pageTo, int selection) { // select an entry in a page
+		if ( pageTo < 0 || pageTo >= totalEntries.size() ) {
+			return;
+		}
+		selectionInPage = selection;
+		currentPage = pageTo;
+		myPages.setCurrentPageIndex(currentPage); // go to the target page where item resides
+		setCurrentToSelectionInPage();
+		
+		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
+		if ( pageContent.size() == 0 ) { // no elements in page
+			return;
+		}
+		// remove previous selection's style
+		if ( selectedPane != null ) {
+			if ( selectedPane.getStyleClass().size() > 1 ) {
+				selectedPane.getStyleClass().remove(1);
+			}
+		}	
+		selectedPane = (StackPane) pageContent.get(selectionInPage);
+		selectedPane.getStyleClass().add(selectionStyle);		
 	}
 	
 	/**
@@ -90,37 +119,15 @@ public class UiPagination {
 			return;
 		}
 		if ( event.getCode() == KeyCode.DOWN) {
-			select(currentSelection + 1);
+			selectInPage(currentPage,selectionInPage+1);
 		} else if ( event.getCode() == KeyCode.UP) {
-			select(currentSelection - 1);
+			selectInPage(currentPage,selectionInPage-1);
 		} else if ( event.getCode() == KeyCode.RIGHT) {
-			myPages.setCurrentPageIndex(currentPage+1); 
-		} else {
-			myPages.setCurrentPageIndex(currentPage-1); // note Pagination handles negative values
+			selectInPage(currentPage+1,selectionInPage);
+		} else if ( event.getCode() == KeyCode.LEFT) {
+			selectInPage(currentPage-1,selectionInPage);
 		}
 	}	
-	
-	private void select(int selection) {
-		if ( totalEntries.size() == 0 ) {
-			return;
-		}
-		ArrayList<StackPane> pageContent = totalEntries.get(currentPage);
-		if ( pageContent.size() == 0 ) { // division by 0
-			return;
-		}
-		selection %= pageContent.size();
-		if ( selection < 0 ) {
-			selection = pageContent.size()-1;
-		}
-		// remove previous selection's style
-		 StackPane myPane = pageContent.get(currentSelection);
-		if ( myPane.getStyleClass().size() > 1) {
-			myPane.getStyleClass().remove(1);
-		}
-		currentSelection = selection;
-		myPane = (StackPane) pageContent.get(currentSelection);
-		myPane.getStyleClass().add(selectionStyle);
-	}
 
 	/**
 	 * Adds the grid to pagination, and provides an arraylist of stackpanes
@@ -144,17 +151,14 @@ public class UiPagination {
 		if ( pageIndex >= myGrids.size() ) {
 			return null; // grid has not been initialized
 		} 
-		if ( currentSelection != 0 ) {
-			select(0); // de-select previous selection
-		}
-		currentSelection = 0;
-		currentPage = pageIndex;
-		select(0); // only after arraylist has been initialized
-		return myGrids.get(pageIndex);
+		currentPage = Math.min(currentPage, myGrids.size()-1);
+		selectInPage(currentPage,selectionInPage);
+		return myGrids.get(currentPage);
     }	
 	
 	public void clear() {
 		myGrids.clear();
 		totalEntries.clear();
+		selectedPane = null;
 	}
 }

@@ -40,12 +40,24 @@ public class Logic {
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (Task t : pendingList) {
-			if (t.getDeadlineEpoch() < timeConverter.getCurrTime() || t.getEndDateEpoch() < timeConverter.getCurrTime()) {
-				taskLists.get(ListID.EXPIRED.getIndex()).add(t);
-			} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())
-				|| timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-				thisWeek.add(t);
+		for (int i = 0; i < pendingList.size(); i++) {
+			Task t = pendingList.get(i);
+			if (t.getTaskType().equals("DEADLINE")) {
+				if (t.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+					removeFromAllLists(taskLists, t);
+					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
+					thisWeek.add(t);
+				}
+			}
+			
+			if (t.getTaskType().equals("EVENT")) {
+				if (t.getEndDateEpoch() < timeConverter.getCurrTime()) {
+					removeFromAllLists(taskLists, t);
+					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
+					thisWeek.add(t);
+				}
 			}
 		}
 		
@@ -360,15 +372,17 @@ public class Logic {
 		}
 		
     	ArrayList<Task> targetList = getListFromContentBox(copy, currentContent);
-		Task toDelete = new Task(taskName);
+		Task toDelete = getTaskByName(targetList, taskName);
 
 		//Named task does not exist in the list
-		if (!targetList.remove(toDelete)) {
+		if (toDelete == null) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskName + "\" not found in this list!"));
 		}
 		
 		if (!currentContent.equals(ContentBox.EXPIRED)) {
 			removeFromAllLists(copy, toDelete);
+		} else {
+			targetList.remove(toDelete);
 		}
 		
 		try {
@@ -396,7 +410,7 @@ public class Logic {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 		for (Task t : pendingList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				matches.get(0).add(t);
+				matches.get(ListID.SEARCH.getIndex()).add(t);
 			}
 		}
 
@@ -440,15 +454,16 @@ public class Logic {
 	//Marks an named task from the current tab as done and saves the updated lists to disk.
 	//TODO: support "done" from the "ACTION" tab. 
 	LogicFeedback doneByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName) {
-		Task toMarkAsDone = new Task(taskName);
-
 		//"done" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
 			return new LogicFeedback(copy, po, new Exception("Cannot use \"done\" command from this tab!"));
 		}
-
+		
+		ArrayList<Task> targetList = getListFromContentBox(copy, currentContent);
+		Task toMarkAsDone = getTaskByName(targetList, taskName);
+		
 		//Named task does not exist in the list
-		if (!copy.get(ListID.PENDING.getIndex()).contains(toMarkAsDone)) {
+		if (toMarkAsDone == null) {
 			return new LogicFeedback(copy, po, new Exception(taskName + " does not exist in this tab!"));
 		}
 
@@ -712,8 +727,8 @@ public class Logic {
 	//Removes the given Task from all existing lists except the "EXPIRED" and "COMPLETED" lists.
 	//The intended Task may not be removed if duplicate Task names are allowed.
 	private void removeFromAllLists(ArrayList<ArrayList<Task>> taskLists, Task toRemove) {
-		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
 		taskLists.get(ListID.PENDING.getIndex()).remove(toRemove);
+		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
 		taskLists.get(ListID.GENERAL.getIndex()).remove(toRemove);
 		taskLists.get(ListID.DEADLINE.getIndex()).remove(toRemove);
 		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
@@ -752,7 +767,7 @@ public class Logic {
 		}
 	}
 
-	//Returns true if and only if a given task should be classified under the list specified by listIndex.
+	//Returns true if and only if a given pending task should be classified under the list specified by listIndex.
 	private boolean belongsToList(Task task, int listIndex) {
 		String taskType = task.getTaskType();
 
@@ -762,14 +777,26 @@ public class Logic {
 		} else if (listIndex == ListID.PENDING.getIndex()) {
 			return true;
 		} else if (listIndex == ListID.GENERAL.getIndex()) {
-			return (taskType == "FLOATING");
+			return (taskType.equals("FLOATING"));
 		} else if (listIndex == ListID.DEADLINE.getIndex()) {
-			return (taskType == "DEADLINE");
+			return (taskType.equals("DEADLINE"));
 		} else if (listIndex == ListID.EVENT.getIndex()) {
-			return (taskType == "EVENT");
+			return (taskType.equals("EVENT"));
 		}
 
 		return false; //Stub
+	}
+	
+	//Returns the first Task whose name matches taskName. If no such Task is found, this method
+	//returns null.
+	private Task getTaskByName(ArrayList<Task> list, String taskName) {
+		for (Task t : list) {
+			if (t.getTaskName().equals(taskName)) {
+				return t;
+			}
+		}
+		
+		return null;
 	}
 
 	//Save all task lists to Storage. If the save failed, the task lists will be reverted to the states

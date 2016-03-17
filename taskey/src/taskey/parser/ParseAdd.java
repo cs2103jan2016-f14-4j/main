@@ -114,16 +114,17 @@ public class ParseAdd {
 		} else if (rawDate.contains("by")) {
 			if (simpString.split("by").length != 1) {
 				//deadline 
-				processed = handleDeadlineBy(task, taskName, rawDate);
+				processed = handleDeadline(task, taskName, rawDate);
 			} 
 		} else if (rawDate.contains("on")) {
 			if (simpString.split("on").length != 1) {
 				//deadline
-				processed = handleDeadlineOn(task, taskName, rawDate);	
+				processed = handleDeadline(task, taskName, rawDate);	
 			}
 		} else if (rawDate.contains("at")) {
 			if (simpString.split("at").length != 1) {
 				//handle as deadline 
+				processed = handleDeadline(task, taskName, rawDate);
 			}
 		} else {
 			//set as floating task 
@@ -230,17 +231,18 @@ public class ParseAdd {
 	}
 	
 	/**
-	 * ADD: process deadlines with the keyword "by"
+	 * ADD: process deadlines with the keyword "by", "on" and "at" 
 	 * @param task
 	 * @param simpString
 	 * @return
 	 */
-	private ProcessedObject handleDeadlineBy(Task task, String taskName, String rawDate) {
+	private ProcessedObject handleDeadline(Task task, String taskName, String rawDate) {
 		long epochTime;
 		ProcessedObject processed;
 		String dateForPrettyParser = rawDate;
 		rawDate = rawDate.replace("by", ""); 
-		
+		rawDate = rawDate.replace("on", ""); 
+		rawDate = rawDate.replace("at", ""); 
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(dateForPrettyParser);
@@ -252,43 +254,6 @@ public class ParseAdd {
 				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
-				return processed; 
-			}
-		} else {
-			//process the special day
-			epochTime = specialDays.get(rawDate);
-			task.setDeadline(epochTime);
-		}
-		
-		task.setTaskName(taskName);
-		task.setTaskType("DEADLINE");
-		processed = new ProcessedObject("ADD_DEADLINE",task);
-		return processed;
-	}
-
-	/**
-	 * Add: Process deadlines with the keyword "on"
-	 * @param task
-	 * @param simpString
-	 * @return
-	 */
-	private ProcessedObject handleDeadlineOn(Task task, String taskName, String rawDate) {
-		long epochTime;
-		ProcessedObject processed;
-		String dateForPrettyParser = rawDate; 
-		rawDate = rawDate.replace("on","").trim();  
-		
-		//if time contains am or pm or morning or night, 
-		//call pretty parser to process the time.
-		epochTime = getPrettyTime(dateForPrettyParser);
-		if (epochTime != -1) {
-			task.setDeadline(epochTime); 
-		} else if (!specialDays.containsKey(rawDate)) {
-			try {
-				epochTime = timeConverter.toEpochTime(rawDate);
-				task.setDeadline(epochTime);
-			} catch (Exception error) {
 				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
@@ -426,7 +391,7 @@ public class ParseAdd {
 							String time2 = splitName[i+2];
 							String time3 = time + " " + time2; 
 							if (time2.matches(timeSpecifier) || time2.length() == 3) {
-								//eg. 3 pm or a month like feb 
+								//eg. 3 pm or a month like feb (assume v. few words len(3) after num) 
 								i += 2;
 								break;								
 							} else if (specialDays.containsKey(time3)) {
@@ -434,15 +399,6 @@ public class ParseAdd {
 								i += 2;
 								break; 							
 							} else {
-								//somewhere to handle 17 fbr <- spelling wrong
-								/*
-								try {
-									timeConverter.toEpochTime(time3);
-									i += 2;
-									break;
-								} catch (ParseException error) {
-									//something wrong with the date 
-								} */ 
 								//probably a place and not time
 								stringRep += word + " " + time + " " + time2 + " ";
 								i += 3; 

@@ -74,7 +74,7 @@ FIXED: add project meeting on 19 feb from 4pm to 5pm (returns wrong time)
 FIXED: add do homework at 3pm by tomorrow (correct time, return today's date)
 	regex: at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by
 
-add do homework at 3pm (classified as floating task)
+FIXED: add do homework at 3pm (classified as floating task)
 FIXED: add project meeting on cells from 4pm to 5pm (splits wrongly, goes to deadline)
 FIXED: add do homework by the park on fri
 

@@ -421,36 +421,42 @@ public class ParseAdd {
 	 * @return
 	 */
 	public String removeTimeFromName(String taskName) {
+		String keyword = "(at|from|on|by)";
+		String timeSpecifier = "(am|pm)";
+		String timePattern = "\\d{1,2}(:|.)?\\d{0,2}"; //regex
 		String stringRep = ""; 
 		String[] splitName = taskName.split(" "); 
 		int size = splitName.length; 
 		
 		for(int i = 0; i < size; ) {
 			String word = splitName[i]; 
-			if (word.compareTo("at") == 0) {
+			if (word.matches(keyword)) {
 				if (i+1 < size) {
 					String time = splitName[i+1];
-					if (time.contains("am")) {
+					if (time.matches(timeSpecifier)) {
 						i += 2; 
-					} else if (time.contains("pm")) {
-						i += 2; 
-					} else if (time.contains("p.m.")) {
-						i += 2; 
-					} else if (time.contains("a.m.")) {
-						i += 2; 
+						break;
+					} else if (time.matches(timePattern)) {
+						if (i+2 < size) {
+							String time2 = splitName[i+2];
+							if (time2.matches(timeSpecifier)) {
+								i += 2;
+								break;
+							} else {
+								//probably a place and not time
+								stringRep += word + " " + time + " " + time2 + " ";
+								i += 3; 
+								continue; 
+							}
+						}
 					} else {
 						//probably a place and not time,
 						//so add it to the task name 
 						stringRep += word + " " + time + " ";
 						i += 2; 
+						continue; 
 					}
 				}
-			} else if (word.compareTo("from") == 0) {
-				break; 
-			} else if (word.compareTo("on") == 0) {
-				break;
-			} else if (word.compareTo("by") == 0) {
-				break; 
 			} else {
 				stringRep += word + " "; 
 				i += 1; 

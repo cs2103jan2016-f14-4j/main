@@ -97,7 +97,22 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processFri(long currTime) {
-		toEndOfWeek = 2;
+		//toEndOfWeek = 2;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("mon", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("tue", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("wed", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("thu", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("fri", 
+				currTime);
+		specialDays.put("sat",
+				currTime + ParserConstants.ONE_DAY);
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.TWO_DAYS); 
@@ -109,6 +124,8 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this thu", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this fri", 
+				currTime);
 		specialDays.put("this sat",
 				currTime + ParserConstants.ONE_DAY);
 		
@@ -133,7 +150,22 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processThu(long currTime) {
-		toEndOfWeek = 3;
+		//toEndOfWeek = 3;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("mon", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("tue", 
+				currTime +  ParserConstants.FIVE_DAYS); 
+		specialDays.put("wed", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("thu", 
+				currTime); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("sat",
+				currTime + ParserConstants.TWO_DAYS);
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.THREE_DAYS); 
@@ -143,6 +175,8 @@ public class SpecialDaysConverter {
 				currTime +  ParserConstants.FIVE_DAYS); 
 		specialDays.put("this wed", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this thu", 
+				currTime); 
 		specialDays.put("this fri", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this sat",
@@ -169,7 +203,22 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processWed(long currTime) {
-		toEndOfWeek = 4;
+		//toEndOfWeek = 4;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("mon", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("tue", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("wed", 
+				currTime); 
+		specialDays.put("thu", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("sat",
+				currTime + ParserConstants.THREE_DAYS);
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FOUR_DAYS); 
@@ -177,6 +226,8 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this tue", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this wed", 
+				currTime); 
 		specialDays.put("this thu", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this fri", 
@@ -205,12 +256,29 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processTue(long currTime) {
-		toEndOfWeek = 5;
+		//toEndOfWeek = 5;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("mon", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("tue", 
+				currTime); 
+		specialDays.put("wed", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("thu", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("sat",
+				currTime + ParserConstants.FOUR_DAYS);
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this mon", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this tue", 
+				currTime); 
 		specialDays.put("this wed", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this thu", 
@@ -241,10 +309,27 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processMon(long currTime) {
-		toEndOfWeek = 6;
+		//toEndOfWeek = 6;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("mon", 
+				currTime);
+		specialDays.put("tue", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("wed", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("thu", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("sat",
+				currTime + ParserConstants.FIVE_DAYS); 
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this mon", 
+				currTime);
 		specialDays.put("this tue", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this wed", 
@@ -277,7 +362,22 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processSun(long currTime) {
-		toEndOfWeek = 7;
+		//toEndOfWeek = 7;
+		
+		specialDays.put("mon", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("tue", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("wed", 
+				currTime  + ParserConstants.THREE_DAYS); 
+		specialDays.put("thu", 
+				currTime  + ParserConstants.FOUR_DAYS); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("sat",
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("sun",
+				currTime);
 		
 		specialDays.put("this mon", 
 				currTime + ParserConstants.ONE_DAY); 
@@ -291,6 +391,8 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this sat",
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this sun",
+				currTime);
 		
 		specialDays.put("next sun", currTime + ParserConstants.ONE_WEEK); 
 		specialDays.put("next mon", 
@@ -312,7 +414,22 @@ public class SpecialDaysConverter {
 	 * @param currTime
 	 */
 	private void processSat(long currTime) {
-		toEndOfWeek = 0;
+		//toEndOfWeek = 0;
+		
+		specialDays.put("sun", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("mon", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("tue", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("wed", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("thu", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("fri", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("sat", 
+				currTime);
 		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.ONE_DAY); 
@@ -326,6 +443,8 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this fri", 
 				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this sat", 
+				currTime);
 		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 

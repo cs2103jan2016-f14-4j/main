@@ -36,9 +36,7 @@ public class ParseEdit {
 		keywordsList.put("to", "to");
 		
 		timeWords.add("am");
-		timeWords.add("a.m.");
 		timeWords.add("pm");
-		timeWords.add("p.m.");
 		//PrettyTime's default time for morning/night is 8am/8pm
 		timeWords.add("morning"); 
 		timeWords.add("night"); //can be tonight, tomorrow night, etc

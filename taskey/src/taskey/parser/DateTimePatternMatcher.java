@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
  * by a regex (regular expression). If it does,
  * return an Error object to tell the user to key in the date in some
  * other format. 
+ * This blacklist is to ensure that grammatically incorrect dates and times
+ * do not get parsed by PrettyTimeParser, as they are potentially confusing
+ * and get varied results from the parser. 
  * @author Xue Hui
  *
  */

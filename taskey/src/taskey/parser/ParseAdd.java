@@ -101,11 +101,13 @@ public class ParseAdd {
 		String taskName = removeTimeFromName(simpString); 
 		String rawDate = simpString.replace(taskName, "").trim();
 		rawDate = rawDate.split("#")[0].trim();//remove tags
+		
 		//do pattern matching on raw date here. 
 		if (pm.hasPattern(rawDate)) {
 			processed = parseError.processError("Unable to process grammatically incorrect date");
 			return processed; 
 		}
+		
 		if (rawDate.contains("from")) {
 			if (simpString.split("from").length != 1) {
 				//event
@@ -240,9 +242,11 @@ public class ParseAdd {
 		long epochTime;
 		ProcessedObject processed;
 		String dateForPrettyParser = rawDate;
-		rawDate = rawDate.replace("by", ""); 
-		rawDate = rawDate.replace("on", ""); 
-		rawDate = rawDate.replace("at", ""); 
+		rawDate = rawDate.replaceFirst("by", "").trim(); 
+		rawDate = rawDate.replaceFirst("on", "").trim(); 
+		rawDate = rawDate.replaceFirst("at", "").trim(); 
+		
+		System.out.println(rawDate);
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(dateForPrettyParser);

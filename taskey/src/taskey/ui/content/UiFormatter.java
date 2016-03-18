@@ -37,10 +37,14 @@ public abstract class UiFormatter {
 		myGrids = new ArrayList<GridPane>();
 		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 	}
-	
 	public void setCategories(ArrayList<Triplet<Color,String,Integer>> _categoryList) {
 		categoryList = _categoryList;
 	}
+	
+	public void cleanUp() {
+		myGrids.clear();
+	}
+	
 	protected void setGrid(int index) {
 		assert(index >= 0 && index < myGrids.size());
 		currentGrid = myGrids.get(index);
@@ -71,9 +75,5 @@ public abstract class UiFormatter {
 		if (currentGrid.isGridLinesVisible()) {
 			currentGrid.getChildren().add(0, node);
 		}
-	}
-	
-	public void cleanUp() {
-		myGrids.clear();
 	}
 }

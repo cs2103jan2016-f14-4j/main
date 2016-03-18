@@ -28,6 +28,7 @@ public class UiActionFormatter extends UiFormatter {
 	private UiHelpMenu myHelpMenu;
 	private UiPagination currentView;
 	private int entriesPerPage = 6;
+	private int stackPanePadding = 2;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
@@ -43,8 +44,10 @@ public class UiActionFormatter extends UiFormatter {
 		}
 	}
 	@Override
-	public int processDeleteKey() {
-		//currentView.processDeleteKey()
+	public int processDeleteKey() {	
+		if ( currentView == listView ) {
+			return currentView.getSelection();
+		}
 		return -1;
 	}
 	@Override
@@ -96,7 +99,7 @@ public class UiActionFormatter extends UiFormatter {
 					break;
 				}
 				StackPane entryPane = gridHelper.createStyledCell(1, j, UiConstants.STYLE_DEFAULT_BOX, newGrid);
-				//pageEntries.add(entryPane);
+				pageEntries.add(entryPane);
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, newGrid);	
 				addTaskDescription(theTask, j,newGrid);
@@ -113,6 +116,7 @@ public class UiActionFormatter extends UiFormatter {
 		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "" + (id + 1);
 		Color theColor = Color.WHITE;
+		System.out.println(theTask.getTaskType());
 		for ( int i = 0; i < categoryList.size(); i ++ ) {
 			String tag = theTask.getTaskType();
 			if ( tag != null ) {
@@ -165,7 +169,7 @@ public class UiActionFormatter extends UiFormatter {
 			line += "None";
 		}
 		StackPane pane = gridHelper.getWrapperAtCell(1, row, newGrid);
-		pane.setPadding(new Insets(2));
+		pane.setPadding(new Insets(stackPanePadding));
 		gridHelper.addTextFlowToCell(1, row, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 	}
 }

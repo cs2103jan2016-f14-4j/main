@@ -3,7 +3,8 @@ package taskey.logic;
 public class LogicConstants {
 
 	public enum ListID {
-		THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6);
+		THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6), 
+		SEARCH(0);
 		
 		private int index;
 		

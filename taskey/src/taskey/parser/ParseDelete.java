@@ -10,11 +10,10 @@ import taskey.constants.ParserConstants;
  * @author Xue Hui
  *
  */
-public class ParseDelete {
-	private ParseError parseError = new ParseError();
+public class ParseDelete extends ParseCommand {
 	
 	public ParseDelete() {
-		
+		super(); 
 	}
 	
 	/**
@@ -32,7 +31,7 @@ public class ParseDelete {
 		String taskName = getTaskName(command, stringInput);
 		
 		if (taskName.compareTo("") == 0) {
-			return parseError.processError("No task has been selected for delete"); 
+			return super.processError("No task has been selected for delete"); 
 		}
 		
 		//delete by category
@@ -44,7 +43,7 @@ public class ParseDelete {
 				processed.setCategory(category);
 				return processed; 
 			} else {
-				return parseError.processError("Cannot delete an empty category"); 
+				return super.processError("Cannot delete an empty category"); 
 			}
 		}
 		

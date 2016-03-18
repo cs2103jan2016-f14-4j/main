@@ -18,7 +18,7 @@ import taskey.logic.Task;
  * @author Xue Hui
  *
  */
-public class ParseEdit {
+public class ParseEdit extends ParseCommand {
 	ArrayList<String> timeWords = new ArrayList<String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
@@ -26,9 +26,8 @@ public class ParseEdit {
 	private TimeConverter timeConverter = new TimeConverter(); 
 	private PrettyTimeParser prettyParser = new PrettyTimeParser();
 	
-	private ParseError parseError = new ParseError(); 
-	
 	public ParseEdit() {
+		super(); 
 		keywordsList.put("every", "every");
 		keywordsList.put("by", "by");
 		keywordsList.put("on", "on");
@@ -70,7 +69,7 @@ public class ParseEdit {
 				return updateByName(rawIndex, newTaskName, newDate); 
 			}
 		}
-		return parseError.processError(ParserConstants.ERROR_INVALID_INPUT);
+		return super.processError(ParserConstants.ERROR_INVALID_INPUT);
 	}
 	
 	/**
@@ -115,7 +114,7 @@ public class ParseEdit {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
-			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
+			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
@@ -164,7 +163,7 @@ public class ParseEdit {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
-			processed = parseError.processError(ParserConstants.ERROR_STRING_FORMAT);
+			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
@@ -225,7 +224,7 @@ public class ParseEdit {
 				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {
@@ -242,7 +241,7 @@ public class ParseEdit {
 				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {
@@ -283,7 +282,7 @@ public class ParseEdit {
 				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
 			} catch (ParseException error){
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {

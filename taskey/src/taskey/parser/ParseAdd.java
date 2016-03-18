@@ -18,18 +18,18 @@ import taskey.logic.Task;
  * @author Xue Hui
  *
  */
-public class ParseAdd { 
+public class ParseAdd extends ParseCommand { 
 	ArrayList<String> timeWords = new ArrayList<String>(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	private PrettyTimeParser prettyParser = new PrettyTimeParser();
-	private DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
+	private DateTimePatternMatcher pm = new DateTimePatternMatcher();  
 	
-	private ParseError parseError = new ParseError(); 
-	
-	public ParseAdd() {		
+	public ParseAdd() {	
+		super();
+		
 		keywordsList.put("every", "every");
 		keywordsList.put("by", "by");
 		keywordsList.put("on", "on");
@@ -60,12 +60,12 @@ public class ParseAdd {
 		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		
 		if (isEmptyAdd(simpString)) {
-			processed = parseError.processError(ParserConstants.ERROR_ADD_EMPTY);
+			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
 			return processed;
 		}
 		
 		if(isOnlyNumbers(simpString)) {
-			processed = parseError.processError(ParserConstants.ERROR_ONLY_NUMS);
+			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 
 		
@@ -103,7 +103,7 @@ public class ParseAdd {
 		
 		//do pattern matching on raw date here. 
 		if (pm.hasPattern(rawDate)) {
-			processed = parseError.processError("Unable to process grammatically incorrect date");
+			processed = super.processError("Unable to process grammatically incorrect date");
 			return processed; 
 		}
 		
@@ -201,7 +201,7 @@ public class ParseAdd {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {
@@ -216,7 +216,7 @@ public class ParseAdd {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {
@@ -256,7 +256,7 @@ public class ParseAdd {
 				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
 			} catch (ParseException error) {
-				processed = parseError.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
 				return processed; 
 			}
 		} else {

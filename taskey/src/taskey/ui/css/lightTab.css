@@ -6,27 +6,27 @@
 
 .tab-pane
 {
-    -fx-tab-min-width:110px;
+    -fx-tab-min-width: 110px;
+    -fx-tab-min-height: 30px;
 }
 
 .tab{
-    -fx-background-insets: 0 1 0 1;
+    -fx-background-color: #206ba4;
+}
+.tab .tab-label { 
+    -fx-alignment: CENTER;
+    -fx-text-fill: #ebf4fb;
+    -fx-font-size: 17px;
+    -fx-font-smoothing-type: gray;
+    -fx-font-family: 'Montserrat';
 }
 
 .tab-pane .tab:selected
 {
-    -fx-background-color: #b3ffb3;
-}
-
-.tab .tab-label { 
-    -fx-alignment: CENTER;
-    -fx-text-fill: #828282;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-font-family: 'Montserrat';
+    -fx-background-color: #ebf4fb;
 }
 
 .tab:selected .tab-label { 
     -fx-alignment: CENTER;
-    -fx-text-fill: #3c3c3c;
+    -fx-text-fill: #206ba4;
 }

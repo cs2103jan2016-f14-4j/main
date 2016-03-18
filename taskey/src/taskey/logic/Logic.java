@@ -691,7 +691,7 @@ public class Logic {
 	
 	//Creates a deep copy of the original lists.
 	ArrayList<ArrayList<Task>> cloneLists(ArrayList<ArrayList<Task>> lists) {
-		assert(lists.size() == 7);
+		//assert(lists.size() == 7);
 		ArrayList<ArrayList<Task>> copy = new ArrayList<ArrayList<Task>>();
 		
 		for (int i = 0; i < lists.size(); i++) {

@@ -8,6 +8,7 @@ import taskey.storage.StorageException;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import taskey.logic.LogicConstants.ListID;
 import taskey.constants.UiConstants.ContentBox;
@@ -40,11 +41,13 @@ public class Logic {
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (int i = 0; i < pendingList.size(); i++) {
-			Task t = pendingList.get(i);
+		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
+			Task t = it.next();
 			if (t.getTaskType().equals("DEADLINE")) {
 				if (t.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //May throw ConcurrentModificationException is duplicate
+					                                  //names are allowed
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
 					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
@@ -53,7 +56,8 @@ public class Logic {
 			
 			if (t.getTaskType().equals("EVENT")) {
 				if (t.getEndDateEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //Same issue as above
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
@@ -747,7 +751,7 @@ public class Logic {
 		return copy;
 	}
 	
-	//Creates a deep copy of the original lists.
+	//Creates a deep copy of the original task lists.
 	ArrayList<ArrayList<Task>> cloneLists(ArrayList<ArrayList<Task>> lists) {
 		assert(lists.size() == 7);
 		ArrayList<ArrayList<Task>> copy = new ArrayList<ArrayList<Task>>();
@@ -813,7 +817,7 @@ public class Logic {
 	}
 
 	//Replace the Task whose name is oldTaskName with another task changedTask.
-	//Also updates all lists containing the updated Task.
+	//All lists containing the replaced task are updated as well.
 	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, String oldTaskName, Task changedTask) {
 		Task toRemove = new Task(oldTaskName);
 		removeFromAllLists(taskLists, toRemove);

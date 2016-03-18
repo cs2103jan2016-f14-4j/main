@@ -61,6 +61,7 @@ Examples:
 When you are done with a task, you can archive it. 
 
 Format: done \<taskname/id\>
+
 Examples:
 <ul> 
   <li><b>done</b> 1

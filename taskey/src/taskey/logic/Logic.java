@@ -34,9 +34,9 @@ public class Logic {
 		history = storage.getHistory();
 
 		//Get lists from Storage
-		taskLists = cloneLists(storage.loadAllTasklists());
-		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
+		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
+		loadedLists.add(0, new ArrayList<Task>()); //Reserve first slot in taskLists for this week's task list
+		taskLists = cloneLists(loadedLists);
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
@@ -47,7 +47,7 @@ public class Logic {
 					removeFromAllLists(taskLists, t);
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 			
@@ -56,7 +56,7 @@ public class Logic {
 					removeFromAllLists(taskLists, t);
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 		}

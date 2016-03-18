@@ -54,7 +54,7 @@ Examples:
   <li><b>set</b> 1 [none] 
   <li><b>set</b> learn cooking [19 feb] 
   <li><b>set</b> 1 [19 feb 3pm, 19 feb 4pm] 
-  <li><b>set 1</b> "learn golf" [19 feb 5pm,19 feb 6pm]
+  <li><b>set</b> 1 "learn golf" [19 feb 5pm,19 feb 6pm]
 </ul> 
 
 ###Archive a task

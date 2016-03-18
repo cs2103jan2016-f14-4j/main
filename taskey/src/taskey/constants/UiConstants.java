@@ -89,6 +89,7 @@ public class UiConstants {
 	public static final String STYLE_TEXT_BLACK = "textBlack";
 	public static final String STYLE_TEXT_BLUE = "textBlue";
 	public static final String STYLE_TEXT_CATEGORY = "textCategory";
+	public static final String STYLE_CATEGORY_BOX = "categoryBox";
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
 	public static final String STYLE_ELLIPSE = "ellipse";

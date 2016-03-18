@@ -67,6 +67,10 @@
 }
 
 /* Boxes */
+.categoryBox {
+	-fx-background-color: #455372;
+}
+
 .defaultBox {
 	-fx-background-color: #2d3956;
 }

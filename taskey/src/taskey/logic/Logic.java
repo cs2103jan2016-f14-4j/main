@@ -351,7 +351,7 @@ public class Logic {
 		try {
 			toDelete = targetList.remove(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 		}
 		
 		if (!currentContent.equals(ContentBox.EXPIRED)) {
@@ -431,13 +431,13 @@ public class Logic {
 			try {
 				toMarkAsDone = copy.get(ListID.THIS_WEEK.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+				return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 			}
 		} else if (currentContent.equals(ContentBox.PENDING)) {
 			try {
 				toMarkAsDone = copy.get(ListID.PENDING.getIndex()).remove(taskIndex);
 			} catch (IndexOutOfBoundsException e) {
-				return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+				return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 			}
 		} else { //"done" command is not allowed in tabs other than "this week" or "pending"
 			return new LogicFeedback(copy, po, new Exception("Cannot use \"done\" command from this tab!"));
@@ -501,7 +501,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 		}
 
 		updateAllLists(copy, toUpdate.getTaskName(), newTaskName);
@@ -531,7 +531,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 		}
 		
 		if (changedTask.getTaskType().equals("DEADLINE")) {
@@ -576,7 +576,7 @@ public class Logic {
 		try {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
-			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
+			return new LogicFeedback(copy, po, new Exception("\"" + (taskIndex + 1) + "\" is not a valid index!"));
 		}
 		
 		if (changedTask.getTaskType().equals("DEADLINE")) {

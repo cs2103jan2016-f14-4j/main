@@ -400,8 +400,8 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(logic.getAllTaskLists(), t, po);
-		po = parser.parseInput("del 1");
-		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 1);
+		po = parser.parseInput("del 2");
+		LogicFeedback actual = logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, po.getIndex());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -410,7 +410,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"2\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -593,8 +593,8 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(logic.getAllTaskLists(), t, po);
-		po = parser.parseInput("done 1");
-		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, 1);
+		po = parser.parseInput("done 2");
+		LogicFeedback actual = logic.doneByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, po.getIndex());
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -603,7 +603,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"2\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}
@@ -775,8 +775,8 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addDeadline(logic.getAllTaskLists(), t, po);
-		po = parser.parseInput("set 1 \"ayy lmao \"");
-		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.PENDING, po, 1, "ayy lmao");
+		po = parser.parseInput("set 2 \"ayy lmao \"");
+		LogicFeedback actual = logic.updateByIndexChangeName(logic.getAllTaskLists(), ContentBox.PENDING, po, po.getIndex(), "ayy lmao");
 		
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		while (temp.size() < 7) {
@@ -785,7 +785,7 @@ public class LogicTest {
 		temp.get(ListID.PENDING.getIndex()).add(t);
 		temp.get(ListID.THIS_WEEK.getIndex()).add(t);
 		temp.get(ListID.DEADLINE.getIndex()).add(t);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"1\" is not a valid index!"));
+		LogicFeedback expected = new LogicFeedback(temp, po, new Exception("\"2\" is not a valid index!"));
 		
 		assertTrue(actual.equals(expected));
 	}

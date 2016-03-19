@@ -1,6 +1,7 @@
 package taskey.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @@author A0107345L
@@ -11,6 +12,7 @@ import java.util.ArrayList;
  *
  */
 public class AutoComplete {
+	private HashMap<String,String> commandList = new HashMap<String,String>();
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
 	
@@ -23,6 +25,15 @@ public class AutoComplete {
 		commands.add("done");
 		commands.add("undo");
 		commands.add("file_loc");
+		
+		commandList.put("add","add");
+		commandList.put("view","view");
+		commandList.put("del", "del");
+		commandList.put("set","set");
+		commandList.put("search","search");
+		commandList.put("done","done");
+		commandList.put("undo","undo");
+		commandList.put("file_loc","file_loc");
 		
 		viewList.add("all");
 		viewList.add("general");
@@ -41,6 +52,12 @@ public class AutoComplete {
 	 */
 	public ArrayList<String> completeCommand(String phrase) {
 		phrase = phrase.toLowerCase(); 
+		
+		//if the command is completed, don't need to process
+		if (commandList.containsKey("phrase")) {
+			return null; 
+		}
+		
 		ArrayList<String> availCommands = new ArrayList<String>();
 		
 		for(int i = 0; i < commands.size(); i++) {

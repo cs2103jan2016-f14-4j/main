@@ -17,6 +17,7 @@ import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
+import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
 
 /**
@@ -108,5 +109,6 @@ public class UiMain extends Application {
 		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
 		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
 		myController.displayTabContents(ContentBox.ACTION);
+		
 	}
 }

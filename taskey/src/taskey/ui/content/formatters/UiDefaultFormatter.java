@@ -3,13 +3,18 @@ package taskey.ui.content.formatters;
 import java.util.ArrayList;
 
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -41,6 +46,8 @@ public class UiDefaultFormatter extends UiFormatter {
 		myPagination = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 		mainPane.setContent(myPagination.getPagination());
 		mainPane.setFitToHeight(true);
+		
+		createPromptNoTasks();
 	}
 
 	@Override
@@ -60,15 +67,30 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
-		assert(myTaskList != null);	
-		myPagination.clear();
-		createPaginationGrids(myTaskList);
-		if ( lastNum != -1 && myTaskList.size() > lastNum ) { // addition of a task
-			myPagination.selectInPage(totalPages-1, entriesPerPage); // select last
-		} 
-		lastNum = myTaskList.size();
+		assert(myTaskList != null);			
+		if ( myTaskList.size() == 0 ) {	
+			mainPane.setContent(currentGrid);	
+		} else {
+			mainPane.setContent(myPagination.getPagination());
+			myPagination.clear();
+			createPaginationGrids(myTaskList);
+			if ( lastNum != -1 && myTaskList.size() > lastNum ) { // addition of a task
+				myPagination.selectInPage(totalPages-1, entriesPerPage); // select last
+			} 
+			lastNum = myTaskList.size();
+		}
 	}
 
+	private void createPromptNoTasks() {
+		// create prompt in absence of tasks
+		addGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_SINGLE),true);
+		RowConstraints row = new RowConstraints();
+		row.setPercentHeight(100);
+		currentGrid.getRowConstraints().add(row);
+		gridHelper.createStyledCell(0, 0, "", currentGrid);
+		gridHelper.createLabelInCell(0, 0, "No tasks in window, add some tasks to get started!", "", currentGrid);
+	}
+	
 	private void createPaginationGrids(ArrayList<Task> myTaskList) {
 		totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 		int entryNo = 0;

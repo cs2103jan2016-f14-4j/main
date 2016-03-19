@@ -77,10 +77,7 @@ public class UiPopupManager {
 		assert(numRows >= 0);
 		Popup newPopup = new Popup();
 		VBox container = new VBox(); // VBox is used only for formatting purposes purposes
-		for (int i = 0; i < numRows; i++) {
-			StackPane row = new StackPane();
-			container.getChildren().add(row);
-		}
+		container.setFillWidth(true);
 		newPopup.getContent().add(container);
 		popupList.add(newPopup);
 		return newPopup;

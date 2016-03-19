@@ -1,5 +1,6 @@
 package taskey.logic;
 
+import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.storage.History;
@@ -809,6 +810,43 @@ public class Logic {
 			System.out.println(se.getMessage());
 			taskLists = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
 			throw new Exception (se.getMessage());
+		}
+	}
+	
+	
+	public ArrayList<String> autoCompleteLine( String line , ContentBox currentContent ) {
+		AutoComplete auto = new AutoComplete();
+		ArrayList<String> suggestions = auto.completeCommand(line);
+		if ( suggestions != null ) { // to complete a command
+			return suggestions;
+		} else { // valid command
+			ProcessedObject po = parser.parseInput(line);
+			switch ( po.getCommand() ) {
+			case "ADD_FLOATING":
+			case "ADD_DEADLINE":
+			case "ADD_EVENT":
+				return new ArrayList<String>(); // valid
+			case "DELETE_BY_INDEX":
+			case "DELETE_BY_NAME":
+			case "VIEW":
+			case "SEARCH":
+			case "DONE_BY_INDEX":
+			case "DONE_BY_NAME":
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+			case "UPDATE_BY_INDEX_CHANGE_BOTH":
+			case "UPDATE_BY_NAME_CHANGE_NAME":
+			case "UPDATE_BY_NAME_CHANGE_DATE":
+			case "UPDATE_BY_NAME_CHANGE_BOTH":
+
+			case "UNDO":
+				return new ArrayList<String>();
+				
+			case "ERROR":
+				return null;
+			default:
+				return null;
+			}
 		}
 	}
 }

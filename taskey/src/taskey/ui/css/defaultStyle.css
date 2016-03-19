@@ -27,11 +27,6 @@
 	-fx-background-color: #2d3956;
 }
 
-#input {
-	-fx-background-color: #e7e7e7;
-	-fx-text-fill: #2d3956;
-}
-
 #expiredIcon {
 	-fx-text-fill: white;
 	-fx-background-color: red;
@@ -41,6 +36,22 @@
 }
 
 /* Switchable styles */
+
+.inputNormal {
+	-fx-background-color: #e7e7e7;
+	-fx-text-fill: #2d3956;
+}
+
+.inputError {
+  -fx-outer-border: red;
+  -fx-body-color: #e7e7e7;
+  -fx-background-color: 
+       -fx-outer-border, 
+       -fx-body-color;
+  -fx-background-insets: 0, 2;
+  -fx-background-radius: 2px, 0px;
+}
+
 .prompt {
 	-fx-padding: 2px;
 	-fx-background-color: #e7e7e7;
@@ -49,7 +60,7 @@
     -fx-text-fill: #2d3956;
 }
 
-.prompt-select {
+.promptSelect {
 	-fx-padding: 2px;
 	-fx-background-color:#2d3956;
     -fx-background-radius: 5px;

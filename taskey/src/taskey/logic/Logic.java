@@ -9,6 +9,7 @@ import taskey.storage.StorageException;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import taskey.logic.LogicConstants.ListID;
 import taskey.constants.UiConstants.ContentBox;
@@ -35,29 +36,32 @@ public class Logic {
 		history = storage.getHistory();
 
 		//Get lists from Storage
-		taskLists = cloneLists(storage.loadAllTasklists());
-		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
+		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
+		loadedLists.add(0, new ArrayList<Task>()); //Reserve first slot in taskLists for this week's task list
+		taskLists = cloneLists(loadedLists);
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (int i = 0; i < pendingList.size(); i++) {
-			Task t = pendingList.get(i);
+		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
+			Task t = it.next();
 			if (t.getTaskType().equals("DEADLINE")) {
 				if (t.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //May throw ConcurrentModificationException is duplicate
+					                                  //names are allowed
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 			
 			if (t.getTaskType().equals("EVENT")) {
 				if (t.getEndDateEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //Same issue as above
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 		}
@@ -282,7 +286,8 @@ public class Logic {
 		}
 		
 		if (task.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-			copy.get(ListID.EXPIRED.getIndex()).add(task);
+			return new LogicFeedback(copy, po, new Exception("The date " + task.getDeadline()
+			                                                 + " is already past!"));
 		} else {
 			pendingList.add(task);
 			copy.get(ListID.DEADLINE.getIndex()).add(task);
@@ -313,7 +318,8 @@ public class Logic {
 
 
 		if (task.getEndDateEpoch() < timeConverter.getCurrTime()) {
-			copy.get(ListID.EXPIRED.getIndex()).add(task);
+			return new LogicFeedback(copy, po, new Exception("The date " + task.getEndDate()
+            						 + " is already past!"));
 		} else {
 			pendingList.add(task);
 			copy.get(ListID.EVENT.getIndex()).add(task);
@@ -528,6 +534,20 @@ public class Logic {
 		} catch (IndexOutOfBoundsException e) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
 
 		changedTask.setTaskName(toUpdate.getTaskName());
 		updateAllLists(copy, toUpdate.getTaskName(), changedTask);
@@ -559,7 +579,21 @@ public class Logic {
 		} catch (IndexOutOfBoundsException e) {
 			return new LogicFeedback(copy, po, new Exception("\"" + taskIndex + "\" is not a valid index!"));
 		}
-
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
+		
 		changedTask.setTaskName(newTaskName);
 		updateAllLists(copy, toUpdate.getTaskName(), changedTask);
 		
@@ -616,6 +650,20 @@ public class Logic {
 		if (!targetList.contains(toUpdate)) {
 			return new LogicFeedback(copy, po, new Exception(taskName + " not found in this list!"));
 		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
+		}
 
 		updateAllLists(copy, taskName, changedTask);
 		
@@ -643,6 +691,20 @@ public class Logic {
 
 		if (!targetList.contains(toUpdate)) {
 			return new LogicFeedback(copy, po, new Exception(oldTaskName + " not found in this list!"));
+		}
+		
+		if (changedTask.getTaskType().equals("DEADLINE")) {
+			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getDeadline()
+				                                                 + " is already past!")); 
+			}
+		}
+		
+		if (changedTask.getTaskType().equals("EVENT")) {
+			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
+				return new LogicFeedback(copy, po, new Exception("The date " + changedTask.getEndDate()
+				                                                 + " is already past!"));
+			}
 		}
 
 		changedTask.setTaskName(newTaskName);
@@ -690,7 +752,7 @@ public class Logic {
 		return copy;
 	}
 	
-	//Creates a deep copy of the original lists.
+	//Creates a deep copy of the original task lists.
 	ArrayList<ArrayList<Task>> cloneLists(ArrayList<ArrayList<Task>> lists) {
 		//assert(lists.size() == 7);
 		ArrayList<ArrayList<Task>> copy = new ArrayList<ArrayList<Task>>();
@@ -756,7 +818,7 @@ public class Logic {
 	}
 
 	//Replace the Task whose name is oldTaskName with another task changedTask.
-	//Also updates all lists containing the updated Task.
+	//All lists containing the replaced task are updated as well.
 	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, String oldTaskName, Task changedTask) {
 		Task toRemove = new Task(oldTaskName);
 		removeFromAllLists(taskLists, toRemove);

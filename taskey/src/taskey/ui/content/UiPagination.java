@@ -100,9 +100,7 @@ public class UiPagination {
 		}
 		// remove previous selection's style
 		if ( selectedPane != null ) {
-			if ( selectedPane.getStyleClass().size() > 1 ) {
-				selectedPane.getStyleClass().remove(1);
-			}
+			selectedPane.getStyleClass().remove(selectionStyle);
 		}	
 		selectedPane = (StackPane) pageContent.get(selectionInPage);
 		selectedPane.getStyleClass().add(selectionStyle);		

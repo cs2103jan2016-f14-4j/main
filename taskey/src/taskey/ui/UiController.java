@@ -29,6 +29,7 @@ import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Logic;
 import taskey.logic.LogicConstants.ListID;
+import taskey.parser.AutoComplete;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
 import taskey.logic.Task;
@@ -88,6 +89,7 @@ public class UiController {
 		logic = new Logic();
 		updateAll(logic.getAllTaskLists());
 		input.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+		input.getStyleClass().add(UiConstants.STYLE_INPUT_NORMAL);
 	}
 
 	/**
@@ -212,10 +214,16 @@ public class UiController {
 				break;	
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
+			case "UPDATE_BY_INDEX_CHANGE_BOTH":
+			case "UPDATE_BY_NAME_CHANGE_NAME":
+			case "UPDATE_BY_NAME_CHANGE_DATE":
+			case "UPDATE_BY_NAME_CHANGE_BOTH":
 				updateAll(allLists);
 				break;
-			default:
+			case "UNDO":
 				updateAll(allLists);
+			case "ERROR":
+			default:
 				break;
 		}
 	}
@@ -249,20 +257,35 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
-				if ( event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
-					myDropDown.updateMenuItems(new ArrayList<String>(Arrays.asList("PLACEHOLDER" + Math.random(),"PLACEHOLDER" + Math.random())));
-					myDropDown.updateMenu();
-				}
-				if (event.getCode() == KeyCode.ENTER) {
-					String line = input.getText();
-					if ( line.isEmpty() == false ) {
-						input.clear();	
-						System.out.println(getCurrentContent().toString());
-						handleFeedback(logic.executeCommand(getCurrentContent(),line));
-						event.consume();
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);
+				
+				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
+					ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
+					if ( suggestions == null ) {
+						input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
 						myDropDown.closeMenu();
 					} else {
-						myContentManager.processEnter(getCurrentContent());
+						myDropDown.updateMenuItems(suggestions);
+						myDropDown.updateMenu();
+					}
+				}
+				if (event.getCode() == KeyCode.ENTER) {	
+					String selection = myDropDown.getSelectedItem();
+					if ( selection.isEmpty() == false ) { // make selected item as input text
+						input.setText(selection);
+						input.selectEnd();
+						input.deselect();
+						myDropDown.closeMenu();
+					} else  {
+						String line = input.getText();
+						if ( line.isEmpty() == false ) {						
+							input.clear();	
+							handleFeedback(logic.executeCommand(getCurrentContent(),line));
+							event.consume();
+							myDropDown.closeMenu();
+						} else {
+							myContentManager.processEnter(getCurrentContent());
+						}
 					}
 				}
 			}
@@ -272,7 +295,9 @@ public class UiController {
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 	          public void handle(KeyEvent event) {
 	        	  if ( event.getCode().isArrowKey()) {
-	        		  event.consume();
+	        		  if ( event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN ) {
+	        			  event.consume();
+	        		  }
 	        	  } else if (event.getCode() == KeyCode.TAB) {
 	        		  event.consume();
 	        	  }
@@ -290,14 +315,14 @@ public class UiController {
 			public void handle(KeyEvent event) {
 				input.requestFocus(); // give focus to textfield
 				 if ( event.getCode().isArrowKey()) {
-	        		  if ( myDropDown.isMenuOpen()) {
+	        		  if ( input.getText().isEmpty() == false ) {
 	        			  myDropDown.processArrowKey(event);
 	        		  } else {
 	        			  myContentManager.processArrowKey(event, getCurrentContent());
 	        		  }	  
 	        	  }  
 	        	  if ( event.getCode() == KeyCode.DELETE ) {
-	        		  if ( myDropDown.isMenuOpen() == false ) {
+	        		  if (input.getText().isEmpty() == true ) {
 	        			  int id = myContentManager.processDelete(getCurrentContent()); 
 	        			  if ( id != 0 ) {
 	        				  handleFeedback(logic.executeCommand(getCurrentContent(),"del " + id));

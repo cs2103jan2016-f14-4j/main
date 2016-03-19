@@ -15,6 +15,10 @@ import taskey.logic.LogicConstants.ListID;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.ProcessedObject;
 
+import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
+import static taskey.constants.ParserConstants.FINISHED_COMMAND;
+import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
+
 /**
  * The Logic class handles the execution of user commands. It contains an internal memory of task lists 
  * which facilitate the addition, deletion and updating of tasks. Each time a command is executed, these lists
@@ -876,11 +880,18 @@ public class Logic {
 	}
 	
 	
-	public ArrayList<String> autoCompleteLine( String line , ContentBox currentContent ) {
+	public ArrayList<String> autoCompleteLine(String line, ContentBox currentContent) {
 		AutoComplete auto = new AutoComplete();
-		ArrayList<String> suggestions = auto.completeCommand(line);
-		if ( suggestions != null ) { // to complete a command
+		ProcessedAC pac = auto.completeCommand(line); 
+		String pacCommand = pac.getCommand(); 
+		
+		if ( pacCommand.compareTo(DISPLAY_COMMAND) == 0) { // to complete a command
+			ArrayList<String> suggestions = pac.getAvailCommands(); 
 			return suggestions;
+		} else if (pacCommand.compareTo(FINISHED_COMMAND) == 0) {
+			return null;
+		} else if (pacCommand.compareTo(NO_SUCH_COMMAND) == 0) {
+			return null;  
 		} else { // valid command
 			ProcessedObject po = parser.parseInput(line);
 			switch ( po.getCommand() ) {

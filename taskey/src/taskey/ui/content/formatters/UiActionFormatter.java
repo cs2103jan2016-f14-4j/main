@@ -46,7 +46,7 @@ public class UiActionFormatter extends UiFormatter {
 	@Override
 	public int processDeleteKey() {	
 		if ( currentView == listView ) {
-			return currentView.getSelection();
+			return currentView.getSelection() + 1;
 		}
 		return -1;
 	}

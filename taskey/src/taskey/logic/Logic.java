@@ -1,5 +1,6 @@
 package taskey.logic;
 
+import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.storage.History;
@@ -8,6 +9,7 @@ import taskey.storage.StorageException;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import taskey.logic.LogicConstants.ListID;
 import taskey.constants.UiConstants.ContentBox;
@@ -34,29 +36,32 @@ public class Logic {
 		history = storage.getHistory();
 
 		//Get lists from Storage
-		taskLists = cloneLists(storage.loadAllTasklists());
-		ArrayList<Task> thisWeek = new ArrayList<Task>();
-		taskLists.add(0, thisWeek); //Reserve first slot in taskLists for this week's task list
+		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
+		loadedLists.add(0, new ArrayList<Task>()); //Reserve first slot in taskLists for this week's task list
+		taskLists = cloneLists(loadedLists);
 
 		//Update EXPIRED and THIS_WEEK list based on the current date and time
 		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		for (int i = 0; i < pendingList.size(); i++) {
-			Task t = pendingList.get(i);
+		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
+			Task t = it.next();
 			if (t.getTaskType().equals("DEADLINE")) {
 				if (t.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //May throw ConcurrentModificationException is duplicate
+					                                  //names are allowed
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 			
 			if (t.getTaskType().equals("EVENT")) {
 				if (t.getEndDateEpoch() < timeConverter.getCurrTime()) {
-					removeFromAllLists(taskLists, t);
+					it.remove();
+					removeFromAllLists(taskLists, t); //Same issue as above
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
 				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
-					thisWeek.add(t);
+					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
 			}
 		}
@@ -747,7 +752,7 @@ public class Logic {
 		return copy;
 	}
 	
-	//Creates a deep copy of the original lists.
+	//Creates a deep copy of the original task lists.
 	ArrayList<ArrayList<Task>> cloneLists(ArrayList<ArrayList<Task>> lists) {
 		//assert(lists.size() == 7);
 		ArrayList<ArrayList<Task>> copy = new ArrayList<ArrayList<Task>>();
@@ -813,7 +818,7 @@ public class Logic {
 	}
 
 	//Replace the Task whose name is oldTaskName with another task changedTask.
-	//Also updates all lists containing the updated Task.
+	//All lists containing the replaced task are updated as well.
 	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, String oldTaskName, Task changedTask) {
 		Task toRemove = new Task(oldTaskName);
 		removeFromAllLists(taskLists, toRemove);
@@ -867,6 +872,43 @@ public class Logic {
 			System.out.println(se.getMessage());
 			taskLists = se.getLastModifiedTasklists(); //Dylan: this hasn't been tested. Will test next time.
 			throw new Exception (se.getMessage());
+		}
+	}
+	
+	
+	public ArrayList<String> autoCompleteLine( String line , ContentBox currentContent ) {
+		AutoComplete auto = new AutoComplete();
+		ArrayList<String> suggestions = auto.completeCommand(line);
+		if ( suggestions != null ) { // to complete a command
+			return suggestions;
+		} else { // valid command
+			ProcessedObject po = parser.parseInput(line);
+			switch ( po.getCommand() ) {
+			case "ADD_FLOATING":
+			case "ADD_DEADLINE":
+			case "ADD_EVENT":
+				return new ArrayList<String>(); // valid
+			case "DELETE_BY_INDEX":
+			case "DELETE_BY_NAME":
+			case "VIEW":
+			case "SEARCH":
+			case "DONE_BY_INDEX":
+			case "DONE_BY_NAME":
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+			case "UPDATE_BY_INDEX_CHANGE_BOTH":
+			case "UPDATE_BY_NAME_CHANGE_NAME":
+			case "UPDATE_BY_NAME_CHANGE_DATE":
+			case "UPDATE_BY_NAME_CHANGE_BOTH":
+
+			case "UNDO":
+				return new ArrayList<String>();
+				
+			case "ERROR":
+				return null;
+			default:
+				return null;
+			}
 		}
 	}
 }

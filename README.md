@@ -1,5 +1,9 @@
 #Taskey Quick Start Guide
 ---
+### Pre-requisites:
+ - Java SE Runtime Environment 8u74 (can be downloaded from Oracle.com) 
+
+
 PS: Take note of stuff in bold as they are important keywords. 
 
 ###Shortcuts
@@ -50,12 +54,19 @@ Examples:
   <li><b>set</b> 1 [none] 
   <li><b>set</b> learn cooking [19 feb] 
   <li><b>set</b> 1 [19 feb 3pm, 19 feb 4pm] 
+  <li><b>set</b> 1 "learn golf" [19 feb 5pm,19 feb 6pm]
 </ul> 
 
 ###Archive a task
 When you are done with a task, you can archive it. 
 
 Format: done \<taskname/id\>
+
+Examples:
+<ul> 
+  <li><b>done</b> 1
+  <li><b>done</b> learn golf 
+</ul> 
 
 ###Search for a task
 If you have many tasks, you can search for your tasks by typing the command "<b>search</b>". 

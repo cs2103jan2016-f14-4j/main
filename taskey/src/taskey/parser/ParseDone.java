@@ -10,11 +10,10 @@ import taskey.constants.ParserConstants;
  * @author Xue Hui
  *
  */
-public class ParseDone {
-	private ParseError parseError = new ParseError();
+public class ParseDone extends ParseCommand {
 		
 	public ParseDone() {
-		
+		super(); 
 	}
 
 	/**
@@ -31,7 +30,7 @@ public class ParseDone {
 		String taskName = getTaskName(command, stringInput);
 		
 		if (taskName.compareTo("") == 0) {
-			return parseError.processError("no task has been selected as done");
+			return super.processError("No task has been selected as done");
 		}
 		
 		try {

@@ -10,10 +10,10 @@ import taskey.constants.ParserConstants;
  * @author Xue Hui
  *
  */
-public class ParseFileLocation {
+public class ParseFileLocation extends ParseCommand {
 	
 	public ParseFileLocation() {
-		
+		super(); 
 	}
 	
 	public ProcessedObject processLoc(String command, String rawInput) {

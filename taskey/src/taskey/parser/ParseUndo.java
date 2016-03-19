@@ -8,10 +8,10 @@ import taskey.logic.ProcessedObject;
  * @author Xue Hui
  *
  */
-public class ParseUndo {
+public class ParseUndo extends ParseCommand {
 	
 	public ParseUndo() {
-		
+		super(); 
 	}
 
 	/**

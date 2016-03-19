@@ -3,6 +3,9 @@ package taskey.parser;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import taskey.constants.ParserConstants;
+import taskey.logic.ProcessedAC;
+
 /**
  * @@author A0107345L
  * This class processes what words should be shown in the dropdown
@@ -50,12 +53,12 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such command exists, return null
 	 */
-	public ArrayList<String> completeCommand(String phrase) {
+	public ProcessedAC completeCommand(String phrase) {
 		phrase = phrase.toLowerCase(); 
 		
 		//if the command is completed, don't need to process
 		if (commandList.containsKey("phrase")) {
-			return null; 
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 		}
 		
 		ArrayList<String> availCommands = new ArrayList<String>();
@@ -67,10 +70,10 @@ public class AutoComplete {
 		}
 		
 		if (!availCommands.isEmpty()) {
-			return availCommands;
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
 		} 
 		//no such command containing that sub-string
-		return null; 
+		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
 	
 	/**

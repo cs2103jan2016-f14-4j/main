@@ -52,6 +52,7 @@ add do homework on fri
 add do homework on this fri 
 add meet friends on 20 feb 2016
 add meet friends on 3pm 
+add meet friends at 3pm 
 add project meeting from 4pm to 5pm on 19 feb
 add project meeting from 19 feb 3pm to 4pm
 add do homework at 3pm on tomorrow 
@@ -83,16 +84,29 @@ FIXED: add bar by tmr at 11pm (does not read tmr)
 
 
 ------ ALL POSSIBLE PERMUTATIONS -----
-x add do homework
-x add do homework on mon
-x add do homework by the park
-x add do homework on cells
-x add do homework by the park on 17 feb
-x add do homework on cells by tomorrow
-x add do homework on cells by tmr
-x add do homework on cells by today
-x add do homework by the park by this fri
+add do homework
+add do homework at 11pm
+add do homework on mon
+add do homework on mon 11pm
+add do homework on mon at 11pm 
+add do homework by mon 11pm
+add do homework by mon at 11pm
+add do homework by the park
+add do homework on cells
+add do homework by the park on 17 feb
+add do homework on cells by tomorrow
+add do homework on cells by tmr
+add do homework on cells by today
+add do homework by the park by this fri
+add do homework from 4pm to 5pm on 19 mar
+add do homework from 19 mar 4pm to 5pm 
+
+add do homework from tmr 4pm to 5pm 
 
 error handling: make sure they don't go to floating
-x add do homework by the park on 17 fbr
-x add do homework on 17 fbr 
+add do homework by the park on 17 fbr
+add do homework on 17 fbr 
+add do homework on 30 feb (invalid date range, to be caught by TC)
+
+add do homework by 17 foo rd on sun <- will not be caught by ErrorDetector
+add watch the movie named 'day after tomorrow' <- should not be interpreted as date 

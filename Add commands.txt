@@ -108,4 +108,5 @@ add do homework by the park on 17 fbr
 add do homework on 17 fbr 
 add do homework on 30 feb (invalid date range, to be caught by TC)
 
-do homework by 17 foo rd on sun <- will not be caught by ErrorDetector
+add do homework by 17 foo rd on sun <- will not be caught by ErrorDetector
+add watch the movie named 'day after tomorrow' <- should not be interpreted as date 

@@ -15,7 +15,7 @@ import taskey.constants.UiConstants.IMAGE_ID;
  */
 
 public class UiImageManager {
-
+	private String helpFolder = UiConstants.UI_IMAGE_PATH_OFFSET + UiConstants.UI_IMAGE_HELP_PATH_OFFSET;
 	private HashMap<IMAGE_ID, Image> myImageContainer = new HashMap<IMAGE_ID, Image>();
 	private static UiImageManager instance = null;
 	private UiImageManager() {
@@ -65,9 +65,17 @@ public class UiImageManager {
 		myImageContainer.clear();
 	}
 	
-	public void loadHelpMenuImages() {
-		String helpFolder = UiConstants.UI_IMAGE_PATH_OFFSET + UiConstants.UI_IMAGE_HELP_PATH_OFFSET;
-		// help add images
+	public void loadHelpMenuImages() {	
+		loadAddMenuImages();
+		loadDeleteMenuImages();
+		loadSetMenuImages();
+		loadDoneMenuImages();
+		loadSearchMenuImages();
+		loadUndoMenuImages();
+		loadTagMenuImages();
+		loadViewMenuImages();
+	}
+	private void loadAddMenuImages() {
 		myImageContainer.put(IMAGE_ID.ADD_FLOAT, 
 				new Image(getClass().getResourceAsStream(helpFolder + "addFloat.png")));
 		myImageContainer.put(IMAGE_ID.ADD_DEADLINE, 
@@ -78,43 +86,50 @@ public class UiImageManager {
 				new Image(getClass().getResourceAsStream(helpFolder + "addEvent.png")));
 		myImageContainer.put(IMAGE_ID.ADD_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "addLast.png")));
-		// help delete images
+	}
+	private void loadDeleteMenuImages() {
 		myImageContainer.put(IMAGE_ID.DELETE_ID, 
 				new Image(getClass().getResourceAsStream(helpFolder + "deleteID.png")));
 		myImageContainer.put(IMAGE_ID.DELETE_NAME, 
 				new Image(getClass().getResourceAsStream(helpFolder + "deleteName.png")));
 		myImageContainer.put(IMAGE_ID.DELETE_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "deleteLast.png")));
-		// help set images
+	}
+	private void loadSetMenuImages() {
 		myImageContainer.put(IMAGE_ID.SET_ID_DATE, 
 				new Image(getClass().getResourceAsStream(helpFolder + "setIDDate.png")));
 		myImageContainer.put(IMAGE_ID.SET_ID_EVENT, 
 				new Image(getClass().getResourceAsStream(helpFolder + "setIDEvent.png")));
 		myImageContainer.put(IMAGE_ID.SET_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "setLast.png")));
-		// help done images
+	}
+	private void loadDoneMenuImages() {
 		myImageContainer.put(IMAGE_ID.DONE_ID, 
 				new Image(getClass().getResourceAsStream(helpFolder + "doneID.png")));
 		myImageContainer.put(IMAGE_ID.DONE_NAME, 
 				new Image(getClass().getResourceAsStream(helpFolder + "doneName.png")));
 		myImageContainer.put(IMAGE_ID.DONE_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "doneLast.png")));
-		// help search images
+	}
+	private void loadSearchMenuImages() {
 		myImageContainer.put(IMAGE_ID.SEARCH_NAME, 
 				new Image(getClass().getResourceAsStream(helpFolder + "undo.png")));
 		myImageContainer.put(IMAGE_ID.SEARCH_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "undoLast.png")));
-		// help undo images
+	}
+	private void loadUndoMenuImages() {
 		myImageContainer.put(IMAGE_ID.UNDO, 
 				new Image(getClass().getResourceAsStream(helpFolder + "undo.png")));
 		myImageContainer.put(IMAGE_ID.UNDO_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "undoLast.png")));
-		// help tag
+	}
+	private void loadTagMenuImages() {
 		myImageContainer.put(IMAGE_ID.TAG, 
 				new Image(getClass().getResourceAsStream(helpFolder + "tag.png")));
 		myImageContainer.put(IMAGE_ID.TAG_LAST, 
 				new Image(getClass().getResourceAsStream(helpFolder + "tagLast.png")));
-		// help view
+	}
+	private void loadViewMenuImages() {
 		myImageContainer.put(IMAGE_ID.VIEW_GENERAL, 
 				new Image(getClass().getResourceAsStream(helpFolder + "tag.png")));
 		myImageContainer.put(IMAGE_ID.VIEW_DEADLINE, 

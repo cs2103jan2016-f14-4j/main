@@ -85,24 +85,24 @@ public class UiAnimationManager {
 	 * @param filler -the filler
 	 * @return - the timeline
 	 */
-	public Timeline createTimelineAnimation( Label theLabel, int interval, int charsToSkip, String filler ) {
+	public Timeline createTimelineAnimation(Label theLabel, int interval, int charsToSkip, String filler) {
 
-	        Timeline timeline = new Timeline();
-	        timeline.setCycleCount(Timeline.INDEFINITE);
-	        timeline.setAutoReverse(true);
- 
-	        KeyValue keyValue = new KeyValue(theLabel.scaleXProperty(), 1);
-	        Duration duration = Duration.millis(interval);
-	        EventHandler<ActionEvent> onFinished = new EventHandler<ActionEvent>() {
-	            public void handle(ActionEvent t) {
-	            	String myText = theLabel.getText();
-	        		myText = myText.substring(charsToSkip, myText.length()) + myText.substring(0,charsToSkip);
-	            	theLabel.setText(myText);
-	            }
-	        };
-	 
-	        KeyFrame keyFrame = new KeyFrame(duration, onFinished , keyValue);
-	        timeline.getKeyFrames().add(keyFrame);
-	        return timeline;
+		Timeline timeline = new Timeline();
+		timeline.setCycleCount(Timeline.INDEFINITE);
+		timeline.setAutoReverse(true);
+
+		KeyValue keyValue = new KeyValue(theLabel.scaleXProperty(), 1);
+		Duration duration = Duration.millis(interval);
+		EventHandler<ActionEvent> onFinished = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				String myText = theLabel.getText();
+				myText = myText.substring(charsToSkip, myText.length()) + myText.substring(0, charsToSkip);
+				theLabel.setText(myText);
+			}
+		};
+
+		KeyFrame keyFrame = new KeyFrame(duration, onFinished, keyValue);
+		timeline.getKeyFrames().add(keyFrame);
+		return timeline;
 	}
 }

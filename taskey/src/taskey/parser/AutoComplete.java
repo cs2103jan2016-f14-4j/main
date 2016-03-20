@@ -54,7 +54,7 @@ public class AutoComplete {
 	 * @return If no such command exists, return null
 	 */
 	public ProcessedAC completeCommand(String phrase) {
-		phrase = phrase.toLowerCase(); 
+		phrase = phrase.toLowerCase().trim(); 
 		
 		//if the command is completed, don't need to process
 		if (commandList.containsKey("phrase")) {
@@ -63,6 +63,22 @@ public class AutoComplete {
 		
 		ArrayList<String> availCommands = new ArrayList<String>();
 		
+		//if only one letter, don't search the wrong part of the command
+		if (phrase.length() == 1) {
+			for(int i = 0; i < commands.size(); i++) {
+				String tempCommand = commands.get(i); 
+				int temp = tempCommand.indexOf(phrase);
+				if (temp == 0) { //first pos 
+					availCommands.add(tempCommand); 		
+				}
+			}
+			if (!availCommands.isEmpty()) {
+				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
+			}
+			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
+		}
+		
+		//find list normally 
 		for(int i = 0; i < commands.size(); i++) {
 			if (commands.get(i).contains(phrase)) {
 				availCommands.add(commands.get(i)); 

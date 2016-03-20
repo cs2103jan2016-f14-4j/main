@@ -28,6 +28,13 @@ public class UserTagDatabase {
 	}
 	
 	/**
+	 * Removes all tags from the userTagDatabase
+	 */
+	public void deleteAllTags() {
+		userTags.clear();
+	}
+	
+	/**
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
 	 */

@@ -1,15 +1,19 @@
-package taskey.logic;
-
-import java.util.ArrayList;
+package taskey.junit;
 
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logic.Logic;
 import taskey.logic.LogicConstants.ListID;
+import taskey.logic.LogicFeedback;
+import taskey.logic.ProcessedObject;
+import taskey.logic.Task;
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 import taskey.parser.UserTagDatabase;

@@ -24,7 +24,7 @@ import taskey.ui.utility.UiImageManager;
  * @author junwei
  */
 
-public class UiHelpMenu {
+public class UiHelpView {
 	
 	private UiGridHelper gridHelper;
 	private UiPagination helpView;
@@ -33,7 +33,7 @@ public class UiHelpMenu {
 	private int entriesPerPage = 10; // main menu
 	private int imageWidth = 333;
 	
-	public UiHelpMenu() {
+	public UiHelpView() {
 		gridHelper = new UiGridHelper("");
 		helpView = new UiPagination(UiConstants.STYLE_ELLIPSE);
 		commandViews = new ArrayList<UiPagination>();

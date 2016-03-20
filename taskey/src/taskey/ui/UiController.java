@@ -236,7 +236,7 @@ public class UiController {
 				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
-				new Triplet<Color, String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
+				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
 				));
 		updateCategoryDisplay(categoryList);
 		
@@ -259,8 +259,7 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
-				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);
-				
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);			
 				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
 					ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 					if ( suggestions == null ) {

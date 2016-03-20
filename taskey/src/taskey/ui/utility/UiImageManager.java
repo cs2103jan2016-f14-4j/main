@@ -7,16 +7,19 @@ import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.IMAGE_ID;
 
 /**
+ * @@author A0125419H
  * This class handles loading of image resources 
  * which are likely to be permanent throughout the application life
  * @author Junwei
  *
  */
+
 public class UiImageManager {
 
 	private HashMap<IMAGE_ID, Image> myImageContainer = new HashMap<IMAGE_ID, Image>();
 	private static UiImageManager instance = null;
-	
+	private UiImageManager() {
+	}
 	public static UiImageManager getInstance() {
 		if ( instance == null ) {
 			instance = new UiImageManager();

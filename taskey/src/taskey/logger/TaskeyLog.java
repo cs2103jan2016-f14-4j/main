@@ -13,6 +13,13 @@ import taskey.parser.Parser;
 import taskey.storage.Storage;
 import taskey.ui.UiMain;
 
+/**
+ * @@author A0125419H
+ * This class implements a simple logging instance for Taskey
+ * @author Junwei
+ *
+ */
+
 public class TaskeyLog {
 	public enum LogSystems {
 		UI(0), LOGIC(1), PARSER(2), STORAGE(3);
@@ -28,7 +35,7 @@ public class TaskeyLog {
 	private static final String defaultLocation = "logs/";
 	private static TaskeyLog instance = null;	
 	private ArrayList<Logger> myLoggers;
-	
+	private static final int MAX_BYTES = 1000;
 	private TaskeyLog() {
 		myLoggers = new ArrayList<Logger>();
 		// add loggers
@@ -49,6 +56,10 @@ public class TaskeyLog {
 		myLoggers.add(newLogger);
 	}
 	
+	public Logger getLogger( LogSystems system ) {
+		return myLoggers.get(system.getIndex());
+	}
+	
 	/**
 	 * This method adds a handler to a logger variable, which makes any log() call
 	 * pass on the msg to each handler.
@@ -60,7 +71,7 @@ public class TaskeyLog {
 	 */
 	public void addHandler( LogSystems system , String fileName, int count ) {
 		Logger theLogger = myLoggers.get(system.getIndex());
-		int byteCount = 1000000;
+		int byteCount = MAX_BYTES;
 		Handler handler = null; 
 		try {
 			handler = new FileHandler(defaultLocation + fileName, byteCount,count); 

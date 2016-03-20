@@ -30,11 +30,13 @@ import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
 
 /**
+ * @@author A0125419H
  * This class is responsible for formatting the Default box
  * The default box is used by this week, pending, expired
  * 
  * @author junwei
  */
+
 public class UiDefaultFormatter extends UiFormatter {
 	private int entriesPerPage = 6;
 	private UiPagination myPagination;

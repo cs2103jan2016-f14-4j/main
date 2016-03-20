@@ -8,12 +8,13 @@ import java.util.Arrays;
 import taskey.ui.content.UiGridSettings;
 
 /**
- * 
+ * @@author A0125419H
  * This file contains all the constants for UI
  * 
  * @author JunWei
  *
  */
+
 public class UiConstants {
 
 	public static final String PROGRAM_NAME = "Taskey";

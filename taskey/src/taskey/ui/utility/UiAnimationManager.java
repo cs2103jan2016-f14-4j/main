@@ -13,6 +13,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 
 /**
+ * @@author A0125419H
  * This class provides modified abstractions for some basic animations in javafx
  * as well as custom ones.
  *
@@ -20,8 +21,10 @@ import javafx.util.Pair;
  */
 
 public class UiAnimationManager {
-
+	
 	private static UiAnimationManager instance = null;
+	private UiAnimationManager(){
+	}
 	public static UiAnimationManager getInstance() {
 		if ( instance == null ) {
 			instance = new UiAnimationManager();

@@ -11,11 +11,13 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
 /**
+ * @@author A0125419H
  * This class is used to provide pagination support with extensions.
  * Such as selecting of elements
  * 
  * @author junwei
  */
+
 public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;

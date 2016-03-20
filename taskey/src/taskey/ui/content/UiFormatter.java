@@ -12,12 +12,14 @@ import taskey.constants.UiConstants;
 import taskey.logic.Task;
 
 /**
+ * @@author A0125419H
  * This class contains a default grid-based formatter for the content windows.
  * It is extended by specialized classes to provide different functionality
  * 
  * @author Junwei
  *
  */
+
 public abstract class UiFormatter {
 	
 	protected ScrollPane mainPane;

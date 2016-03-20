@@ -38,11 +38,13 @@ import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 
 /**
+ * @@author A0125419H
  * This class is the main class that handles all of the Ui nodes. 
  * UiController is the only interface between Ui and Logic
  *
  * @author JunWei
  */
+
 public class UiController {
 
 	@FXML

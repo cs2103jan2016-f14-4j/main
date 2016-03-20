@@ -4,14 +4,7 @@ import java.util.ArrayList;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Paint;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
@@ -20,10 +13,12 @@ import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiTextBuilder;
 
 /**
+ * @@author A0125419H
  * This class is responsible for formatting the Category box
  * 
  * @author junwei
  */
+
 public class UiCategoryFormatter extends UiFormatter {
 
 	public UiCategoryFormatter(ScrollPane thePane) {

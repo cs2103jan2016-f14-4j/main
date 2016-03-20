@@ -19,10 +19,12 @@ import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
 
 /**
+ * @@author A0125419H
  * This class is responsible to formatting the Action Tab
  * It provides additional functions like the help menu, but it also uses a pagination as its display
  * @author junwei
  */
+
 public class UiActionFormatter extends UiFormatter {
 	private UiPagination listView;
 	private UiHelpMenu myHelpMenu;

@@ -1,6 +1,7 @@
 package taskey.constants;
 
 /**
+ * @@author A0125419H
  * This class is used to implement triplet generic
  * http://stackoverflow.com/questions/6010843/java-how-to-store-data-triple-in-a-list
  */

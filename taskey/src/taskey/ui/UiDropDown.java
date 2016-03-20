@@ -25,8 +25,12 @@ import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiPopupManager;
 
 /**
- * The Class UiDropDown.
+ * @@author A0125419H
+ * This class implements the dropdown box used by AutoComplete
+ * 
+ * @author JunWei
  */
+
 public class UiDropDown {
 	private static final int MAX_ITEMS = 4;
 	private TextField myInput;

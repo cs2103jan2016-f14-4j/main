@@ -202,7 +202,7 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void testAddTags() {
+	public void testAddTasksWithTags() {
 		Logic logic = new Logic();
 		Parser parser = new Parser();
 		TimeConverter timeConverter = new TimeConverter();
@@ -229,8 +229,6 @@ public class LogicTest {
 		expectedTagList.add(new String("tag1"));
 		expectedTagList.add(new String("tag2"));
 		expectedTagList.add(new String("tag3"));
-		System.out.println(actualTagList);
-		System.out.println(expectedTagList);
 		assertTrue(actualTagList.equals(expectedTagList));
 		
 		ArrayList<Integer> actualTagSizes = logic.getTagSizes();
@@ -238,6 +236,73 @@ public class LogicTest {
 		expectedTagSizes.add(2);
 		expectedTagSizes.add(2);
 		expectedTagSizes.add(1);
+		assertTrue(actualTagSizes.equals(expectedTagSizes));
+	}
+	
+	@Test
+	public void testDeleteTasksWithTags() {
+		Logic logic = new Logic();
+		Parser parser = new Parser();
+		TimeConverter timeConverter = new TimeConverter();
+		UserTagDatabase utd = new UserTagDatabase();
+		logic.executeCommand(ContentBox.PENDING, "clear");
+		long currTime = timeConverter.getCurrTime();
+		String input = "add g2 a?b ,  #tag1 #tag2";
+		ProcessedObject po = parser.parseInput(input);
+		Task t1 = po.getTask();
+		logic.addFloating(logic.getAllTaskLists(), t1, po);
+		input = "add g3 a?b  ,  on " + timeConverter.getDate(currTime) + " #tag2";
+		po = parser.parseInput(input);
+		Task t2 = po.getTask();
+		logic.addDeadline(logic.getAllTaskLists(), t2, po);
+		input = "add g4 a?b ,  from " + timeConverter.getDate(currTime)
+		         + " to " + timeConverter.getDate(currTime + NUM_SECONDS_1_DAY)
+		         + " #tag1 #tag3";
+		po = parser.parseInput(input);
+		Task t3 = po.getTask();
+		logic.addEvent(logic.getAllTaskLists(), t3, po);
+		
+		input = "del 2";
+		po = parser.parseInput(input);
+		logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, po.getIndex());
+
+		ArrayList<String> actualTagList = logic.getTagList();
+		ArrayList<String> expectedTagList = new ArrayList<String>();
+		expectedTagList.add(new String("tag1"));
+		expectedTagList.add(new String("tag2"));
+		expectedTagList.add(new String("tag3"));
+		assertTrue(actualTagList.equals(expectedTagList));
+		
+		ArrayList<Integer> actualTagSizes = logic.getTagSizes();
+		ArrayList<Integer> expectedTagSizes = new ArrayList<Integer>();
+		expectedTagSizes.add(2);
+		expectedTagSizes.add(1);
+		expectedTagSizes.add(1);
+		assertTrue(actualTagSizes.equals(expectedTagSizes));
+		
+		input = "del " + t3.getTaskName();
+		po = parser.parseInput(input);
+		logic.deleteByName(logic.getAllTaskLists(), ContentBox.PENDING, po, t3.getTaskName());
+
+		actualTagList = logic.getTagList();
+		expectedTagList.remove("tag3");
+		assertTrue(actualTagList.equals(expectedTagList));
+		
+		actualTagSizes = logic.getTagSizes();
+		expectedTagSizes.set(0, 1);
+		expectedTagSizes.remove(2);
+		assertTrue(actualTagSizes.equals(expectedTagSizes));
+		
+		input = "del 1";
+		po = parser.parseInput(input);
+		logic.deleteByIndex(logic.getAllTaskLists(), ContentBox.PENDING, po, po.getIndex());
+
+		actualTagList = logic.getTagList();
+		expectedTagList.clear();
+		assertTrue(actualTagList.equals(expectedTagList));
+		
+		actualTagSizes = logic.getTagSizes();
+		expectedTagSizes.clear();
 		assertTrue(actualTagSizes.equals(expectedTagSizes));
 	}
 	

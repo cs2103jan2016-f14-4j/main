@@ -1,0 +1,57 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'jacoco'
+apply plugin: 'application'
+mainClassName = 'taskey.ui.UiMain'
+
+archivesBaseName = 'someJar'
+version = '1.0-SNAPSHOT' 
+
+sourceSets {
+  main {
+     java {
+        srcDir 'src'  
+        } 
+     resources {
+        srcDir 'src'
+        }
+     }
+  test {
+     java {
+        srcDir 'test'
+        } 
+     }
+} 
+
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'taskey.ui.UiMain'
+    }
+}
+
+dependencies {
+   compile  'log4j:log4j:1.2.16'
+   compile fileTree(dir: 'lib', include: ['*.jar'])
+   compile files('lib/gson-2.6.2.jar')
+   compile files('lib/prettytime-nlp-4.0.1.Final.jar')
+   testCompile 'junit:junit:4.12'
+} 
+
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}

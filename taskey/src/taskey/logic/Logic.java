@@ -203,10 +203,8 @@ public class Logic {
 			
 			utd.deleteAllTags();
 				
-			try {
-				utd.saveTagDatabase();
-			} catch (Exception e) {
-				return new LogicFeedback(cloneLists(taskLists), new ProcessedObject("CLEAR"), e); //Stub
+			if (!utd.saveTagDatabase()) {
+				return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
 			}
 			
 			taskLists = cloneLists(copy);
@@ -296,10 +294,8 @@ public class Logic {
 				utd.addTag(s);
 			}
 			
-			try {
-				utd.saveTagDatabase();
-			} catch (Exception e) {
-				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			if (!utd.saveTagDatabase()) {
+				return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
 			}
 		}
 		
@@ -340,10 +336,8 @@ public class Logic {
 				utd.addTag(s);
 			}
 			
-			try {
-				utd.saveTagDatabase();
-			} catch (Exception e) {
-				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			if (!utd.saveTagDatabase()) {
+				return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
 			}
 		}
 		
@@ -385,10 +379,8 @@ public class Logic {
 				utd.addTag(s);
 			}
 			
-			try {
-				utd.saveTagDatabase();
-			} catch (Exception e) {
-				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			if (!utd.saveTagDatabase()) {
+				return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
 			}
 		}
 		

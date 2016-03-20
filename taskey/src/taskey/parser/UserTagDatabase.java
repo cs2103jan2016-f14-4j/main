@@ -123,9 +123,10 @@ public class UserTagDatabase {
   
 	/**
 	 * Save the tag hash map into a file for persistent storage. 
+	 * @return true if save was successful; false otherwise
 	 */
-	public void saveTagDatabase() {
-		db.saveTags(userTags); 
+	public boolean saveTagDatabase() {
+		return db.saveTags(userTags); 
 	}
     
 	

@@ -52,6 +52,13 @@ public class Logic {
 					removeFromAllLists(taskLists, t); //May throw ConcurrentModificationException is duplicate
 					                                  //names are allowed
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+					
+					ArrayList<String> taskTags = t.getTaskTags();
+					if (taskTags != null) {
+						for (String s : taskTags) {
+							utd.removeTag(s);
+						}
+					}	
 				} else if (timeConverter.isSameWeek(t.getDeadlineEpoch(), timeConverter.getCurrTime())) {
 					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
@@ -62,6 +69,13 @@ public class Logic {
 					it.remove();
 					removeFromAllLists(taskLists, t); //Same issue as above
 					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
+					
+					ArrayList<String> taskTags = t.getTaskTags();
+					if (taskTags != null) {
+						for (String s : taskTags) {
+							utd.removeTag(s);
+						}
+					}	
 				} else if (timeConverter.isSameWeek(t.getStartDateEpoch(), timeConverter.getCurrTime())) {
 					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
 				}
@@ -406,6 +420,17 @@ public class Logic {
 		
 		if (!currentContent.equals(ContentBox.EXPIRED)) {
 			removeFromAllLists(copy, toDelete);
+			
+			ArrayList<String> taskTags = toDelete.getTaskTags();
+			if (taskTags != null) {
+				for (String s : taskTags) {
+					utd.removeTag(s);
+				}
+				
+				if (!utd.saveTagDatabase()) {
+					return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
+				}
+			}
 		}
 		
 		try {
@@ -437,6 +462,18 @@ public class Logic {
 		
 		if (!currentContent.equals(ContentBox.EXPIRED)) {
 			removeFromAllLists(copy, toDelete);
+			
+			ArrayList<String> taskTags = toDelete.getTaskTags();
+			if (taskTags != null) {
+				for (String s : taskTags) {
+					utd.removeTag(s);
+				}
+				
+				if (!utd.saveTagDatabase()) {
+					return new LogicFeedback(cloneLists(taskLists), po, new Exception("Save failed!")); //Stub
+				}
+			}
+				
 		} else {
 			targetList.remove(toDelete);
 		}

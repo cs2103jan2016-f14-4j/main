@@ -41,12 +41,20 @@ public class ParseView extends ParseCommand {
 	 * @return processedStuff
 	 */
 	public ProcessedObject processView(String command, String stringInput) {
+		String rawView = getViewRaw(command, stringInput); 
 		String viewType = getViewType(command, stringInput);
+		
+		//empty view
+		if (rawView.compareTo("") == 0) {
+			return super.processError(ParserConstants.ERROR_VIEW_EMPTY);
+		}
 		
 		if (viewType.compareTo("error") != 0) {
 			return new ProcessedObject("VIEW",viewType.toUpperCase());
 		}
-		return super.processError(ParserConstants.ERROR_VIEW_TYPE); 
+		//no such category 
+		return super.processError(String.format(
+				ParserConstants.ERROR_VIEW_TYPE, rawView)); 
 	}
 	
 	/**
@@ -58,8 +66,8 @@ public class ParseView extends ParseCommand {
 	 * @return string view type 
 	 */
 	public String getViewType(String command, String stringInput) {
-		stringInput = stringInput.toLowerCase(); 
-		String viewType = stringInput.replaceFirst(command, "");
+		String temp = stringInput.toLowerCase(); 
+		String viewType = temp.replaceFirst(command, "");
 		viewType = viewType.toLowerCase();
 		viewType = viewType.trim(); 
 		
@@ -69,6 +77,21 @@ public class ParseView extends ParseCommand {
 			return viewType; 
 		}
 		return "error"; 
+	}
+	
+	/**
+	 * Get raw View for a user input
+	 * @param command
+	 * @param stringInput
+	 * @return
+	 */
+	public String getViewRaw(String command, String stringInput) {
+		String temp = stringInput.toLowerCase(); 
+		String viewType = temp.replaceFirst(command, "");
+		viewType = viewType.toLowerCase();
+		viewType = viewType.trim(); 
+
+		return viewType; 
 	}
 
 }

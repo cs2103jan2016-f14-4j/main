@@ -9,7 +9,7 @@ import taskey.logic.ProcessedAC;
 /**
  * @@author A0107345L
  * This class processes what words should be shown in the dropdown
- * menu if the user types into the CLI - it allows user to auto-complete
+ * menu if the user types into the CLI - it allows the user to auto-complete
  * his commands. 
  * @author Xue Hui
  *

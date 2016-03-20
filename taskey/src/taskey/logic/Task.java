@@ -326,7 +326,7 @@ public class Task implements Comparable<Task> {
 		}
 		
 		if (taskTags != null) {
-			duplicate.setTaskTags(taskTags);
+			duplicate.setTaskTags(new ArrayList<String>(taskTags));
 		}
 		
 		if (taskType != null) {
@@ -425,5 +425,18 @@ public class Task implements Comparable<Task> {
 		
 		return stringRep; 
 	}
+	
+	/* For testing
+	public static void main(String[] args) {
+		Task t1 = new Task("t1");
+		t1.setTaskType("FLOATING");
+		t1.addTaskTag("meow");
+		Task t2 = t1.getDuplicate();
+		t2.setTaskName("t2");
+		t2.setTaskType("DEADLINE");
+		t2.addTaskTag("crap");
+		System.out.println("t1: " + t1);
+		System.out.println("t2: " + t2);
+	}*/
 
 }

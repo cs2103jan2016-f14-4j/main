@@ -92,6 +92,27 @@ public class UserTagDatabase {
 		}
 		return tagList; 
 	}
+	
+	/**
+	 * For Logic: Get the sizes of each tag category so that 
+	 * it can be displayed by the UI.
+	 * Remember to call this function every time a task tag is added/removed,
+	 * cos the main form is a HashMap...
+	 * @return
+	 */
+	public ArrayList<Integer> getTagSizes() {
+		ArrayList<Integer> tagSizes = new ArrayList<Integer>(); 
+		
+		if (!userTags.isEmpty()) {
+			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
+			
+			while(itKeys.hasNext()) {
+				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
+				tagSizes.add(pair.getValue()); 
+			}
+		}
+		return tagSizes; 
+	}
   
 	/**
 	 * Save the tag hash map into a file for persistent storage. 

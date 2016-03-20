@@ -39,14 +39,14 @@ import taskey.ui.utility.UiImageManager;
 
 public class UiDefaultFormatter extends UiFormatter {
 	private int entriesPerPage = 6;
-	private UiListView myListView;
+	private UiTaskView myTaskView;
 	private int lastNum = -1;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
-		myListView = new UiListView(entriesPerPage);
+		myTaskView = new UiTaskView(entriesPerPage);
 		
-		mainPane.setContent(myListView.getView().getPagination());
+		mainPane.setContent(myTaskView.getView().getPagination());
 		mainPane.setFitToHeight(true);
 		
 		createPromptNoTasks();
@@ -59,12 +59,12 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	@Override
 	public void processArrowKey(KeyEvent event) {
-		myListView.getView().processArrowKey(event);
+		myTaskView.getView().processArrowKey(event);
 	}
 
 	@Override
 	public int processDeleteKey() {
-		return myListView.getView().getSelection() + 1;
+		return myTaskView.getView().getSelection() + 1;
 	}
 	
 	@Override
@@ -73,23 +73,29 @@ public class UiDefaultFormatter extends UiFormatter {
 		if ( myTaskList.size() == 0 ) {	
 			mainPane.setContent(currentGrid);	
 		} else {
-			mainPane.setContent(myListView.getView().getPagination());
-			myListView.getView().clear();
+			mainPane.setContent(myTaskView.getView().getPagination());
+			myTaskView.getView().clear();
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
-			myListView.createPaginationGrids(myTaskList,categoryList,totalPages);
+			myTaskView.createPaginationGrids(myTaskList,categoryList,totalPages);
 			if ( lastNum != -1 && myTaskList.size() > lastNum ) { // addition of a task
-				myListView.getView().selectInPage(totalPages-1, entriesPerPage); // select last
+				myTaskView.getView().selectInPage(totalPages-1, entriesPerPage); // select last
 			} 
 			lastNum = myTaskList.size();
 		}
 	}
 	private void createPromptNoTasks() {
 		// create prompt in absence of tasks
-		addGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_SINGLE),true);
+		setGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_SINGLE));
 		RowConstraints row = new RowConstraints();
 		row.setPercentHeight(100);
 		currentGrid.getRowConstraints().add(row);
 		gridHelper.createStyledCell(0, 0, "", currentGrid);
 		gridHelper.createLabelInCell(0, 0, "No tasks in window, add some tasks to get started!", "", currentGrid);
+	}
+
+	@Override
+	public void cleanUp() {
+		myTaskView.clear();
+		clearCurrentGridContents();
 	}
 }

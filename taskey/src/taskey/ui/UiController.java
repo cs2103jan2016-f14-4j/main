@@ -132,6 +132,12 @@ public class UiController {
 		selectionModel.select(toContent.getValue());
 		currentContent = toContent;
 	}
+	
+	private ContentBox getCurrentContent() {
+		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
+		return currentContent;
+	}
+	
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
@@ -163,11 +169,6 @@ public class UiController {
 		} catch (Exception excep) {
 			System.out.println(excep + " loading style sheets");
 		}
-	}
-
-	private ContentBox getCurrentContent() {
-		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
-		return currentContent;
 	}
 	
 	private void handleFeedback( LogicFeedback feedback ) {

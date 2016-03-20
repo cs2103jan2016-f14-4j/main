@@ -26,14 +26,14 @@ import taskey.ui.content.UiTextBuilder;
  */
 
 public class UiActionFormatter extends UiFormatter {
-	private UiListView listView;
+	private UiTaskView taskView;
 	private UiHelpView helpView;
 	private UiPagination currentView;
 	private int entriesPerPage = 6;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
-		listView = new UiListView(entriesPerPage);
+		taskView = new UiTaskView(entriesPerPage);
 		helpView = new UiHelpView();
 		mainPane.setFitToHeight(true);
 	}
@@ -46,14 +46,14 @@ public class UiActionFormatter extends UiFormatter {
 	}
 	@Override
 	public int processDeleteKey() {	
-		if ( currentView == listView.getView() ) {
+		if ( currentView == taskView.getView() ) {
 			return currentView.getSelection() + 1;
 		}
 		return -1;
 	}
 	@Override
 	public int processEnterKey() {
-		if ( currentView != listView.getView() ) {
+		if ( currentView != taskView.getView() ) {
 			helpView.processEnterKey();
 			currentView = helpView.getView();
 			mainPane.setContent(currentView.getPagination());
@@ -75,7 +75,7 @@ public class UiActionFormatter extends UiFormatter {
 				mainPane.setContent(currentView.getPagination());				
 				break;
 			default:
-				currentView = listView.getView();
+				currentView = taskView.getView();
 				mainPane.setContent(currentView.getPagination());
 				format(myList);
 		}
@@ -84,8 +84,14 @@ public class UiActionFormatter extends UiFormatter {
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);	
-		listView.getView().clear();
+		taskView.getView().clear();
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
-		listView.createPaginationGrids(myTaskList,categoryList,totalPages);
+		taskView.createPaginationGrids(myTaskList,categoryList,totalPages);
+	}
+
+	@Override
+	public void cleanUp() {
+		helpView.clear();
+		taskView.clear();
 	}
 }

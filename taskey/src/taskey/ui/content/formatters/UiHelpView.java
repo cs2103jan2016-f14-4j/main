@@ -18,7 +18,7 @@ import taskey.ui.utility.UiImageManager;
 
 /**
  * @@author A0125419H
- * This class is used to seperate help menu from UiActionFormatter,
+ * This class is used mainly to separate help menu from UiActionFormatter,
  * in order to make UiActionFormatter cleaner
  * 
  * @author junwei
@@ -175,5 +175,12 @@ public class UiHelpView {
 				"type: view events, to view all tasks with events"
 				));
 		addMenu(images, info);	
+	}
+	
+	public void clear() {
+		for ( int i = 0 ; i < commandViews.size(); i ++ ) {
+			commandViews.get(i).clear();
+		}
+		helpView.clear();
 	}
 }

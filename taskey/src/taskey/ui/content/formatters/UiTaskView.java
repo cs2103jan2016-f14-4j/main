@@ -16,20 +16,28 @@ import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
 
-public class UiListView {
+/**
+ * @@author A0125419H
+ * This class is used to separate out the displaying of the task list
+ * as DefaultFormatter, ActionFormatter both use it
+ * 
+ * @author junwei
+ */
+
+public class UiTaskView {
 
 	private int stackPanePadding = 2;
-	private UiPagination myPagination;
+	private UiPagination taskView;
 	private int entriesPerPage;
 	private UiGridHelper gridHelper;
 	
-	public UiListView(int _entriesPerPage) {
+	public UiTaskView(int _entriesPerPage) {
 		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 		entriesPerPage = _entriesPerPage;
-		myPagination = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
+		taskView = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 	}
 	public UiPagination getView() {
-		return myPagination;
+		return taskView;
 	}
 	public void createPaginationGrids(ArrayList<Task> myTaskList, ArrayList<Triplet<Color,String,Integer>> categoryList, int totalPages) {
 		int entryNo = 0;
@@ -53,9 +61,9 @@ public class UiListView {
 				
 				pageEntries.add(entryPane);
 			}
-			myPagination.addGridToPagination(newGrid,pageEntries);
+			taskView.addGridToPagination(newGrid,pageEntries);
 		}
-		myPagination.initialize(totalPages); // update UI and bind call back
+		taskView.initialize(totalPages); // update UI and bind call back
 	}
 
 	private void addTaskID(Task theTask, int id, int row, ArrayList<Triplet<Color,String,Integer>> categoryList, GridPane theGrid) {
@@ -136,5 +144,9 @@ public class UiListView {
 		}
 		gridHelper.createStyledCell(1, 0, "", newGrid);
 		gridHelper.createImageInCell(1,0,UiImageManager.getInstance().getImage(imgID),30,30,newGrid);
+	}
+	
+	public void clear() {
+		taskView.clear();
 	}
 }

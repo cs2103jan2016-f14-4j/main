@@ -213,22 +213,24 @@ public class LogicTest {
 		ProcessedObject po = parser.parseInput(input);
 		Task t = po.getTask();
 		logic.addFloating(logic.getAllTaskLists(), t, po);
-		input = "add g2 a?b  ,  on " + timeConverter.getDate(currTime) + " #tag2";
+		input = "add g3 a?b  ,  on " + timeConverter.getDate(currTime) + " #tag2";
 		po = parser.parseInput(input);
 		t = po.getTask();
 		logic.addDeadline(logic.getAllTaskLists(), t, po);
-		input = "add g2 a?b ,  from " + timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK)
-		         + " to " + timeConverter.getDate(currTime - NUM_SECONDS_1_DAY)
+		input = "add g4 a?b ,  from " + timeConverter.getDate(currTime)
+		         + " to " + timeConverter.getDate(currTime + NUM_SECONDS_1_DAY)
 		         + " #tag1 #tag3";
 		po = parser.parseInput(input);
 		t = po.getTask();
 		logic.addEvent(logic.getAllTaskLists(), t, po);
-		
+
 		ArrayList<String> actualTagList = logic.getTagList();
 		ArrayList<String> expectedTagList = new ArrayList<String>();
 		expectedTagList.add(new String("tag1"));
 		expectedTagList.add(new String("tag2"));
 		expectedTagList.add(new String("tag3"));
+		System.out.println(actualTagList);
+		System.out.println(expectedTagList);
 		assertTrue(actualTagList.equals(expectedTagList));
 		
 		ArrayList<Integer> actualTagSizes = logic.getTagSizes();

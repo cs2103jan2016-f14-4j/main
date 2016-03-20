@@ -2,6 +2,7 @@ package taskey.logic;
 
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
+import taskey.parser.UserTagDatabase;
 import taskey.storage.History;
 import taskey.storage.Storage;
 import taskey.storage.StorageException;
@@ -24,6 +25,7 @@ import taskey.logic.ProcessedObject;
 public class Logic {
 	private Parser parser;
 	private TimeConverter timeConverter;
+	private UserTagDatabase utd;
 	private Storage storage;
 	private History history;
 	private ArrayList<ArrayList<Task>> taskLists; //Can be moved to a LogicMemory component next time
@@ -31,6 +33,7 @@ public class Logic {
 	public Logic() {
 		parser = new Parser();
 		timeConverter = new TimeConverter();
+		utd = new UserTagDatabase();
 		storage = new Storage();
 		history = storage.getHistory();
 
@@ -168,6 +171,14 @@ public class Logic {
 
 		return cloneList(completedList);
 	}
+	
+	public ArrayList<String> getTagList() {
+		return utd.getTagList();
+	}
+	
+	public ArrayList<Integer> getTagSizes() {
+		return utd.getTagSizes();
+	}
 
 	/**
 	 * Executes the user supplied command.
@@ -186,6 +197,14 @@ public class Logic {
 			clearAllLists(copy);
 			try {
 				saveAllTasks(copy);
+			} catch (Exception e) {
+				return new LogicFeedback(cloneLists(taskLists), new ProcessedObject("CLEAR"), e); //Stub
+			}
+			
+			utd.deleteAllTags();
+				
+			try {
+				utd.saveTagDatabase();
 			} catch (Exception e) {
 				return new LogicFeedback(cloneLists(taskLists), new ProcessedObject("CLEAR"), e); //Stub
 			}
@@ -271,6 +290,19 @@ public class Logic {
 			return new LogicFeedback(cloneLists(taskLists), po, e);
 		}
 		
+		ArrayList<String> taskTags = task.getTaskTags();
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				utd.addTag(s);
+			}
+			
+			try {
+				utd.saveTagDatabase();
+			} catch (Exception e) {
+				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			}
+		}
+		
 		taskLists = cloneLists(copy);
 		return new LogicFeedback(copy, po, null);
 	}
@@ -300,6 +332,19 @@ public class Logic {
 			saveAllTasks(copy);
 		} catch (Exception e) {
 			return new LogicFeedback(cloneLists(taskLists), po, e);
+		}
+		
+		ArrayList<String> taskTags = task.getTaskTags();
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				utd.addTag(s);
+			}
+			
+			try {
+				utd.saveTagDatabase();
+			} catch (Exception e) {
+				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			}
 		}
 		
 		taskLists = cloneLists(copy);
@@ -332,6 +377,19 @@ public class Logic {
 			saveAllTasks(copy);
 		} catch (Exception e) {
 			return new LogicFeedback(cloneLists(taskLists), po, e);
+		}
+		
+		ArrayList<String> taskTags = task.getTaskTags();
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				utd.addTag(s);
+			}
+			
+			try {
+				utd.saveTagDatabase();
+			} catch (Exception e) {
+				return new LogicFeedback(cloneLists(taskLists), po, e); //Stub
+			}
 		}
 		
 		taskLists = cloneLists(copy);

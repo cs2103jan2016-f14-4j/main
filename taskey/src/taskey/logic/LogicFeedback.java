@@ -21,7 +21,7 @@ public class LogicFeedback {
 	 * @param po         an object encapsulating information on the executed command and its associated task
 	 * @param e          an exception containing an error message. If not error occurred, this will be null.
 	 */
-	protected LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
+	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
 		assert (taskLists != null);
 		assert (taskLists.size() == 7); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated

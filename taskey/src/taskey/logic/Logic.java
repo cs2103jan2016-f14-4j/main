@@ -259,7 +259,7 @@ public class Logic {
 	}
 
 	//Adds a floating task to the relevant lists, and saves the updated lists to disk.
-	LogicFeedback addFloating(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
+	public LogicFeedback addFloating(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task names not allowed
@@ -281,7 +281,7 @@ public class Logic {
 	}
 
 	//Adds a deadline task to the relevant lists, and saves the updated lists to disk.
-	LogicFeedback addDeadline(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
+	public LogicFeedback addDeadline(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
@@ -312,7 +312,7 @@ public class Logic {
 	}
 	
 	//Adds an event task to the relevant lists, and saves the updated lists to disk.
-	LogicFeedback addEvent(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
+	public LogicFeedback addEvent(ArrayList<ArrayList<Task>> copy, Task task, ProcessedObject po) {
 		ArrayList<Task> pendingList = copy.get(ListID.PENDING.getIndex());
 
 		if (pendingList.contains(task)) { //Duplicate task name not allowed
@@ -345,7 +345,7 @@ public class Logic {
 	
 	//Removes an indexed task from the current tab and saves the updated lists to disk.
 	//TODO: support removal from the "ACTION" tab.
-	LogicFeedback deleteByIndex(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex) {
+	public LogicFeedback deleteByIndex(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		if (currentContent.equals(ContentBox.ACTION)) { 
 			return new LogicFeedback(copy, po, new Exception("Cannot delete from this tab!"));
 		}
@@ -376,7 +376,7 @@ public class Logic {
 	
 	//Removes an indexed task from the current tab and saves the updated lists to disk.
 	//TODO: support removal from the "ACTION" tab.
-	LogicFeedback deleteByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, 
+	public LogicFeedback deleteByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, 
 			                   String taskName) {
 		if (currentContent.equals(ContentBox.ACTION)) { 
 			return new LogicFeedback(copy, po, new Exception("Cannot delete from this tab!"));
@@ -408,7 +408,7 @@ public class Logic {
 	
 	//Search for all pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
 	//TODO: search list includes expired and completed tasks as well
-	LogicFeedback search(ArrayList<ArrayList<Task>> copy, ProcessedObject po, String searchPhrase) {
+	public LogicFeedback search(ArrayList<ArrayList<Task>> copy, ProcessedObject po, String searchPhrase) {
 		if (searchPhrase.equals("")) {
 			return new LogicFeedback(copy, po, new Exception("Search phrase cannot be empty!"));
 		}
@@ -430,7 +430,7 @@ public class Logic {
 	
 	//Marks an indexed task from the current tab as done and saves the updated lists to disk.
 	//TODO: support "done" from the "ACTION" tab. 
-	LogicFeedback doneByIndex(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex) {
+	public LogicFeedback doneByIndex(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex) {
 		Task toMarkAsDone = null;
 		if (currentContent.equals(ContentBox.THIS_WEEK)) {
 			try {
@@ -464,7 +464,7 @@ public class Logic {
 	
 	//Marks an named task from the current tab as done and saves the updated lists to disk.
 	//TODO: support "done" from the "ACTION" tab. 
-	LogicFeedback doneByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName) {
+	public LogicFeedback doneByName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName) {
 		//"done" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
 			return new LogicFeedback(copy, po, new Exception("Cannot use \"done\" command from this tab!"));
@@ -493,7 +493,7 @@ public class Logic {
 	
 	//Updates an indexed task's name on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByIndexChangeName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex, 
+	public LogicFeedback updateByIndexChangeName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex, 
 			                                      String newTaskName) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -523,7 +523,7 @@ public class Logic {
 
 	//Updates an indexed task's date on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByIndexChangeDate(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex, 
+	public LogicFeedback updateByIndexChangeDate(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex, 
 			                              Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -568,7 +568,7 @@ public class Logic {
 	
 	//Updates an indexed task's name and date on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByIndexChangeBoth(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex,
+	public LogicFeedback updateByIndexChangeBoth(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, int taskIndex,
 			                              String newTaskName, Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -613,7 +613,7 @@ public class Logic {
 	
 	//Updates an named task's name on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByNameChangeName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String oldTaskName, 
+	public LogicFeedback updateByNameChangeName(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String oldTaskName, 
 			                             String newTaskName) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -641,7 +641,7 @@ public class Logic {
 	
 	//Updates an named task's date on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByNameChangeDate(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName, 
+	public LogicFeedback updateByNameChangeDate(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String taskName, 
 			                             Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -683,7 +683,7 @@ public class Logic {
 	
 	//Updates an named task's name and date on the current tab and saves the updated lists to disk.
 	//TODO: support "set" from the "ACTION" tab. 
-	LogicFeedback updateByNameChangeBoth(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String oldTaskName,
+	public LogicFeedback updateByNameChangeBoth(ArrayList<ArrayList<Task>> copy, ContentBox currentContent, ProcessedObject po, String oldTaskName,
 			                             String newTaskName, Task changedTask) {
 		//"set" command is not allowed in tabs other than "this week" or "pending"
 		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
@@ -725,7 +725,7 @@ public class Logic {
 	}
 
 	//Undo the last change to the task lists.
-	LogicFeedback undo(ProcessedObject po) {
+	public LogicFeedback undo(ProcessedObject po) {
 		assert(!history.isEmpty()); //History must always have at least one item, which is the current superlist
 		ArrayList<ArrayList<Task>> currentSuperList = history.pop();
 		ArrayList<ArrayList<Task>> previousSuperList = history.peek();

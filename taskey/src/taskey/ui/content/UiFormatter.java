@@ -42,7 +42,7 @@ public abstract class UiFormatter {
 		categoryList = _categoryList;
 	}
 	/**
-	 * Sets the current grid
+	 * Sets the current grid variable only, note needs mainPane.setContent() for effect
 	 *
 	 * @param newGrid - the new grid
 	 */

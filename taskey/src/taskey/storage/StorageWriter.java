@@ -92,6 +92,7 @@ class StorageWriter {
      * Save tags - Leagacy method *
      *============================*/
     /**
+     * Deprecated
      * Saves the given HashMap containing user-defined tags to the File dest.
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
      * @param tags HashMap that maps tag strings to their corresponding multiplicities

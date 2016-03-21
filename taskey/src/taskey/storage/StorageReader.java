@@ -95,6 +95,7 @@ class StorageReader {
      * Load tags - Legacy method *
      *===========================*/
     /**
+     * Deprecated
      * Returns a HashMap containing the user-defined tags read from the File src.
      * An empty HashMap is returned if src was not found.
      * @param src source file to be read

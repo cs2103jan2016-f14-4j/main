@@ -379,10 +379,14 @@ public class Task implements Comparable<Task> {
 			return -1; 
 		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
 			return -1; 
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+			return 1; 
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
 			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
 			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+			return 1; 
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
 			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {

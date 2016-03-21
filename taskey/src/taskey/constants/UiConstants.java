@@ -73,7 +73,7 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 0, 20, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
-	
+	public static final UiGridSettings GRID_SETTINGS_SINGLE = new UiGridSettings(0, 0, 0, 100);
 	// Resources 
 	// Not that getResourceByStream uses relative Package directory. 
 	// In this case, images has to be a sub package of utility for a runnable JAR to work
@@ -89,12 +89,15 @@ public class UiConstants {
 	public static final String STYLE_TEXT_BLACK = "textBlack";
 	public static final String STYLE_TEXT_BLUE = "textBlue";
 	public static final String STYLE_TEXT_CATEGORY = "textCategory";
+	public static final String STYLE_CATEGORY_BOX = "categoryBox";
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
 	public static final String STYLE_ELLIPSE = "ellipse";
 	public static final String STYLE_PROMPT = "prompt";
-	public static final String STYLE_PROMPT_SELECTED = "prompt-select";
-
+	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
+	public static final String STYLE_INPUT_NORMAL = "inputNormal";
+	public static final String STYLE_INPUT_ERROR = "inputError";
+	
 	public static final ArrayList<String> STYLE_UI_DEFAULT = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "defaultStyle.css", "defaultTab.css" ));
 	public static final ArrayList<String> STYLE_UI_LIGHT = new ArrayList<String>(

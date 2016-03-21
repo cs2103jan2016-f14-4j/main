@@ -1,125 +1,115 @@
 /* Note: Affects all scroll panes */
 .scroll-pane {
-    -fx-background-color: black;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-padding: 2px;
-    -fx-background-radius: 5px, 5px;
 }
 
 .scroll-pane > .viewport { /* Needed to color scroll pane's view port */
-   -fx-background-color: white;
+   -fx-background-color: #ebf4fb;
 }
 
 /* Bound to fx:id */
 #main {
-	-fx-background-color:
-        linear-gradient(#ffff99, #FFFFFF);
+	-fx-background-color: #bbdaef;
 }
 
 #dateLabel {
-		/*-fx-background-color: 
-		 linear-gradient(#f0ff35, #a9ff00),
-         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);*/
-    -fx-background-insets: 0px,2px;
-    -fx-padding: 2px;
+	-fx-text-fill: #206ba4; 
+    -fx-font-smoothing-type: gray;
     -fx-font-weight: bold;
     -fx-font-family: 'Montserrat';
-    -fx-font-smoothing-type: gray;
 }
 
 #categoryLabel {
-    -fx-font-weight: bold;
     -fx-font-smoothing-type: gray;
     -fx-font-family: 'Montserrat';
 }
 
 #dragBar {
-	-fx-background-color: 
-		 linear-gradient(#ffff00, #ffff00);
+	-fx-background-color: #206ba4;
 }
 
+#expiredIcon {
+	-fx-text-fill: white;
+	-fx-background-color: red;
+	-fx-background-radius: 15px;
+	-fx-padding: 2px;
+	-fx-font-family: 'Montserrat';
+}
 
 /* Switchable styles */
+.inputNormal {
+	-fx-background-color: #ebf4fb;
+	-fx-text-fill: #206ba4;
+}
+
+.inputError {
+  -fx-outer-border: red;
+  -fx-body-color: #ebf4fb;
+  -fx-background-color: 
+       -fx-outer-border, 
+       -fx-body-color;
+  -fx-background-insets: 0, 2;
+  -fx-background-radius: 2px, 0px;
+}
+
 .prompt {
 	-fx-padding: 2px;
-	-fx-background-color:
-        linear-gradient(#ffff99, #b3ffb3),
-        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #b3ffb3 50%);
+	-fx-background-color: #ebf4fb;
     -fx-background-radius: 5px;
     -fx-background-insets: 0px, 1px;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-text-fill: #395306;
+    -fx-text-fill: #206ba4;
 }
 
-.prompt-select {
+.promptSelect {
 	-fx-padding: 2px;
-	-fx-background-color:
-        linear-gradient(#00ccff, #00ccff),
-        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #b3ffb3 50%);
+	-fx-background-color:#206ba4;
     -fx-background-radius: 5px;
     -fx-background-insets: 0px, 3px;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
-    -fx-text-fill: #395306;
-}
-
-.numberIcon {
-	-fx-background-color: 
-        linear-gradient(#ffd65b, #f0ff35),
-        linear-gradient(#ffef84, #f0ff35),
-        linear-gradient(#ffea6a, #f0ff35),
-        linear-gradient(#ffe657 0%, #f8c202 50%, #f0ff35 100%),
-        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); /*alpha */
-    -fx-background-radius: 30px;
-    -fx-background-insets: 0px,1px,2px,3px,0px;
-    -fx-padding: 2px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
+    -fx-text-fill: #ebf4fb;
 }
 
 .textCategory { 
-	-fx-font-size: 9px;
-	-fx-fill: black;
+	-fx-font-size: 12px;
+	-fx-fill: #ebf4fb;
+}
+
+.textDefault { 
+	-fx-fill: #ebf4fb;
+}
+
+/* Boxes */
+.categoryBox {
+	-fx-background-color: #206ba4;
+}
+
+.defaultBox {
+	-fx-background-color: #206ba4;
+}
+
+.highlightBox {
+	-fx-background-color: #8cbadb;
+
 }
 
 /* Pagination */
 .pagination .pagination-control {
-    -fx-background-color: white;    
+    -fx-background-color: #ebf4fb;    
 }
 .pagination .pagination-control .bullet-button {
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, white;
+    -fx-background-color: transparent, #ebf4fb, #206ba4, #ebf4fb, #ebf4fb;
 }
  
 .pagination .pagination-control .bullet-button:selected {   
-    -fx-background-color: transparent, #DDF1F8, #0E5D79, white, #0E5D79;
+    -fx-background-color: transparent, #ebf4fb, #206ba4, #ebf4fb, #206ba4;
 }
  
 .pagination .pagination-control .left-arrow, .right-arrow{
-    -fx-background-color: #DDF1F8, #0E5D79;
-}
-
-.textDefault { 
-	-fx-fill: black;
-}
-
-/* Boxes */
-.defaultBox {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
-}
-
-.highlightBox {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #AAAAAA 50%, #BBBBBB 50%);
-    -fx-padding: 1px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
+    -fx-background-color: #ebf4fb, #206ba4;
 }
 
 .ellipse {
-	-fx-background-color: 
-        radial-gradient(center 50% -50%, radius 200%, #ff3333 50%, #ff6666 50%);
-    -fx-background-radius: 15px;
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
+	-fx-padding: 5px;
+	-fx-background-color: linear-gradient(#ebf4fb, #206ba4);
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0px, 5px;
 }
 

@@ -25,9 +25,7 @@ import taskey.ui.content.UiTextBuilder;
  * @author junwei
  */
 public class UiCategoryFormatter extends UiFormatter {
-	
-	public static final int BULLET_RADIUS = 5;
-	
+
 	public UiCategoryFormatter(ScrollPane thePane) {
 		super(thePane);
 		addGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_CATEGORY),true);
@@ -40,14 +38,15 @@ public class UiCategoryFormatter extends UiFormatter {
 		myBuilder.addMarker(0,UiConstants.STYLE_TEXT_CATEGORY);
 		
 		for ( int i = 0; i < categoryList.size(); i ++ ) {
-			gridHelper.createStyledCell(1, i, UiConstants.STYLE_HIGHLIGHT_BOX, currentGrid);
+			
 			// add Rect
 			gridHelper.createStyledCell(0, i, "", currentGrid);
 			gridHelper.createScaledRectInCell(0, i, categoryList.get(i).getA(), currentGrid);
 			// add tag name
+			gridHelper.createStyledCell(1, i, UiConstants.STYLE_CATEGORY_BOX, currentGrid);
 			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryList.get(i).getB()),TextAlignment.CENTER,currentGrid);
 			
-			gridHelper.createStyledCell(2, i, UiConstants.STYLE_HIGHLIGHT_BOX, currentGrid);
+			gridHelper.createStyledCell(2, i, UiConstants.STYLE_CATEGORY_BOX, currentGrid);
 			// add tag numbers
 			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryList.get(i).getC()),TextAlignment.CENTER,currentGrid);
 		}

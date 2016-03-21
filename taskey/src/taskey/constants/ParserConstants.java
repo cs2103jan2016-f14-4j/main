@@ -6,6 +6,9 @@ package taskey.constants;
  *
  */
 public class ParserConstants {
+	public static final String FINISHED_COMMAND = "FINISHED_COMMAND";
+	public static final String DISPLAY_COMMAND = "DISPLAY_COMMAND"; 
+	public static final String NO_SUCH_COMMAND = "NO_SUCH_COMMAND"; 
 	public static final String DELETE_BY_INDEX = "DELETE_BY_INDEX"; 
 	public static final String DELETE_BY_NAME = "DELETE_BY_NAME"; 
 	public static final String DELETE_BY_CATEGORY = "DELETE_BY_CATEGORY"; 

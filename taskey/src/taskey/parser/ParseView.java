@@ -11,12 +11,12 @@ import taskey.logic.ProcessedObject;
  * @author Xue Hui
  *
  */
-public class ParseView {
+public class ParseView extends ParseCommand {
 	private HashMap<String,String> viewList = new HashMap<String,String>();
 	private UserTagDatabase tagDB = null; 
-	private ParseError parseError = new ParseError(); 
-	
+
 	public ParseView(UserTagDatabase tagDB) {
+		super();
 		this.tagDB = tagDB; 
 		
 		viewList.put("all", "all"); 
@@ -46,7 +46,7 @@ public class ParseView {
 		if (viewType.compareTo("error") != 0) {
 			return new ProcessedObject("VIEW",viewType.toUpperCase());
 		}
-		return parseError.processError(ParserConstants.ERROR_VIEW_TYPE); 
+		return super.processError(ParserConstants.ERROR_VIEW_TYPE); 
 	}
 	
 	/**

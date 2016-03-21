@@ -1,6 +1,10 @@
 package taskey.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import taskey.constants.ParserConstants;
+import taskey.logic.ProcessedAC;
 
 /**
  * @@author A0107345L
@@ -11,6 +15,7 @@ import java.util.ArrayList;
  *
  */
 public class AutoComplete {
+	private HashMap<String,String> commandList = new HashMap<String,String>();
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
 	
@@ -23,6 +28,15 @@ public class AutoComplete {
 		commands.add("done");
 		commands.add("undo");
 		commands.add("file_loc");
+		
+		commandList.put("add","add");
+		commandList.put("view","view");
+		commandList.put("del", "del");
+		commandList.put("set","set");
+		commandList.put("search","search");
+		commandList.put("done","done");
+		commandList.put("undo","undo");
+		commandList.put("file_loc","file_loc");
 		
 		viewList.add("all");
 		viewList.add("general");
@@ -39,8 +53,14 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such command exists, return null
 	 */
-	public ArrayList<String> completeCommand(String phrase) {
+	public ProcessedAC completeCommand(String phrase) {
 		phrase = phrase.toLowerCase(); 
+		
+		//if the command is completed, don't need to process
+		if (commandList.containsKey("phrase")) {
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+		}
+		
 		ArrayList<String> availCommands = new ArrayList<String>();
 		
 		for(int i = 0; i < commands.size(); i++) {
@@ -50,10 +70,10 @@ public class AutoComplete {
 		}
 		
 		if (!availCommands.isEmpty()) {
-			return availCommands;
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
 		} 
 		//no such command containing that sub-string
-		return null; 
+		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
 	
 	/**

@@ -30,7 +30,11 @@ public class DateTimePatternMatcher {
 		
 	}
 	
-	
+	/**
+	 * Check if the input falls into any of the patterns specified in this class
+	 * @param input
+	 * @return true if it contains the pattern, false if it doesnt 
+	 */
 	public boolean hasPattern(String input) {
 		Pattern p = Pattern.compile(pattern1);
 		Matcher m = p.matcher(input);
@@ -82,6 +86,7 @@ public class DateTimePatternMatcher {
 		return false; 
 	}
 	
+	/*
 	public static void main(String[] args) {
 		DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 		String string1 = "add project meeting by 3 pm on 17 feb";
@@ -92,6 +97,5 @@ public class DateTimePatternMatcher {
 		System.out.println(pm.hasPattern(string2));
 		System.out.println(pm.hasPattern(string3));
 	}
-	
-	
+	*/ 
 }

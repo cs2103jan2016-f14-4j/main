@@ -8,11 +8,10 @@ import taskey.logic.ProcessedObject;
  * @author Xue Hui
  *
  */
-public class ParseSearch {
-	private ParseError parseError = new ParseError(); 
+public class ParseSearch extends ParseCommand {
 	
 	public ParseSearch() {
-		
+		super(); 
 	}
 	
 	/**
@@ -28,7 +27,7 @@ public class ParseSearch {
 		if (searchPhrase.compareTo("") != 0) { 
 			processed.setSearchPhrase(searchPhrase);
 		} else {
-			processed = parseError.processError("no search phrase entered"); 
+			processed = super.processError("No search phrase entered"); 
 		}
 		return processed; 
 	}

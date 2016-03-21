@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -32,6 +33,7 @@ public class UiDropDown {
 	private Popup myMenu = null;
 	private FadeTransition fade;
 	private Window myWindow;
+	private StackPane selectedPane;
 	private int currentSelection;
 	private int currentItemSize;
 	
@@ -50,27 +52,27 @@ public class UiDropDown {
 		});
 		myWindow = primaryStage.getScene().getWindow();
 		currentItemSize = 0;
+		currentSelection = -1;
+		selectedPane = null;
 	}
 
 	public void updateMenuItems(ArrayList<String> items) {
 		assert(items != null);
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
-		for (int i = 0; i < menuItems.size(); i++) {
-			StackPane myPane = (StackPane) menuItems.get(i);
-			if (i < items.size()) {
-				Label text = new Label(items.get(i));
-				text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-				text.getStyleClass().add(UiConstants.STYLE_PROMPT);
-				myPane.getChildren().clear();
-				myPane.getChildren().add(text);
-				myPane.setVisible(true);
-			} else {
-				myPane.setVisible(false);
-			}
+		menuItems.clear();
+		for (int i = 0; i < items.size() && i < MAX_ITEMS; i++) {
+			StackPane myPane = new StackPane();
+			Label text = new Label(items.get(i));
+			text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+			text.getStyleClass().add(UiConstants.STYLE_PROMPT);
+			myPane.setAlignment(Pos.CENTER_LEFT);
+			myPane.getChildren().clear();
+			myPane.getChildren().add(text);
+			myContent.getChildren().add(myPane);
 		}
 		currentItemSize = items.size();
-		select(0);
+		deSelect();
 	}
 	
 	/**
@@ -115,6 +117,9 @@ public class UiDropDown {
 	
 	public String getSelectedItem() {
 		assert(myMenu.getContent().get(0) != null);
+		if ( currentSelection == -1 ) {
+			return "";
+		}
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		StackPane myPane = (StackPane) menuItems.get(currentSelection);
 		Label content = (Label)myPane.getChildren().get(0);
@@ -125,45 +130,53 @@ public class UiDropDown {
 		assert(myMenu != null);
 		myMenu.hide();
 		currentItemSize = 0;
-	}
-	
-	public boolean isMenuOpen() {
-		return myMenu.isShowing();
+		deSelect();
 	}
 	
 	/**
 	 * Most of the time after switching styles or setting visibility
 	 * The popup window has some tears, probably because it renders separately from the main program
-	 * This fixes that issue, and also sets opacity full for display.
+	 * This fixes that issue
 	 */
 	private void refresh() {
 		assert(myMenu != null);
 		assert(fade != null);
 		myMenu.hide();
-		fade.stop();
-		fade.getNode().setOpacity(1);
-		fade.playFromStart();
+		restartFade();
 		myMenu.show(myWindow);
 	}
 	
+	/**
+	 * This method sets opacity full for the menu
+	 */
+	private void restartFade() {
+		fade.stop();
+		fade.getNode().setOpacity(1);
+		fade.playFromStart();
+	}
+	private void deSelect() {
+		if ( selectedPane != null ) {
+			Label toStyle = (Label) selectedPane.getChildren().get(0);
+			toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
+			toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT);
+			selectedPane = null;
+			currentSelection = -1;
+		}	
+	}
 	private void select(int selection) {
-		assert(selection >= 0 && selection < MAX_ITEMS);
-		assert(myMenu.getContent().get(0) != null);
-		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
-		StackPane myPane;
-	
-		// remove previous
-		myPane = (StackPane) menuItems.get(currentSelection);
-		Label toStyle = (Label) myPane.getChildren().get(0);
-		toStyle.getStyleClass().remove(2);
-		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT);
+		VBox myContent = (VBox) myMenu.getContent().get(0);
+		assert(selection >= 0 && selection < myContent.getChildren().size());
+
+		deSelect(); 
 		
+		// do selection
 		currentSelection = selection;
-		myPane = (StackPane) menuItems.get(currentSelection);
-		toStyle = (Label) myPane.getChildren().get(0);
-		toStyle.getStyleClass().remove(2);
+		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
+		selectedPane = (StackPane) menuItems.get(currentSelection);
+		Label toStyle = (Label) selectedPane.getChildren().get(0);
+		toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
 		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
-		refresh();	
+		restartFade();
 	}
 	
 	public void processArrowKey(KeyEvent event) {

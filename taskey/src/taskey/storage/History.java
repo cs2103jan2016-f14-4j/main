@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -19,17 +20,16 @@ import taskey.logic.Task;
  */
 public class History {
 	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;
-	private ArrayDeque<HashMap<String, Integer>> tagStack; //for exception handling when saving tags
+	private ArrayDeque<ArrayList<TagCategory>> tagStack; //for exception handling when saving tags
 
 	public History() {
 		stack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
-		tagStack = new ArrayDeque<HashMap<String, Integer>>();
+		tagStack = new ArrayDeque<ArrayList<TagCategory>>();
 	}
 
 	public boolean isEmpty() {
 		return stack.isEmpty();
 	}
-
 
 	/*========*
 	 * Adders *
@@ -55,15 +55,30 @@ public class History {
 			}
 		}
 	}
-
+	
 	/**
-	 * Pushes the given tagmap to History.
-	 * @param tagmap to be added
+	 * Pushes the given tag list to History.
+	 * Has a check that prevents tagList from being added, if it is identical to the tag list at
+	 * the top of the stack
+	 * @param taglist to be added
 	 */
-	public void add(HashMap<String, Integer> tagmap) {
-		tagStack.push(tagmap);
-	}
+	public void addTagList(ArrayList<TagCategory> tagList) {
+		ArrayList<TagCategory> mostRecentTagList = tagStack.peek();
+		if (mostRecentTagList == null) {
+			tagStack.push(tagList);
+			return;
+		}
 
+		// Don't add tag list to history if it's identical to the most recent tag list
+		if (!tagList.equals(mostRecentTagList) ) {
+			tagStack.push(tagList);
+		}
+		
+		System.out.println("tagStack size: " + tagStack.size());
+	}
+	
+	public void addTags(HashMap<String, Integer> tags){
+	}
 
 	/*=========*
 	 * Getters *
@@ -81,7 +96,7 @@ public class History {
 	 * Not in use.
 	 * @return the tagmap last added to History
 	 */
-	public HashMap<String, Integer> peekTags() {
+	public ArrayList<TagCategory> peekTags() {
 		return tagStack.peek();
 	}
 
@@ -103,7 +118,7 @@ public class History {
 	 * For undo (not in use).
 	 * @return the removed tagmap
 	 */
-	public HashMap<String, Integer> popTags() {
+	public ArrayList<TagCategory> popTags() {
 		return tagStack.pop();
 	}
 

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -78,9 +79,9 @@ class StorageWriter {
      * @param dest the destination file to be written to
      * @throws IOException when there is error writing to file
      */
-    void saveTaglist(ArrayList<Tag> tags, File dest) throws IOException {
+    void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
     	try {
-    		writeToFile(dest, tags, new TypeToken<ArrayList<Tag>>() {});
+    		writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
     	} catch (IOException e) {
     		e.printStackTrace();
     		throw e;

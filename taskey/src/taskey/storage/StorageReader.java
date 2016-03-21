@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -77,14 +78,14 @@ class StorageReader {
      * @param src source file to be read
      * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
      */
-    ArrayList<Tag> loadTaglist(File src) {
-    	ArrayList<Tag> tags;
+    ArrayList<TagCategory> loadTaglist(File src) {
+    	ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
     	try {
-    		tags = readFromFile(src, new TypeToken<ArrayList<Tag>>() {});
+    		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
     		System.out.println("{Tags loaded} " + src.getName()); //debug info
     	} catch (FileNotFoundException e) {
     		System.out.println("{Tags not found} " + src.getName()); //debug info
-    		tags = new ArrayList<Tag>();
+    		tags = new ArrayList<TagCategory>();
     	}
     	return tags;
     }

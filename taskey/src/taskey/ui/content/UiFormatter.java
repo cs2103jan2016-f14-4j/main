@@ -12,17 +12,18 @@ import taskey.constants.UiConstants;
 import taskey.logic.Task;
 
 /**
+ * @@author A0125419H
  * This class contains a default grid-based formatter for the content windows.
- * It is extended by specialized classes to provide different functionality
+ * It is extended by specialized classes to provide extended functionalities
  * 
  * @author Junwei
  *
  */
+
 public abstract class UiFormatter {
 	
 	protected ScrollPane mainPane;
 	protected GridPane currentGrid;
-	protected ArrayList<GridPane> myGrids;
 	protected UiGridHelper gridHelper;
 	protected ArrayList<Triplet<Color,String,Integer>> categoryList;
 	// Abstract methods that are handled by extended classes
@@ -30,39 +31,24 @@ public abstract class UiFormatter {
 	public abstract void processArrowKey(KeyEvent event);
 	public abstract int processDeleteKey();
 	public abstract int processEnterKey();
+	public abstract void cleanUp();
 	
 	public UiFormatter(ScrollPane thePane) {
 		mainPane = thePane;
 		mainPane.setFitToWidth(true);
-		myGrids = new ArrayList<GridPane>();
 		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 	}
 	public void setCategories(ArrayList<Triplet<Color,String,Integer>> _categoryList) {
 		categoryList = _categoryList;
 	}
-	
-	public void cleanUp() {
-		myGrids.clear();
-	}
-	
-	protected void setGrid(int index) {
-		assert(index >= 0 && index < myGrids.size());
-		currentGrid = myGrids.get(index);
-		mainPane.setContent(currentGrid);
-	}
-	
 	/**
-	 * Adds the grid, with a boolean whether to use that as the current grid
+	 * Sets the current grid variable only, note needs mainPane.setContent() for effect
 	 *
 	 * @param newGrid - the new grid
-	 * @param setToCurrent - whether to use
 	 */
-	protected void addGrid(GridPane newGrid, boolean setToCurrent) {
+	protected void setGrid(GridPane newGrid) {
 		assert(newGrid != null);
-		if ( setToCurrent == true ) {
-			currentGrid = newGrid;
-		}
-		myGrids.add(newGrid);
+		currentGrid = newGrid;
 	}
 	
 	protected void clearCurrentGridContents() {

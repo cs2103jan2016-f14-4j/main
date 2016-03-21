@@ -38,8 +38,8 @@ public class Logic {
 	public Logic() {
 		parser = new Parser();
 		timeConverter = new TimeConverter();
-		utd = new UserTagDatabase();
 		storage = new Storage();
+		utd = new UserTagDatabase(storage);
 		history = storage.getHistory();
 
 		// Get lists from Storage
@@ -96,6 +96,11 @@ public class Logic {
 		}
 		
 		history.add(cloneLists(taskLists));
+		history.addTagList(utd.getTagList());
+	}
+	
+	public Storage getStorage() {
+		return storage;
 	}
 	
 	/**
@@ -193,13 +198,10 @@ public class Logic {
 		return cloneList(completedList);
 	}
 	
-	public ArrayList<String> getTagList() {
+	public ArrayList<TagCategory> getTagList() {
 		return utd.getTagList();
 	}
 	
-	public ArrayList<Integer> getTagSizes() {
-		return utd.getTagSizes();
-	}
 
 	/**
 	 * Executes the user supplied command by performing list operations on a copy of the existing task lists, and saving
@@ -238,6 +240,9 @@ public class Logic {
 
 			case "DELETE_BY_NAME":
 				return deleteByName(currentContent, originalCopy, modifiedCopy, po);
+				
+			case "DELETE_BY_CATEGORY":
+				return deleteByCategory(originalCopy, modifiedCopy, po);
 
 			case "VIEW":
 				return new LogicFeedback(originalCopy, po, null);
@@ -282,6 +287,38 @@ public class Logic {
 		return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_COMMAND_EXECUTION));
 	}
 	
+	LogicFeedback deleteByCategory(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+								   ProcessedObject po) {
+		String category = po.getCategory();
+		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
+		
+		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
+			Task t = it.next();
+			ArrayList<String> taskTags = t.getTaskTags();
+			if (taskTags != null && taskTags.contains(category)) {
+				it.remove();
+				removeFromAllLists(modifiedCopy, t); // May throw ConcurrentModificationException if duplicate names
+				                                     // are allowed
+			}
+		}
+		
+		try {
+			saveAllTasks(modifiedCopy);
+		} catch (Exception e) {
+			return new LogicFeedback(originalCopy, po, e);
+		}
+		
+		utd.removeTagCategory(category);
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		}
+		
+		taskLists = cloneLists(modifiedCopy);
+		
+		return new LogicFeedback(modifiedCopy, po, null);
+	}
+
 	// Clears all task lists, and saves the updated lists to disk.
 	public LogicFeedback clear(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy) {
 		ProcessedObject po = new ProcessedObject("CLEAR"); // Stub
@@ -296,7 +333,6 @@ public class Logic {
 		utd.deleteAllTags();
 			
 		if (!utd.saveTagDatabase()) {
-			// TODO: undo changes to tag database
 			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
@@ -888,9 +924,12 @@ public class Logic {
 		assert(!history.isEmpty()); // History must always have at least one item, which is the current superlist
 		ArrayList<ArrayList<Task>> currentSuperList = history.pop();
 		ArrayList<ArrayList<Task>> previousSuperList = history.peek();
+		ArrayList<TagCategory> currentTagList = history.popTags();
+		ArrayList<TagCategory> previousTagList = history.peekTags();
 		
 		if (previousSuperList == null) {
 			history.add(currentSuperList);
+			history.addTagList(currentTagList);
 			return new LogicFeedback(taskLists, po, new Exception(LogicConstants.MSG_EXCEPTION_UNDO));
 		}
 		
@@ -898,7 +937,20 @@ public class Logic {
 			saveAllTasks(previousSuperList);
 		} catch (Exception e) {
 			history.add(currentSuperList);
+			history.addTagList(previousTagList);
 			return new LogicFeedback(currentSuperList, po, e);
+		}
+		
+		if (previousTagList == null) { //No tags to undo
+			history.addTagList(currentTagList);
+		} else {
+			utd.setTags(previousTagList);
+			
+			if (!utd.saveTagDatabase()) {
+				history.addTagList(currentTagList);
+				utd.setTags(currentTagList);
+				return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+			}
 		}
 		
 		taskLists = cloneLists(previousSuperList);
@@ -1082,4 +1134,25 @@ public class Logic {
 			}
 		}
 	}
+	
+	
+	/**
+	 * This function takes in a ProcessedObject, checks whether there are
+	 * tags that can be added to the UserTagDatabase, else do nothing. 
+	 * @param po
+	 */
+	public void trackTags(ProcessedObject po) {
+		Task task = po.getTask();
+		if (task != null) {
+			ArrayList<String> tags = task.getTaskTags(); 
+			
+			if (tags != null) {
+				for(int i = 0; i < tags.size(); i++) {
+					if (!utd.containsTagName(tags.get(i))) {
+						utd.addTag(tags.get(i));
+					}
+				}
+			}	 
+		}
+	} 
 }

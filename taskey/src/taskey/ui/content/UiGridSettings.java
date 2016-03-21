@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import javafx.geometry.Insets;
 
 /**
+ * @@author A0125419H
  * Helper class for static initialization objects for grid, placed in UiConstants.
  *
  * @author JunWei
  */
+
 public class UiGridSettings {
 
 	private int gridHGap;

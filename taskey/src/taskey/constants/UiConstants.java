@@ -8,12 +8,13 @@ import java.util.Arrays;
 import taskey.ui.content.UiGridSettings;
 
 /**
- * 
+ * @@author A0125419H
  * This file contains all the constants for UI
  * 
  * @author JunWei
  *
  */
+
 public class UiConstants {
 
 	public static final String PROGRAM_NAME = "Taskey";
@@ -70,6 +71,7 @@ public class UiConstants {
 	}
 
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
+	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 0, 20, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);

@@ -381,7 +381,11 @@ public class Task implements Comparable<Task> {
 		
 		Task other = (Task) obj;
 		
-		return taskName.equals(other.getTaskName()); 
+		if (taskName == null) {
+			return (other.getTaskName() == null);
+		}
+		
+		return ((other.getTaskName() != null) && taskName.equals(other.getTaskName())); 
 	}
 	
 	@Override 

@@ -135,10 +135,10 @@ public class Storage {
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
-    		System.out.println("{Setting default directory}"); //debug info
+    		System.out.println("{Setting default directory}");
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
-    		System.out.println("{Storage directory loaded}"); //debug info
+    		System.out.println("{Storage directory loaded}");
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
@@ -218,46 +218,14 @@ public class Storage {
      * @param tags the ArrayList containing the user-defined tags
      * @throws IOException in case Logic wants to handle the exception
      */
-    public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+    public void saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+    	assert (tags != null);
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-		if (tags == null) {
-			System.out.println("tags are null");
-		}
-    	history.addTagList(tags); //TODO: KIV
-		return true; 
+    	history.addTagList(tags);
+		//return true; //unnecessary?
     }
 	
-    /*=================================*
-     * Load/Save tags - Legacy methods *
-     *=================================*/
-	/**
-     * Returns a HashMap the containing user-defined tags loaded from Storage.
-     * An empty HashMap is returned if the tags file was not found.
-     * @return the HashMap read from file, or an empty HashMap if the file was not found
-     */
-    public HashMap<String, Integer> loadTags() {
-    	File src = new File(directory, FILENAME_TAGS);
-    	return storageReader.loadTags(src);
-    }
-
-    /**
-     * Saves the given HashMap containing user-defined tags to Storage.
-     * @param tags the HashMap that maps tag strings to their corresponding multiplicities
-     * @return true if save was successful; false otherwise
-     */
-    public boolean saveTags(HashMap<String, Integer> tags) {
-    	File dest = new File(directory, FILENAME_TAGS);
-    	try {
-    		storageWriter.saveTags(tags, dest);
-        	history.addTags(tags);
-        	return true;
-    	} catch (IOException e) {
-    		//throw new StorageException(e, history.peekTags()); //TODO: KIV
-    		return false;
-    	}
-    }
-
 
     /*=====================*
      * Set/get directories *
@@ -297,7 +265,7 @@ public class Storage {
 	    	}
 			
 			directory = dir;
-			System.out.println("{Storage directory set} " + getDirectory()); //debug info
+			System.out.println("{Storage directory set} " + getDirectory());
 			return true;
 		} else {
 			return false;
@@ -345,9 +313,9 @@ public class Storage {
     	}
     	
 		if (isSuccessful) {
-			System.out.println("{Storage files moved}"); //debug info
+			System.out.println("{Storage files moved}");
 		} else {
-			System.out.println("Error moving directory"); //debug info
+			System.out.println("Error moving directory");
 		}
     	return isSuccessful;
     }

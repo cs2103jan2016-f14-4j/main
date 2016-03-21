@@ -60,9 +60,9 @@ class StorageReader {
     	ArrayList<Task> tasks;
 		try {
 			tasks = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-			System.out.println("{Tasklist loaded} " + src.getName()); //debug info
+			System.out.println("{Tasklist loaded} " + src.getName());
 		} catch (FileNotFoundException e) {
-			System.out.println("{Tasklist not found} " + src.getName()); //debug info
+			System.out.println("{Tasklist not found} " + src.getName());
 			tasks = new ArrayList<Task>();
 		}
     	return tasks;
@@ -79,12 +79,12 @@ class StorageReader {
      * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
      */
     ArrayList<TagCategory> loadTaglist(File src) {
-    	ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
+    	ArrayList<TagCategory> tags = new ArrayList<TagCategory>(); //unnecessary?
     	try {
     		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-    		System.out.println("{Tags loaded} " + src.getName()); //debug info
+    		System.out.println("{Tags loaded} " + src.getName());
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName()); //debug info
+    		System.out.println("{Tags not found} " + src.getName());
     		tags = new ArrayList<TagCategory>();
     	}
     	return tags;
@@ -104,9 +104,9 @@ class StorageReader {
     	HashMap<String, Integer> tags;
     	try {
     		tags = readFromFile(src, new TypeToken<HashMap<String, Integer>>() {});
-    		System.out.println("{Tags loaded} " + src.getName()); //debug info
+    		System.out.println("{Tags loaded} " + src.getName());
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName()); //debug info
+    		System.out.println("{Tags not found} " + src.getName());
     		tags = new HashMap<String, Integer>();
     	}
     	return tags;

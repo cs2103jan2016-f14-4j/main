@@ -21,6 +21,7 @@ import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
 
 /**
+ * @@author A0125419H
  * This class is the main entry point for Taskey. 
  * It performs the main setups for the UI.
  *

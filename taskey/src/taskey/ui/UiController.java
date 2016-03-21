@@ -38,11 +38,13 @@ import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 
 /**
+ * @@author A0125419H
  * This class is the main class that handles all of the Ui nodes. 
  * UiController is the only interface between Ui and Logic
  *
  * @author JunWei
  */
+
 public class UiController {
 
 	@FXML
@@ -130,6 +132,12 @@ public class UiController {
 		selectionModel.select(toContent.getValue());
 		currentContent = toContent;
 	}
+	
+	private ContentBox getCurrentContent() {
+		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
+		return currentContent;
+	}
+	
 	public void updateDisplay(ArrayList<Task> myTaskList, UiConstants.ContentBox contentID) {
 		assert(myTaskList != null);
 		myContentManager.updateContentBox(myTaskList, contentID);
@@ -161,11 +169,6 @@ public class UiController {
 		} catch (Exception excep) {
 			System.out.println(excep + " loading style sheets");
 		}
-	}
-
-	private ContentBox getCurrentContent() {
-		currentContent = ContentBox.fromInteger(myTabs.getSelectionModel().getSelectedIndex());
-		return currentContent;
 	}
 	
 	private void handleFeedback( LogicFeedback feedback ) {
@@ -234,7 +237,7 @@ public class UiController {
 				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
-				new Triplet<Color, String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
+				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
 				));
 		updateCategoryDisplay(categoryList);
 		
@@ -257,8 +260,7 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {	
-				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);
-				
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);			
 				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
 					ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 					if ( suggestions == null ) {

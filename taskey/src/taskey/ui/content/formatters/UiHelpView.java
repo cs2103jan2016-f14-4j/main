@@ -17,13 +17,14 @@ import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
 
 /**
- * This class is used to seperate help menu from UiActionFormatter,
+ * @@author A0125419H
+ * This class is used mainly to separate help menu from UiActionFormatter,
  * in order to make UiActionFormatter cleaner
  * 
  * @author junwei
  */
 
-public class UiHelpMenu {
+public class UiHelpView {
 	
 	private UiGridHelper gridHelper;
 	private UiPagination helpView;
@@ -32,7 +33,7 @@ public class UiHelpMenu {
 	private int entriesPerPage = 10; // main menu
 	private int imageWidth = 333;
 	
-	public UiHelpMenu() {
+	public UiHelpView() {
 		gridHelper = new UiGridHelper("");
 		helpView = new UiPagination(UiConstants.STYLE_ELLIPSE);
 		commandViews = new ArrayList<UiPagination>();
@@ -174,5 +175,12 @@ public class UiHelpMenu {
 				"type: view events, to view all tasks with events"
 				));
 		addMenu(images, info);	
+	}
+	
+	public void clear() {
+		for ( int i = 0 ; i < commandViews.size(); i ++ ) {
+			commandViews.get(i).clear();
+		}
+		helpView.clear();
 	}
 }

@@ -221,6 +221,9 @@ public class Storage {
     public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
+		if (tags == null) {
+			System.out.println("tags are null");
+		}
     	history.addTagList(tags); //TODO: KIV
 		return true; 
     }

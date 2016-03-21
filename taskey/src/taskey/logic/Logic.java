@@ -38,8 +38,8 @@ public class Logic {
 	public Logic() {
 		parser = new Parser();
 		timeConverter = new TimeConverter();
-		utd = new UserTagDatabase();
 		storage = new Storage();
+		utd = new UserTagDatabase(storage);
 		history = storage.getHistory();
 
 		// Get lists from Storage
@@ -97,6 +97,10 @@ public class Logic {
 		
 		history.add(cloneLists(taskLists));
 		history.addTagList(utd.getTagList());
+	}
+	
+	public Storage getStorage() {
+		return storage;
 	}
 	
 	/**

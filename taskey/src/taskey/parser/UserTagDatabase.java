@@ -19,9 +19,10 @@ import taskey.storage.Storage;
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
 	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
-	Storage db = new Storage(); 
+	Storage db; 
 	
-	public UserTagDatabase() {
+	public UserTagDatabase(Storage storage) {
+		db = storage;
 		//initialise the database of tags. 
 		userTags = cloneTagList(db.loadTaglist());  
 	}
@@ -114,6 +115,7 @@ public class UserTagDatabase {
 		try {
 			return db.saveTaglist(cloneTagList(userTags));
 		} catch (IOException e) {
+			System.out.println("save fail");
 			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 
 		} 

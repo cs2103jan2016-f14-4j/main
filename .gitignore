@@ -1,11 +1,11 @@
 *.class
-taskey/Taskey savefiles
-taskey/last-used directory.taskey_config
-taskey/last_used_directory.taskeyconfig
+Taskey savefiles
+last-used directory.taskey_config
+last_used_directory.taskeyconfig
 *.taskeyconfig
 javadoc
-taskey/USER_TAG_DB
-taskey/logs
-taskey/bin
-taskey/build
-taskey/.gradle
+USER_TAG_DB
+logs
+bin
+build
+.gradle

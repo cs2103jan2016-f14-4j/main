@@ -217,7 +217,7 @@ public class Storage {
      * @param tags the ArrayList containing the user-defined tags
      * @throws IOException in case Logic wants to handle the exception
      */
-    public void saveTags(ArrayList<Tag> tags) throws IOException {
+    public void saveTaglist(ArrayList<Tag> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
     	//history.add(tags); //TODO: KIV

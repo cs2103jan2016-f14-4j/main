@@ -1,7 +1,6 @@
 package taskey.parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import taskey.constants.ParserConstants;
 import taskey.logic.ProcessedObject;
@@ -16,10 +15,7 @@ import taskey.logic.Task;
  * @author Xue Hui
  *
  */
-public class Parser {
-	
-	private HashMap<String,String> commandList = new HashMap<String,String>(); 
-	
+public class Parser {	
 	private ParseError parseError = new ParseError(); 
 	private ParseAdd parseAdd = new ParseAdd(); 
 	private ParseEdit parseEdit = new ParseEdit(); 
@@ -33,14 +29,7 @@ public class Parser {
 	private ParseView parseView = new ParseView(tagDB);
 	
 	public Parser() {
-		commandList.put("add", "add"); 
-		commandList.put("view", "view"); 
-		commandList.put("del", "del"); 
-		commandList.put("set", "set"); 
-		commandList.put("search", "search"); 
-		commandList.put("done", "done"); 
-		commandList.put("undo", "undo"); 
-		commandList.put("file_loc", "file_loc");
+	
 	}
 	
 	/**
@@ -86,7 +75,8 @@ public class Parser {
 				break; 
 			default:
 				//error goes here
-				processed = parseError.processError(ParserConstants.ERROR_COMMAND); 
+				processed = parseError.processError(String.format(
+						ParserConstants.ERROR_COMMAND, command)); 
 				break; 
 		}
 		//update tag categories if needed
@@ -105,10 +95,7 @@ public class Parser {
 		String[] splitString = stringInput.split(" ");
 		String command = splitString[0].toLowerCase();
 		
-		if (commandList.containsKey(command)) {
-			return command;
-		} 
-		return "error"; 
+		return command;
 	}
 	
 	/**

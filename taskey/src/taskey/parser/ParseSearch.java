@@ -1,5 +1,6 @@
 package taskey.parser;
 
+import taskey.constants.ParserConstants;
 import taskey.logic.ProcessedObject;
 
 /**
@@ -27,7 +28,7 @@ public class ParseSearch extends ParseCommand {
 		if (searchPhrase.compareTo("") != 0) { 
 			processed.setSearchPhrase(searchPhrase);
 		} else {
-			processed = super.processError("No search phrase entered"); 
+			processed = super.processError(ParserConstants.ERROR_EMPTY_SEARCH); 
 		}
 		return processed; 
 	}

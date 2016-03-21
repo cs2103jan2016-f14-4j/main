@@ -30,7 +30,7 @@ public class ParseDone extends ParseCommand {
 		String taskName = getTaskName(command, stringInput);
 		
 		if (taskName.compareTo("") == 0) {
-			return super.processError("No task has been selected as done");
+			return super.processError(ParserConstants.ERROR_DONE_EMPTY);
 		}
 		
 		try {
@@ -46,7 +46,6 @@ public class ParseDone extends ParseCommand {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput

@@ -85,15 +85,13 @@ public class TagCategory implements Comparable<TagCategory> {
 	 * Overriding this method for ArrayList's .contains() method 
 	 */
     public boolean equals(Object object) {
-        boolean isSame = false;
-
         if (object != null && object instanceof TagCategory) {
         	TagCategory other = (TagCategory) object;
             if (this.tagName.equals(other.getTagName())) {
-            	return equals(this.numTags == other.numTags);
+            	return (this.numTags == other.numTags);
             }
         }
-        return isSame;
+        return false;
     }
 
 	@Override

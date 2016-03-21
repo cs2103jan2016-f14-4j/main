@@ -374,80 +374,56 @@ public class Task implements Comparable<Task> {
 		
 		//FLOATING HAS THE LOWEST PRIORITY : compare by name 
 		if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("FLOATING") == 0) {
-			//compare by name 
-			if (this.taskName.compareTo(otherTaskName) == 0) {
-				return 0; 
-			} else if (this.taskName.compareTo(otherTaskName) > 0) {
-				return 1; //this task name is greater than the other task name 
-			} else {
-				return -1; //less impt than the other task name
-			}
+			return compareTaskNames(otherTaskName);
 		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("EVENT") == 0) {
 			return -1; 
 		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
 			return -1; 
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
-			if (startTime > otherStartTime) {
-				return 1;
-			} else if (startTime == otherStartTime) {
-				//compare by name
-				if (this.taskName.compareTo(otherTaskName) == 0) {
-					return 0; 
-				} else if (this.taskName.compareTo(otherTaskName) > 0) {
-					return 1; //this task name is greater than the other task name 
-				} else {
-					return -1; //less impt than the other task name
-				}
-			} else {
-				return -1; 
-			}
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
-			if (startTime > otherStartTime) {
-				return 1;
-			} else if (startTime == otherStartTime) {
-				//compare by name
-				if (this.taskName.compareTo(otherTaskName) == 0) {
-					return 0; 
-				} else if (this.taskName.compareTo(otherTaskName) > 0) {
-					return 1; //this task name is greater than the other task name 
-				} else {
-					return -1; //less impt than the other task name
-				}
-			} else {
-				return -1; 
-			}
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
-			if (startTime > otherStartTime) {
-				return 1;
-			} else if (startTime == otherStartTime) {
-				//compare by name 
-				if (this.taskName.compareTo(otherTaskName) == 0) {
-					return 0; 
-				} else if (this.taskName.compareTo(otherTaskName) > 0) {
-					return 1; //this task name is greater than the other task name 
-				} else {
-					return -1; //less impt than the other task name
-				}
-			} else {
-				return -1; 
-			}
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
-			if (startTime > otherStartTime) {
-				return 1;
-			} else if (startTime == otherStartTime) {
-				//compare by name 
-				if (this.taskName.compareTo(otherTaskName) == 0) {
-					return 0; 
-				} else if (this.taskName.compareTo(otherTaskName) > 0) {
-					return 1; //this task name is greater than the other task name 
-				} else {
-					return -1; //less impt than the other task name
-				}
-			} else {
-				return -1; 
-			}
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} 
 		return 0; //shouldn't get here. 
+	}
+
+	/**
+	 * Compare Events and Deadline:
+	 * 1) Based on Time
+	 * 2) Based on name, if time is the same 
+	 * @param startTime
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return
+	 */
+	private int compareNonFloating(long startTime, String otherTaskName, long otherStartTime) {
+		if (startTime > otherStartTime) {
+			return 1;
+		} else if (startTime == otherStartTime) {
+			return compareTaskNames(otherTaskName);
+		} else {
+			return -1; 
+		}
+	}
+	
+	/**
+	 * Compare events, floatings or deadlines based on their task names
+	 * @param otherTaskName
+	 * @return
+	 */
+	private int compareTaskNames(String otherTaskName) {
+		//compare by name 
+		if (this.taskName.compareTo(otherTaskName) == 0) {
+			return 0; 
+		} else if (this.taskName.compareTo(otherTaskName) > 0) {
+			return 1; //this task name is greater than the other task name 
+		} else {
+			return -1; //less impt than the other task name
+		}
 	}
 	
 	/**

@@ -240,6 +240,9 @@ public class Logic {
 
 			case "DELETE_BY_NAME":
 				return deleteByName(currentContent, originalCopy, modifiedCopy, po);
+				
+			case "DELETE_BY_CATEGORY":
+				return deleteByCategory(originalCopy, modifiedCopy, po);
 
 			case "VIEW":
 				return new LogicFeedback(originalCopy, po, null);
@@ -284,6 +287,38 @@ public class Logic {
 		return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_COMMAND_EXECUTION));
 	}
 	
+	LogicFeedback deleteByCategory(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+								   ProcessedObject po) {
+		String category = po.getCategory();
+		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
+		
+		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
+			Task t = it.next();
+			ArrayList<String> taskTags = t.getTaskTags();
+			if (taskTags != null && taskTags.contains(category)) {
+				it.remove();
+				removeFromAllLists(modifiedCopy, t); // May throw ConcurrentModificationException if duplicate names
+				                                     // are allowed
+			}
+		}
+		
+		try {
+			saveAllTasks(modifiedCopy);
+		} catch (Exception e) {
+			return new LogicFeedback(originalCopy, po, e);
+		}
+		
+		utd.removeTagCategory(category);
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		}
+		
+		taskLists = cloneLists(modifiedCopy);
+		
+		return new LogicFeedback(modifiedCopy, po, null);
+	}
+
 	// Clears all task lists, and saves the updated lists to disk.
 	public LogicFeedback clear(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy) {
 		ProcessedObject po = new ProcessedObject("CLEAR"); // Stub

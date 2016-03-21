@@ -7,5 +7,3 @@ javadoc
 taskey/USER_TAG_DB
 taskey/logs
 taskey/bin
-taskey/build
-taskey/.gradle

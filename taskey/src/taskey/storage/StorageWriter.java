@@ -67,10 +67,29 @@ class StorageWriter {
 			throw e;
 		}
     }
+    
+    /*========================*
+     * Save tags - New method *
+     *========================*/
+    /**
+     * Saves the given ArrayList of Tags to the File dest.
+     * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
+     * @param tags ArrayList containing the user-defined tags
+     * @param dest the destination file to be written to
+     * @throws IOException when there is error writing to file
+     */
+    void saveTaglist(ArrayList<Tag> tags, File dest) throws IOException {
+    	try {
+    		writeToFile(dest, tags, new TypeToken<ArrayList<Tag>>() {});
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		throw e;
+    	}
+    }
 
-    /*===========*
-     * Save tags *
-     *===========*/
+    /*============================*
+     * Save tags - Leagacy method *
+     *============================*/
     /**
      * Saves the given HashMap containing user-defined tags to the File dest.
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.

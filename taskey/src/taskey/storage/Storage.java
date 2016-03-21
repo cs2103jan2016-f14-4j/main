@@ -168,7 +168,6 @@ public class Storage {
 		}
 
 		//history.add(superlist); //Logic will add the initial loaded list to History
-		//TODO: can move to here, as long as this method is only called once
 		return superlist;
 	}
 
@@ -200,9 +199,33 @@ public class Storage {
 	}
 
 
-    /*================*
-     * Load/Save tags *
-     *================*/
+    /*==============================*
+     * Load/Save tags - new methods *
+     *==============================*/
+	/**
+     * Returns the ArrayList of Tags loaded from Storage.
+     * An empty ArrayList is returned if the tags file was not found.
+     * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
+	 */
+	public ArrayList<Tag> loadTaglist() {
+		File src = new File(directory, FILENAME_TAGS);
+		return storageReader.loadTaglist(src);
+	}
+	
+    /**
+     * Saves the given ArrayList of Tags to Storage.
+     * @param tags the ArrayList containing the user-defined tags
+     * @throws IOException in case Logic wants to handle the exception
+     */
+    public void saveTags(ArrayList<Tag> tags) throws IOException {
+    	File dest = new File(directory, FILENAME_TAGS);
+		storageWriter.saveTaglist(tags, dest);
+    	//history.add(tags); //TODO: KIV
+    }
+	
+    /*=================================*
+     * Load/Save tags - Legacy methods *
+     *=================================*/
 	/**
      * Returns a HashMap the containing user-defined tags loaded from Storage.
      * An empty HashMap is returned if the tags file was not found.

@@ -66,10 +66,33 @@ class StorageReader {
 		}
     	return tasks;
     }
+    
+    
+    /*========================*
+     * Load tags - new method *
+     *========================*/
+    /**
+     * Returns an ArrayList of Tags read from the File src.
+     * An empty ArrayList is returned if src was not found.
+     * @param src source file to be read
+     * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
+     */
+    ArrayList<Tag> loadTaglist(File src) {
+    	ArrayList<Tag> tags;
+    	try {
+    		tags = readFromFile(src, new TypeToken<ArrayList<Tag>>() {});
+    		System.out.println("{Tags loaded} " + src.getName()); //debug info
+    	} catch (FileNotFoundException e) {
+    		System.out.println("{Tags not found} " + src.getName()); //debug info
+    		tags = new ArrayList<Tag>();
+    	}
+    	return tags;
+    }
+    
 
-    /*===========*
-     * Load tags *
-     *===========*/
+    /*===========================*
+     * Load tags - Legacy method *
+     *===========================*/
     /**
      * Returns a HashMap containing the user-defined tags read from the File src.
      * An empty HashMap is returned if src was not found.

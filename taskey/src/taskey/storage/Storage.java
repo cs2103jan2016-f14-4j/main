@@ -76,39 +76,6 @@ public class Storage {
 		System.out.println("\nInitial load ======================================");
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
-
-		// Initialize - tags hashmap
-		HashMap<String, Integer> loadedTags = storage.loadTags();
-		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
-
-		// Load after save - tasklists
-		System.out.println("\n\nLoad after save ===================================");
-		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
-		ArrayList<Task> ignoredList = new ArrayList<Task>();
-		ArrayList<Task> pendingList = new ArrayList<Task>();
-		pendingList.add(new Task("1. This is a test task"));
-		pendingList.add(new Task("2. This is a test task"));
-		pendingList.add(new Task("3. This is a test task"));
-		superlist.add(ignoredList);
-		superlist.add(pendingList);
-		for (int i=0; i<5; i++) {
-			superlist.add(new ArrayList<Task>());
-		}
-		try {
-			storage.saveAllTasklists(superlist);
-		} catch (StorageException e) {
-			System.err.println(e.getMessage());
-			print(e.getLastModifiedTasklists());
-		}
-		loadedLists = storage.loadAllTasklists();
-		print(loadedLists);
-
-		// Load after save - tagsmap
-		HashMap<String, Integer> tags = new HashMap<String, Integer>();
-		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
-		storage.saveTags(tags);
-		loadedTags = storage.loadTags();
-		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 	}
 
 	private static void print(ArrayList<ArrayList<Task>> lists) {

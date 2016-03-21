@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
@@ -36,15 +37,37 @@ public class StorageTest {
 	public void tearDown() throws Exception {
 	}
 
+    /*===========*
+     * Test tags *
+     *===========*/
 	@Test
-	public final void saveAndLoadTasklists() throws IOException {
+	public void saveAndLoadTags() throws IOException {
+		ArrayList<TagCategory> tags = createTaglist();
+		storage.saveTaglist(tags);
+		
+		ArrayList<TagCategory> loadedList = storage.loadTaglist();
+		assertEquals(taglistToString(tags), taglistToString(loadedList));
+	}
+	
+	private static ArrayList<TagCategory> createTaglist() {
+		ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
+		for (int i=0; i<3; i++) {
+			tags.add(new TagCategory("tag_" + i));
+		}
+		return tags;
+	}
+	
+    /*================*
+     * Test tasklists *
+     *================*/
+	@Test
+	public void saveAndLoadTasklists() throws IOException {
 		ArrayList<ArrayList<Task>> superlist = createSuperlist();
 		storage.saveAllTasklists(superlist);
 		
 		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
-		assertEquals(toString(superlist), toString(loadedlist));
+		assertEquals(superlistToString(superlist), superlistToString(loadedlist));
 	}
-
 
 	private ArrayList<ArrayList<Task>> createSuperlist() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
@@ -60,8 +83,11 @@ public class StorageTest {
 		return superlist;
 	}
 
-	
-	private static String toString(ArrayList<ArrayList<Task>> superlist) {
+
+    /*================*
+     * Helper methods *
+     *================*/
+	private static String superlistToString(ArrayList<ArrayList<Task>> superlist) {
 		String str = "";
 		for (ArrayList<Task> list : superlist) {
 			for (Task t : list)
@@ -69,5 +95,14 @@ public class StorageTest {
 		}
 		return str;
 	}
+	
+	private static String taglistToString(ArrayList<TagCategory> tags) {
+		String str = "";
+		for (TagCategory tag : tags) {
+			str.concat(tag.getTagName());
+		}
+		return str;
+	}
+	
 
 }

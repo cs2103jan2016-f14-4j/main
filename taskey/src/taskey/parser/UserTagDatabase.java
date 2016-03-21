@@ -1,9 +1,7 @@
 package taskey.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import taskey.logic.TagCategory;
 import taskey.storage.Storage;
@@ -24,7 +22,7 @@ public class UserTagDatabase {
 	
 	public UserTagDatabase() {
 		//initialise the database of tags. 
-		//userTags = db.loadTags();  reinit this when dylan has changed it to arraylist
+		userTags = db.loadTaglist();  
 	}
 	
 	/**
@@ -106,8 +104,11 @@ public class UserTagDatabase {
 	 * @return true if save was successful; false otherwise
 	 */
 	public boolean saveTagDatabase() {
-		//return db.saveTags(userTags); //reinit when dylan has changed to arraylist 
-		return false;
+		try {
+			return db.saveTaglist(userTags);
+		} catch (IOException e) {
+			return false; 
+		} 
 	}
     
 	

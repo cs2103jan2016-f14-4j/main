@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -207,7 +208,7 @@ public class Storage {
      * An empty ArrayList is returned if the tags file was not found.
      * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
 	 */
-	public ArrayList<Tag> loadTaglist() {
+	public ArrayList<TagCategory> loadTaglist() {
 		File src = new File(directory, FILENAME_TAGS);
 		return storageReader.loadTaglist(src);
 	}
@@ -217,10 +218,11 @@ public class Storage {
      * @param tags the ArrayList containing the user-defined tags
      * @throws IOException in case Logic wants to handle the exception
      */
-    public void saveTaglist(ArrayList<Tag> tags) throws IOException {
+    public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
     	//history.add(tags); //TODO: KIV
+		return true; 
     }
 	
     /*=================================*

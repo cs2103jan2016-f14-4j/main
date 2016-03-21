@@ -1,6 +1,7 @@
 package taskey.constants;
 
 /**
+ * @@author A0107345L
  * Constants for usage by the Parser package
  * @author Xue Hui
  *
@@ -24,13 +25,19 @@ public class ParserConstants {
 	
 	/* Errors */ 
 	public static final String ERROR = "ERROR"; 
-	public static final String ERROR_DATE_FORMAT = "Wrong date format"; 
-	public static final String ERROR_VIEW_TYPE = "No such category"; 
-	public static final String ERROR_COMMAND = "No such command"; 
-	public static final String ERROR_ADD_EMPTY = "Cannot be an empty add";
-	public static final String ERROR_ONLY_NUMS = "Task name cannot consist entirely of numbers";
-	public static final String ERROR_INVALID_INPUT = "Invalid input: cannot be an empty set"; 
-	public static final String ERROR_STRING_FORMAT = "Wrong format for new task name/date";
+	public static final String ERROR_DATE_FORMAT = "Error: \"%s\" is not an accepted date format"; 
+	public static final String ERROR_DATE_GRAMMAR = "Error: \"%s\" is a grammatically incorrect date"; 
+	public static final String ERROR_VIEW_TYPE = "Error: \"%s\" is not a valid category"; 
+	public static final String ERROR_VIEW_EMPTY = "Error: No view type selected";
+	public static final String ERROR_COMMAND = "Error: \"%s\" is not a valid command"; 
+	public static final String ERROR_ADD_EMPTY = "Error: Cannot be an empty add";
+	public static final String ERROR_ONLY_NUMS = "Error: Task name cannot consist entirely of numbers";
+	public static final String ERROR_INPUT_EMPTY = "Error: Cannot be an empty change"; 
+	public static final String ERROR_STRING_FORMAT = "Error: Wrong format for new task name/date";
+	public static final String ERROR_DEL_EMPTY_CAT = "Error: Cannot delete an empty category!";
+	public static final String ERROR_DEL_EMPTY = "Error: No task has been selected for deletion";
+	public static final String ERROR_DONE_EMPTY = "Error: No task has been selected as done";
+	public static final String ERROR_EMPTY_SEARCH = "Error: No search phrase entered"; 
 	
 	/*Date Handling Constants*/
 	public static final String DAY_END = "23:59:59"; 

@@ -69,7 +69,8 @@ public class ParseEdit extends ParseCommand {
 				return updateByName(rawIndex, newTaskName, newDate); 
 			}
 		}
-		return super.processError(ParserConstants.ERROR_INVALID_INPUT);
+		//empty input, return error 
+		return super.processError(ParserConstants.ERROR_INPUT_EMPTY);
 	}
 	
 	/**
@@ -101,6 +102,7 @@ public class ParseEdit extends ParseCommand {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else if (newDateRaw != null && newTaskName != null) {
+			//change both name and date 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH, index);
 			processed = updateChangeName(processed, index, newTaskName); 
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
@@ -114,6 +116,7 @@ public class ParseEdit extends ParseCommand {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
+			//error: wrong format
 			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
@@ -135,6 +138,7 @@ public class ParseEdit extends ParseCommand {
 					new Task(oldTaskName)); 
 			return updateChangeName(processed, newTaskName); 
 		} else if (newDateRaw != null && newTaskName == null) {
+			//changing date only
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, 
 					new Task(oldTaskName)); 
 			
@@ -149,6 +153,7 @@ public class ParseEdit extends ParseCommand {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else if (newTaskName != null && newDateRaw != null) {
+			//changing both name and date 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH,
 					new Task(oldTaskName));
 			processed = updateChangeName(processed, newTaskName); 
@@ -163,6 +168,7 @@ public class ParseEdit extends ParseCommand {
 				return updateToDeadline(processed, newDateRaw);
 			}
 		} else {
+			//error: wrong format
 			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
@@ -180,6 +186,7 @@ public class ParseEdit extends ParseCommand {
 	}
 	
 	/**
+	 * OVERLOADED METHOD: 
 	 * Given task index, we want to change a task name. 
 	 * @param processed
 	 * @param taskName
@@ -224,7 +231,8 @@ public class ParseEdit extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(startDate);
 				changedTask.setStartDate(epochTime);
 			} catch (ParseException error) {
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, startDate)); 
 				return processed; 
 			}
 		} else {
@@ -241,7 +249,8 @@ public class ParseEdit extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(endDate);
 				changedTask.setEndDate(epochTime);
 			} catch (ParseException error) {
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, endDate)); 
 				return processed; 
 			}
 		} else {
@@ -282,7 +291,8 @@ public class ParseEdit extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(newDateRaw.toLowerCase());
 				changedTask.setDeadline(epochTime);
 			} catch (ParseException error){
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, newDateRaw.toLowerCase())); 
 				return processed; 
 			}
 		} else {
@@ -391,7 +401,7 @@ public class ParseEdit extends ParseCommand {
 	public String getNewName(String stringInput) {
 		String newName = null;
 		String[] splitString = stringInput.split("\""); 
-		//TODO: settle empty "" 
+		
 		if (splitString.length > 1) {
 			newName = splitString[1].trim(); 
 		}

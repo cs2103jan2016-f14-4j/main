@@ -103,7 +103,8 @@ public class ParseAdd extends ParseCommand {
 		
 		//do pattern matching on raw date here. 
 		if (pm.hasPattern(rawDate)) {
-			processed = super.processError("Unable to process grammatically incorrect date");
+			processed = super.processError(String.format(
+					ParserConstants.ERROR_DATE_GRAMMAR, rawDate));
 			return processed; 
 		}
 		
@@ -201,7 +202,8 @@ public class ParseAdd extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				task.setStartDate(epochTime);
 			} catch (ParseException error) {
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, rawStartDate)); 
 				return processed; 
 			}
 		} else {
@@ -216,7 +218,8 @@ public class ParseAdd extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				task.setEndDate(epochTime); 	
 			} catch (ParseException error) {
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, rawEndDate)); 
 				return processed; 
 			}
 		} else {
@@ -256,7 +259,8 @@ public class ParseAdd extends ParseCommand {
 				epochTime = timeConverter.toEpochTime(rawDate); 
 				task.setDeadline(epochTime);
 			} catch (ParseException error) {
-				processed = super.processError(ParserConstants.ERROR_DATE_FORMAT); 
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, rawDate)); 
 				return processed; 
 			}
 		} else {
@@ -355,7 +359,7 @@ public class ParseAdd extends ParseCommand {
 	public ArrayList<String> getTagList(String rawInput) {
 		ArrayList<String> tagList = new ArrayList<String>();
 		String[] splitString = rawInput.split("#");
-		for (int i=1; i < splitString.length; i++) {
+		for(int i = 1; i < splitString.length; i++) {
 			tagList.add(splitString[i].trim());
 		}
 		return tagList; 

@@ -2,15 +2,18 @@ package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Test;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.parser.Parser;
 
-/* @@author A0107345L */
+/**
+ * @@author A0107345L
+ * This class tests all the functionality of Parser to ensure 
+ * it is returning the correct thing 
+ * @author Xue Hui
+ *
+ */
 public class ParserTest {
 	Parser parser = new Parser(); 
 	PrettyTimeParser p = new PrettyTimeParser();
@@ -24,7 +27,7 @@ public class ParserTest {
 				parser.parseInput("ADD MEETING2").toString());
 		
 		//disallow task names with only numbers 
-		assertEquals("Command: ERROR\nerror type: Task name cannot consist "
+		assertEquals("Command: ERROR\nerror type: Error: Task name cannot consist "
 				+ "entirely of numbers\n",
 				parser.parseInput("add 2345").toString());
 	}
@@ -100,14 +103,16 @@ public class ParserTest {
 	public void testTag() {
 		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
 				parser.parseInput("add meeting #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Cannot be an empty add\n",
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
 				parser.parseInput("add  ").toString());
 		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016\n"
 				+ "tags: sua, serious, \n",
 				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr\" is not an "
+				+ "accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Wrong date format\n",
+		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr 2016\" is not "
+				+ "an accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 "
 				+ "to 18 Feb 2016\ntags: sua, serious, \n",
@@ -116,7 +121,7 @@ public class ParserTest {
 	}
 	
 	@Test 
-	public void testChanges() {
+	public void testChangesById() {
 		//set <task name>/<id> "new task name" 
 		//by task id
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_NAME\nat index: 0\n"
@@ -124,7 +129,7 @@ public class ParserTest {
 				parser.parseInput("set 1 \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nFLOATING, \nat index: 1\n",
 				parser.parseInput("set 2 [none]").toString());
-		assertEquals("Command: ERROR\nerror type: Wrong format for new task name/date\n",
+		assertEquals("Command: ERROR\nerror type: Error: Wrong format for new task name/date\n",
 				parser.parseInput("set 2 []").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, "
 				+ "due on 17 Feb 2016\nat index: 1\n",
@@ -135,14 +140,17 @@ public class ParserTest {
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016 "
 				+ "to 17 Feb 2016\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb,17 Feb]").toString());
-		
+	}
+	
+	@Test 
+	public void testChangesByName() {
 		//by task name
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n"
 				+ "new TaskName: urgent meeting\n",
 				parser.parseInput("set meeting \"urgent meeting\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, FLOATING, \n",
 				parser.parseInput("set meeting [none]").toString());
-		assertEquals("Command: ERROR\nerror type: Wrong format for new task name/date\n",
+		assertEquals("Command: ERROR\nerror type: Error: Wrong format for new task name/date\n",
 				parser.parseInput("set meeting []").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, DEADLINE, "
 				+ "due on 17 Feb 2016\n",
@@ -153,7 +161,10 @@ public class ParserTest {
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_DATE\nmeeting, EVENT, "
 				+ "from 16 Feb 2016 to 17 Feb 2016\n",
 				parser.parseInput("set meeting [16 feb,17 Feb]").toString());	
-		
+	}
+	
+	@Test
+	public void testChangesTimeUsage() { 
 		//test time usage
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
 				+ "Feb 2016 15:00\nat index: 1\n",
@@ -162,7 +173,10 @@ public class ParserTest {
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nEVENT, from 16 Feb 2016"
 				+ " 15:00 to 19 Feb 2016 17:00\nat index: 1\n",
 				parser.parseInput("set 2 [16 feb 3pm,19 feb 5pm]").toString());
-		
+	}
+	
+	@Test 
+	public void testChangesBothNameDate() { 
 		//test combination
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
 				+ "Feb 2016\nat index: 1\nnew TaskName: newname\n",

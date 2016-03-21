@@ -12,6 +12,7 @@ public class LogicConstants {
 	public static final String MSG_EXCEPTION_DONE_INVALID_TAB = "Cannot use \"done\" command from this tab!";
 	public static final String MSG_EXCEPTION_UPDATE_INVALID_TAB = "Cannot use \"set\" command from this tab!";
 	public static final String MSG_EXCEPTION_UNDO = "Nothing to undo!";
+	public static final String MSG_EXCEPTION_TAG_NOT_FOUND = "There are no pending tasks tagged with \"%1$s\".";
 	
 	public enum ListID {
 		THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6), 

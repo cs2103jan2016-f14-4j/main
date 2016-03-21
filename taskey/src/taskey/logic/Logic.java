@@ -244,8 +244,8 @@ public class Logic {
 			case "DELETE_BY_CATEGORY":
 				return deleteByCategory(originalCopy, modifiedCopy, po);
 
-			case "VIEW":
-				return new LogicFeedback(originalCopy, po, null);
+			/*case "VIEW":
+				return view(po);*/
 
 			case "SEARCH":
 				return search(originalCopy, po);
@@ -287,19 +287,33 @@ public class Logic {
 		return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_COMMAND_EXECUTION));
 	}
 	
+	/*LogicFeedback view(ProcessedObject po) {
+		String viewType = po.getViewType();
+		return null;
+	}*/
+	
+	// Delete all tasks with the tag category specified within the ProcessedObject po.
 	LogicFeedback deleteByCategory(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
 								   ProcessedObject po) {
 		String category = po.getCategory();
 		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
+		boolean categoryExists = false;
 		
+		// Remove all tasks tagged with the specified category from all active lists
 		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
-			Task t = it.next();
-			ArrayList<String> taskTags = t.getTaskTags();
+			Task task = it.next();
+			ArrayList<String> taskTags = task.getTaskTags();
 			if (taskTags != null && taskTags.contains(category)) {
+				categoryExists = true;
 				it.remove();
-				removeFromAllLists(modifiedCopy, t); // May throw ConcurrentModificationException if duplicate names
-				                                     // are allowed
+				removeFromAllLists(modifiedCopy, task); // May throw ConcurrentModificationException if duplicate names
+				                                        // are allowed
 			}
+		}
+		
+		if (!categoryExists) {
+			String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND, category);
+			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
 		
 		try {
@@ -315,7 +329,6 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		
 		return new LogicFeedback(modifiedCopy, po, null);
 	}
 
@@ -480,7 +493,7 @@ public class Logic {
 	// Removes an indexed task from the current tab and saves the updated lists to disk.
 	// TODO: support removal from the "ACTION" tab.
 	public LogicFeedback deleteByIndex(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-			                    ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
+			                    	   ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
 		int taskIndex = po.getIndex();
 		
 		if (currentContent.equals(ContentBox.ACTION)) { 

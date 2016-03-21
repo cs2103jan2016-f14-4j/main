@@ -892,9 +892,6 @@ public class Logic {
 		ArrayList<TagCategory> currentTagList = history.popTags();
 		ArrayList<TagCategory> previousTagList = history.peekTags();
 		
-		System.out.println(currentTagList == null);
-		System.out.println(previousTagList == null);
-		
 		if (previousSuperList == null) {
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
@@ -905,14 +902,20 @@ public class Logic {
 			saveAllTasks(previousSuperList);
 		} catch (Exception e) {
 			history.add(currentSuperList);
+			history.addTagList(previousTagList);
 			return new LogicFeedback(currentSuperList, po, e);
 		}
 		
-		utd.setTags(previousTagList);
-		if (!utd.saveTagDatabase()) {
+		if (previousTagList == null) { //No tags to undo
 			history.addTagList(currentTagList);
-			utd.setTags(currentTagList);
-			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		} else {
+			utd.setTags(previousTagList);
+			
+			if (!utd.saveTagDatabase()) {
+				history.addTagList(currentTagList);
+				utd.setTags(currentTagList);
+				return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+			}
 		}
 		
 		taskLists = cloneLists(previousSuperList);

@@ -221,7 +221,7 @@ public class Storage {
     public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-    	//history.add(tags); //TODO: KIV
+    	history.addTagList(tags); //TODO: KIV
 		return true; 
     }
 	
@@ -247,7 +247,7 @@ public class Storage {
     	File dest = new File(directory, FILENAME_TAGS);
     	try {
     		storageWriter.saveTags(tags, dest);
-        	history.add(tags);
+        	history.addTags(tags);
         	return true;
     	} catch (IOException e) {
     		//throw new StorageException(e, history.peekTags()); //TODO: KIV

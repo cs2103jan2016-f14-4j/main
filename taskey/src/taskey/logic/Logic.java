@@ -96,6 +96,7 @@ public class Logic {
 		}
 		
 		history.add(cloneLists(taskLists));
+		history.addTagList(utd.getTagList());
 	}
 	
 	/**
@@ -293,7 +294,6 @@ public class Logic {
 		utd.deleteAllTags();
 			
 		if (!utd.saveTagDatabase()) {
-			// TODO: undo changes to tag database
 			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
@@ -885,9 +885,15 @@ public class Logic {
 		assert(!history.isEmpty()); // History must always have at least one item, which is the current superlist
 		ArrayList<ArrayList<Task>> currentSuperList = history.pop();
 		ArrayList<ArrayList<Task>> previousSuperList = history.peek();
+		ArrayList<TagCategory> currentTagList = history.popTags();
+		ArrayList<TagCategory> previousTagList = history.peekTags();
+		
+		System.out.println(currentTagList == null);
+		System.out.println(previousTagList == null);
 		
 		if (previousSuperList == null) {
 			history.add(currentSuperList);
+			history.addTagList(currentTagList);
 			return new LogicFeedback(taskLists, po, new Exception(LogicConstants.MSG_EXCEPTION_UNDO));
 		}
 		
@@ -896,6 +902,13 @@ public class Logic {
 		} catch (Exception e) {
 			history.add(currentSuperList);
 			return new LogicFeedback(currentSuperList, po, e);
+		}
+		
+		utd.setTags(previousTagList);
+		if (!utd.saveTagDatabase()) {
+			history.addTagList(currentTagList);
+			utd.setTags(currentTagList);
+			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		taskLists = cloneLists(previousSuperList);
@@ -1093,7 +1106,7 @@ public class Logic {
 			
 			if (tags != null) {
 				for(int i = 0; i < tags.size(); i++) {
-					if (!utd.hasTag(tags.get(i))) {
+					if (!utd.containsTagName(tags.get(i))) {
 						utd.addTag(tags.get(i));
 					}
 				}

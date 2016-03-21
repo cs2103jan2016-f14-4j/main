@@ -227,6 +227,7 @@ public class UiController {
 				updateAll(allLists);
 			case "ERROR":
 			default:
+				updateAll(allLists); 
 				break;
 		}
 	}

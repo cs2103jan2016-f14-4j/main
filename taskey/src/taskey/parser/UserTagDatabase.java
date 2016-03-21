@@ -1,11 +1,11 @@
 package taskey.parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import taskey.logic.TagCategory;
 import taskey.storage.Storage;
 
 /**
@@ -19,12 +19,12 @@ import taskey.storage.Storage;
  */
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
-	HashMap<String,Integer> userTags = new HashMap<String,Integer>(); 
+	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
 	Storage db = new Storage(); 
 	
 	public UserTagDatabase() {
 		//initialise the database of tags. 
-		userTags = db.loadTags();  
+		//userTags = db.loadTags();  reinit this when dylan has changed it to arraylist
 	}
 	
 	/**
@@ -39,11 +39,18 @@ public class UserTagDatabase {
 	 * @param tag
 	 */
 	public void addTag(String tag) {
-		if (!userTags.containsKey(tag)) {
-			userTags.put(tag,new Integer(1)); 
+		TagCategory newTag = new TagCategory(tag); 
+		
+		if (!userTags.contains(newTag)) {
+			userTags.add(newTag); 
 		} else {
-			int temp = userTags.get(tag) + 1; 
-			userTags.put(tag, temp); 
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tagCat = userTags.get(i); 
+				if (tagCat.compareTo(newTag) == 0) { 
+					tagCat.increaseCount();
+					break; 
+				}
+			}
 		}
 	}
 	
@@ -54,13 +61,19 @@ public class UserTagDatabase {
 	 * @return true if successfully removed
 	 */
 	public boolean removeTag(String tag) {
-		if (userTags.containsKey(tag)) {
-			int temp = userTags.get(tag) - 1;
-			if (temp <= 0) {
-				userTags.remove(tag); 
-			} else {
-				//there are still tasks with that tag
-				userTags.put(tag, temp); 
+		TagCategory toRemove = new TagCategory(tag); 
+		
+		if (userTags.contains(toRemove)) {
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tagCat = userTags.get(i); 
+				if (tagCat.compareTo(toRemove) == 0) { 
+					tagCat.decreaseCount();
+					//if 0 tasks with that tag, remove it from arraylist
+					if (tagCat.isEmpty()) {
+						userTags.remove(i);  
+					}
+					break; 
+				}
 			}
 			return true; 
 		}
@@ -73,7 +86,7 @@ public class UserTagDatabase {
 	 * @return true if the tag exists in database
 	 */
 	public boolean hasTag(String tag) {
-		if (userTags.containsKey(tag)) {
+		if (userTags.contains(new TagCategory(tag))) {
 			return true;
 		}	
 		return false; 
@@ -82,67 +95,33 @@ public class UserTagDatabase {
 	/**
 	 * For Logic: Get the entire tagList so that 
 	 * it can be displayed by the UI.
-	 * Remember to call this function every time a task tag is added/removed,
-	 * cos the main form is a HashMap...
 	 * @return
 	 */
-	public ArrayList<String> getTagList() {
-		ArrayList<String> tagList = new ArrayList<String>(); 
-		
-		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				tagList.add(pair.getKey()); 
-			}
-		}
-		return tagList; 
+	public ArrayList<TagCategory> getTagList() {
+		return userTags; 
 	}
 	
-	/**
-	 * For Logic: Get the sizes of each tag category so that 
-	 * it can be displayed by the UI.
-	 * Remember to call this function every time a task tag is added/removed,
-	 * cos the main form is a HashMap...
-	 * @return
-	 */
-	public ArrayList<Integer> getTagSizes() {
-		ArrayList<Integer> tagSizes = new ArrayList<Integer>(); 
-		
-		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				tagSizes.add(pair.getValue()); 
-			}
-		}
-		return tagSizes; 
-	}
-  
 	/**
 	 * Save the tag hash map into a file for persistent storage. 
 	 * @return true if save was successful; false otherwise
 	 */
 	public boolean saveTagDatabase() {
-		return db.saveTags(userTags); 
+		//return db.saveTags(userTags); //reinit when dylan has changed to arraylist 
+		return false;
 	}
     
 	
     /*
      * FOR DEBUGGING
      */
-    
 	@Override
 	public String toString() {
 		String stringRep = "";
 		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				stringRep += pair.getKey() + ","; 
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tag = userTags.get(i);
+				stringRep += "Tag Name: " + tag.getTagName() + ", ";
+				stringRep += "TagCount: " + tag.getNumTags() + "\n"; 
 			}
 		}
 		return stringRep; 
@@ -152,8 +131,13 @@ public class UserTagDatabase {
 	public static void main(String[] args) {
 		UserTagDatabase db = new UserTagDatabase(); 
 		db.addTag("hello");
+		db.addTag("hello");
 		db.addTag("monkey");
+		db.addTag("hello");
+		db.removeTag("hello");
 		System.out.println(db);
-		db.saveTagDatabase(); 
-	} */
+		db.removeTag("monkey");
+		System.out.println(db);
+		//db.saveTagDatabase(); 
+	} */ 
 }

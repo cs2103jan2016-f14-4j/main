@@ -390,7 +390,14 @@ public class Task implements Comparable<Task> {
 			if (startTime > otherStartTime) {
 				return 1;
 			} else if (startTime == otherStartTime) {
-				return 0;
+				//compare by name
+				if (this.taskName.compareTo(otherTaskName) == 0) {
+					return 0; 
+				} else if (this.taskName.compareTo(otherTaskName) > 0) {
+					return 1; //this task name is greater than the other task name 
+				} else {
+					return -1; //less impt than the other task name
+				}
 			} else {
 				return -1; 
 			}
@@ -398,7 +405,14 @@ public class Task implements Comparable<Task> {
 			if (startTime > otherStartTime) {
 				return 1;
 			} else if (startTime == otherStartTime) {
-				return 0;
+				//compare by name
+				if (this.taskName.compareTo(otherTaskName) == 0) {
+					return 0; 
+				} else if (this.taskName.compareTo(otherTaskName) > 0) {
+					return 1; //this task name is greater than the other task name 
+				} else {
+					return -1; //less impt than the other task name
+				}
 			} else {
 				return -1; 
 			}
@@ -406,7 +420,14 @@ public class Task implements Comparable<Task> {
 			if (startTime > otherStartTime) {
 				return 1;
 			} else if (startTime == otherStartTime) {
-				return 0;
+				//compare by name 
+				if (this.taskName.compareTo(otherTaskName) == 0) {
+					return 0; 
+				} else if (this.taskName.compareTo(otherTaskName) > 0) {
+					return 1; //this task name is greater than the other task name 
+				} else {
+					return -1; //less impt than the other task name
+				}
 			} else {
 				return -1; 
 			}
@@ -414,7 +435,14 @@ public class Task implements Comparable<Task> {
 			if (startTime > otherStartTime) {
 				return 1;
 			} else if (startTime == otherStartTime) {
-				return 0;
+				//compare by name 
+				if (this.taskName.compareTo(otherTaskName) == 0) {
+					return 0; 
+				} else if (this.taskName.compareTo(otherTaskName) > 0) {
+					return 1; //this task name is greater than the other task name 
+				} else {
+					return -1; //less impt than the other task name
+				}
 			} else {
 				return -1; 
 			}

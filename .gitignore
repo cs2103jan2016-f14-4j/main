@@ -8,3 +8,4 @@ USER_TAG_DB
 logs
 bin
 build
+.gradle

@@ -67,8 +67,8 @@ public class UiMain extends Application {
 	 */
 	private StackPane setUpResize(Stage primaryStage, Region contentRootRegion) {
 		 //Set a default "standard" or "100%" resolution
-	    double origW = 960;
-	    double origH = 540;
+	    double origW = UiConstants.MIN_SIZE.getWidth()*2;
+	    double origH = UiConstants.MIN_SIZE.getHeight()*2;
 		// If the Region containing the GUI does not already have a preferred
 		// width and height, set it.
 		// But, if it does, we can use that setting as the "standard"

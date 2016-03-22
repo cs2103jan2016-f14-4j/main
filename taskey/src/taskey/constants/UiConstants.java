@@ -23,7 +23,7 @@ public class UiConstants {
 	public static final String FXML_PATH = "layout.fxml";
 	public static final String FXML_LOAD_FAIL = "Fxml file not found";
 	
-	public static final Dimension MIN_SIZE = new Dimension(370,285);
+	public static final Dimension MIN_SIZE = new Dimension(370,285); // half of original size
 	// Content Boxes
 	public enum ContentBox {
 		THIS_WEEK(0), PENDING(1), EXPIRED(2), ACTION(3), CATEGORY(4);

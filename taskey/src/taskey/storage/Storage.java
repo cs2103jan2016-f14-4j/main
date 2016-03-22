@@ -123,7 +123,7 @@ public class Storage {
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
 	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK list.
-	 * @return the superlist of tasklists read from disk, or empty if any one list is missing
+	 * @return the superlist of tasklists read from disk, or empty if any constituent list is missing
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
@@ -131,7 +131,7 @@ public class Storage {
 		for (TasklistEnum e : TasklistEnum.values()) {
 			File src = new File(directory, e.filename());
 			ArrayList<Task> loadedList = storageReader.loadTasklist(src);
-			// If any one of the lists are missing, just return an empty superlist to prevent weird behaviour
+			// If any constituent list is missing, just return an empty superlist to prevent weird behaviour
 			if (loadedList.isEmpty()) {
 				return new ArrayList<ArrayList<Task>>();
 			}

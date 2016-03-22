@@ -318,7 +318,10 @@ public class ProcessedObject {
 		}
 		
 		if (viewType != null) {
-			stringRep += "view type: " + viewType + "\n"; 
+			for(int i = 0; i < viewType.size(); i++) {
+				stringRep += "view type: " + viewType.get(i) + ", "; 
+			}
+			stringRep += "\n"; 
 		}
 		
 		if (errorType != null) {

@@ -52,17 +52,6 @@ public class ParserTest {
 				parser.parseInput("add meeting 222 on 17 Feb").toString());
 	}
 	
-	public void testDeadlineHuman() {
-		//tests the SpecialDateConverter, which is based on relative dates.
-		//thus, cannot to assert this 
-		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
-		System.out.println(parser.parseInput("add do homework by tonight")); 
-		System.out.println(parser.parseInput("add complete essay by today")); 
-		System.out.println(parser.parseInput("add complete essay by tmr")); 
-		System.out.println(parser.parseInput("add complete essay by this Wed"));
-		System.out.println(parser.parseInput("add complete essay by next Wed"));
-	}
-	
 	@Test
 	public void testEvents() {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 "
@@ -90,13 +79,6 @@ public class ParserTest {
 				+ " to 19 Feb 2016 17:00\n",
 				parser.parseInput("add mtg2234 from 19 feb 4pm to 5pm ").toString());
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
-	}
-	
-	public void testEventsHuman() {
-		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
 	@Test
@@ -189,11 +171,6 @@ public class ParserTest {
 				parser.parseInput("set 1 [14 mar,15 mar] \"task 2\"").toString());
 	}
 	
-	public void testChangesHuman() {
-		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
-		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
-	}
-	
 	@Test
 	public void testDelete() {
 		assertEquals("Command: DELETE_BY_INDEX\nat index: 4\n",
@@ -226,17 +203,51 @@ public class ParserTest {
 		assertEquals("Command: UNDO\n",parser.parseInput("undo").toString());	
 	}
 	
+	
 	@Test 
+	/**
+	 * Test that the basic view types are all working correctly 
+	 */
 	public void testView() {
-		assertEquals("Command: VIEW\nview type: ALL\n",
+		assertEquals("Command: VIEW_BASIC\nview type: ALL, \n",
 				parser.parseInput("view all").toString());
-		assertEquals("Command: VIEW\nview type: GENERAL\n",
+		assertEquals("Command: VIEW_BASIC\nview type: GENERAL, \n",
 				parser.parseInput("View general").toString());
-		assertEquals("Command: VIEW\nview type: DEADLINES\n",
+		assertEquals("Command: VIEW_BASIC\nview type: DEADLINES, \n",
 				parser.parseInput("vieW deadlines").toString());
-		assertEquals("Command: VIEW\nview type: EVENTS\n",
+		assertEquals("Command: VIEW_BASIC\nview type: EVENTS, \n",
 				parser.parseInput("view Events").toString());
-		assertEquals("Command: VIEW\nview type: ARCHIVE\n",
+		assertEquals("Command: VIEW_BASIC\nview type: ARCHIVE, \n",
 				parser.parseInput("view archive").toString());
+	}
+	
+	
+	/*
+	 * All the methods below will be manually tested because 
+	 * dates like "tomorrow" and "today" are relative, and the time/date will
+	 * change every time the the unit test is run 
+	 */
+	
+	public void testEventsHuman() {
+		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
+	}
+	
+	public void testChangesHuman() {
+		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
+		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
+	}
+	
+	public void testDeadlineHuman() {
+		//tests the SpecialDateConverter, which is based on relative dates.
+		//thus, cannot to assert this 
+		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
+		System.out.println(parser.parseInput("add do homework by tonight")); 
+		System.out.println(parser.parseInput("add complete essay by today")); 
+		System.out.println(parser.parseInput("add complete essay by tmr")); 
+		System.out.println(parser.parseInput("add complete essay by this Wed"));
+		System.out.println(parser.parseInput("add complete essay by next Wed"));
 	}
 }

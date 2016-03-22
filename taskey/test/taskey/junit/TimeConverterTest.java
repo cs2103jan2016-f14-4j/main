@@ -46,5 +46,21 @@ public class TimeConverterTest {
 		assertEquals("11 Feb 2016 01:00",timeConverter.toHumanTime(1455123600)); 
 
 	}
+	
+	@Test
+	public void testSameWeek() {
+		TimeConverter tc = new TimeConverter();
+		try {
+			long epochTime1 = tc.toEpochTime("27 Mar");
+			long epochTime2 = tc.toEpochTime("28 Mar"); 
+			//sun and mon are diff days of the week
+			assertFalse(tc.isSameWeek(epochTime1, epochTime2));
+			epochTime1 = tc.toEpochTime("29 Mar");
+			//mon and tues are same days of the week 
+			assertTrue(tc.isSameWeek(epochTime1, epochTime2));
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
 
 }

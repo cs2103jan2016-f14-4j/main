@@ -356,16 +356,78 @@ public class Task implements Comparable<Task> {
 	 * So that one can easily just call Collections.sort(taskList) 
 	 */
 	public int compareTo(Task anotherTask) {
-		long startTime = datesEpoch[1]; 
-		long otherStartTime = anotherTask.getStartDateEpoch(); 
+		long startTime = -1; 
+		if (this.taskType.compareTo("EVENT") == 0) {
+			startTime = getStartDateEpoch(); 
+		} else if (this.taskType.compareTo("DEADLINE") == 0) { 
+			startTime = getDeadlineEpoch(); 
+		}
 		
-		if (startTime > otherStartTime) {
+		String otherTaskType = anotherTask.getTaskType(); 
+		String otherTaskName = anotherTask.getTaskName(); 
+		long otherStartTime = -1; 
+		if (anotherTask.getTaskType().compareTo("EVENT") == 0) {
+			otherStartTime = anotherTask.getStartDateEpoch(); 
+		} else if (anotherTask.getTaskType().compareTo("DEADLINE") == 0) { 
+			otherStartTime = anotherTask.getDeadlineEpoch(); 
+		}
+		
+		//FLOATING HAS THE LOWEST PRIORITY : compare by name 
+		if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("FLOATING") == 0) {
+			return compareTaskNames(otherTaskName);
+		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return -1; 
+		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return -1; 
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
 			return 1; 
-		} else if (startTime == otherStartTime) {
-			return 0;
-		} else {
-			return -1;
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+			return 1; 
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
 		} 
+		return 0; //shouldn't get here. 
+	}
+
+	/**
+	 * Compare Events and Deadline:
+	 * 1) Based on Time
+	 * 2) Based on name, if time is the same 
+	 * @param startTime
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return
+	 */
+	private int compareNonFloating(long startTime, String otherTaskName, long otherStartTime) {
+		if (startTime > otherStartTime) {
+			return 1;
+		} else if (startTime == otherStartTime) {
+			return compareTaskNames(otherTaskName);
+		} else {
+			return -1; 
+		}
+	}
+	
+	/**
+	 * Compare events, floatings or deadlines based on their task names
+	 * @param otherTaskName
+	 * @return
+	 */
+	private int compareTaskNames(String otherTaskName) {
+		//compare by name 
+		if (this.taskName.compareTo(otherTaskName) == 0) {
+			return 0; 
+		} else if (this.taskName.compareTo(otherTaskName) > 0) {
+			return 1; //this task name is greater than the other task name 
+		} else {
+			return -1; //less impt than the other task name
+		}
 	}
 	
 	/**

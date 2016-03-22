@@ -193,6 +193,7 @@ public class UiController {
 				updateAll(allLists);
 				break;		
 			case "VIEW":
+				/*
 				String viewType = processed.getViewType();
 				if (viewType.equals("GENERAL")) {
 					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionMode.LIST);
@@ -205,7 +206,7 @@ public class UiController {
 				} else if (viewType.equals("HELP")) {
 					updateActionDisplay(null, ActionMode.HELP);
 				}
-				displayTabContents(ContentBox.ACTION);
+				displayTabContents(ContentBox.ACTION); */ 
 				break;
 			case "SEARCH":
 				updateActionDisplay(allLists.get(ListID.SEARCH.getIndex()), ActionMode.LIST);

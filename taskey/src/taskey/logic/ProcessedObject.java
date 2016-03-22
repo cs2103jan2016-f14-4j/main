@@ -1,5 +1,7 @@
 package taskey.logic;
 
+import java.util.ArrayList;
+
 /**
  * @@author A0107345L
  * This class will be used for facilitating transfer of a processed task from 
@@ -19,13 +21,14 @@ package taskey.logic;
  * 11. UPDATE_BY_NAME_CHANGE_NAME
  * 12. UPDATE_BY_NAME_CHANGE_DATE
  * 13. UPDATE_BY_NAME_CHANGE_BOTH
- * 14. VIEW 
- * 15. ERROR 
- * 16. DONE_BY_INDEX
- * 17. DONE_BY_NAME
- * 18. SEARCH
- * 19. UNDO 
- * 20. CHANGE_FILE_LOC
+ * 14. VIEW_TAGS
+ * 15. VIEW_BASIC
+ * 16. ERROR 
+ * 17. DONE_BY_INDEX
+ * 18. DONE_BY_NAME
+ * 19. SEARCH
+ * 20. UNDO 
+ * 21. CHANGE_FILE_LOC
  * 
  * @author Xue Hui
  *
@@ -45,7 +48,7 @@ public class ProcessedObject {
 	private String command = null;
 	private Task task = null; 
 	private int index = -1; 
-	private String viewType = null; 
+	private ArrayList<String> viewType = null; 
 	private String errorType = null;
 	private String searchPhrase = null; 
 	private String newTaskName = null; 
@@ -71,10 +74,10 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for VIEW 
+	 * Constructor for VIEW_BASIC, VIEW_TAGS 
 	 * @param command
 	 */
-	public ProcessedObject(String command, String viewType) {
+	public ProcessedObject(String command, ArrayList<String> viewType) {
 		this.command = command; 
 		this.viewType = viewType; 
 	}
@@ -156,7 +159,7 @@ public class ProcessedObject {
 	/**
 	 * @return view type of a view command
 	 */
-	public String getViewType() {
+	public ArrayList<String> getViewType() {
 		return viewType; 
 	}
 	
@@ -164,7 +167,7 @@ public class ProcessedObject {
 	 * Set view type of a view command
 	 * @param viewType
 	 */
-	public void setViewType(String viewType) {
+	public void setViewType(ArrayList<String> viewType) {
 		this.viewType = viewType; 
 	}
 	

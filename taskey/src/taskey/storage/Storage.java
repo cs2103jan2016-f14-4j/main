@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -50,9 +51,9 @@ public class Storage {
 	    	return index;
 	    }
 	    
-	    public static boolean contains(String name) {
+	    public static boolean contains(String filename) {
 	    	for (TasklistEnum e : TasklistEnum.values()) {
-	    		if (e.filename.equals(name)) {
+	    		if (e.filename.equals(filename)) {
 	    			return true;
 	    		}
 	    	}
@@ -168,7 +169,6 @@ public class Storage {
 		}
 
 		//history.add(superlist); //Logic will add the initial loaded list to History
-		//TODO: can move to here, as long as this method is only called once
 		return superlist;
 	}
 
@@ -200,9 +200,34 @@ public class Storage {
 	}
 
 
-    /*================*
-     * Load/Save tags *
-     *================*/
+    /*==============================*
+     * Load/Save tags - new methods *
+     *==============================*/
+	/**
+     * Returns the ArrayList of Tags loaded from Storage.
+     * An empty ArrayList is returned if the tags file was not found.
+     * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
+	 */
+	public ArrayList<TagCategory> loadTaglist() {
+		File src = new File(directory, FILENAME_TAGS);
+		return storageReader.loadTaglist(src);
+	}
+	
+    /**
+     * Saves the given ArrayList of Tags to Storage.
+     * @param tags the ArrayList containing the user-defined tags
+     * @throws IOException in case Logic wants to handle the exception
+     */
+    public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+    	File dest = new File(directory, FILENAME_TAGS);
+		storageWriter.saveTaglist(tags, dest);
+    	//history.add(tags); //TODO: KIV
+		return true; 
+    }
+	
+    /*=================================*
+     * Load/Save tags - Legacy methods *
+     *=================================*/
 	/**
      * Returns a HashMap the containing user-defined tags loaded from Storage.
      * An empty HashMap is returned if the tags file was not found.
@@ -248,10 +273,11 @@ public class Storage {
      * This method is invoked by Logic, should the end user request to change it.
      * <p>Post-conditions:
      * <br>- Creates the directory if it does not exist yet.
-     * <br>- Saves the new directory to a .taskeyconfig file in "user.dir".
-     * <br>- Moves the .taskey storage files in the existing directory to the new one.
-     * @return true if the new directory was successfully created and/or set;
-     * 		   false if the path is invalid due to illegal characters (e.g. *) or reserved words (e.g. CON in Windows)
+     * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
+     * <br>- Moves the .taskey storage files from the existing directory to the new one.
+     * @return True if the new directory was successfully created and/or set;
+     * 		   <br>False if the path is invalid due to illegal characters (e.g. *), 
+     * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
      * @param pathname can be a relative or absolute path
      */
     public boolean setDirectory(String pathname) {
@@ -261,12 +287,10 @@ public class Storage {
 		}
 
 		if (dir.isDirectory()) {
-			boolean shouldSave = isNewDirectory(dir); //compares the new directory with the old to see if it should be saved
-			if (shouldSave) {
+			// Compare the new directory with the old to see if it should be saved and moved
+			if (isNewDirectory(dir)) {
 	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
-	    		System.out.println("{New storage directory saved}"); //debug info
 				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
-				System.out.println("{Storage files moved}"); //debug info
 	    	}
 			
 			directory = dir;
@@ -313,10 +337,15 @@ public class Storage {
         		} catch (IOException e) {
         			isSuccessful = false;
         			e.printStackTrace();
-        			System.out.println("Error moving directory");
         		}
         	}
     	}
+    	
+		if (isSuccessful) {
+			System.out.println("{Storage files moved}"); //debug info
+		} else {
+			System.out.println("Error moving directory"); //debug info
+		}
     	return isSuccessful;
     }
 }

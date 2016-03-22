@@ -11,11 +11,13 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 
 /**
+ * @@author A0125419H
  * This class is used to provide pagination support with extensions.
  * Such as selecting of elements
  * 
  * @author junwei
  */
+
 public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;
@@ -107,18 +109,18 @@ public class UiPagination {
 	}
 	
 	/**
-	 * Process arrow key, for the selection to be handled
+	 * Process key, for the selection to be handled
 	 * Needs to be called by the UiFormatters in order to interact with the page
 	 *
 	 * @param - event the event
 	 */
-	public void processArrowKey(KeyEvent event) {
+	public void processKey(KeyEvent event) {
 		if ( totalEntries.size() == 0 ) {
 			return;
 		}
-		if ( event.getCode() == KeyCode.DOWN) {
+		if ( event.getCode() == KeyCode.PAGE_DOWN) {
 			selectInPage(currentPage,selectionInPage+1);
-		} else if ( event.getCode() == KeyCode.UP) {
+		} else if ( event.getCode() == KeyCode.PAGE_UP) {
 			selectInPage(currentPage,selectionInPage-1);
 		} else if ( event.getCode() == KeyCode.RIGHT) {
 			selectInPage(currentPage+1,selectionInPage);

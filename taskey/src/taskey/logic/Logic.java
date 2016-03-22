@@ -193,13 +193,10 @@ public class Logic {
 		return cloneList(completedList);
 	}
 	
-	public ArrayList<String> getTagList() {
+	public ArrayList<TagCategory> getTagList() {
 		return utd.getTagList();
 	}
 	
-	public ArrayList<Integer> getTagSizes() {
-		return utd.getTagSizes();
-	}
 
 	/**
 	 * Executes the user supplied command by performing list operations on a copy of the existing task lists, and saving
@@ -1082,4 +1079,25 @@ public class Logic {
 			}
 		}
 	}
+	
+	
+	/**
+	 * This function takes in a ProcessedObject, checks whether there are
+	 * tags that can be added to the UserTagDatabase, else do nothing. 
+	 * @param po
+	 */
+	public void trackTags(ProcessedObject po) {
+		Task task = po.getTask();
+		if (task != null) {
+			ArrayList<String> tags = task.getTaskTags(); 
+			
+			if (tags != null) {
+				for(int i = 0; i < tags.size(); i++) {
+					if (!utd.hasTag(tags.get(i))) {
+						utd.addTag(tags.get(i));
+					}
+				}
+			}	 
+		}
+	} 
 }

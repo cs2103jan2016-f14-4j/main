@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
+* @@author A0125419H
 * This class implements a tray module for the program, adapted from 
 * http://stackoverflow.com/questions/14626550/to-hide-javafx-fxml-or-javafx-swing-application-to-system-tray
 * @author alvaro, junwei

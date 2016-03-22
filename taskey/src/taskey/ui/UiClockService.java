@@ -10,10 +10,12 @@ import javafx.util.Duration;
 import taskey.constants.UiConstants;
 
 /**
+ * @@author A0125419H
  * This class performs a background service, which updates the UI clock.
  *
  * @author JunWei
  */
+
 public class UiClockService extends ScheduledService<Void> {
 
 	private Label timeLabelRef;

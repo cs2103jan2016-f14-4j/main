@@ -15,16 +15,20 @@ import javafx.stage.PopupWindow;
 import taskey.constants.UiConstants;
 
 /**
+ * @@author A0125419H
  * This class creates various types of pop up windows, and supports the use of
  * animations
  * 
  * @author JunWei
  *
  */
+
 public class UiPopupManager {
+	
 	private static UiPopupManager instance = null;
 	private ArrayList<PopupWindow> popupList = new ArrayList<PopupWindow>();
-
+	private UiPopupManager() {
+	}
 	public static UiPopupManager getInstance() {
 		if (instance == null) {
 			instance = new UiPopupManager();

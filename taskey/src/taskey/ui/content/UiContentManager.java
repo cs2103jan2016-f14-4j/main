@@ -14,11 +14,13 @@ import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;
 
 /**
+ * @@author A0125419H
  * This class acts as the interface for all content display related operations
  * It does the main job of setting up the UiFormatters, and redirecting input from UiController.
  *
  * @author JunWei
  */
+
 public class UiContentManager {
 	private ArrayList<Triplet<Color,String,Integer>> myCategoryList; // for using to set colors
 	private ArrayList<UiFormatter> myFormatters; // for each content box
@@ -116,5 +118,11 @@ public class UiContentManager {
 		int arrayIndex = currentContent.getValue();
 		UiFormatter myFormatter = myFormatters.get(arrayIndex);
 		myFormatter.processEnterKey();
+	}
+	
+	public void processPageUpAndDown(KeyEvent event, ContentBox currentContent) {
+		int arrayIndex = currentContent.getValue();
+		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		myFormatter.processPageUpAndDown(event);
 	}
 }

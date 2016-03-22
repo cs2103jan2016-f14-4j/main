@@ -36,6 +36,7 @@ public class ParserConstants {
 	public static final String ERROR_ADD_EMPTY = "Error: Cannot be an empty add";
 	public static final String ERROR_ONLY_NUMS = "Error: Task name cannot consist entirely of numbers";
 	public static final String ERROR_INPUT_EMPTY = "Error: Cannot be an empty change"; 
+	public static final String ERROR_NAME_EMPTY = "Error: Task name/index is not given";
 	public static final String ERROR_STRING_FORMAT = "Error: Wrong format for new task name/date";
 	public static final String ERROR_DEL_EMPTY_CAT = "Error: Cannot delete an empty category!";
 	public static final String ERROR_DEL_EMPTY = "Error: No task has been selected for deletion";

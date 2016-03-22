@@ -64,6 +64,10 @@ public class ParseEdit extends ParseCommand {
 			String newDate = getNewDate(strNoCommand); 
 			int newPriority = getNewPriority(strNoCommand); 
 			
+			if (rawIndex.compareTo("") == 0) {
+				return super.processError(ParserConstants.ERROR_NAME_EMPTY);
+			}
+			
 			if (newPriority == -1) {
 				return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY); 
 			}
@@ -154,7 +158,7 @@ public class ParseEdit extends ParseCommand {
 		
 		//changing priority only 
 		if (newPriority != 0) { 
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_PRIORITY,
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_PRIORITY,
 							new Task(oldTaskName)); 
 			processed.setNewPriority(newPriority);
 			return processed; 
@@ -372,7 +376,7 @@ public class ParseEdit extends ParseCommand {
 				//specifier for change date
 				canAdd = false;
 				break;
-			} else if (k == '*') {
+			} else if (k == '!') {
 				//specifier for change priority
 				canAdd = false;
 				break; 

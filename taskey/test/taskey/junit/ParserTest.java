@@ -37,7 +37,7 @@ public class ParserTest {
 	
 	@Test
 	/**
-	 * Tst that adding deadline tasks gets parsed correctly 
+	 * Test that adding deadline tasks gets parsed correctly 
 	 */
 	public void testDeadline() {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
@@ -114,8 +114,17 @@ public class ParserTest {
 		
 	}
 	
-	public void testPriority() {
+	//TODO 
+	/**
+	 * Test the adding of tasks with priority 
+	 */
+	public void testAddPriority() {
 		//test setting of priority here 
+		System.out.println(parser.parseInput("add meeting !"));
+		System.out.println(parser.parseInput("add meeting on 18 feb !!!"));
+		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb !!"));
+		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb #boo !!"));
+		System.out.println(parser.parseInput("add meeting #sua !!"));
 	}
 	
 	@Test 
@@ -199,6 +208,24 @@ public class ParserTest {
 				parser.parseInput("set 1 [14 mar,15 mar] \"task 2\"").toString());
 	}
 	
+	//TODO
+	/**
+	 * Test the changing of task priorities 
+	 */
+	public void testChangesTaskPriority() {
+		//test boundary case 
+		System.out.println(parser.parseInput("set 1 !!!")); 
+		//test out of bound case 
+		System.out.println(parser.parseInput("set 1 !!!!"));
+		System.out.println(parser.parseInput("set do homework !!"));
+		//test boundary case 
+		System.out.println(parser.parseInput("set 2 !")); 
+		//test no task name given 
+		System.out.println(parser.parseInput("set !")); 
+		//test no priority given
+		System.out.println(parser.parseInput("set 2")); 
+	}
+	
 	@Test
 	/**
 	 * Tests that the delete by index and by task name parses correctly
@@ -220,8 +247,6 @@ public class ParserTest {
 	public void testSearch() {
 		assertEquals("Command: SEARCH\nsearch phrase: hello world\n",
 				parser.parseInput("search hello world").toString());
-		//assertEquals("Command: SEARCH\nsearch phrase: #mycategory\n",
-		//		parser.parseInput("search #mycategory").toString());
 	}
 	
 	@Test
@@ -264,6 +289,9 @@ public class ParserTest {
 	}
 	
 	//TODO 
+	/**
+	 * Test the viewing of tasks by tag categories 
+	 */
 	public void testViewTags() {
 		parser.parseInput("view #work");
 		parser.parseInput("view #work #homework #yolo");

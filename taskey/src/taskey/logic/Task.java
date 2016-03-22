@@ -537,6 +537,10 @@ public class Task implements Comparable<Task> {
 			stringRep += "\n";
 		}
 		
+		if (priority > 1) {
+			stringRep += "priority: " + priority + "\n";
+		}
+		
 		return stringRep; 
 	}
 	

@@ -39,7 +39,7 @@ Format:
 - Floating: add \<taskname\> 
 - Deadline: add \<taskname\> on/by \<date/time\> 
 - Event: add \<taskname\> from \<date/time\> to \<date/time\>
-- Adding hashtags/ priorities: [any of the above 3] + "#hashtags !!!" 
+- Adding hashtags/ priorities: [any of the above 3] + "#hashtags !!!" (adding of priorities must come after adding of hashtags)
 
 Examples: 
 <ul> 

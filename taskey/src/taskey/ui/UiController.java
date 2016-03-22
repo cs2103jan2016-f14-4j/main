@@ -340,6 +340,10 @@ public class UiController {
 						if (id != 0) {
 							handleFeedback(logic.executeCommand(getCurrentContent(), "del " + id));
 						}
+					} else if ( event.getCode().isArrowKey()) {
+						if  ( event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.RIGHT) {
+							myContentManager.processArrowKey(event, getCurrentContent());
+						}
 					}
 				}
 				if (event.getCode().isArrowKey() && event.isControlDown()) {

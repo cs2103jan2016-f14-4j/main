@@ -18,9 +18,11 @@ public class ParserConstants {
 	public static final String UPDATE_BY_INDEX_CHANGE_NAME = "UPDATE_BY_INDEX_CHANGE_NAME"; 
 	public static final String UPDATE_BY_INDEX_CHANGE_DATE = "UPDATE_BY_INDEX_CHANGE_DATE"; 
 	public static final String UPDATE_BY_INDEX_CHANGE_BOTH = "UPDATE_BY_INDEX_CHANGE_BOTH";
+	public static final String UPDATE_BY_INDEX_CHANGE_PRIORITY = "UPDATE_BY_INDEX_CHANGE_PRIORITY";
 	public static final String UPDATE_BY_NAME_CHANGE_NAME = "UPDATE_BY_NAME_CHANGE_NAME";
 	public static final String UPDATE_BY_NAME_CHANGE_DATE = "UPDATE_BY_NAME_CHANGE_DATE";
 	public static final String UPDATE_BY_NAME_CHANGE_BOTH = "UPDATE_BY_NAME_CHANGE_BOTH";
+	public static final String UPDATE_BY_NAME_CHANGE_PRIORITY = "UPDATE_BY_NAME_CHANGE_PRIORITY";
 	public static final String NEW_FILE_LOC = "CHANGE_FILE_LOC"; 
 	
 	/* Errors */ 
@@ -39,6 +41,7 @@ public class ParserConstants {
 	public static final String ERROR_DEL_EMPTY = "Error: No task has been selected for deletion";
 	public static final String ERROR_DONE_EMPTY = "Error: No task has been selected as done";
 	public static final String ERROR_EMPTY_SEARCH = "Error: No search phrase entered"; 
+	public static final String ERROR_SET_NEW_PRIORITY = "Error: Invalid task priority entered"; 
 	
 	/*Date Handling Constants*/
 	public static final String DAY_END = "23:59:59"; 

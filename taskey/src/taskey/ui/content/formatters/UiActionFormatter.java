@@ -41,7 +41,7 @@ public class UiActionFormatter extends UiFormatter {
 	@Override
 	public void processArrowKey(KeyEvent event) {
 		if ( currentView != null ) {
-			currentView.processArrowKey(event);
+			currentView.processKey(event);
 		}
 	}
 	@Override
@@ -59,6 +59,13 @@ public class UiActionFormatter extends UiFormatter {
 			mainPane.setContent(currentView.getPagination());
 		} 
 		return 0;
+	}
+	
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {
+		if ( currentView != null ) {
+			currentView.processKey(event);
+		}
 	}
 
 	/**

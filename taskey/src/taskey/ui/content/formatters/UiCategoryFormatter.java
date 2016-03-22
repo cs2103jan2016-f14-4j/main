@@ -67,4 +67,8 @@ public class UiCategoryFormatter extends UiFormatter {
 	public void cleanUp() {
 		clearCurrentGridContents();
 	}
+
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {	
+	}
 }

@@ -31,6 +31,7 @@ public abstract class UiFormatter {
 	public abstract void processArrowKey(KeyEvent event);
 	public abstract int processDeleteKey();
 	public abstract int processEnterKey();
+	public abstract void processPageUpAndDown(KeyEvent event);
 	public abstract void cleanUp();
 	
 	public UiFormatter(ScrollPane thePane) {

@@ -346,9 +346,8 @@ public class UiController {
 						}
 					}
 				}
-				if (event.getCode().isArrowKey() && event.isControlDown()) {
-					myContentManager.processArrowKey(event, getCurrentContent());
-					event.consume();
+				if ( event.getCode() == KeyCode.PAGE_UP || event.getCode() == KeyCode.PAGE_DOWN) {
+					myContentManager.processPageUpAndDown(event, getCurrentContent());
 				}
 			}
 		});

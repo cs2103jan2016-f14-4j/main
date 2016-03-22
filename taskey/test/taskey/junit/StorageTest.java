@@ -64,7 +64,7 @@ public class StorageTest {
 	@Test
 	public void saveAndLoadTasklists() throws IOException {
 		ArrayList<ArrayList<Task>> superlist = createSuperlist();
-		storage.saveAllTasklists(superlist);
+		storage.saveAllTasklists(superlist); //TODO use temp folder
 		
 		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
 		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 7

@@ -56,7 +56,7 @@ public class UiTaskView {
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, categoryList, newGrid); // add to main grid
 				addTaskDescription(theTask,paneGrid);
-				addImage(theTask,paneGrid);
+				//addImage(theTask,paneGrid);
 				entryNo++;
 				
 				pageEntries.add(entryPane);
@@ -71,7 +71,17 @@ public class UiTaskView {
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 		String line = "" + (id + 1);
-		Color theColor = Color.WHITE;
+		Color theColor = null;
+		switch ( theTask.getPriority()) {
+			case 2: theColor = Color.RED;
+			break;
+			case 1: theColor = Color.ORANGE;
+			break;
+			default:
+			theColor = Color.GREEN;
+		}
+		/*
+		 * Color theColor = Color.WHITE;
 		for ( int i = 0; i < categoryList.size(); i ++ ) {
 			String tag = theTask.getTaskType();
 			if ( tag != null ) {
@@ -86,6 +96,7 @@ public class UiTaskView {
 				break;
 			}
 		}
+		 */
 		gridHelper.createStyledCell(0, row, "", theGrid);
 		gridHelper.createScaledRectInCell(0, row, theColor, theGrid);
 		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);	

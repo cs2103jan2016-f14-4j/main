@@ -25,6 +25,9 @@ public class ParseView extends ParseCommand {
 		viewList.put("events", "events"); 
 		viewList.put("archive", "archive"); 
 		viewList.put("help", "help"); 
+		viewList.put("high", "high");
+		viewList.put("medium", "medium"); 
+		viewList.put("low", "low"); 
 	}
 	
 	/**
@@ -36,6 +39,7 @@ public class ParseView extends ParseCommand {
 	 * 5. ARCHIVE
 	 * 6. HELP 
 	 * 7. #tags 
+	 * 8. Priority: high, medium, low
 	 * @param command
 	 * @param stringInput
 	 * @return processedStuff
@@ -69,30 +73,41 @@ public class ParseView extends ParseCommand {
 	 */
 	public ProcessedObject getView(String stringInput) {
 		ArrayList<String> views = new ArrayList<String>(); 
+		String[] split = stringInput.split(" ");
+		String category; 
 		
-		if (stringInput.contains("#")) {
-			//wants to view by tag categories
-			String[] split = stringInput.split("#"); 
-			for(int i = 0; i < split.length; i++) {
-				views.add(split[i].trim()); 
-			}
-			//LOGIC to check if the tags are valid/exists 
-			return new ProcessedObject("VIEW_TAGS", views); 
-		} else {
-			//basic view type
-			String[] split = stringInput.split(" "); 
-			for(int i = 0; i < split.length; i++) {
-				String category = split[i].trim(); 
+		//if only one view 
+		if (split.length == 1) {
+			category = split[0].trim().toLowerCase();
+			
+			//check if it is a tagged view: Logic to handle if tag doesnt exist
+			if (category.startsWith("#")) {
+				views.add(category.replace("#", "").trim());
+				return new ProcessedObject("VIEW_TAGS", views); 
+			} else {
 				if (viewList.containsKey(category)) {
-					views.add(category.toUpperCase()); 
+					views.add(category);
+					return new ProcessedObject("VIEW_BASIC", views);
 				} else {
+					//no such category 
 					return super.processError(String.format(
 							ParserConstants.ERROR_VIEW_TYPE, category));
 				}
 			}
-			return new ProcessedObject("VIEW_BASIC", views); 
 		}
-
+		
+		//multiple views: only for hashtags 
+		for(int i = 0; i < split.length; i++) {
+			category = split[i].trim().toLowerCase(); 
+			//tags view type
+			if (category.startsWith("#")) {
+				views.add(category.replace("#", "").trim());
+			} else {
+				return super.processError(String.format(
+						ParserConstants.ERROR_VIEW_TYPE_TAG, category));
+			}
+		}
+		return new ProcessedObject("VIEW_TAGS", views); 
 	}
 
 }

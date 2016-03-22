@@ -250,17 +250,24 @@ public class ParserTest {
 	 * Test that the basic view types are all working correctly 
 	 */
 	public void testView() {
-		assertEquals("Command: VIEW_BASIC\nview type: ALL, \n",
+		assertEquals("Command: VIEW_BASIC\nview type: all, \n",
 				parser.parseInput("view all").toString());
-		assertEquals("Command: VIEW_BASIC\nview type: GENERAL, \n",
+		assertEquals("Command: VIEW_BASIC\nview type: general, \n",
 				parser.parseInput("View general").toString());
-		assertEquals("Command: VIEW_BASIC\nview type: DEADLINES, \n",
+		assertEquals("Command: VIEW_BASIC\nview type: deadlines, \n",
 				parser.parseInput("vieW deadlines").toString());
-		assertEquals("Command: VIEW_BASIC\nview type: EVENTS, \n",
+		assertEquals("Command: VIEW_BASIC\nview type: events, \n",
 				parser.parseInput("view Events").toString());
-		assertEquals("Command: VIEW_BASIC\nview type: ARCHIVE, \n",
+		assertEquals("Command: VIEW_BASIC\nview type: archive, \n",
 				parser.parseInput("view archive").toString());
-		//test view by tag task 
+		
+	}
+	
+	//TODO 
+	public void testViewTags() {
+		parser.parseInput("view #work");
+		parser.parseInput("view #work #homework #yolo");
+		parser.parseInput("view lala #yolo");
 	}
 	
 	

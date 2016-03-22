@@ -366,6 +366,15 @@ public class ParseAdd extends ParseCommand {
 	}
 	
 	/**
+	 * Return the priority for a task 
+	 * @param rawInput
+	 * @return
+	 */
+	public int getPriority(String rawInput) {
+		return 1; //stub 
+	}
+	
+	/**
 	 * Depending on where the user keyed in his dates, the task name
 	 * might still contain the time in it. So this function will remove
 	 * the time from the task name (if it is there) 

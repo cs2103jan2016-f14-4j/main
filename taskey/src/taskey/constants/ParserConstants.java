@@ -28,6 +28,7 @@ public class ParserConstants {
 	public static final String ERROR_DATE_FORMAT = "Error: \"%s\" is not an accepted date format"; 
 	public static final String ERROR_DATE_GRAMMAR = "Error: \"%s\" is a grammatically incorrect date"; 
 	public static final String ERROR_VIEW_TYPE = "Error: \"%s\" is not a valid category"; 
+	public static final String ERROR_VIEW_TYPE_TAG = "Error: \"%s\" is not a valid tag";
 	public static final String ERROR_VIEW_EMPTY = "Error: No view type selected";
 	public static final String ERROR_COMMAND = "Error: \"%s\" is not a valid command"; 
 	public static final String ERROR_ADD_EMPTY = "Error: Cannot be an empty add";

@@ -117,8 +117,6 @@ public class UiMain extends Application {
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
-		
-		primaryStage.setResizable(true);
 		trayModule = new UiTrayModule(primaryStage);
 		
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file

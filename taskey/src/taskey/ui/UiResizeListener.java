@@ -1,13 +1,12 @@
 package taskey.ui;
 
-import java.awt.Dimension;
-
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import taskey.constants.UiConstants;
+import taskey.ui.utility.UiPopupManager;
 
 /**
  * This class implements a stage resizelistener
@@ -101,6 +100,7 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 					}
 				}
 			}
+			UiPopupManager.getInstance().resizeAllPopups(stage);
 		}
 	}
 }

@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
+import javafx.stage.Window;
 import taskey.constants.UiConstants;
 
 /**
@@ -24,7 +25,7 @@ import taskey.constants.UiConstants;
  */
 
 public class UiPopupManager {
-	
+	private double X_Ratio = 1, Y_Ratio = 1;
 	private static UiPopupManager instance = null;
 	private ArrayList<PopupWindow> popupList = new ArrayList<PopupWindow>();
 	private UiPopupManager() {
@@ -50,6 +51,8 @@ public class UiPopupManager {
 		Popup newPopup = new Popup();
 		Bounds screenBounds = getScreenBoundsOfNode(node);
 		Label content = new Label();
+		content.setScaleX(X_Ratio);
+		content.setScaleY(Y_Ratio);
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
@@ -70,6 +73,21 @@ public class UiPopupManager {
 		return newPopup;
 	}
 
+	/**
+	 * This method resizes all existing popups
+	 * @param mainStage
+	 */
+	public void resizeAllPopups(Window mainStage) {
+		X_Ratio = mainStage.getWidth()/2/UiConstants.MIN_SIZE.getWidth();
+		Y_Ratio = mainStage.getHeight()/2/UiConstants.MIN_SIZE.getHeight();
+		
+		for ( int i = 0; i < popupList.size(); i++ ) {
+			Popup thePopup = (Popup) popupList.get(i);
+			Node content = thePopup.getContent().get(0);
+			content.setScaleX(X_Ratio);
+			content.setScaleY(Y_Ratio);
+		}
+	}
 	
 	/**
 	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems

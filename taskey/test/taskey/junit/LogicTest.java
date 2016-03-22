@@ -53,6 +53,12 @@ public class LogicTest {
 	public static final String STRING_UPDATE_BY_INVALID_NAME = "set g3 a?b ,  \"ayy lmao\"";
 	public static final String STRING_UNDO = "undo";
 	
+	private Logic logic;
+	private ArrayList<ArrayList<Task>> originalCopy;
+	private ArrayList<ArrayList<Task>> modifiedCopy;
+	private Parser parser;
+	private TimeConverter timeConverter;
+	
 	public static ArrayList<ArrayList<Task>> getEmptyLists() {
 		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
 		
@@ -107,6 +113,7 @@ public class LogicTest {
 		return temp;
 	}
 	
+	// Make sure clear command works because it is used in setUp().
 	@BeforeClass
 	public static void testClear() {
 		Logic logic = new Logic();
@@ -120,19 +127,19 @@ public class LogicTest {
 	}
 	
 	@Before
-	public void clear() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
+	public void setUp() {
+		logic = new Logic();
+		originalCopy = logic.getAllTaskLists();
+		modifiedCopy = logic.getAllTaskLists();
+		parser = new Parser();
+		timeConverter = new TimeConverter();
 		logic.clear(originalCopy, modifiedCopy);
+		originalCopy = logic.getAllTaskLists();
+		modifiedCopy = logic.getAllTaskLists();
 	}
 	
 	@Test
 	public void testAddFloating() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		LogicFeedback actual = logic.addFloating(originalCopy, modifiedCopy, po);
 		ArrayList<ArrayList<Task>> temp = addTaskToLists(po.getTask());
@@ -143,11 +150,6 @@ public class LogicTest {
 	 
 	@Test
 	public void testAddDeadlineForThisWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -160,11 +162,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddDeadlineOutsideThisWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK));
 		ProcessedObject po = parser.parseInput(input);
@@ -177,11 +174,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddEventForThisWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_EVENT, timeConverter.getDate(currTime),
 				                     timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK));
@@ -195,11 +187,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddEventOutsideThisWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_EVENT, timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK),
 				                     timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY));
@@ -213,11 +200,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddExpiredDeadlineTask() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime - NUM_SECONDS_1_DAY));
 		ProcessedObject po = parser.parseInput(input);
@@ -232,11 +214,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddExpiredEventTask() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_EVENT, timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK),
 				                     timeConverter.getDate(currTime - NUM_SECONDS_1_DAY));
@@ -252,10 +229,6 @@ public class LogicTest {
 	
 	@Test
 	public void testAddDuplicateTaskName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		logic.addFloating(originalCopy, modifiedCopy, po);
 		
@@ -373,11 +346,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDeleteTaskByIndex() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -395,11 +363,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDeleteTaskByName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -417,11 +380,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDeleteFromWrongTab() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -440,11 +398,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDeleteTaskByInvalidIndex() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -464,11 +417,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDeleteTaskByInvalidName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -488,10 +436,6 @@ public class LogicTest {
 	
 	@Test
 	public void testSearchPhraseFound() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		Task task = po.getTask();
 		logic.addFloating(originalCopy, modifiedCopy, po);
@@ -508,10 +452,6 @@ public class LogicTest {
 	
 	@Test
 	public void testSearchPhraseNotFound() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		logic.addFloating(originalCopy, modifiedCopy, po);
 
@@ -526,10 +466,6 @@ public class LogicTest {
 	
 	@Test
 	public void testSearchPhraseEmpty() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		logic.addFloating(originalCopy, modifiedCopy, po);
 
@@ -544,11 +480,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDoneTaskByIndex() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -568,11 +499,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDoneTaskFromWrongTab() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -590,11 +516,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDoneTaskByInvalidIndex() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -612,11 +533,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDoneTaskByName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -636,11 +552,6 @@ public class LogicTest {
 	
 	@Test
 	public void testDoneTaskByInvalidName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -660,11 +571,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -684,11 +590,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexFromWrongTab() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -708,11 +609,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexOutOfBounds() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -732,11 +628,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeDateSameWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -759,11 +650,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeDateDiffWeek() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -773,7 +659,9 @@ public class LogicTest {
 		originalCopy = logic.getAllTaskLists();
 		modifiedCopy = logic.getAllTaskLists();
 		input = String.format(STRING_UPDATE_BY_INDEX_CHANGE_DATE_DEADLINE, timeConverter.getDate(currTime 
-				                                                                                 + NUM_SECONDS_1_WEEK));
+				                                                                                 + NUM_SECONDS_1_WEEK
+				                                                                                 + NUM_SECONDS_BUFFER_TIME));
+		                                                                                         // Boundary value
 		po = parser.parseInput(input);
 		LogicFeedback actual = logic.updateByIndexChangeDate(ContentBox.PENDING, originalCopy, modifiedCopy, po);
 		Task task = po.getTask();
@@ -786,11 +674,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeDateFromFloatingToDeadline() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		String taskName = po.getTask().getTaskName();
@@ -812,11 +695,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeDateFromDeadlineToEvent() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -839,11 +717,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeDateFromEventToFloating() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_EVENT, timeConverter.getDate(currTime), 
 				                     timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK));
@@ -865,11 +738,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateEventTaskByIndexChangeDateExpired() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		Task task = po.getTask();
@@ -890,11 +758,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByNameChangeName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -914,11 +777,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByNameFromWrongTab() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -938,11 +796,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByInvalidName() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -962,11 +815,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByIndexChangeBoth() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -986,11 +834,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUpdateTaskByNameChangeBoth() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
-		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
 		ProcessedObject po = parser.parseInput(input);
@@ -1010,10 +853,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoAdd() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		logic.addFloating(originalCopy, modifiedCopy, po);
 		
@@ -1029,10 +868,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoDelete() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		Task task = po.getTask();
 		logic.addFloating(originalCopy, modifiedCopy, po);
@@ -1054,10 +889,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoUpdate() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		Task task = po.getTask();
 		logic.addFloating(originalCopy, modifiedCopy, po);
@@ -1079,10 +910,6 @@ public class LogicTest {
 	
 	@Test
 	public void testUndoDone() {
-		Logic logic = new Logic();
-		ArrayList<ArrayList<Task>> originalCopy = logic.getAllTaskLists();
-		ArrayList<ArrayList<Task>> modifiedCopy = logic.getAllTaskLists();
-		Parser parser = new Parser();
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
 		Task task = po.getTask();
 		logic.addFloating(originalCopy, modifiedCopy, po);

@@ -22,7 +22,13 @@ import static taskey.constants.ParserConstants.DAY_END_SHORT;
  * dates*[2]: end Time (events) 
  * dates*[3]: deadline 
  * idea for recurring : store the diff in time to the next recurrence in seconds
- * TODO: decide how to store the diff in time of a recurring event in human time. 
+ * RECURRING WILL NOT BE IMPLEMENTED FOR NOW 
+ * 
+ * PRIORITY FOR THE TASK:
+ * HIGH: 3
+ * MEDIUM: 2
+ * LOW: 1
+ * Default: LOW (1) 
  * 
  * @author Xue Hui 
  *
@@ -37,6 +43,8 @@ public class Task implements Comparable<Task> {
 	private String taskType = null; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
+	private int priority = 1; //default. to add this to toString for debugging
+	boolean pinTask = false; //default: not pinned, to decide whether or not to add this
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -253,7 +261,23 @@ public class Task implements Comparable<Task> {
 		datesHuman[3] = timeConverter.toHumanTime(deadline); 	
 		
 	}
-	 
+	
+	/**
+	 * @return priority of the task. where 1 is the lowest priority and
+	 * 3 is the highest priority
+	 */
+	public int getPriority() {
+		return priority;
+	}
+	
+	/**
+	 * Set the priority of the task, where 1 is the lowest priority and
+	 * 3 is the highest priority 
+	 * @param priority
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority; 
+	}
 	
 	//NON-BASIC METHODS ==========================================
 	
@@ -322,12 +346,14 @@ public class Task implements Comparable<Task> {
 		Task duplicate = new Task();
 		
 		if (taskName != null) {
-			duplicate.setTaskName(taskName);
+			duplicate.setTaskName(new String(taskName));
 		}
 		
 		if (taskTags != null) {
 			duplicate.setTaskTags(new ArrayList<String>(taskTags));
 		}
+		
+		duplicate.setPriority(new Integer(priority));
 		
 		if (taskType != null) {
 			duplicate.setTaskType(this.getTaskType());
@@ -337,15 +363,14 @@ public class Task implements Comparable<Task> {
 					//nothing else to add. 
 					break;
 				case "DEADLINE":
-					duplicate.setDeadline(this.getDeadlineEpoch());
+					duplicate.setDeadline(new Long(this.getDeadlineEpoch()));
 					break;
 				case "EVENT":
-					duplicate.setStartDate(this.getStartDateEpoch());
-					duplicate.setEndDate(this.getEndDateEpoch());
+					duplicate.setStartDate(new Long(this.getStartDateEpoch()));
+					duplicate.setEndDate(new Long(this.getEndDateEpoch()));
 					break; 
 			}
-		}
-		
+		}	
 		return duplicate; 
 	}
 	
@@ -365,13 +390,36 @@ public class Task implements Comparable<Task> {
 		
 		String otherTaskType = anotherTask.getTaskType(); 
 		String otherTaskName = anotherTask.getTaskName(); 
+		int otherTaskPriority = anotherTask.getPriority(); 
 		long otherStartTime = -1; 
 		if (anotherTask.getTaskType().compareTo("EVENT") == 0) {
 			otherStartTime = anotherTask.getStartDateEpoch(); 
 		} else if (anotherTask.getTaskType().compareTo("DEADLINE") == 0) { 
 			otherStartTime = anotherTask.getDeadlineEpoch(); 
 		}
+		//1. Sort by Priority
+		//2. Sort by type (Event and Deadline first, floating behind
+		//3. Sort by task name (alphabetical order) 
 		
+		if (this.priority > otherTaskPriority) {
+			return 1; 
+		} else if (this.priority == otherTaskPriority) {
+			return compareByTaskType(startTime, otherTaskType, otherTaskName, otherStartTime);
+		} else {
+			return -1; //this.priority < otherTaskPriority 
+		}
+	}
+	
+	/**
+	 * Compare the priority of the tasks based on whether it is floating, deadline or event
+	 * @param startTime
+	 * @param otherTaskType
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return 1 if this task is "greater" than the other Task, 0 if they are the same,
+	 * and -1 if this task is "lesser" then the other Task 
+	 */
+	private int compareByTaskType(long startTime, String otherTaskType, String otherTaskName, long otherStartTime) {
 		//FLOATING HAS THE LOWEST PRIORITY : compare by name 
 		if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("FLOATING") == 0) {
 			return compareTaskNames(otherTaskName);

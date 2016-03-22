@@ -71,6 +71,7 @@ public class ParseView extends ParseCommand {
 		ArrayList<String> views = new ArrayList<String>(); 
 		
 		if (stringInput.contains("#")) {
+			//wants to view by tag categories
 			String[] split = stringInput.split("#"); 
 			for(int i = 0; i < split.length; i++) {
 				views.add(split[i].trim()); 
@@ -78,11 +79,12 @@ public class ParseView extends ParseCommand {
 			//LOGIC to check if the tags are valid/exists 
 			return new ProcessedObject("VIEW_TAGS", views); 
 		} else {
+			//basic view type
 			String[] split = stringInput.split(" "); 
 			for(int i = 0; i < split.length; i++) {
 				String category = split[i].trim(); 
 				if (viewList.containsKey(category)) {
-					views.add(category); 
+					views.add(category.toUpperCase()); 
 				} else {
 					return super.processError(String.format(
 							ParserConstants.ERROR_VIEW_TYPE, category));

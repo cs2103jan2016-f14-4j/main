@@ -47,7 +47,7 @@ public class TimeConverterTest {
 
 	}
 	
-	@Test
+	@Test //Test that the week starts on sunday and not monday 
 	public void testSameWeek() {
 		TimeConverter tc = new TimeConverter();
 		try {

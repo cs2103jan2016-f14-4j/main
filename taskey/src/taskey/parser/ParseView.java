@@ -52,7 +52,11 @@ public class ParseView extends ParseCommand {
 		return getView(stringWithoutCommand); 
 	}
 	
-	
+	/**
+	 * @param command
+	 * @param stringInput
+	 * @return string without the "view" command attached to it. 
+	 */
 	public String getStringWithoutCommand(String command, String stringInput) {
 		return stringInput.replace(command, "").trim().toLowerCase();
 	}

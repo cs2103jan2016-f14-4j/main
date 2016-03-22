@@ -19,6 +19,9 @@ public class ParserTest {
 	PrettyTimeParser p = new PrettyTimeParser();
 	
 	@Test
+	/**
+	 * Test that adding floating tasks get parsed correctly 
+	 */
 	public void testFloating() {		
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
@@ -33,6 +36,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Tst that adding deadline tasks gets parsed correctly 
+	 */
 	public void testDeadline() {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
@@ -53,6 +59,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that adding events get parsed correctly. 
+	 */
 	public void testEvents() {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 "
 				+ "to 20 Feb 2016\n",
@@ -82,6 +91,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that tagging gets parsed correctly 
+	 */
 	public void testTag() {
 		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
 				parser.parseInput("add meeting #sua #serious").toString());
@@ -102,7 +114,14 @@ public class ParserTest {
 		
 	}
 	
+	public void testPriority() {
+		//test setting of priority here 
+	}
+	
 	@Test 
+	/**
+	 * Test setting of changes via using task index
+	 */
 	public void testChangesById() {
 		//set <task name>/<id> "new task name" 
 		//by task id
@@ -125,6 +144,9 @@ public class ParserTest {
 	}
 	
 	@Test 
+	/**
+	 * Test setting of changes via using task name 
+	 */
 	public void testChangesByName() {
 		//by task name
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n"
@@ -146,6 +168,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test the setting of new time 
+	 */
 	public void testChangesTimeUsage() { 
 		//test time usage
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
@@ -158,6 +183,9 @@ public class ParserTest {
 	}
 	
 	@Test 
+	/**
+	 * Test the parsing of setting both name and task name in 1 command
+	 */
 	public void testChangesBothNameDate() { 
 		//test combination
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
@@ -172,6 +200,10 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Tests that the delete by index and by task name parses correctly
+	 * Also tests that it parses a category to be deleted correctly. 
+	 */
 	public void testDelete() {
 		assertEquals("Command: DELETE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("del 5").toString());
@@ -182,14 +214,20 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that the search feature parses correctly 
+	 */
 	public void testSearch() {
 		assertEquals("Command: SEARCH\nsearch phrase: hello world\n",
 				parser.parseInput("search hello world").toString());
-		assertEquals("Command: SEARCH\nsearch phrase: #mycategory\n",
-				parser.parseInput("search #mycategory").toString());
+		//assertEquals("Command: SEARCH\nsearch phrase: #mycategory\n",
+		//		parser.parseInput("search #mycategory").toString());
 	}
 	
 	@Test
+	/**
+	 * Test that done parses correctly by both index and task name 
+	 */
 	public void testDone() {
 		assertEquals("Command: DONE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("done 5").toString());
@@ -199,6 +237,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that the undo feature parses correctly
+	 */
 	public void testUndo() {
 		assertEquals("Command: UNDO\n",parser.parseInput("undo").toString());	
 	}
@@ -219,6 +260,7 @@ public class ParserTest {
 				parser.parseInput("view Events").toString());
 		assertEquals("Command: VIEW_BASIC\nview type: ARCHIVE, \n",
 				parser.parseInput("view archive").toString());
+		//test view by tag task 
 	}
 	
 	
@@ -228,6 +270,9 @@ public class ParserTest {
 	 * change every time the the unit test is run 
 	 */
 	
+	/**
+	 * Tests that the methods return the correct dates for human defined events 
+	 */
 	public void testEventsHuman() {
 		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
 		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));

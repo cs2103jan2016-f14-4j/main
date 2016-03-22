@@ -43,7 +43,8 @@ public class Task implements Comparable<Task> {
 	private String taskType = null; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
-	private int priority = 1; //default 
+	private int priority = 1; //default. to add this to toString for debugging
+	boolean pinTask = false; //default: not pinned, to decide whether or not to add this
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	

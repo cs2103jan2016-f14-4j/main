@@ -46,6 +46,7 @@ public class StorageTest {
 		storage.saveTaglist(tags);
 		
 		ArrayList<TagCategory> loadedList = storage.loadTaglist();
+		assertNotEquals(0, loadedList.size()); //taglist must not be empty
 		assertEquals(taglistToString(tags), taglistToString(loadedList));
 	}
 	
@@ -66,6 +67,7 @@ public class StorageTest {
 		storage.saveAllTasklists(superlist);
 		
 		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
+		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 7
 		assertEquals(superlistToString(superlist), superlistToString(loadedlist));
 	}
 

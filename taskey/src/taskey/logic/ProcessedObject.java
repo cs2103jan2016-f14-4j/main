@@ -74,7 +74,7 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for VIEW 
+	 * Constructor for VIEW_BASIC, VIEW_TAGS 
 	 * @param command
 	 */
 	public ProcessedObject(String command, ArrayList<String> viewType) {

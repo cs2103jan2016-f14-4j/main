@@ -1,11 +1,7 @@
 package taskey.parser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task; 
+import taskey.logic.ProcessedObject; 
 
 
 /**
@@ -16,10 +12,7 @@ import taskey.logic.Task;
  * @author Xue Hui
  *
  */
-public class Parser {
-	
-	private HashMap<String,String> commandList = new HashMap<String,String>(); 
-	
+public class Parser {	
 	private ParseError parseError = new ParseError(); 
 	private ParseAdd parseAdd = new ParseAdd(); 
 	private ParseEdit parseEdit = new ParseEdit(); 
@@ -29,18 +22,10 @@ public class Parser {
 	private ParseDone parseDone = new ParseDone(); 
 	private ParseFileLocation parseDir = new ParseFileLocation(); 
 	
-	private UserTagDatabase tagDB = new UserTagDatabase(); 
-	private ParseView parseView = new ParseView(tagDB);
+	private ParseView parseView = new ParseView();
 	
 	public Parser() {
-		commandList.put("add", "add"); 
-		commandList.put("view", "view"); 
-		commandList.put("del", "del"); 
-		commandList.put("set", "set"); 
-		commandList.put("search", "search"); 
-		commandList.put("done", "done"); 
-		commandList.put("undo", "undo"); 
-		commandList.put("file_loc", "file_loc");
+	
 	}
 	
 	/**
@@ -86,11 +71,10 @@ public class Parser {
 				break; 
 			default:
 				//error goes here
-				processed = parseError.processError(ParserConstants.ERROR_COMMAND); 
+				processed = parseError.processError(String.format(
+						ParserConstants.ERROR_COMMAND, command)); 
 				break; 
 		}
-		//update tag categories if needed
-		trackTags(processed); 
 		
 		return processed;   
 	}
@@ -105,10 +89,7 @@ public class Parser {
 		String[] splitString = stringInput.split(" ");
 		String command = splitString[0].toLowerCase();
 		
-		if (commandList.containsKey(command)) {
-			return command;
-		} 
-		return "error"; 
+		return command;
 	}
 	
 	/**
@@ -122,35 +103,5 @@ public class Parser {
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 
-	}
-	
-	/**
-	 * This function takes in a ProcessedObject, checks whether there are
-	 * tags that can be added to the UserTagDatabase, else do nothing. 
-	 * @param po
-	 */
-	public void trackTags(ProcessedObject po) {
-		Task task = po.getTask();
-		if (task != null) {
-			ArrayList<String> tags = task.getTaskTags(); 
-			
-			if (tags != null) {
-				for(int i = 0; i < tags.size(); i++) {
-					if (!tagDB.hasTag(tags.get(i))) {
-						tagDB.addTag(tags.get(i));
-					}
-				}
-			}	 
-		}
-	}
-	
-	/**
-	 * For Logic: you can get this database to update the 
-	 * available categories to display, or even update
-	 * if all tasks do not have that category. 
-	 * @return
-	 */
-	public UserTagDatabase getUserTagDB() {
-		return tagDB; 
 	}
 }

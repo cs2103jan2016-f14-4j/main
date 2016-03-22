@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -66,10 +67,33 @@ class StorageReader {
 		}
     	return tasks;
     }
+    
+    
+    /*========================*
+     * Load tags - new method *
+     *========================*/
+    /**
+     * Returns an ArrayList of Tags read from the File src.
+     * An empty ArrayList is returned if src was not found.
+     * @param src source file to be read
+     * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
+     */
+    ArrayList<TagCategory> loadTaglist(File src) {
+    	ArrayList<TagCategory> tags;
+    	try {
+    		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
+    		System.out.println("{Tags loaded} " + src.getName()); //debug info
+    	} catch (FileNotFoundException e) {
+    		System.out.println("{Tags not found} " + src.getName()); //debug info
+    		tags = new ArrayList<TagCategory>();
+    	}
+    	return tags;
+    }
+    
 
-    /*===========*
-     * Load tags *
-     *===========*/
+    /*===========================*
+     * Load tags - Legacy method *
+     *===========================*/
     /**
      * Returns a HashMap containing the user-defined tags read from the File src.
      * An empty HashMap is returned if src was not found.

@@ -31,7 +31,7 @@ public class ParseDelete extends ParseCommand {
 		String taskName = getTaskName(command, stringInput);
 		
 		if (taskName.compareTo("") == 0) {
-			return super.processError("No task has been selected for delete"); 
+			return super.processError(ParserConstants.ERROR_DEL_EMPTY); 
 		}
 		
 		//delete by category
@@ -43,7 +43,7 @@ public class ParseDelete extends ParseCommand {
 				processed.setCategory(category);
 				return processed; 
 			} else {
-				return super.processError("Cannot delete an empty category"); 
+				return super.processError(ParserConstants.ERROR_DEL_EMPTY_CAT); 
 			}
 		}
 		

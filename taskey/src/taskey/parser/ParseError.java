@@ -1,7 +1,5 @@
 package taskey.parser;
 
-import taskey.logic.ProcessedObject;
-
 /**
  * @@author A0107345L
  * Purpose of this class is to parse "errors" for any 

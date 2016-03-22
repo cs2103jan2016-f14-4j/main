@@ -7,6 +7,13 @@
    -fx-background-color: #e7e7e7;
 }
 
+.text-field {
+    -fx-prompt-text-fill: #2d3956;
+}
+.text-field:focused {
+    -fx-prompt-text-fill: transparent ;
+}
+
 /* Bound to fx:id */
 #main {
 	-fx-background-color: #616a7f;
@@ -108,10 +115,8 @@
     -fx-background-color: #e7e7e7, #2d3956;
 }
 
-.ellipse {
+.helpSelector {
 	-fx-padding: 5px;
-	-fx-background-color: linear-gradient(#e7e7e7, #2d3956);
-    -fx-background-radius: 10px;
-    -fx-background-insets: 0px, 5px;
+	-fx-background-color: #2d3956;
 }
 

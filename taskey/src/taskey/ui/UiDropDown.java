@@ -137,6 +137,11 @@ public class UiDropDown {
 		deSelect();
 	}
 	
+	public boolean isMenuShowing() {
+		assert(myMenu != null);
+		return myMenu.isShowing();
+	}
+	
 	/**
 	 * Most of the time after switching styles or setting visibility
 	 * The popup window has some tears, probably because it renders separately from the main program

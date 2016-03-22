@@ -30,12 +30,12 @@ public class UiHelpView {
 	private UiPagination helpView;
 	private ArrayList<UiPagination> commandViews;
 	private UiPagination currentView;
-	private int entriesPerPage = 10; // main menu
+	private int entriesPerPage = 8; // main menu
 	private int imageWidth = 333;
 	
 	public UiHelpView() {
 		gridHelper = new UiGridHelper("");
-		helpView = new UiPagination(UiConstants.STYLE_ELLIPSE);
+		helpView = new UiPagination(UiConstants.STYLE_HELP_SELECTOR);
 		commandViews = new ArrayList<UiPagination>();
 		setUpHelpView();
 		currentView = helpView;
@@ -77,7 +77,7 @@ public class UiHelpView {
 		for ( int i = 0; i < totalPages; i++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP);
 			ArrayList<StackPane> menuElements = new ArrayList<StackPane>();
-			
+			//newGrid.setGridLinesVisible(true);
 			for ( int j = 0; j < entriesPerPage; j ++ ) {
 				if ( entryNo >= numCommmands ) {
 					break;
@@ -90,10 +90,10 @@ public class UiHelpView {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
 				UiTextBuilder myBuilder = new UiTextBuilder();
-				myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
+				myBuilder.addMarker(0, UiConstants.STYLE_PROMPT_SELECTED);
 				String line = info.get(entryNo);
-				gridHelper.createStyledCell(1, j, UiConstants.STYLE_HIGHLIGHT_BOX, newGrid);
-				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.CENTER, newGrid);
+				gridHelper.createStyledCell(1, j, "", newGrid);
+				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.LEFT, newGrid);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
 				entryNo++;
 			}

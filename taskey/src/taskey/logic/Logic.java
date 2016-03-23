@@ -229,7 +229,7 @@ public class Logic {
 				return deleteByCategory(originalCopy, modifiedCopy, po);
 
 			case "VIEW_BASIC":
-				return new LogicFeedback(originalCopy, po, null);
+				return viewBasic(originalCopy, po);
 			
 			case "VIEW_TAGS":
 				return viewTags(originalCopy, po);
@@ -304,6 +304,43 @@ public class Logic {
 					}
 				}
 			}
+		}
+		
+		taskLists = cloneLists(originalCopy);
+		return new LogicFeedback(originalCopy, po, null);
+	}
+	
+	// Views one of the task categories.
+	LogicFeedback viewBasic(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+		String viewType = po.getViewType().get(0);
+		switch (viewType) {
+			case "general":
+				ArrayList<Task> generalList = originalCopy.get(ListID.GENERAL.getIndex());
+				originalCopy.set(ListID.ACTION.getIndex(), generalList);
+				break;
+			
+			case "deadlines":
+				ArrayList<Task> deadlineList = originalCopy.get(ListID.DEADLINE.getIndex());
+				originalCopy.set(ListID.ACTION.getIndex(), deadlineList);
+				break;
+				
+			case "events":
+				ArrayList<Task> eventList = originalCopy.get(ListID.EVENT.getIndex());
+				originalCopy.set(ListID.ACTION.getIndex(), eventList);
+				break;
+				
+			case "completed":
+				ArrayList<Task> completedList = originalCopy.get(ListID.COMPLETED.getIndex());
+				originalCopy.set(ListID.ACTION.getIndex(), completedList);
+				break;
+				
+			case "expired":
+				ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
+				originalCopy.set(ListID.ACTION.getIndex(), expiredList);
+				break;
+			
+			default:
+				break;
 		}
 		
 		taskLists = cloneLists(originalCopy);

@@ -24,7 +24,7 @@ public class LogicFeedback {
 	 */
 	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
 		assert (taskLists != null);
-		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		assert (taskLists.size() == 8); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
 		assert (po != null);
 		

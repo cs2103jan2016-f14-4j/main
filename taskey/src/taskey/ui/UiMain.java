@@ -62,10 +62,12 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		UiImageManager.getInstance().loadImages();
 		myController = new UiController();
 		// set up alert window
 		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
 		// set up main window
+		
 		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 	
@@ -127,7 +129,6 @@ public class UiMain extends Application {
 	 *             
 	 */
 	private void setUpScene(Stage primaryStage, Parent root) {
-		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		

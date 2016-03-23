@@ -46,9 +46,11 @@ public class ParseEdit extends ParseCommand {
 	 * 1. UPDATE_BY_INDEX_CHANGE_NAME
 	 * 2. UPDATE_BY_INDEX_CHANGE_DATE
 	 * 3. UPDATE_BY_INDEX_CHANGE_BOTH
-	 * 4. UPDATE_BY_NAME_CHANGE_NAME
-	 * 5. UPDATE_BY_NAME_CHANGE_DATE
-	 * 6. UPDATE_BY_NAME_CHANGE_BOTH 
+	 * 4. UPDATE_BY_INDEX_CHANGE_PRIORITY
+	 * 5. UPDATE_BY_NAME_CHANGE_NAME
+	 * 6. UPDATE_BY_NAME_CHANGE_DATE
+	 * 7. UPDATE_BY_NAME_CHANGE_BOTH
+	 * 8. UPDATE_BY_NAME_CHANGE_PRIORITY 
 	 * @param command
 	 * @param stringInput
 	 * @return appropriate ProcessedObject
@@ -60,13 +62,23 @@ public class ParseEdit extends ParseCommand {
 			String rawIndex = getTaskName(strNoCommand);
 			String newTaskName = getNewName(strNoCommand);
 			String newDate = getNewDate(strNoCommand); 
+			int newPriority = getNewPriority(strNoCommand); 
+			
+			if (rawIndex.compareTo("") == 0) {
+				return super.processError(ParserConstants.ERROR_NAME_EMPTY);
+			}
+			
+			if (newPriority == -1) {
+				return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY); 
+			}
+			
 			try {
 				int index = Integer.parseInt(rawIndex);	
-				return updateByIndex(index-1, newTaskName, newDate); 
+				return updateByIndex(index-1, newTaskName, newDate, newPriority); 
 			} catch (Exception e) {
 				//if the update is not by index, then it's by task name. 
 				//here rawIndex == old Task Name 
-				return updateByName(rawIndex, newTaskName, newDate); 
+				return updateByName(rawIndex, newTaskName, newDate, newPriority); 
 			}
 		}
 		//empty input, return error 
@@ -75,18 +87,28 @@ public class ParseEdit extends ParseCommand {
 	
 	/**
 	 * Called by processSet(). Updates based on index the user has keyed in 
-	 * @param processed
-	 * @param taskName
 	 * @param index
-	 * @return
+	 * @param newTaskName
+	 * @param newDateRaw
+	 * @param newPriority
+	 * @return ProcessedObject
 	 */
-	private ProcessedObject updateByIndex(int index, String newTaskName, String newDateRaw) {
+	private ProcessedObject updateByIndex(int index, String newTaskName, String newDateRaw,
+			int newPriority) {
 		ProcessedObject processed = null; 
+		
+		//changing priority only 
+		if (newPriority != 0) { 
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_PRIORITY,
+					index); 
+			processed.setNewPriority(newPriority);
+			return processed; 
+		}
 		
 		//changing name only
 		if (newTaskName != null && newDateRaw == null) {
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_NAME); 
-			return updateChangeName(processed, index, newTaskName); 
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_NAME, index); 
+			return updateChangeName(processed, newTaskName); 
 		} else if (newDateRaw != null && newTaskName == null) {
 			//changing date only 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_DATE, index);
@@ -104,7 +126,7 @@ public class ParseEdit extends ParseCommand {
 		} else if (newDateRaw != null && newTaskName != null) {
 			//change both name and date 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH, index);
-			processed = updateChangeName(processed, index, newTaskName); 
+			processed = updateChangeName(processed, newTaskName); 
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
 				//change the task to floating
 				return updateToFloating(processed); 
@@ -124,13 +146,23 @@ public class ParseEdit extends ParseCommand {
 	
 	/**
 	 * Called by processSet(). Updates based on task name that user has keyed in 
-	 * @param processed
-	 * @param taskName
-	 * @return
+	 * @param oldTaskName
+	 * @param newTaskName
+	 * @param newDateRaw
+	 * @param newPriority
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject updateByName(String oldTaskName, String newTaskName,
-			String newDateRaw) {
+			String newDateRaw, int newPriority) {
 		ProcessedObject processed = null; 
+		
+		//changing priority only 
+		if (newPriority != 0) { 
+			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_PRIORITY,
+							new Task(oldTaskName)); 
+			processed.setNewPriority(newPriority);
+			return processed; 
+		}
 		
 		//if changing name only
 		if (newTaskName != null && newDateRaw == null) {
@@ -185,20 +217,6 @@ public class ParseEdit extends ParseCommand {
 		return processed; 
 	}
 	
-	/**
-	 * OVERLOADED METHOD: 
-	 * Given task index, we want to change a task name. 
-	 * @param processed
-	 * @param taskName
-	 * @param index
-	 * @return
-	 */
-	private ProcessedObject updateChangeName(ProcessedObject processed, int index, String newTaskName) {
-		processed.setNewTaskName(newTaskName);
-		processed.setIndex(index);
-		
-		return processed; 
-	}
 	
 	/**
 	 * Given a task we want to we want to change the task type to event. 
@@ -351,16 +369,44 @@ public class ParseEdit extends ParseCommand {
 		for(int i = 0; i < strLen; i++) {
 			char k = stringInput.charAt(i); 
 			if (k == '"') {
+				//specifier for change task name
 				canAdd = false;
 				break; 
 			} else if (k == '[') {
+				//specifier for change date
 				canAdd = false;
 				break;
+			} else if (k == '!') {
+				//specifier for change priority
+				canAdd = false;
+				break; 
 			} else if (canAdd == true) {
 				taskName += k; 
 			}
 		}
 		return taskName.trim(); 
+	}
+	
+	/**
+	 * Get new priority for the task
+	 * @param stringInput
+	 * @return priority level 1,2,3 or -1 if error
+	 */
+	public int getNewPriority(String stringInput) {
+		int strLen = stringInput.length();
+		int count = 0; 
+		
+		for(int i = 0; i < strLen; i++) {
+			char k = stringInput.charAt(i);
+			//specifier for change priority
+			if (k == '!') {
+				count += 1; 
+			} 
+		}
+		if (count <= 3) {
+			return count; 
+		} 
+		return -1; 	
 	}
 	
 	/**

@@ -99,6 +99,14 @@ public class ParseAdd extends ParseCommand {
 			ProcessedObject processed, Task task, String simpString) {
 		String taskName = removeTimeFromName(simpString); 
 		String rawDate = simpString.replace(taskName, "").trim();
+		int priority = getPriority(rawDate); 
+		
+		//invalid priority given
+		if (priority == -1) {
+			return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY);
+		}
+		
+		rawDate = rawDate.split("!")[0].trim(); //remove priority
 		rawDate = rawDate.split("#")[0].trim();//remove tags
 		
 		//do pattern matching on raw date here. 
@@ -130,7 +138,17 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//set as floating task 
-			processed = handleFloating(command, simpString);
+			priority = getPriority(taskName); 
+			//invalid priority given
+			if (priority == -1) {
+				return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY);
+			}
+			taskName = taskName.split("!")[0].trim();
+			processed = handleFloating(command, taskName);
+		}
+		//set the priority
+		if (priority != 0) {
+			processed.getTask().setPriority(priority);
 		}
 		return processed;
 	}
@@ -360,9 +378,31 @@ public class ParseAdd extends ParseCommand {
 		ArrayList<String> tagList = new ArrayList<String>();
 		String[] splitString = rawInput.split("#");
 		for(int i = 1; i < splitString.length; i++) {
-			tagList.add(splitString[i].trim());
+			String tag = splitString[i].replace("!", "").trim(); 
+			tagList.add(tag);
 		}
 		return tagList; 
+	}
+	
+	/**
+	 * Return the priority for a task 
+	 * @param rawDate: date with priority still stuck there... 
+	 * @return priority for the task
+	 */
+	public int getPriority(String rawDate) {
+		int count = 0; 
+		int dateLen = rawDate.length(); 
+		for(int i = dateLen-1; i >= 0; i--) {
+			char k = rawDate.charAt(i); 
+			if (k == '!') {
+				count += 1; 
+			}
+		}
+		
+		if (count <= 3) {
+			return count;
+		}
+		return -1; //error with priority 
 	}
 	
 	/**

@@ -69,7 +69,7 @@ public class UiConstants {
 		VIEW_GENERAL, VIEW_DEADLINE, VIEW_EVENT;
 	}
 	
-	// For action 
+	// For action 5
 	public enum ActionMode {
 		LIST, HELP;
 	}

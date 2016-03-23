@@ -34,6 +34,7 @@ import taskey.logic.LogicConstants.ListID;
 import taskey.parser.AutoComplete;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiImageManager;
@@ -99,7 +100,7 @@ public class UiController {
 		myTabs.requestFocus(); // to display prompt at the start
 		
 		logic = new Logic();
-		updateAll(logic.getAllTaskLists());
+		updateAll(logic.getTagList(),logic.getAllTaskLists());
 	}
 
 	/**
@@ -194,42 +195,31 @@ public class UiController {
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
 				displayTabContents(ContentBox.PENDING);
-				updateAll(allLists);
+				updateAll(logic.getTagList(),allLists);
 				break;
-			case "VIEW":
-				/*
-				String viewType = processed.getViewType();
-				if (viewType.equals("GENERAL")) {
-					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("DEADLINES")) {
-					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("EVENTS")) {
-					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("ARCHIVE")) {
-					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("HELP")) {
-					updateActionDisplay(null, ActionMode.HELP);
-				}
-				displayTabContents(ContentBox.ACTION); */ 
-				break;
+			case "VIEW_BASIC":
+			case "VIEW_TAGS":
 			case "SEARCH":
-				updateActionDisplay(allLists.get(ListID.SEARCH.getIndex()), ActionMode.LIST);
+				updateActionDisplay(allLists.get(ListID.ACTION.getIndex()), ActionMode.LIST);
 				displayTabContents(ContentBox.ACTION);
 				break;	
 			default:
-				updateAll(allLists);
+				updateAll(logic.getTagList(),allLists);
 				break;
 		}
 	}
 	
-	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
-		ArrayList<Triplet<Color,String,Integer>> categoryList;
-		categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
+	public void updateAll(ArrayList<TagCategory> tagList, ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
 				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
 				));
+		// Add tags in addition to the default lists
+		for ( int i = 0 ; i < tagList.size(); i++ ) {
+			categoryList.add(new Triplet<Color,String,Integer>(Color.DARKGRAY,tagList.get(i).getTagName(), tagList.get(i).getNumTags()));
+		}
 		updateCategoryDisplay(categoryList);
 		
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);

@@ -441,11 +441,14 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "search 2");
 		expected.remove(task1);
 		assertEquals(expected, logic.getActionList());
-		
-		// Search phrase not found
-		logic.executeCommand(ContentBox.PENDING, "search t ask");
-		expected.remove(task2);
-		assertEquals(expected, logic.getActionList());
+	}
+	
+	@Test
+	public void searchShouldThrowExceptionMessageIfSearchPhraseNotFound() {
+		String input = "add task1";
+		logic.executeCommand(ContentBox.PENDING, input);
+		Exception actual = logic.executeCommand(ContentBox.PENDING, "search t ask").getException();
+		assertEquals(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND, actual.getMessage());
 	}
 	
 	/*

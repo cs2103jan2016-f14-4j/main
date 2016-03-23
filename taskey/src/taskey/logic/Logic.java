@@ -244,10 +244,10 @@ public class Logic {
 				return viewBasic(originalCopy, po);
 			
 			case "VIEW_TAGS":
-				return viewTags(originalCopy, po);
+				return viewTags(originalCopy, modifiedCopy, po);
 
 			case "SEARCH":
-				return search(originalCopy, po);
+				return search(originalCopy, modifiedCopy, po);
 
 			case "DONE_BY_INDEX":
 				return doneByIndex(currentContent, originalCopy, modifiedCopy, po);
@@ -288,11 +288,12 @@ public class Logic {
 	
 	// Searches for all expired and pending tasks that are tagged with at least one of the tag categories that the user 
 	// wants to view.
-	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+			               ProcessedObject po) {
 		ArrayList<String> tagsToView = po.getViewType();
-		ArrayList<Task> pendingList = originalCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
+		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
+		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
 		actionList.clear();
 		
 		for (Task t : expiredList) {
@@ -318,10 +319,12 @@ public class Logic {
 				}
 			}
 		}
-		
-		history.add(originalCopy);
-		taskLists = cloneLists(originalCopy);
-		return new LogicFeedback(originalCopy, po, null);
+		if (actionList.isEmpty()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND));
+		}
+			
+		taskLists = cloneLists(modifiedCopy);
+		return new LogicFeedback(modifiedCopy, po, null);
 	}
 	
 	// Views one of the task categories.
@@ -358,7 +361,6 @@ public class Logic {
 				
 		}
 		
-		history.add(originalCopy);
 		taskLists = cloneLists(originalCopy);
 		return new LogicFeedback(originalCopy, po, null);
 	}
@@ -463,10 +465,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 
 		try {
@@ -517,10 +519,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		try {
@@ -572,10 +574,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		try {
@@ -612,10 +614,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.removeTag(s);
 			}
-				
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		removeFromAllLists(modifiedCopy, toDelete);
@@ -687,11 +689,12 @@ public class Logic {
 	// Search for all expired and pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
 	// TODO: search list includes completed tasks as well?
 	// TODO: improved search
-	public LogicFeedback search(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+	public LogicFeedback search(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+			                    ProcessedObject po) {
 		String searchPhrase = po.getSearchPhrase(); // Validity of searchPhrase is already checked in ParseSearch
 
-		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
+		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
 		actionList.clear();
 		for (Task t : expiredList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
@@ -706,8 +709,12 @@ public class Logic {
 			}
 		}
 		
-		taskLists = cloneLists(originalCopy);
-		return new LogicFeedback(originalCopy, po, null);
+		if (actionList.isEmpty()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND));
+		}
+		
+		taskLists = cloneLists(modifiedCopy);
+		return new LogicFeedback(modifiedCopy, po, null);
 	}
 
 	// Marks an indexed task from the current tab as done and saves the updated lists to disk.
@@ -744,11 +751,11 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.removeTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-			}
 		}	
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
@@ -846,6 +853,10 @@ public class Logic {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		}
 		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
+		
 		try {
 			saveAllTasks(modifiedCopy);
 		} catch (Exception e) {
@@ -903,6 +914,10 @@ public class Logic {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		}
 		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
+		
 		try {
 			saveAllTasks(modifiedCopy);
 		} catch (Exception e) {
@@ -953,6 +968,9 @@ public class Logic {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		}
 		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
@@ -1086,27 +1104,25 @@ public class Logic {
 			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_UNDO));
 		}
 		
-		if (previousTagList == null) { //No tags to undo
+		utd.setTags(previousTagList); 
+		if (!utd.saveTagDatabase()) { // This tries to adds another copy of previousTagList to history, be mindful
+			history.add(currentSuperList);
 			history.addTagList(currentTagList);
-		} else {
-			utd.setTags(previousTagList); 
-			
-			if (!utd.saveTagDatabase()) { //This tries to adds another copy of previousTagList to history, be mindful
-				history.add(currentSuperList);
-				history.addTagList(currentTagList);
-				utd.setTags(currentTagList);
-				return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+			utd.setTags(currentTagList);
+			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
+		history.popTags(); // To remove the extra copy mentioned above
 		
 		try {
-			saveAllTasks(previousSuperList);
+			saveAllTasks(previousSuperList); // Same as above, this tries to add another copy of previousSuperList to 
+			                                 // history.
 		} catch (Exception e) {
 			utd.setTags(currentTagList);
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
 			return new LogicFeedback(currentSuperList, po, e);
 		}
+		history.pop();
 		
 		taskLists = cloneLists(previousSuperList);
 		return new LogicFeedback(previousSuperList, po, null);

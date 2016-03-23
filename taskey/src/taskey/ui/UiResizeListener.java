@@ -9,10 +9,12 @@ import taskey.constants.UiConstants;
 import taskey.ui.utility.UiPopupManager;
 
 /**
+ * @@author A0125419H
+ * 
  * This class implements a stage resizelistener
  * Taken and modified from: https://geektortoise.wordpress.com/2014/02/07/how-to-programmatically-resize-the-stage-in-a-javafx-app/
  * 
- * @@author A0125419H
+ * @author JunWei
  */
 class UiResizeListener implements EventHandler<MouseEvent> {
 	double dx, dy;

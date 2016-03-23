@@ -21,6 +21,7 @@ import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 
 /**
+ * @@author A0134177E
  * @author Hubert
  */
 public class LogicTest {

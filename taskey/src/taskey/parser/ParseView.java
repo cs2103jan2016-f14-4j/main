@@ -109,5 +109,14 @@ public class ParseView extends ParseCommand {
 		}
 		return new ProcessedObject("VIEW_TAGS", views); 
 	}
-
+	
+	/* @@author A0134177E
+	 * For quick testing if parsing of tags is done correctly.
+	public static void main(String[] args) {
+		ParseView pv = new ParseView();
+		ProcessedObject po = pv.processView("view", "view tag1#tag2 #tag3");
+		System.out.println(po.getCommand());
+		po = pv.processView("view", "view #tag1 #tag 2 #tag3");
+		System.out.println(po.getCommand());
+	}*/
 }

@@ -1,5 +1,6 @@
 package taskey.logic;
 
+//@@author A0134177E
 public class LogicConstants {
 	public static final String MSG_EXCEPTION_COMMAND_EXECUTION = "Failed to execute command.";
 	public static final String MSG_EXCEPTION_DUPLICATE_TASKS = "The task \"%1$s\" already exists!";

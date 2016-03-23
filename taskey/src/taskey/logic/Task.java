@@ -478,7 +478,9 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
+	
 	/**
+	 * @@author A0134177E
 	 * tasks are the same if they have the same name
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
@@ -500,6 +502,7 @@ public class Task implements Comparable<Task> {
 	
 	@Override 
 	/**
+	 * @@author A0107345L 
 	 * For debugging 
 	 */
 	public String toString() {
@@ -544,7 +547,8 @@ public class Task implements Comparable<Task> {
 		return stringRep; 
 	}
 	
-	/* For testing
+	/* @@author A0134177E
+	 * To test whether the getDuplicate() method returns a deep copy of a given Task.
 	public static void main(String[] args) {
 		Task t1 = new Task("t1");
 		t1.setTaskType("FLOATING");
@@ -556,5 +560,4 @@ public class Task implements Comparable<Task> {
 		System.out.println("t1: " + t1);
 		System.out.println("t2: " + t2);
 	}*/
-
 }

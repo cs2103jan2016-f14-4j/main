@@ -266,6 +266,7 @@ public class ProcessedObject {
 	
 	@Override
 	/**
+	 * @@author A0134177E
 	 * Compare if a ProcessedObject is equal to another ProcessedObject
 	 */
 	public boolean equals(Object obj) {
@@ -319,6 +320,7 @@ public class ProcessedObject {
 	
 	@Override 
 	/**
+	 * @@author A0107345L
 	 * For debugging
 	 */
 	public String toString() {

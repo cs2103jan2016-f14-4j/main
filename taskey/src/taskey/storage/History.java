@@ -35,6 +35,7 @@ public class History {
 	 * Adders *
 	 *========*/
 	/**
+	 * @@author A0134177E
 	 * Pushes the given superlist to History.
 	 * Has a check that prevents superlist from being added, if all of its constituent lists
 	 * are equal to those of the most recently added superlist.
@@ -73,8 +74,6 @@ public class History {
 		if (!tagList.equals(mostRecentTagList) ) {
 			tagStack.push(tagList);
 		}
-		
-		System.out.println("tagStack size: " + tagStack.size());
 	}
 	
 	public void addTags(HashMap<String, Integer> tags){
@@ -92,6 +91,7 @@ public class History {
 	}
 
 	/**
+	 * @@author //To Dylan: you can fill in your matric number here
 	 * Peeks at the last added tagmap in History.
 	 * Not in use.
 	 * @return the tagmap last added to History

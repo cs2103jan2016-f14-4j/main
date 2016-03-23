@@ -21,6 +21,7 @@ import static taskey.constants.ParserConstants.FINISHED_COMMAND;
 import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 /**
+ * @@author A0134177E
  * The Logic class handles the execution of user commands. It contains an internal memory of task lists which facilitate 
  * the addition, deletion and updating of tasks. Each time a command is executed, these lists are modified and then saved 
  * to disk accordingly.
@@ -686,7 +687,7 @@ public class Logic {
 		String taskName = po.getTask().getTaskName();
 		String exceptionMsg;
 		
-		if (!(currentContent.equals(ContentBox.THIS_WEEK) || currentContent.equals(ContentBox.PENDING))) {
+		if (currentContent.equals(ContentBox.ACTION)) {
 			exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID_TAB;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}

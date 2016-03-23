@@ -82,6 +82,7 @@ public class TagCategory implements Comparable<TagCategory> {
 	
 	@Override
 	/**
+	 * @@author A0134177E
 	 * Overriding this method for ArrayList's .contains() method 
 	 */
     public boolean equals(Object object) {
@@ -95,6 +96,7 @@ public class TagCategory implements Comparable<TagCategory> {
     }
 
 	@Override
+	//@@author A0107345L
 	public int compareTo(TagCategory tag) {
 		String otherTagName = tag.getTagName(); 
         if (this.tagName.compareTo(otherTagName) == 0) {

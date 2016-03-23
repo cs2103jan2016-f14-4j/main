@@ -225,6 +225,7 @@ public class UiController {
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
+		updateDisplay(allLists.get(ListID.ACTION.getIndex()), UiConstants.ContentBox.ACTION);	
 		expiredIcon.setText(String.valueOf(allLists.get(ListID.EXPIRED.getIndex()).size()));
 	}
 	

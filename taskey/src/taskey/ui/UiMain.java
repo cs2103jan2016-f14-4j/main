@@ -38,38 +38,40 @@ public class UiMain extends Application {
 	private UiTrayModule trayModule;
 	
 	/**
-	 * This method loads the .fxml file and set ups the scene
+	 * This method loads the .fxml file and returns a region object
 	 *
-	 * @param primaryStage the primary stage
+	 * @param theController - the class to set as controller
+	 * @param fileName - name of fxml file
 	 */
+	private Region loadFXML(Object theController, String fileName) {
+		FXMLLoader myloader = new FXMLLoader(getClass().getResource(fileName));
+		Region contentRootRegion = null;
+		myloader.setController(theController);
+		try {
+			contentRootRegion = (Region) myloader.load();
+		} catch (IOException e) {
+			System.out.println(UiConstants.FXML_LOAD_FAIL);
+		}
+		return contentRootRegion;
+	}
 	
+	/**
+	 * This method is the main entry point for javafx, it performs initializations
+	 * 
+	 * @param primaryStage is passed from Application
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		myController = new UiController();
 		// set up alert window
-		FXMLLoader myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_ALERT_PATH));
-		Region contentRootRegion = null;
-		myloader.setController(UiAlertController.getInstance());
-		try {
-			contentRootRegion = (Region) myloader.load();
-		} catch (IOException e) {
-			System.out.println(UiConstants.FXML_LOAD_FAIL);
-		}
-		UiAlertController.getInstance().setUpStage(contentRootRegion);
-		
-		myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_PATH));
-		myloader.setController(myController);
-		try {
-			contentRootRegion = (Region) myloader.load();
-		} catch (IOException e) {
-			System.out.println(UiConstants.FXML_LOAD_FAIL);
-		}
-		Parent root = setUpResize(primaryStage, contentRootRegion);
+		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
+		// set up main window
+		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 	
 		trayModule = new UiTrayModule();
 		trayModule.createTrayIcon(primaryStage);
-		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage());
+		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
 	}
 	
 	/**

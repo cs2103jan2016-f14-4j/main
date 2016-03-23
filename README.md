@@ -13,6 +13,11 @@ PS: Take note of stuff in bold as they are important keywords.
   <li>F3: Light Theme 
   <li>Ctrl+W : Minimise Taskey
   <li>Tab: Scroll through the tabs 
+  <li>Page Up: Scroll up the task list
+  <li>Page Down: Scroll down the task list
+  <li>Left Arrow Key: view previous page
+  <li>Right Arrow Key: view next page
+  <li>Up/Down Arrow Keys: get previous commands
 </ul> 
 
 ###Reserved Characters

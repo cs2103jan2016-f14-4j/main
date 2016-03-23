@@ -202,7 +202,6 @@ public class Logic {
 		return utd.getTagList();
 	}
 	
-
 	/**
 	 * Executes the user supplied command by performing list operations on a copy of the existing task lists, and saving
 	 * the copy to disk. If save errors occurred, the existing task lists remain intact. If no save errors occurred, the 
@@ -244,8 +243,11 @@ public class Logic {
 			case "DELETE_BY_CATEGORY":
 				return deleteByCategory(originalCopy, modifiedCopy, po);
 
-			/*case "VIEW":
-				return view(po);*/
+			case "VIEW_BASIC":
+				return new LogicFeedback(originalCopy, po, null);
+			
+			case "VIEW_TAGS":
+				return viewTags(originalCopy, po);
 
 			case "SEARCH":
 				return search(originalCopy, po);
@@ -287,10 +289,32 @@ public class Logic {
 		return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_COMMAND_EXECUTION));
 	}
 	
-	/*LogicFeedback view(ProcessedObject po) {
-		String viewType = po.getViewType();
-		return null;
-	}*/
+	// Searches for all pending tasks that are tagged with at least one of the tag categories that the user wants to view.
+	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+		ArrayList<String> tagsToView = po.getViewType();
+		ArrayList<Task> pendingList = originalCopy.get(ListID.PENDING.getIndex());
+		ArrayList<Task> viewList = new ArrayList<Task>();
+		
+		for (Task t : pendingList) {
+			ArrayList<String> tagList = t.getTaskTags();
+			if (tagList != null) {
+				for (String s : tagsToView) {
+					if (tagList.contains(s)) {
+						viewList.add(t);
+						break;
+					}
+				}
+			}
+		}
+		
+		ArrayList<ArrayList<Task>> matches = new ArrayList<ArrayList<Task>>();
+		while (matches.size() < 7) {
+			matches.add(new ArrayList<Task>());
+		}
+		matches.set(ListID.VIEW.getIndex(), viewList);
+		
+		return new LogicFeedback(matches, po, null);
+	}
 	
 	// Delete all tasks with the tag category specified within the ProcessedObject po.
 	LogicFeedback deleteByCategory(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
@@ -308,6 +332,9 @@ public class Logic {
 				it.remove();
 				removeFromAllLists(modifiedCopy, task); // May throw ConcurrentModificationException if duplicate names
 				                                        // are allowed
+				for (String s : taskTags) {
+					utd.removeTag(s);
+				}
 			}
 		}
 		
@@ -321,8 +348,6 @@ public class Logic {
 		} catch (Exception e) {
 			return new LogicFeedback(originalCopy, po, e);
 		}
-		
-		utd.removeTagCategory(category);
 		
 		if (!utd.saveTagDatabase()) {
 			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
@@ -1096,7 +1121,7 @@ public class Logic {
 	private void saveAllTasks(ArrayList<ArrayList<Task>> taskLists) throws Exception {
 		try {
 			storage.saveAllTasklists(taskLists);
-			System.out.println("All tasklists saved.");
+			//System.out.println("All tasklists saved.");
 		} catch (StorageException se) {
 			System.out.println(se.getMessage());
 			taskLists = se.getLastModifiedTasklists(); // Dylan: this hasn't been tested. Will test next time.

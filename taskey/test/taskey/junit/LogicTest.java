@@ -906,4 +906,23 @@ public class LogicTest {
 		expected.add(new TagCategory("tag1")); // #tag2 and #tag3 should not be in tag database
 		assertEquals(expected, logic.getTagList());
 	}
+	
+	// The order of displayed tasks is not tested here.
+	// This test also checks that there are no duplicate tasks in the displayed list.
+	@Test
+	public void viewingTagsShouldOnlyDisplayAllTasksWithAtLeastOneOfThoseTags() {
+		logic.executeCommand(ContentBox.PENDING, "add task1 #tag1");
+		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
+		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
+		logic.executeCommand(ContentBox.PENDING, "add task4 #tag2 #tag4");
+		LogicFeedback lf = logic.executeCommand(ContentBox.PENDING, "view #tag1 #tag3 #tag5");
+		ArrayList<Task> viewList = lf.getTaskLists().get(ListID.VIEW.getIndex());
+		Task task1 = parser.parseInput("add task1 #tag1").getTask();
+		assertTrue(viewList.contains(task1));
+		Task task2 = parser.parseInput("add task2 on 31 dec 3pm #tag2 #tag3").getTask();
+		assertTrue(viewList.contains(task2));
+		Task task3 = parser.parseInput("add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3").getTask();
+		assertTrue(viewList.contains(task3));
+		assertTrue(viewList.size() == 3); // Should not contain task4
+	}
 }

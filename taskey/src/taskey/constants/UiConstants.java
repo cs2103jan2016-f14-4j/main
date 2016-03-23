@@ -21,6 +21,7 @@ public class UiConstants {
 	// Initialization in UiMain
 	public static final String PROGRAM_NAME = "Taskey";
 	public static final String FXML_PATH = "layout.fxml";
+	public static final String FXML_ALERT_PATH = "alert.fxml";
 	public static final String FXML_LOAD_FAIL = "Fxml file not found";
 	
 	public static final Dimension MIN_SIZE = new Dimension(370,285); // half of original size
@@ -79,6 +80,8 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE = new UiGridSettings(0, 0, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 90);
 	// Resources 
 	// Note that getResourceByStream uses relative Package directory. 
 	// In this case, images has to be a sub package of utility for a runnable JAR to work

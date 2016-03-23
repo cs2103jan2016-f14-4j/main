@@ -98,7 +98,8 @@ public class UiDropDown {
 	private void ShiftMenu() {
 		assert(myInput != null);
 		double width = getWidthOfTextFieldInput(myInput);
-		Bounds screenBounds = UiPopupManager.getInstance().getScreenBoundsOfNode(myInput);
+		Bounds bounds = myInput.getBoundsInLocal();
+		Bounds screenBounds = myInput.localToScreen(bounds);
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth(), screenBounds.getMinX() + width));
 		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight());
 	}

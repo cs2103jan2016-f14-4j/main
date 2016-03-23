@@ -372,7 +372,7 @@ public class UiController {
 					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 				} else if (event.getCode() == KeyCode.F3) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
-				}
+				} 
 			}
 		});
 

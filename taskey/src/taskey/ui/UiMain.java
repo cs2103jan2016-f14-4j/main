@@ -22,6 +22,7 @@ import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
 import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiPopupManager;
 
 /**
  * @@author A0125419H
@@ -45,18 +46,30 @@ public class UiMain extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		myController = new UiController();
-		FXMLLoader myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_PATH));
-		myloader.setController(myController);
-
+		// set up alert window
+		FXMLLoader myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_ALERT_PATH));
 		Region contentRootRegion = null;
+		myloader.setController(UiAlertController.getInstance());
 		try {
 			contentRootRegion = (Region) myloader.load();
 		} catch (IOException e) {
-			System.out.println("Unable to load fxml file");
+			System.out.println(UiConstants.FXML_LOAD_FAIL);
 		}
-
+		UiAlertController.getInstance().setUpStage(contentRootRegion);
+		
+		myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_PATH));
+		myloader.setController(myController);
+		try {
+			contentRootRegion = (Region) myloader.load();
+		} catch (IOException e) {
+			System.out.println(UiConstants.FXML_LOAD_FAIL);
+		}
 		Parent root = setUpResize(primaryStage, contentRootRegion);
-		setUpScene(primaryStage, root);
+		setUpScene(primaryStage, root); // set up main scene
+	
+		trayModule = new UiTrayModule();
+		trayModule.createTrayIcon(primaryStage);
+		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage());
 	}
 	
 	/**
@@ -65,7 +78,7 @@ public class UiMain extends Application {
 	 * 
 	 * Credits: http://gillius.org/blog/2013/02/javafx-window-scaling-on-resize.html
 	 */
-	private StackPane setUpResize(Stage primaryStage, Region contentRootRegion) {
+	private Region setUpResize(Stage primaryStage, Region contentRootRegion) {
 		 //Set a default "standard" or "100%" resolution
 	    double origW = UiConstants.MIN_SIZE.getWidth()*2;
 	    double origH = UiConstants.MIN_SIZE.getHeight()*2;
@@ -100,7 +113,7 @@ public class UiMain extends Application {
 		newScene.setOnMouseMoved(listener);
 		newScene.setOnMousePressed(listener);
 		newScene.setOnMouseDragged(listener);
-		return rootPane;
+		return contentRootRegion;
 	}
 
 	/**
@@ -117,8 +130,7 @@ public class UiMain extends Application {
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
-		trayModule = new UiTrayModule(primaryStage);
-		
+
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
@@ -128,7 +140,6 @@ public class UiMain extends Application {
 		
 		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
 		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
-	  
 	}
 
 	/**

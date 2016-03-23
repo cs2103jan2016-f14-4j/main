@@ -281,6 +281,7 @@ public class Logic {
 		ArrayList<Task> pendingList = originalCopy.get(ListID.PENDING.getIndex());
 		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
 		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		actionList.clear();
 		
 		for (Task t : expiredList) {
 			ArrayList<String> tagList = t.getTaskTags();
@@ -306,6 +307,7 @@ public class Logic {
 			}
 		}
 		
+		history.add(originalCopy);
 		taskLists = cloneLists(originalCopy);
 		return new LogicFeedback(originalCopy, po, null);
 	}
@@ -341,8 +343,10 @@ public class Logic {
 			
 			default:
 				break;
+				
 		}
 		
+		history.add(originalCopy);
 		taskLists = cloneLists(originalCopy);
 		return new LogicFeedback(originalCopy, po, null);
 	}
@@ -676,6 +680,7 @@ public class Logic {
 
 		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
 		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		actionList.clear();
 		for (Task t : expiredList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
 				actionList.add(t);
@@ -690,7 +695,6 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(originalCopy);
-		history.add(originalCopy);
 		return new LogicFeedback(originalCopy, po, null);
 	}
 
@@ -1040,7 +1044,7 @@ public class Logic {
 		return new LogicFeedback(modifiedCopy, po, null);
 	}*/
 
-	//@@author A0134177E
+	// @@author A0134177E
 	// Undo the last change to the task lists.
 	public LogicFeedback undo(ProcessedObject po) {
 		// History stacks must always have at least one item, which is inserted at startup

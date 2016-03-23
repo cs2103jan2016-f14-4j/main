@@ -971,7 +971,6 @@ public class LogicTest {
 	public void undoDoneShouldUpdateTagDatabase() {
 		String input = "add task #tag1 #tag2";
 		logic.executeCommand(ContentBox.PENDING, input);
-		Task task = parser.parseInput(input).getTask();
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "undo");
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
@@ -1070,5 +1069,25 @@ public class LogicTest {
 		Task task3 = parser.parseInput("add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3").getTask();
 		assertTrue(viewList.contains(task3));
 		assertTrue(viewList.size() == 3); // Should not contain task4
+	}
+	
+	@Test
+	public void updatingCompletedTasksShouldThrowExceptionMessage() {
+		String input = "add task";
+		logic.executeCommand(ContentBox.PENDING, input);
+		logic.executeCommand(ContentBox.PENDING, "done 1");
+		logic.executeCommand(ContentBox.PENDING, "view archive");
+		Exception actual = logic.executeCommand(ContentBox.ACTION, "set 1 \"new name\"").getException();
+		assertEquals(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID, actual.getMessage());
+	}
+	
+	@Test
+	public void doneCompletedTasksShouldThrowExceptionMessage() {
+		String input = "add task";
+		logic.executeCommand(ContentBox.PENDING, input);
+		logic.executeCommand(ContentBox.PENDING, "done 1");
+		logic.executeCommand(ContentBox.PENDING, "view archive");
+		Exception actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
+		assertEquals(LogicConstants.MSG_EXCEPTION_DONE_INVALID, actual.getMessage());
 	}
 }

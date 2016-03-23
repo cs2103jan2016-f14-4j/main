@@ -18,17 +18,19 @@ import java.util.ArrayList;
  * 8. UPDATE_BY_INDEX_CHANGE_NAME
  * 9. UPDATE_BY_INDEX_CHANGE_DATE
  * 10. UPDATE_BY_INDEX_CHANGE_BOTH
- * 11. UPDATE_BY_NAME_CHANGE_NAME
- * 12. UPDATE_BY_NAME_CHANGE_DATE
- * 13. UPDATE_BY_NAME_CHANGE_BOTH
- * 14. VIEW_TAGS
- * 15. VIEW_BASIC
- * 16. ERROR 
- * 17. DONE_BY_INDEX
- * 18. DONE_BY_NAME
- * 19. SEARCH
- * 20. UNDO 
- * 21. CHANGE_FILE_LOC
+ * 11. UPDATE_BY_INDEX_CHANGE_PRIORITY
+ * 12. UPDATE_BY_NAME_CHANGE_NAME
+ * 13. UPDATE_BY_NAME_CHANGE_DATE
+ * 14. UPDATE_BY_NAME_CHANGE_BOTH
+ * 15. UPDATE_BY_NAME_CHANGE_PRIORITY
+ * 16. VIEW_TAGS
+ * 17. VIEW_BASIC
+ * 18. ERROR 
+ * 19. DONE_BY_INDEX
+ * 20. DONE_BY_NAME
+ * 21. SEARCH
+ * 22. UNDO 
+ * 23. CHANGE_FILE_LOC
  * 
  * @author Xue Hui
  *
@@ -52,6 +54,7 @@ public class ProcessedObject {
 	private String errorType = null;
 	private String searchPhrase = null; 
 	private String newTaskName = null; 
+	private int newPriority = -1; 
 	private String newFileLoc = null; 
 	private String category = null; 
 	
@@ -247,8 +250,23 @@ public class ProcessedObject {
 		return category; 
 	}
 	
+	/**
+	 * @return new priority of the task (for set) 
+	 */
+	public int getNewPriority() {
+		return newPriority; 
+	}
+	
+	/**
+	 * @param newPriority set new priority of the task (for set) 
+	 */
+	public void setNewPriority(int newPriority) {
+		this.newPriority = newPriority; 
+	}
+	
 	@Override
 	/**
+	 * @@author A0134177E
 	 * Compare if a ProcessedObject is equal to another ProcessedObject
 	 */
 	public boolean equals(Object obj) {
@@ -302,6 +320,7 @@ public class ProcessedObject {
 	
 	@Override 
 	/**
+	 * @@author A0107345L
 	 * For debugging
 	 */
 	public String toString() {

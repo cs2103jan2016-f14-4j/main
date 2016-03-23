@@ -2,6 +2,7 @@ package taskey.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import taskey.logic.TagCategory;
 import taskey.storage.Storage;
@@ -18,11 +19,18 @@ import taskey.storage.Storage;
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
 	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
-	Storage db = new Storage(); 
+	Storage db; 
 	
-	public UserTagDatabase() {
+	//@@author A0134177E
+	public UserTagDatabase(Storage storage) {
+		db = storage;
 		//initialise the database of tags. 
-		userTags = db.loadTaglist();  
+		userTags = cloneTagList(db.loadTaglist());  
+	}
+	
+	public void setTags(ArrayList<TagCategory> tagList) {
+		assert(tagList != null);
+		userTags = cloneTagList(tagList);
 	}
 	
 	/**
@@ -33,13 +41,14 @@ public class UserTagDatabase {
 	}
 	
 	/**
+	 * @@author A0107345L
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
 	 */
 	public void addTag(String tag) {
 		TagCategory newTag = new TagCategory(tag); 
 		
-		if (!userTags.contains(newTag)) {
+		if (!containsTagName(tag)) {
 			userTags.add(newTag); 
 		} else {
 			for(int i = 0; i < userTags.size(); i++) {
@@ -61,7 +70,7 @@ public class UserTagDatabase {
 	public boolean removeTag(String tag) {
 		TagCategory toRemove = new TagCategory(tag); 
 		
-		if (userTags.contains(toRemove)) {
+		if (containsTagName(tag)) {
 			for(int i = 0; i < userTags.size(); i++) {
 				TagCategory tagCat = userTags.get(i); 
 				if (tagCat.compareTo(toRemove) == 0) { 
@@ -78,41 +87,70 @@ public class UserTagDatabase {
 		return false;
 	}
 	
-	/**
-	 * Checks if the user tag database has a particular tag
-	 * @param tag
-	 * @return true if the tag exists in database
-	 */
-	public boolean hasTag(String tag) {
-		if (userTags.contains(new TagCategory(tag))) {
-			return true;
-		}	
-		return false; 
+	//@@author A0134177E
+	public boolean removeTagCategory(String tag) {
+		for (Iterator<TagCategory> it = userTags.iterator(); it.hasNext();) {
+			TagCategory tc = it.next();
+			
+			if (tc.getTagName().equals(tag)) {
+				it.remove();
+				return true;
+			}
+		}
+		
+		return false;
 	}
-	
+
 	/**
+	 * @@author A0107345L
 	 * For Logic: Get the entire tagList so that 
 	 * it can be displayed by the UI.
 	 * @return
 	 */
 	public ArrayList<TagCategory> getTagList() {
-		return userTags; 
+		return cloneTagList(userTags);
 	}
 	
 	/**
+	 * @@author A0134177E
 	 * Save the tag hash map into a file for persistent storage. 
 	 * @return true if save was successful; false otherwise
 	 */
 	public boolean saveTagDatabase() {
 		try {
-			return db.saveTaglist(userTags);
+			return db.saveTaglist(cloneTagList(userTags));
 		} catch (IOException e) {
+			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 
 		} 
 	}
-    
 	
+	public ArrayList<TagCategory> cloneTagList(ArrayList<TagCategory> tagList) {
+		ArrayList<TagCategory> clone = new ArrayList<TagCategory>();
+		for (TagCategory tc : tagList) {
+			clone.add(new TagCategory(tc));
+		}
+		
+		return clone;
+	}
+	
+	/**
+	 * Checks if the user tag database has a particular tag
+	 * @param tag
+	 * @return true if the tag exists in database
+	 */
+	public boolean containsTagName(String name) {
+		for (TagCategory tc : userTags) {
+			if (tc.getTagName().equals(name)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+   
     /*
+     * @@author A0107345L
      * FOR DEBUGGING
      */
 	@Override

@@ -16,6 +16,11 @@ public class TagCategory implements Comparable<TagCategory> {
 		numTags += 1; 
 	}
 	
+	public TagCategory(TagCategory other) {
+		tagName = other.tagName;
+		numTags = other.numTags;
+	}
+	
 	/**
 	 * @return Tag name of the TagCategory
 	 */
@@ -77,21 +82,21 @@ public class TagCategory implements Comparable<TagCategory> {
 	
 	@Override
 	/**
+	 * @@author A0134177E
 	 * Overriding this method for ArrayList's .contains() method 
 	 */
     public boolean equals(Object object) {
-        boolean isSame = false;
-
         if (object != null && object instanceof TagCategory) {
-        	String otherTagName = ((TagCategory) object).getTagName(); 
-            if (this.tagName.compareTo(otherTagName) == 0) {
-            	isSame = true;
+        	TagCategory other = (TagCategory) object;
+            if (this.tagName.equals(other.getTagName())) {
+            	return (this.numTags == other.numTags);
             }
         }
-        return isSame;
+        return false;
     }
 
 	@Override
+	//@@author A0107345L
 	public int compareTo(TagCategory tag) {
 		String otherTagName = tag.getTagName(); 
         if (this.tagName.compareTo(otherTagName) == 0) {

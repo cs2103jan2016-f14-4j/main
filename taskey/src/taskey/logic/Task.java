@@ -2,6 +2,7 @@ package taskey.logic;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import taskey.parser.TimeConverter; 
 import static taskey.constants.ParserConstants.DAY_END_SHORT; 
@@ -478,11 +479,13 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
+	
 	/**
-	 * tasks are the same if they have the same name
+	 * @@author A0134177E
+	 * Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
-	 * @return true if they have the same name, else return false 
+	 * @return true if the two Tasks are equal
 	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Task)) {
@@ -491,15 +494,20 @@ public class Task implements Comparable<Task> {
 		
 		Task other = (Task) obj;
 		
-		if (taskName == null) {
-			return (other.getTaskName() == null);
+		// All Task objects are created by Parser, and should not have a null task name or task type
+		assert(taskName != null && other.taskName != null); 
+		assert(taskType != null && other.taskType != null);
+		
+		if (taskName.equals(other.taskName) && taskType.equals(other.taskType)) {
+			return (Arrays.equals(datesEpoch, other.datesEpoch) && Arrays.equals(datesHuman, other.datesHuman));
 		}
 		
-		return ((other.getTaskName() != null) && taskName.equals(other.getTaskName())); 
+		return false;
 	}
 	
 	@Override 
 	/**
+	 * @@author A0107345L 
 	 * For debugging 
 	 */
 	public String toString() {
@@ -537,10 +545,15 @@ public class Task implements Comparable<Task> {
 			stringRep += "\n";
 		}
 		
+		if (priority > 1) {
+			stringRep += "priority: " + priority + "\n";
+		}
+		
 		return stringRep; 
 	}
 	
-	/* For testing
+	/* @@author A0134177E
+	 * To test whether the getDuplicate() method returns a deep copy of a given Task.
 	public static void main(String[] args) {
 		Task t1 = new Task("t1");
 		t1.setTaskType("FLOATING");
@@ -552,5 +565,4 @@ public class Task implements Comparable<Task> {
 		System.out.println("t1: " + t1);
 		System.out.println("t2: " + t2);
 	}*/
-
 }

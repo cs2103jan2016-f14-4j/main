@@ -181,6 +181,18 @@ public class Logic {
 	}
 	
 	/**
+	 * Returns a deep copy of ACTION list.
+	 */
+	public ArrayList<Task> getActionList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 8);
+		ArrayList<Task> actionList = taskLists.get(ListID.ACTION.getIndex());
+		assert (actionList != null);
+
+		return cloneList(actionList);
+	}
+	
+	/**
 	 * Returns a deep copy of the current tag list.
 	 */
 	public ArrayList<TagCategory> getTagList() {
@@ -409,18 +421,17 @@ public class Logic {
 	// Clears all task lists and the tag database, and saves the updated lists to disk.
 	public LogicFeedback clear(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy) {
 		ProcessedObject po = new ProcessedObject("CLEAR"); // Stub
-		clearAllLists(modifiedCopy);
 		
+		utd.deleteAllTags();
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		}
+		
+		clearAllLists(modifiedCopy);	
 		try {
 			saveAllTasks(modifiedCopy);
 		} catch (Exception e) {
 			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		utd.deleteAllTags();
-			
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
@@ -815,9 +826,16 @@ public class Logic {
 		Task toUpdate;
 
 		try {
-			toUpdate = targetList.get(taskIndex);
+			toUpdate = targetList.get(taskIndex).getDuplicate();
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
+			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+		}
+		
+		// Cannot update expired or completed tasks
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
+			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
+			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
 
@@ -840,7 +858,6 @@ public class Logic {
 
 
 	// Updates an indexed task's date on the current tab and saves the updated lists to disk.
-	// TODO: support "set" from the "ACTION" tab. 
 	public LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
             							  		 ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
 		int taskIndex = po.getIndex();
@@ -854,6 +871,13 @@ public class Logic {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
+			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+		}
+		
+		// Cannot update expired or completed tasks
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
+			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
+			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
 		
@@ -1175,12 +1199,15 @@ public class Logic {
 	}
 
 	// Replace the old Task with another task changedTask.
-	// All lists containing the replaced task are updated as well.
+	// Lists that previously contained oldTask but should not contain changedTask are updated.
+	// Lists that should contain changedTask are updated as well.
+	// This method may mess up the order of lists.
 	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, Task oldTask, Task changedTask) {
+		removeFromAllLists(taskLists, oldTask);
+		
 		for (int i = 0; i < taskLists.size(); i++) {
-			int index = taskLists.get(i).indexOf(oldTask);
-			if (index != -1) { // The list contains the task
-				taskLists.get(i).set(index, changedTask);
+			if (belongsToList(changedTask, i)) {
+				taskLists.get(i).add(changedTask);
 			}
 		}
 	}
@@ -1192,7 +1219,7 @@ public class Logic {
 		if (listIndex == ListID.THIS_WEEK.getIndex()) {
 			return (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())
 					|| timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime()));
-		} else if (listIndex == ListID.PENDING.getIndex()) {
+		} else if (listIndex == ListID.PENDING.getIndex() || listIndex == ListID.ACTION.getIndex()) {
 			return true;
 		} else if (listIndex == ListID.GENERAL.getIndex()) {
 			return (taskType.equals("FLOATING"));

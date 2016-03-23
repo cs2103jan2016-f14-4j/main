@@ -135,10 +135,10 @@ public class Storage {
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
-    		System.out.println("{Setting default directory}"); //debug info
+    		//System.out.println("{Setting default directory}"); //debug info
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
-    		System.out.println("{Storage directory loaded}"); //debug info
+    		//System.out.println("{Storage directory loaded}"); //debug info
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
@@ -179,11 +179,12 @@ public class Storage {
 	 * <br>- Starting from index 1, the lists in the given superlist
 	 * 		 must be in the same order as the enum constants in TasklistEnum.
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
+	 * <br>- Index 7 is reserved for the ACTION list and is not saved to disk because it is session-dependent.
 	 * @param superlist the list of tasklists to be saved
 	 * @throws StorageException contains the last saved tasklist
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == 7);
+		assert (superlist.size() == 8);
 
 		for (TasklistEnum e : TasklistEnum.values()) {
 			ArrayList<Task> listToSave = superlist.get(e.index());
@@ -192,7 +193,7 @@ public class Storage {
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (IOException ioe) {
 				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-				assert (!history.isEmpty());
+				assert (!history.listStackIsEmpty());
 				throw new StorageException(ioe, history.peek());
 			}
 		}
@@ -221,9 +222,6 @@ public class Storage {
     public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-		if (tags == null) {
-			System.out.println("tags are null");
-		}
     	history.addTagList(tags); //TODO: KIV
 		return true; 
     }
@@ -297,7 +295,7 @@ public class Storage {
 	    	}
 			
 			directory = dir;
-			System.out.println("{Storage directory set} " + getDirectory()); //debug info
+			//System.out.println("{Storage directory set} " + getDirectory()); //debug info
 			return true;
 		} else {
 			return false;

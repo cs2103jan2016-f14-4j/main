@@ -27,8 +27,12 @@ public class History {
 		tagStack = new ArrayDeque<ArrayList<TagCategory>>();
 	}
 
-	public boolean isEmpty() {
+	public boolean listStackIsEmpty() {
 		return stack.isEmpty();
+	}
+	
+	public boolean tagStackIsEmpty() {
+		return tagStack.isEmpty();
 	}
 
 	/*========*

@@ -2,6 +2,7 @@ package taskey.logic;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import taskey.parser.TimeConverter; 
 import static taskey.constants.ParserConstants.DAY_END_SHORT; 
@@ -481,10 +482,10 @@ public class Task implements Comparable<Task> {
 	
 	/**
 	 * @@author A0134177E
-	 * tasks are the same if they have the same name
+	 * Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
-	 * @return true if they have the same name, else return false 
+	 * @return true if the two Tasks are equal
 	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Task)) {
@@ -493,11 +494,15 @@ public class Task implements Comparable<Task> {
 		
 		Task other = (Task) obj;
 		
-		if (taskName == null) {
-			return (other.getTaskName() == null);
+		// All Task objects are created by Parser, and should not have a null task name or task type
+		assert(taskName != null && other.taskName != null); 
+		assert(taskType != null && other.taskType != null);
+		
+		if (taskName.equals(other.taskName) && taskType.equals(other.taskType)) {
+			return (Arrays.equals(datesEpoch, other.datesEpoch) && Arrays.equals(datesHuman, other.datesHuman));
 		}
 		
-		return ((other.getTaskName() != null) && taskName.equals(other.getTaskName())); 
+		return false;
 	}
 	
 	@Override 

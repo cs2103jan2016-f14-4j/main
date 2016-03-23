@@ -331,7 +331,7 @@ public class Logic {
 				originalCopy.set(ListID.ACTION.getIndex(), eventList);
 				break;
 				
-			case "completed":
+			case "archive":
 				ArrayList<Task> completedList = originalCopy.get(ListID.COMPLETED.getIndex());
 				originalCopy.set(ListID.ACTION.getIndex(), completedList);
 				break;
@@ -594,11 +594,10 @@ public class Logic {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
-		removeFromAllLists(modifiedCopy, toDelete);
 		
-		// Remove the Task tags, if any, from the tag database.
+		// If the Task is not archived, remove its task tags, if any, from the tag database.
 		ArrayList<String> taskTags = toDelete.getTaskTags();
-		if (taskTags != null) {
+		if (!(modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toDelete)) && taskTags != null) {
 			for (String s : taskTags) {
 				utd.removeTag(s);
 			}
@@ -607,6 +606,8 @@ public class Logic {
 				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 			}
 		}
+		
+		removeFromAllLists(modifiedCopy, toDelete);
 		
 		// Check if user deleted from the ACTION tab. If so, don't clear the ACTION list.
 		if (!currentContent.equals(ContentBox.ACTION)) {
@@ -714,7 +715,7 @@ public class Logic {
 		}
 		
 		// User is trying to complete a task that is already done
-		if (currentContent.equals(ContentBox.ACTION) && modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toComplete)) {
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toComplete)) {
 			exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}

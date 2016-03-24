@@ -73,12 +73,12 @@ public class UiTaskView {
 		String line = "" + (id + 1);
 		Color theColor = null;
 		switch ( theTask.getPriority()) {
-			case 2: theColor = Color.RED;
-			break;
-			case 1: theColor = Color.ORANGE;
-			break;
+			case 3: theColor = Color.RED;
+					break;
+			case 2: theColor = Color.ORANGE;
+					break;
 			default:
-			theColor = Color.GREEN;
+					theColor = Color.GREEN;
 		}
 		/*
 		 * Color theColor = Color.WHITE;

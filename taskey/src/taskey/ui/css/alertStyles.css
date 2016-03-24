@@ -20,13 +20,7 @@
 
 .numberIcon {
 	-fx-background-color: 
-        linear-gradient(#ffd65b, #f0ff35),
-        linear-gradient(#ffef84, #f0ff35),
-        linear-gradient(#ffea6a, #f0ff35),
-        linear-gradient(#ffe657 0%, #f8c202 50%, #f0ff35 100%),
-        linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0)); /*alpha */
-    -fx-background-radius: 30px;
-    -fx-background-insets: 0px,1px,2px,3px,0px;
-    -fx-padding: 2px;
+        radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
+    -fx-padding: 3px;
     -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
 }

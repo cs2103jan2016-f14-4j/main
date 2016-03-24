@@ -80,8 +80,8 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE = new UiGridSettings(0, 0, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 90);
+	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 15, 100);
+	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 80,10);
 	// Resources 
 	// Note that getResourceByStream uses relative Package directory. 
 	// In this case, images has to be a sub package of utility for a runnable JAR to work

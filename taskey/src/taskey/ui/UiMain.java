@@ -70,7 +70,7 @@ public class UiMain extends Application {
 		// set up alert window
 		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
 		trayModule = new UiTrayModule();
-		trayModule.createTrayIcon(primaryStage);
+		trayModule.initTrayVariables(primaryStage);
 		trayModule.createLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
 	}
 	

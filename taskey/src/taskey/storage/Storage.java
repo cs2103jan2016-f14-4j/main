@@ -27,7 +27,7 @@ public class Storage {
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	private static final String FILENAME_EXTENSION = ".taskey";
-	private static final int NUM_LISTS = 8;
+	private static final int NUM_LISTS_FROM_LOGIC = 8;
 
 	public enum TasklistEnum {
 		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
@@ -166,7 +166,7 @@ public class Storage {
 	 * @throws StorageException contains the last saved tasklist
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == NUM_LISTS);
+		assert (superlist.size() == NUM_LISTS_FROM_LOGIC);
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
 			try {

@@ -51,14 +51,16 @@ public class History {
 			stack.push(superlist);
 			return;
 		}
-
+		
+		stack.push(superlist);
+		/*
 		// Don't add superlist to history if it's identical to the most recent superlist
 		for (int i=0; i<superlist.size(); i++) {
 			if (! superlist.get(i).equals(mostRecentSuperlist.get(i)) ) {
 				stack.push(superlist);
 				break;
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -73,11 +75,13 @@ public class History {
 			tagStack.push(tagList);
 			return;
 		}
-
+		
+		tagStack.push(tagList);
+		/*
 		// Don't add tag list to history if it's identical to the most recent tag list
 		if (!tagList.equals(mostRecentTagList) ) {
 			tagStack.push(tagList);
-		}
+		}*/
 	}
 	
 	public void addTags(HashMap<String, Integer> tags){

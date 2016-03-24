@@ -181,6 +181,18 @@ public class Logic {
 	}
 	
 	/**
+	 * Returns a deep copy of ACTION list.
+	 */
+	public ArrayList<Task> getActionList() {
+		assert (taskLists != null);
+		assert (taskLists.size() == 8);
+		ArrayList<Task> actionList = taskLists.get(ListID.ACTION.getIndex());
+		assert (actionList != null);
+
+		return cloneList(actionList);
+	}
+	
+	/**
 	 * Returns a deep copy of the current tag list.
 	 */
 	public ArrayList<TagCategory> getTagList() {
@@ -232,10 +244,10 @@ public class Logic {
 				return viewBasic(originalCopy, po);
 			
 			case "VIEW_TAGS":
-				return viewTags(originalCopy, po);
+				return viewTags(originalCopy, modifiedCopy, po);
 
 			case "SEARCH":
-				return search(originalCopy, po);
+				return search(originalCopy, modifiedCopy, po);
 
 			case "DONE_BY_INDEX":
 				return doneByIndex(currentContent, originalCopy, modifiedCopy, po);
@@ -276,11 +288,13 @@ public class Logic {
 	
 	// Searches for all expired and pending tasks that are tagged with at least one of the tag categories that the user 
 	// wants to view.
-	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+			               ProcessedObject po) {
 		ArrayList<String> tagsToView = po.getViewType();
-		ArrayList<Task> pendingList = originalCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
+		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
+		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
+		actionList.clear();
 		
 		for (Task t : expiredList) {
 			ArrayList<String> tagList = t.getTaskTags();
@@ -305,9 +319,12 @@ public class Logic {
 				}
 			}
 		}
-		
-		taskLists = cloneLists(originalCopy);
-		return new LogicFeedback(originalCopy, po, null);
+		if (actionList.isEmpty()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND));
+		}
+			
+		taskLists = cloneLists(modifiedCopy);
+		return new LogicFeedback(modifiedCopy, po, null);
 	}
 	
 	// Views one of the task categories.
@@ -329,7 +346,7 @@ public class Logic {
 				originalCopy.set(ListID.ACTION.getIndex(), eventList);
 				break;
 				
-			case "completed":
+			case "archive":
 				ArrayList<Task> completedList = originalCopy.get(ListID.COMPLETED.getIndex());
 				originalCopy.set(ListID.ACTION.getIndex(), completedList);
 				break;
@@ -341,6 +358,7 @@ public class Logic {
 			
 			default:
 				break;
+				
 		}
 		
 		taskLists = cloneLists(originalCopy);
@@ -405,18 +423,17 @@ public class Logic {
 	// Clears all task lists and the tag database, and saves the updated lists to disk.
 	public LogicFeedback clear(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy) {
 		ProcessedObject po = new ProcessedObject("CLEAR"); // Stub
-		clearAllLists(modifiedCopy);
 		
+		utd.deleteAllTags();
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		}
+		
+		clearAllLists(modifiedCopy);	
 		try {
 			saveAllTasks(modifiedCopy);
 		} catch (Exception e) {
 			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		utd.deleteAllTags();
-			
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
@@ -448,10 +465,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 
 		try {
@@ -502,10 +519,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		try {
@@ -557,10 +574,10 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.addTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		
 		try {
@@ -590,19 +607,20 @@ public class Logic {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
-		removeFromAllLists(modifiedCopy, toDelete);
 		
-		// Remove the Task tags, if any, from the tag database.
+		// If the Task is not archived, remove its task tags, if any, from the tag database.
 		ArrayList<String> taskTags = toDelete.getTaskTags();
-		if (taskTags != null) {
+		if (!(modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toDelete)) && taskTags != null) {
 			for (String s : taskTags) {
 				utd.removeTag(s);
 			}
-				
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
 		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+		}
+		
+		removeFromAllLists(modifiedCopy, toDelete);
 		
 		// Check if user deleted from the ACTION tab. If so, don't clear the ACTION list.
 		if (!currentContent.equals(ContentBox.ACTION)) {
@@ -671,11 +689,13 @@ public class Logic {
 	// Search for all expired and pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
 	// TODO: search list includes completed tasks as well?
 	// TODO: improved search
-	public LogicFeedback search(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
+	public LogicFeedback search(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
+			                    ProcessedObject po) {
 		String searchPhrase = po.getSearchPhrase(); // Validity of searchPhrase is already checked in ParseSearch
 
-		ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = originalCopy.get(ListID.ACTION.getIndex());
+		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
+		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
+		actionList.clear();
 		for (Task t : expiredList) {
 			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
 				actionList.add(t);
@@ -689,9 +709,12 @@ public class Logic {
 			}
 		}
 		
-		taskLists = cloneLists(originalCopy);
-		history.add(originalCopy);
-		return new LogicFeedback(originalCopy, po, null);
+		if (actionList.isEmpty()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND));
+		}
+		
+		taskLists = cloneLists(modifiedCopy);
+		return new LogicFeedback(modifiedCopy, po, null);
 	}
 
 	// Marks an indexed task from the current tab as done and saves the updated lists to disk.
@@ -710,7 +733,7 @@ public class Logic {
 		}
 		
 		// User is trying to complete a task that is already done
-		if (currentContent.equals(ContentBox.ACTION) && modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toComplete)) {
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toComplete)) {
 			exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
@@ -728,11 +751,11 @@ public class Logic {
 			for (String s : taskTags) {
 				utd.removeTag(s);
 			}
-			
-			if (!utd.saveTagDatabase()) {
-				return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-			}
 		}	
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
@@ -810,9 +833,16 @@ public class Logic {
 		Task toUpdate;
 
 		try {
-			toUpdate = targetList.get(taskIndex);
+			toUpdate = targetList.get(taskIndex).getDuplicate();
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
+			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+		}
+		
+		// Cannot update expired or completed tasks
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
+			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
+			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
 
@@ -821,6 +851,10 @@ public class Logic {
 		// Check if user used "set" from the ACTION tab. If so, don't clear the ACTION list.
 		if (!currentContent.equals(ContentBox.ACTION)) {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
 		}
 		
 		try {
@@ -835,7 +869,6 @@ public class Logic {
 
 
 	// Updates an indexed task's date on the current tab and saves the updated lists to disk.
-	// TODO: support "set" from the "ACTION" tab. 
 	public LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
             							  		 ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
 		int taskIndex = po.getIndex();
@@ -849,6 +882,13 @@ public class Logic {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
+			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+		}
+		
+		// Cannot update expired or completed tasks
+		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
+			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
+			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
 			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
 		}
 		
@@ -872,6 +912,10 @@ public class Logic {
 		// Check if user used "set" from the ACTION tab. If so, don't clear the ACTION list.
 		if (!currentContent.equals(ContentBox.ACTION)) {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
+		}
+		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
 		}
 		
 		try {
@@ -924,6 +968,9 @@ public class Logic {
 			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		}
 		
+		if (!utd.saveTagDatabase()) {
+			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
@@ -1040,7 +1087,7 @@ public class Logic {
 		return new LogicFeedback(modifiedCopy, po, null);
 	}*/
 
-	//@@author A0134177E
+	// @@author A0134177E
 	// Undo the last change to the task lists.
 	public LogicFeedback undo(ProcessedObject po) {
 		// History stacks must always have at least one item, which is inserted at startup
@@ -1057,27 +1104,25 @@ public class Logic {
 			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_UNDO));
 		}
 		
-		if (previousTagList == null) { //No tags to undo
+		utd.setTags(previousTagList); 
+		if (!utd.saveTagDatabase()) { // This tries to adds another copy of previousTagList to history, be mindful
+			history.add(currentSuperList);
 			history.addTagList(currentTagList);
-		} else {
-			utd.setTags(previousTagList); 
-			
-			if (!utd.saveTagDatabase()) { //This tries to adds another copy of previousTagList to history, be mindful
-				history.add(currentSuperList);
-				history.addTagList(currentTagList);
-				utd.setTags(currentTagList);
-				return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-			}
+			utd.setTags(currentTagList);
+			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
+		history.popTags(); // To remove the extra copy mentioned above
 		
 		try {
-			saveAllTasks(previousSuperList);
+			saveAllTasks(previousSuperList); // Same as above, this tries to add another copy of previousSuperList to 
+			                                 // history.
 		} catch (Exception e) {
 			utd.setTags(currentTagList);
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
 			return new LogicFeedback(currentSuperList, po, e);
 		}
+		history.pop();
 		
 		taskLists = cloneLists(previousSuperList);
 		return new LogicFeedback(previousSuperList, po, null);
@@ -1170,12 +1215,15 @@ public class Logic {
 	}
 
 	// Replace the old Task with another task changedTask.
-	// All lists containing the replaced task are updated as well.
+	// Lists that previously contained oldTask but should not contain changedTask are updated.
+	// Lists that should contain changedTask are updated as well.
+	// This method may mess up the order of lists.
 	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, Task oldTask, Task changedTask) {
+		removeFromAllLists(taskLists, oldTask);
+		
 		for (int i = 0; i < taskLists.size(); i++) {
-			int index = taskLists.get(i).indexOf(oldTask);
-			if (index != -1) { // The list contains the task
-				taskLists.get(i).set(index, changedTask);
+			if (belongsToList(changedTask, i)) {
+				taskLists.get(i).add(changedTask);
 			}
 		}
 	}
@@ -1187,7 +1235,7 @@ public class Logic {
 		if (listIndex == ListID.THIS_WEEK.getIndex()) {
 			return (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())
 					|| timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime()));
-		} else if (listIndex == ListID.PENDING.getIndex()) {
+		} else if (listIndex == ListID.PENDING.getIndex() || listIndex == ListID.ACTION.getIndex()) {
 			return true;
 		} else if (listIndex == ListID.GENERAL.getIndex()) {
 			return (taskType.equals("FLOATING"));

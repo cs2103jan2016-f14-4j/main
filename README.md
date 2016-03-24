@@ -11,7 +11,13 @@ PS: Take note of stuff in bold as they are important keywords.
   <li>F1: Help Menu
   <li>F2: Dark Theme
   <li>F3: Light Theme 
-  <li>Ctrl+W : Minimise Taskey
+  <li>Ctrl+W : Minimise/Re-Open Taskey
+  <li>Tab: Scroll through the tabs 
+  <li>Page Up: Scroll up the task list
+  <li>Page Down: Scroll down the task list
+  <li>Left Arrow Key: view previous page
+  <li>Right Arrow Key: view next page
+  <li>Up/Down Arrow Keys: get previous commands
 </ul> 
 
 ###Reserved Characters
@@ -21,7 +27,6 @@ The following characters are reserved for special usage and should not be used i
   <li>! : Used for specifying task priorities (low:!, medium: !!, high: !!!)
   <li># : Used for specifying hashtags for a task 
   <li>^ : For our AutoComplete feature to suggest a list of dates for you
-  <li>more to come. 
 </ul>
 
 ###Accepted date/time formats

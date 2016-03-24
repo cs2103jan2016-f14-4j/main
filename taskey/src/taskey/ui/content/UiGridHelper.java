@@ -157,8 +157,10 @@ public class UiGridHelper {
 		scaledRect.setFill(Paint.valueOf(theColor.toString()));
 		cellWrapper.getChildren().add(scaledRect);
 		StackPane.setAlignment(scaledRect, Pos.CENTER_LEFT);
-		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1)); // problem with precision which shifts the whole row
-		scaledRect.setTranslateX(0.5f); // this mitigates the issue
+		GridPane.setVgrow(scaledRect, Priority.NEVER);
+		GridPane.setHgrow(scaledRect, Priority.NEVER);
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty()); // problem with precision which shifts the whole row
+		//scaledRect.setTranslateX(0.75f); // this mitigates the issue
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;
 	}

@@ -1,6 +1,7 @@
 package taskey.storage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
+import taskey.storage.StorageReader.InvalidTaskException;
 
 /**
  * @@author A0121618M
@@ -25,14 +27,15 @@ public class Storage {
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	private static final String FILENAME_EXTENSION = ".taskey";
+	private static final int NUM_LISTS = 8;
 
 	public enum TasklistEnum {
-		// Index 0 is to  be ignored
+		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
 	    PENDING		("PENDING.taskey", 1),
 	    EXPIRED		("EXPIRED.taskey", 2),
-	    GENERAL		("GENERAL.taskey", 3),
-	    DEADLINE	("DEADLINE.taskey", 4),
-	    EVENT		("EVENT.taskey", 5),
+	    GENERAL		("GENERAL.taskey", 3),	//
+	    DEADLINE	("DEADLINE.taskey", 4),	//
+	    EVENT		("EVENT.taskey", 5),	//
 	    COMPLETED	("COMPLETED.taskey", 6);
 
 	    private final String filename;
@@ -61,7 +64,7 @@ public class Storage {
 	}
 
 	/**
-	 * For testing of the Storage class. This is how Logic will interface with Storage.
+	 * For testing
 	 */
 	public static void main(String args[]) {
 		// The default or last-used directory is automatically set in the constructor method.
@@ -76,10 +79,14 @@ public class Storage {
 	}
 
 	private static void print(ArrayList<ArrayList<Task>> lists) {
+		int i=1;
 		for (ArrayList<Task> list : lists) {
-			for (Task t : list)
+			System.out.println(i++);
+			for (Task t : list) {
 				System.out.println(t);
+			}
 		}
+		System.out.println("end print");
 	}
 
 
@@ -120,17 +127,25 @@ public class Storage {
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
 	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
-	 * @return the superlist of tasklists read from disk, or empty if any constituent list is missing
+	 * <br>- If any single list was not found, an empty superlist is returned.
+	 * @return the superlist of tasklists read from disk, or an empty superlist
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (TasklistEnum e : TasklistEnum.values()) {
-			File src = new File(directory, e.filename());
-			ArrayList<Task> loadedList = storageReader.loadTasklist(src);
-			superlist.add(loadedList);
+		for (TasklistEnum tasklist : TasklistEnum.values()) {
+			try {
+				File src = new File(directory, tasklist.filename());
+				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
+				superlist.add(loadedList);
+			} catch (FileNotFoundException | InvalidTaskException e) {
+				superlist.clear();
+				while (superlist.size() < NUM_LISTS) {
+					superlist.add(new ArrayList<Task>());
+				}
+				return superlist;
+			}
 		}
-
 		// Logic will add this loaded list to History
 		return superlist;
 	}
@@ -147,20 +162,19 @@ public class Storage {
 	 * @throws StorageException contains the last saved tasklist
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == 8);
+		assert (superlist.size() == NUM_LISTS);
 
-		for (TasklistEnum e : TasklistEnum.values()) {
-			ArrayList<Task> listToSave = superlist.get(e.index());
-			File dest = new File(directory, e.filename());
+		for (TasklistEnum tasklist : TasklistEnum.values()) {
 			try {
+				ArrayList<Task> listToSave = superlist.get(tasklist.index());
+				File dest = new File(directory, tasklist.filename());
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (IOException ioe) {
 				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-				assert (!history.listStackIsEmpty());
-				throw new StorageException(ioe, history.peek());
+				throw new StorageException(ioe, history.peek()); //TODO retire StorageException
 			}
 		}
-		history.add(superlist); //to Hubert: moved the check to History's add method
+		history.add(superlist);
 	}
 
 
@@ -224,6 +238,8 @@ public class Storage {
 			// Compare the new directory with the old to see if it should be saved and moved
 			if (isNewDirectory(dir)) {
 	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+	    		//TODO check for existing files: move them only if the new dir does not have existing savefiles OR it contains invalid savefiles that can be overwritten
+	    		//TODO else if there are existing and valid savefiles, load them
 				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
 	    	}
 			

@@ -16,6 +16,10 @@ import taskey.logic.Task;
  * @@author A0121618M
  */
 class StorageReader {
+	@SuppressWarnings("serial")
+	public class InvalidTaskException extends Exception {
+	}
+	
     /**
      * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
      * @param src JSON file to be read
@@ -56,23 +60,40 @@ class StorageReader {
      * An empty ArrayList is returned if src was not found.
      * @param src the source file to be read from
      * @return the tasklist read from file; or an empty list if the file was not found
+     * @throws FileNotFoundException 
+     * @throws InvalidTaskException 
      */
-    ArrayList<Task> loadTasklist(File src) {
-    	ArrayList<Task> tasks;
+    ArrayList<Task> loadTasklist(File src) throws FileNotFoundException, InvalidTaskException {
+    	ArrayList<Task> tasklist;
 		try {
-			tasks = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-			System.out.println("{Tasklist loaded} " + src.getName());
+			tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
+			verifyTasklist(tasklist);
 		} catch (FileNotFoundException e) {
 			System.out.println("{Tasklist not found} " + src.getName());
-			tasks = new ArrayList<Task>();
+			throw e;
+		} catch (InvalidTaskException e) {
+			System.out.println("{Tasklist invalid} " + src.getName());
+			throw e;
 		}
-    	return tasks;
+    	return tasklist;
     }
     
+    /**
+     * Sanity check for when reading tasklists.
+     * @param tasklist
+     * @throws StorageException
+     */
+    void verifyTasklist(ArrayList<Task> tasklist) throws InvalidTaskException {
+    	for (Task t : tasklist) {
+    		if (t.getTaskType() == null) {
+    			throw new InvalidTaskException();
+    		}
+    	}
+    }
     
-    /*========================*
-     * Load tags - new method *
-     *========================*/
+    /*===========*
+     * Load tags *
+     *===========*/
     /**
      * Returns an ArrayList of Tags read from the File src.
      * An empty ArrayList is returned if src was not found.

@@ -56,7 +56,7 @@ public class StorageTest {
 	private static ArrayList<TagCategory> createTaglist() {
 		ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
 		for (int i=0; i<3; i++) {
-			tags.add(new TagCategory("tag_" + i));
+			tags.add(new TagCategory("TestTag_" + i));
 		}
 		return tags;
 	}
@@ -72,16 +72,16 @@ public class StorageTest {
 		
 		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
 		print(loadedlist);
-		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 7
+		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 6
 		assertEquals(superlistToString(superlist), superlistToString(loadedlist));
 	}
 
 	private ArrayList<ArrayList<Task>> createSuperlist() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (int i=0; i <= TasklistEnum.values().length; i++) {
+		for (int i=0; i < 8; i++) {
 			ArrayList<Task> list = new ArrayList<Task>();
-			for (int j=0; j<3; j++) {
+			for (int j=1; j<=3; j++) {
 				list.add(new Task("Tasklist" + i + ": Task" + j));
 			}
 			superlist.add(list);
@@ -112,9 +112,9 @@ public class StorageTest {
 		return str;
 	}
 	
-	private static void print(ArrayList<ArrayList<Task>> lists) {
-		for (ArrayList<Task> list : lists) {
-			for (Task t : list) {
+	private static <E> void print(ArrayList<ArrayList<E>> lists) {
+		for (ArrayList<E> list : lists) {
+			for (E t : list) {
 				System.out.println(t);
 			}
 		}

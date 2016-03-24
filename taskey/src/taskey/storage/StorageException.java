@@ -27,6 +27,9 @@ public class StorageException extends IOException {
 		lastModifiedTagMap = tagmap;
 	}
 
+	public StorageException() {
+	}
+
 	/**
 	 * Returns the ArrayList of tasklists that were last successfully saved by Storage.
 	 * @return the last modified superlist

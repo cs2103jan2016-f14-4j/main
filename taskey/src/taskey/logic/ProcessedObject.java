@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * 1. ADD_FLOATING
  * 2. ADD_DEADLINE
  * 3. ADD_EVENT
- * 4. ADD_RECURRING
+ * 4. ADD_RECURRING //not implementing 
  * 5. DELETE_BY_INDEX
  * 6. DELETE_BY_NAME 
  * 7. DELETE_BY_CATEGORY

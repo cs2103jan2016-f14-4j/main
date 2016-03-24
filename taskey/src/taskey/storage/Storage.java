@@ -40,6 +40,7 @@ public class Storage {
 
 	    private final String filename;
 	    private final int index;
+	    private static final int size = TasklistEnum.values().length;
 
 	    TasklistEnum(String filename, int index) {
 	        this.filename = filename;
@@ -51,6 +52,9 @@ public class Storage {
 	    }
 	    public int index() {
 	    	return index;
+	    }
+	    public static int size() {
+	    	return size;
 	    }
 	    
 	    public static boolean contains(String filename) {
@@ -140,7 +144,7 @@ public class Storage {
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) {
 				superlist.clear();
-				while (superlist.size() < NUM_LISTS) {
+				while (superlist.size() < TasklistEnum.size()) {
 					superlist.add(new ArrayList<Task>());
 				}
 				return superlist;

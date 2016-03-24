@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -45,18 +46,22 @@ public class StorageTest {
      *===========*/
 	@Test
 	public void saveAndLoadTags() throws IOException {
-		ArrayList<TagCategory> tags = createTaglist();
-		storage.saveTaglist(tags);
+		ArrayList<TagCategory> savedTags = createTaglist();
+		storage.saveTaglist(savedTags);
 		
-		ArrayList<TagCategory> loadedList = storage.loadTaglist();
-		assertNotEquals(0, loadedList.size()); //taglist must not be empty
-		assertEquals(taglistToString(tags), taglistToString(loadedList));
+		ArrayList<TagCategory> loadedTags = storage.loadTaglist();
+		assertNotEquals(0, loadedTags.size()); //taglist must not be empty
+		
+		System.out.println(toString(savedTags));
+		System.out.println(toString(loadedTags));
+		
+		assertEquals(toString(savedTags), toString(loadedTags));
 	}
 	
 	private static ArrayList<TagCategory> createTaglist() {
 		ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
 		for (int i=0; i<3; i++) {
-			tags.add(new TagCategory("TestTag_" + i));
+			tags.add(new TagCategory("TestTag_" + i + " "));
 		}
 		return tags;
 	}
@@ -66,14 +71,17 @@ public class StorageTest {
      *================*/
 	@Test
 	public void saveAndLoadTasklists() throws IOException {
-		ArrayList<ArrayList<Task>> superlist = createSuperlist();
-		storage.saveAllTasklists(superlist); //TODO use temp folder
-		print(superlist);
+		ArrayList<ArrayList<Task>> savedList = createSuperlist();
+		storage.saveAllTasklists(savedList); //TODO use temp folder
+		List<ArrayList<Task>> sublist = savedList.subList(1, 7); //storage only saves from index 1 to 6 (both inclusive)
 		
-		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
-		print(loadedlist);
-		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 6
-		assertEquals(superlistToString(superlist), superlistToString(loadedlist));
+		ArrayList<ArrayList<Task>> loadedList = storage.loadAllTasklists();
+		assertEquals(TasklistEnum.size(), loadedList.size()); //loaded list must be size 6
+		
+		System.out.println(toString( sublist ));
+		System.out.println(toString(loadedList));
+		
+		assertEquals(toString(sublist), toString(loadedList));
 	}
 
 	private ArrayList<ArrayList<Task>> createSuperlist() {
@@ -82,7 +90,9 @@ public class StorageTest {
 		for (int i=0; i < 8; i++) {
 			ArrayList<Task> list = new ArrayList<Task>();
 			for (int j=1; j<=3; j++) {
-				list.add(new Task("Tasklist" + i + ": Task" + j));
+				Task t = new Task("Tasklist" + i +" Task" + j);
+				t.setTaskType("floating");
+				list.add(t);
 			}
 			superlist.add(list);
 		}
@@ -94,26 +104,28 @@ public class StorageTest {
     /*================*
      * Helper methods *
      *================*/
-	private static String superlistToString(ArrayList<ArrayList<Task>> superlist) {
+	private static String toString(List<ArrayList<Task>> superlist) {
 		String str = "";
 		for (ArrayList<Task> list : superlist) {
 			for (Task t : list) {
-				str.concat(t.toString());
+				str += t.toString();
 			}
 		}
 		return str;
 	}
 	
-	private static String taglistToString(ArrayList<TagCategory> tags) {
+	private static String toString(ArrayList<TagCategory> tags) {
 		String str = "";
 		for (TagCategory tag : tags) {
-			str.concat(tag.getTagName());
+			str += tag.getTagName();
 		}
 		return str;
 	}
 	
 	private static <E> void print(ArrayList<ArrayList<E>> lists) {
+		int i = 0;
 		for (ArrayList<E> list : lists) {
+			System.out.println(i++);
 			for (E t : list) {
 				System.out.println(t);
 			}

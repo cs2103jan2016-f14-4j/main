@@ -17,6 +17,7 @@ import taskey.logic.TagCategory;
  */
 public class AutoComplete {
 	private HashMap<String,String> commandList = new HashMap<String,String>();
+	private ArrayList<String> specialDays = new ArrayList<String>(); 
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
 	
@@ -45,6 +46,14 @@ public class AutoComplete {
 		viewList.add("events");
 		viewList.add("archive");
 		viewList.add("help");
+		
+		specialDays.add("sun");
+		specialDays.add("mon");
+		specialDays.add("tue");
+		specialDays.add("wed");
+		specialDays.add("thu");
+		specialDays.add("fri");
+		specialDays.add("sat");
 		
 	}
 	
@@ -162,10 +171,12 @@ public class AutoComplete {
 		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
 	
+	//TODO
 	public void completeAdd(String phrase) {
 		//help user to fill in date if any 
 	}
 	
+	//TODO
 	public void completeEdit(String phrase) {
 		//help user to fill in !!! or date 
 	}

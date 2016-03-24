@@ -18,6 +18,11 @@ public class LogicConstants {
 	public static final String MSG_EXCEPTION_UNDO = "Nothing to undo!";
 	public static final String MSG_EXCEPTION_TAG_NOT_FOUND = "No matches found.";
 	public static final String MSG_EXCEPTION_SEARCH_NOT_FOUND = "No matches found.";
+	public static final String MSG_ADD_SUCCESSFUL = "Successfully added task.";
+	public static final String MSG_DELETE_SUCCESSFUL = "Successfully deleted task.";
+	public static final String MSG_DELETE_TAGS_SUCCESSFUL = "Successfully deleted tagged task(s).";
+	public static final String MSG_DONE_SUCCESSFUL = "Task moved to archive.";
+	public static final String MSG_UPDATE_SUCCESSFUL = "Successfully updated task.";
 	
 	public enum ListID {
 		THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6), ACTION(7);

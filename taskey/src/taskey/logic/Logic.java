@@ -417,7 +417,7 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_TAGS_SUCCESSFUL));
 	}
 
 	// Clears all task lists and the tag database, and saves the updated lists to disk.
@@ -481,7 +481,7 @@ public class Logic {
 		// this list.
 		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 	}
 
 	// Adds a deadline task to the relevant lists, and saves the updated lists to disk.
@@ -535,7 +535,7 @@ public class Logic {
 		// this list.
 		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 	}
 	
 	// Adds an event task to the relevant lists, and saves the updated lists to disk.
@@ -590,7 +590,7 @@ public class Logic {
 		// this list.
 		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 	}
 	
 	// Removes an indexed task from the current tab and saves the updated lists to disk.
@@ -634,7 +634,7 @@ public class Logic {
 		}
 
 		taskLists = cloneLists(modifiedCopy);		
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
 	}
 
 	// Search for all expired and pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
@@ -715,7 +715,7 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DONE_SUCCESSFUL));
 	}
 
 	// Updates an indexed task's name on the current tab and saves the updated lists to disk.
@@ -760,7 +760,7 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 
 	// Updates an indexed task's date on the current tab and saves the updated lists to disk.
@@ -820,7 +820,7 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);	
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 	
 	// Updates an indexed task's name and date on the current tab and saves the updated lists to disk. 
@@ -874,7 +874,7 @@ public class Logic {
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
+		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 
 	// Undo the last change to the task lists.

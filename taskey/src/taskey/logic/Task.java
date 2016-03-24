@@ -2,6 +2,7 @@ package taskey.logic;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import taskey.parser.TimeConverter; 
 import static taskey.constants.ParserConstants.DAY_END_SHORT; 
@@ -22,7 +23,13 @@ import static taskey.constants.ParserConstants.DAY_END_SHORT;
  * dates*[2]: end Time (events) 
  * dates*[3]: deadline 
  * idea for recurring : store the diff in time to the next recurrence in seconds
- * TODO: decide how to store the diff in time of a recurring event in human time. 
+ * RECURRING WILL NOT BE IMPLEMENTED FOR NOW 
+ * 
+ * PRIORITY FOR THE TASK:
+ * HIGH: 3
+ * MEDIUM: 2
+ * LOW: 1
+ * Default: LOW (1) 
  * 
  * @author Xue Hui 
  *
@@ -37,6 +44,8 @@ public class Task implements Comparable<Task> {
 	private String taskType = null; 
 	private long[] datesEpoch = {NONE,NONE,NONE,NONE}; 
 	private String[] datesHuman = {EMPTY,EMPTY,EMPTY,EMPTY};
+	private int priority = 1; //default. to add this to toString for debugging
+	boolean pinTask = false; //default: not pinned, to decide whether or not to add this
 	
 	private TimeConverter timeConverter = new TimeConverter(); 
 	
@@ -253,7 +262,23 @@ public class Task implements Comparable<Task> {
 		datesHuman[3] = timeConverter.toHumanTime(deadline); 	
 		
 	}
-	 
+	
+	/**
+	 * @return priority of the task. where 1 is the lowest priority and
+	 * 3 is the highest priority
+	 */
+	public int getPriority() {
+		return priority;
+	}
+	
+	/**
+	 * Set the priority of the task, where 1 is the lowest priority and
+	 * 3 is the highest priority 
+	 * @param priority
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority; 
+	}
 	
 	//NON-BASIC METHODS ==========================================
 	
@@ -322,12 +347,14 @@ public class Task implements Comparable<Task> {
 		Task duplicate = new Task();
 		
 		if (taskName != null) {
-			duplicate.setTaskName(taskName);
+			duplicate.setTaskName(new String(taskName));
 		}
 		
 		if (taskTags != null) {
 			duplicate.setTaskTags(new ArrayList<String>(taskTags));
 		}
+		
+		duplicate.setPriority(new Integer(priority));
 		
 		if (taskType != null) {
 			duplicate.setTaskType(this.getTaskType());
@@ -337,15 +364,14 @@ public class Task implements Comparable<Task> {
 					//nothing else to add. 
 					break;
 				case "DEADLINE":
-					duplicate.setDeadline(this.getDeadlineEpoch());
+					duplicate.setDeadline(new Long(this.getDeadlineEpoch()));
 					break;
 				case "EVENT":
-					duplicate.setStartDate(this.getStartDateEpoch());
-					duplicate.setEndDate(this.getEndDateEpoch());
+					duplicate.setStartDate(new Long(this.getStartDateEpoch()));
+					duplicate.setEndDate(new Long(this.getEndDateEpoch()));
 					break; 
 			}
-		}
-		
+		}	
 		return duplicate; 
 	}
 	
@@ -356,23 +382,110 @@ public class Task implements Comparable<Task> {
 	 * So that one can easily just call Collections.sort(taskList) 
 	 */
 	public int compareTo(Task anotherTask) {
-		long startTime = datesEpoch[1]; 
-		long otherStartTime = anotherTask.getStartDateEpoch(); 
+		long startTime = -1; 
+		if (this.taskType.compareTo("EVENT") == 0) {
+			startTime = getStartDateEpoch(); 
+		} else if (this.taskType.compareTo("DEADLINE") == 0) { 
+			startTime = getDeadlineEpoch(); 
+		}
 		
-		if (startTime > otherStartTime) {
+		String otherTaskType = anotherTask.getTaskType(); 
+		String otherTaskName = anotherTask.getTaskName(); 
+		int otherTaskPriority = anotherTask.getPriority(); 
+		long otherStartTime = -1; 
+		if (anotherTask.getTaskType().compareTo("EVENT") == 0) {
+			otherStartTime = anotherTask.getStartDateEpoch(); 
+		} else if (anotherTask.getTaskType().compareTo("DEADLINE") == 0) { 
+			otherStartTime = anotherTask.getDeadlineEpoch(); 
+		}
+		//1. Sort by Priority
+		//2. Sort by type (Event and Deadline first, floating behind
+		//3. Sort by task name (alphabetical order) 
+		
+		if (this.priority > otherTaskPriority) {
 			return 1; 
-		} else if (startTime == otherStartTime) {
-			return 0;
+		} else if (this.priority == otherTaskPriority) {
+			return compareByTaskType(startTime, otherTaskType, otherTaskName, otherStartTime);
 		} else {
-			return -1;
-		} 
+			return -1; //this.priority < otherTaskPriority 
+		}
 	}
 	
 	/**
-	 * tasks are the same if they have the same name
+	 * Compare the priority of the tasks based on whether it is floating, deadline or event
+	 * @param startTime
+	 * @param otherTaskType
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return 1 if this task is "greater" than the other Task, 0 if they are the same,
+	 * and -1 if this task is "lesser" then the other Task 
+	 */
+	private int compareByTaskType(long startTime, String otherTaskType, String otherTaskName, long otherStartTime) {
+		//FLOATING HAS THE LOWEST PRIORITY : compare by name 
+		if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("FLOATING") == 0) {
+			return compareTaskNames(otherTaskName);
+		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return -1; 
+		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return -1; 
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+			return 1; 
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+			return 1; 
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+		} 
+		return 0; //shouldn't get here. 
+	}
+
+	/**
+	 * Compare Events and Deadline:
+	 * 1) Based on Time
+	 * 2) Based on name, if time is the same 
+	 * @param startTime
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return
+	 */
+	private int compareNonFloating(long startTime, String otherTaskName, long otherStartTime) {
+		if (startTime > otherStartTime) {
+			return 1;
+		} else if (startTime == otherStartTime) {
+			return compareTaskNames(otherTaskName);
+		} else {
+			return -1; 
+		}
+	}
+	
+	/**
+	 * Compare events, floatings or deadlines based on their task names
+	 * @param otherTaskName
+	 * @return
+	 */
+	private int compareTaskNames(String otherTaskName) {
+		//compare by name 
+		if (this.taskName.compareTo(otherTaskName) == 0) {
+			return 0; 
+		} else if (this.taskName.compareTo(otherTaskName) > 0) {
+			return 1; //this task name is greater than the other task name 
+		} else {
+			return -1; //less impt than the other task name
+		}
+	}
+	
+	
+	/**
+	 * @@author A0134177E
+	 * Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.
 	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
 	 * @param anotherTask
-	 * @return true if they have the same name, else return false 
+	 * @return true if the two Tasks are equal
 	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Task)) {
@@ -381,15 +494,20 @@ public class Task implements Comparable<Task> {
 		
 		Task other = (Task) obj;
 		
-		if (taskName == null) {
-			return (other.getTaskName() == null);
+		// All Task objects are created by Parser, and should not have a null task name or task type
+		assert(taskName != null && other.taskName != null); 
+		assert(taskType != null && other.taskType != null);
+		
+		if (taskName.equals(other.taskName) && taskType.equals(other.taskType)) {
+			return (Arrays.equals(datesEpoch, other.datesEpoch) && Arrays.equals(datesHuman, other.datesHuman));
 		}
 		
-		return ((other.getTaskName() != null) && taskName.equals(other.getTaskName())); 
+		return false;
 	}
 	
 	@Override 
 	/**
+	 * @@author A0107345L 
 	 * For debugging 
 	 */
 	public String toString() {
@@ -427,10 +545,15 @@ public class Task implements Comparable<Task> {
 			stringRep += "\n";
 		}
 		
+		if (priority > 1) {
+			stringRep += "priority: " + priority + "\n";
+		}
+		
 		return stringRep; 
 	}
 	
-	/* For testing
+	/* @@author A0134177E
+	 * To test whether the getDuplicate() method returns a deep copy of a given Task.
 	public static void main(String[] args) {
 		Task t1 = new Task("t1");
 		t1.setTaskType("FLOATING");
@@ -442,5 +565,4 @@ public class Task implements Comparable<Task> {
 		System.out.println("t1: " + t1);
 		System.out.println("t2: " + t2);
 	}*/
-
 }

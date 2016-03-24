@@ -21,11 +21,13 @@ import javafx.scene.text.TextFlow;
 import taskey.constants.UiConstants;
 
 /**
+ * @@author A0125419H
  * This class contains methods to manipulate a GridPane,
  * It is used by all the UiFormatter objects
  * 
  * @author junwei
  */
+
 public class UiGridHelper {
 	
 	private String defaultWrapperStyle; // use the style the StackPane in a cell on creation if it does not exist
@@ -160,6 +162,4 @@ public class UiGridHelper {
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;
 	}
-	
-	
 }

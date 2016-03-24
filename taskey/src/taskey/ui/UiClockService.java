@@ -10,10 +10,12 @@ import javafx.util.Duration;
 import taskey.constants.UiConstants;
 
 /**
+ * @@author A0125419H
  * This class performs a background service, which updates the UI clock.
  *
  * @author JunWei
  */
+
 public class UiClockService extends ScheduledService<Void> {
 
 	private Label timeLabelRef;
@@ -35,7 +37,7 @@ public class UiClockService extends ScheduledService<Void> {
 				Calendar cal = Calendar.getInstance(); // need to get a new updated instance every time
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
-					public void run() {
+					public void run() {		
 						//timeLabelRef.setText(formatTime(cal)); (Time will not be in the program for now)
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}

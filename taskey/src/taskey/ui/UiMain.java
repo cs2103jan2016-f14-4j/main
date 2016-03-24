@@ -6,8 +6,11 @@ import java.util.logging.Level;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.UiConstants;
@@ -19,8 +22,10 @@ import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
 import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiPopupManager;
 
 /**
+ * @@author A0125419H
  * This class is the main entry point for Taskey. 
  * It performs the main setups for the UI.
  *
@@ -30,25 +35,87 @@ import taskey.ui.utility.UiImageManager;
 public class UiMain extends Application {
 
 	private UiController myController;
-	private Parent root = null;
 	private UiTrayModule trayModule;
 	
 	/**
-	 * This method loads the .fxml file and set ups the scene
+	 * This method loads the .fxml file and returns a region object
 	 *
-	 * @param primaryStage the primary stage
+	 * @param theController - the class to set as controller
+	 * @param fileName - name of fxml file
 	 */
-	@Override
-	public void start(Stage primaryStage) {
-		myController = new UiController();
-		FXMLLoader myloader = new FXMLLoader(getClass().getResource(UiConstants.FXML_PATH));
-		myloader.setController(myController);
+	private Region loadFXML(Object theController, String fileName) {
+		FXMLLoader myloader = new FXMLLoader(getClass().getResource(fileName));
+		Region contentRootRegion = null;
+		myloader.setController(theController);
 		try {
-			root = myloader.load();
+			contentRootRegion = (Region) myloader.load();
 		} catch (IOException e) {
 			System.out.println(UiConstants.FXML_LOAD_FAIL);
 		}
-		setUpScene(primaryStage, root);
+		return contentRootRegion;
+	}
+	
+	/**
+	 * This method is the main entry point for javafx, it performs initializations
+	 * 
+	 * @param primaryStage is passed from Application
+	 */
+	@Override
+	public void start(Stage primaryStage) {
+		UiImageManager.getInstance().loadImages();
+		myController = new UiController();
+		// set up main window
+		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
+		setUpScene(primaryStage, root); // set up main scene
+		// set up alert window
+		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
+		trayModule = new UiTrayModule();
+		trayModule.createTrayIcon(primaryStage);
+		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
+	}
+	
+	/**
+	 * This method setups the scene for resizing, by placing all the nodes inside a group object centered in a StackPane
+	 * and setting its scale according to the size of the scene
+	 * 
+	 * Credits: http://gillius.org/blog/2013/02/javafx-window-scaling-on-resize.html
+	 */
+	private Region setUpResize(Stage primaryStage, Region contentRootRegion) {
+		 //Set a default "standard" or "100%" resolution
+	    double origW = UiConstants.MIN_SIZE.getWidth()*2;
+	    double origH = UiConstants.MIN_SIZE.getHeight()*2;
+		// If the Region containing the GUI does not already have a preferred
+		// width and height, set it.
+		// But, if it does, we can use that setting as the "standard"
+		// resolution.
+		if (contentRootRegion.getPrefWidth() == Region.USE_COMPUTED_SIZE)
+			contentRootRegion.setPrefWidth(origW);
+		else
+			origW = contentRootRegion.getPrefWidth();
+
+		if (contentRootRegion.getPrefHeight() == Region.USE_COMPUTED_SIZE)
+			contentRootRegion.setPrefHeight(origH);
+		else
+			origH = contentRootRegion.getPrefHeight();
+
+		// Wrap the resizable content in a non-resizable container (Group)
+		Group group = new Group(contentRootRegion);
+		// Place the Group in a StackPane, which will keep it centered
+		StackPane rootPane = new StackPane();
+		rootPane.getChildren().add(group);
+
+		Scene newScene = new Scene(rootPane, origW, origH);
+		primaryStage.setScene(newScene);
+		// Bind the scene's width and height to the scaling parameters on the group
+		group.scaleXProperty().bind(newScene.widthProperty().divide(origW));
+		group.scaleYProperty().bind(newScene.heightProperty().divide(origH));
+
+		// set event handlers / listener
+		UiResizeListener listener = new UiResizeListener(newScene, primaryStage);
+		newScene.setOnMouseMoved(listener);
+		newScene.setOnMousePressed(listener);
+		newScene.setOnMouseDragged(listener);
+		return contentRootRegion;
 	}
 
 	/**
@@ -60,15 +127,11 @@ public class UiMain extends Application {
 	 *             
 	 */
 	private void setUpScene(Stage primaryStage, Parent root) {
-		UiImageManager.getInstance().loadImages();
 		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
-		Scene newScene = new Scene(root);
-		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
-		primaryStage.setScene(newScene);
-		primaryStage.setResizable(false);
-		trayModule = new UiTrayModule(primaryStage);
 		
+		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
+
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();

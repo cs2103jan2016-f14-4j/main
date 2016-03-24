@@ -85,6 +85,9 @@ FIXED: add bar by tmr at 11pm (does not read tmr)
 
 ------ ALL POSSIBLE PERMUTATIONS -----
 add do homework
+add do homework !!!
+add do homework !
+add do homework !!
 add do homework at 11pm
 add do homework on mon
 add do homework on mon 11pm

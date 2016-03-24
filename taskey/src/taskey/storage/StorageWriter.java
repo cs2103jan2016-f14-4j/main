@@ -9,6 +9,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
@@ -42,8 +43,10 @@ class StorageWriter {
     	File dest = new File(filename);
     	try {
     		writeToFile(dest, dir, new TypeToken<File>() {});
+    		System.out.println("{New storage directory saved}"); //debug info
     	} catch (IOException e) {
     		e.printStackTrace();
+    		System.out.println("{Error saving new directory}"); //debug info
     	}
     }
 
@@ -65,10 +68,29 @@ class StorageWriter {
 			throw e;
 		}
     }
+    
+    /*========================*
+     * Save tags - New method *
+     *========================*/
+    /**
+     * Saves the given ArrayList of Tags to the File dest.
+     * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
+     * @param tags ArrayList containing the user-defined tags
+     * @param dest the destination file to be written to
+     * @throws IOException when there is error writing to file
+     */
+    void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
+    	try {
+    		writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		throw e;
+    	}
+    }
 
-    /*===========*
-     * Save tags *
-     *===========*/
+    /*============================*
+     * Save tags - Leagacy method *
+     *============================*/
     /**
      * Saves the given HashMap containing user-defined tags to the File dest.
      * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.

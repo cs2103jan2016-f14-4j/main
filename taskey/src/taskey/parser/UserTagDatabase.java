@@ -1,11 +1,10 @@
 package taskey.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import taskey.logic.TagCategory;
 import taskey.storage.Storage;
 
 /**
@@ -19,12 +18,19 @@ import taskey.storage.Storage;
  */
 public class UserTagDatabase {
 	//public static final int MAX_TAGS = 15; 
-	HashMap<String,Integer> userTags = new HashMap<String,Integer>(); 
-	Storage db = new Storage(); 
+	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
+	Storage db; 
 	
-	public UserTagDatabase() {
+	//@@author A0134177E
+	public UserTagDatabase(Storage storage) {
+		db = storage;
 		//initialise the database of tags. 
-		userTags = db.loadTags();  
+		userTags = cloneTagList(db.loadTaglist());  
+	}
+	
+	public void setTags(ArrayList<TagCategory> tagList) {
+		assert(tagList != null);
+		userTags = cloneTagList(tagList);
 	}
 	
 	/**
@@ -35,15 +41,23 @@ public class UserTagDatabase {
 	}
 	
 	/**
+	 * @@author A0107345L
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
 	 */
 	public void addTag(String tag) {
-		if (!userTags.containsKey(tag)) {
-			userTags.put(tag,new Integer(1)); 
+		TagCategory newTag = new TagCategory(tag); 
+		
+		if (!containsTagName(tag)) {
+			userTags.add(newTag); 
 		} else {
-			int temp = userTags.get(tag) + 1; 
-			userTags.put(tag, temp); 
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tagCat = userTags.get(i); 
+				if (tagCat.compareTo(newTag) == 0) { 
+					tagCat.increaseCount();
+					break; 
+				}
+			}
 		}
 	}
 	
@@ -54,17 +68,70 @@ public class UserTagDatabase {
 	 * @return true if successfully removed
 	 */
 	public boolean removeTag(String tag) {
-		if (userTags.containsKey(tag)) {
-			int temp = userTags.get(tag) - 1;
-			if (temp <= 0) {
-				userTags.remove(tag); 
-			} else {
-				//there are still tasks with that tag
-				userTags.put(tag, temp); 
+		TagCategory toRemove = new TagCategory(tag); 
+		
+		if (containsTagName(tag)) {
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tagCat = userTags.get(i); 
+				if (tagCat.compareTo(toRemove) == 0) { 
+					tagCat.decreaseCount();
+					//if 0 tasks with that tag, remove it from arraylist
+					if (tagCat.isEmpty()) {
+						userTags.remove(i);  
+					}
+					break; 
+				}
 			}
 			return true; 
 		}
 		return false;
+	}
+	
+	//@@author A0134177E
+	public boolean removeTagCategory(String tag) {
+		for (Iterator<TagCategory> it = userTags.iterator(); it.hasNext();) {
+			TagCategory tc = it.next();
+			
+			if (tc.getTagName().equals(tag)) {
+				it.remove();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * @@author A0107345L
+	 * For Logic: Get the entire tagList so that 
+	 * it can be displayed by the UI.
+	 * @return
+	 */
+	public ArrayList<TagCategory> getTagList() {
+		return cloneTagList(userTags);
+	}
+	
+	/**
+	 * @@author A0134177E
+	 * Save the tag hash map into a file for persistent storage. 
+	 * @return true if save was successful; false otherwise
+	 */
+	public boolean saveTagDatabase() {
+		try {
+			return db.saveTaglist(cloneTagList(userTags));
+		} catch (IOException e) {
+			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
+			return false; 
+		} 
+	}
+	
+	public ArrayList<TagCategory> cloneTagList(ArrayList<TagCategory> tagList) {
+		ArrayList<TagCategory> clone = new ArrayList<TagCategory>();
+		for (TagCategory tc : tagList) {
+			clone.add(new TagCategory(tc));
+		}
+		
+		return clone;
 	}
 	
 	/**
@@ -72,77 +139,28 @@ public class UserTagDatabase {
 	 * @param tag
 	 * @return true if the tag exists in database
 	 */
-	public boolean hasTag(String tag) {
-		if (userTags.containsKey(tag)) {
-			return true;
-		}	
-		return false; 
-	}
-	
-	/**
-	 * For Logic: Get the entire tagList so that 
-	 * it can be displayed by the UI.
-	 * Remember to call this function every time a task tag is added/removed,
-	 * cos the main form is a HashMap...
-	 * @return
-	 */
-	public ArrayList<String> getTagList() {
-		ArrayList<String> tagList = new ArrayList<String>(); 
-		
-		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				tagList.add(pair.getKey()); 
+	public boolean containsTagName(String name) {
+		for (TagCategory tc : userTags) {
+			if (tc.getTagName().equals(name)) {
+				return true;
 			}
 		}
-		return tagList; 
-	}
-	
-	/**
-	 * For Logic: Get the sizes of each tag category so that 
-	 * it can be displayed by the UI.
-	 * Remember to call this function every time a task tag is added/removed,
-	 * cos the main form is a HashMap...
-	 * @return
-	 */
-	public ArrayList<Integer> getTagSizes() {
-		ArrayList<Integer> tagSizes = new ArrayList<Integer>(); 
 		
-		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				tagSizes.add(pair.getValue()); 
-			}
-		}
-		return tagSizes; 
+		return false;
 	}
-  
-	/**
-	 * Save the tag hash map into a file for persistent storage. 
-	 * @return true if save was successful; false otherwise
-	 */
-	public boolean saveTagDatabase() {
-		return db.saveTags(userTags); 
-	}
-    
-	
+   
     /*
+     * @@author A0107345L
      * FOR DEBUGGING
      */
-    
 	@Override
 	public String toString() {
 		String stringRep = "";
 		if (!userTags.isEmpty()) {
-			Iterator<Entry<String, Integer>> itKeys = userTags.entrySet().iterator(); 
-			
-			while(itKeys.hasNext()) {
-				Map.Entry<String,Integer> pair = (Map.Entry<String,Integer>) itKeys.next(); 
-				stringRep += pair.getKey() + ","; 
+			for(int i = 0; i < userTags.size(); i++) {
+				TagCategory tag = userTags.get(i);
+				stringRep += "Tag Name: " + tag.getTagName() + ", ";
+				stringRep += "TagCount: " + tag.getNumTags() + "\n"; 
 			}
 		}
 		return stringRep; 
@@ -152,8 +170,13 @@ public class UserTagDatabase {
 	public static void main(String[] args) {
 		UserTagDatabase db = new UserTagDatabase(); 
 		db.addTag("hello");
+		db.addTag("hello");
 		db.addTag("monkey");
+		db.addTag("hello");
+		db.removeTag("hello");
 		System.out.println(db);
-		db.saveTagDatabase(); 
-	} */
+		db.removeTag("monkey");
+		System.out.println(db);
+		//db.saveTagDatabase(); 
+	} */ 
 }

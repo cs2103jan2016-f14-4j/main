@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
+* @@author A0125419H
 * This class implements a tray module for the program, adapted from 
 * http://stackoverflow.com/questions/14626550/to-hide-javafx-fxml-or-javafx-swing-application-to-system-tray
 * @author alvaro, junwei
@@ -27,21 +28,39 @@ import javafx.stage.WindowEvent;
 public class UiTrayModule {
 	private TrayIcon trayIcon;
 	
-	public UiTrayModule ( Stage primaryStage ) {
-		createTrayIcon(primaryStage);
+	public UiTrayModule ( ) {
 		Platform.setImplicitExit(false);
 	}
 	
+	/**
+	 * This method creates the window dependency link between the alerts Window and the main Window
+	 * @param main - main Stage
+	 * @param alerts - alerts Stage
+	 */
+	public void doLinkage(Stage main, Stage alerts) {
+		main.setOnHidden(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent t) {	
+				hide(main);
+				UiAlertController.getInstance().show();
+			}
+		});
+		
+		alerts.setOnHidden(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent t) {	
+				UiAlertController.getInstance().hide();
+				main.show();
+			}
+		});
+	}
 	public void createTrayIcon(final Stage stage) {
+		
+		
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
 			SystemTray tray = SystemTray.getSystemTray();
-			stage.setOnHidden(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent t) {
-					hide(stage);
-				}
-			});
+			
 			// create a action listener to listen for default action executed on
 			// the tray icon
 			final ActionListener closeListener = new ActionListener() {
@@ -57,6 +76,7 @@ public class UiTrayModule {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
+							UiAlertController.getInstance().hide();
 							stage.show();
 						}
 					});

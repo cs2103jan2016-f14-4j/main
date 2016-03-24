@@ -1,9 +1,17 @@
+/* @@author A0125419H */
 /* Note: Affects all scroll panes */
 .scroll-pane {
 }
 
 .scroll-pane > .viewport { /* Needed to color scroll pane's view port */
    -fx-background-color: #ebf4fb;
+}
+
+.text-field {
+    -fx-prompt-text-fill: #206ba4;
+}
+.text-field:focused {
+    -fx-prompt-text-fill: transparent ;
 }
 
 /* Bound to fx:id */
@@ -106,10 +114,8 @@
     -fx-background-color: #ebf4fb, #206ba4;
 }
 
-.ellipse {
-	-fx-padding: 5px;
-	-fx-background-color: linear-gradient(#ebf4fb, #206ba4);
-    -fx-background-radius: 10px;
-    -fx-background-insets: 0px, 5px;
+.helpSelector {
+    -fx-padding: 5px;
+	-fx-background-color: #206ba4;
 }
 

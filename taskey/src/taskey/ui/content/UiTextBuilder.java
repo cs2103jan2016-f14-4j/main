@@ -8,11 +8,13 @@ import javafx.util.Pair;
 import taskey.constants.UiConstants;
 
 /**
+ * @@author A0125419H
  * This class provides a way to configure different styles given a string as input.
  * It builds an array of Text objects to be returned 
  *
  * @author Junwei
  */
+
 public class UiTextBuilder {
 	private ArrayList<Pair<Integer, String>> styleMarkers; 
 	private char symbol; 

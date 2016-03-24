@@ -131,7 +131,7 @@ public class Storage {
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
 	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
-	 * <br>- If any single list was not found, an empty superlist is returned.
+	 * <br>- If any single list was not found, or is invalid, an empty superlist is returned.
 	 * @return the superlist of tasklists read from disk, or an empty superlist
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {

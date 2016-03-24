@@ -11,8 +11,23 @@ PS: Take note of stuff in bold as they are important keywords.
   <li>F1: Help Menu
   <li>F2: Dark Theme
   <li>F3: Light Theme 
-  <li>Ctrl+W : Minimise Taskey
+  <li>Ctrl+W : Minimise/Re-Open Taskey
+  <li>Tab: Scroll through the tabs 
+  <li>Page Up: Scroll up the task list
+  <li>Page Down: Scroll down the task list
+  <li>Left Arrow Key: view previous page
+  <li>Right Arrow Key: view next page
+  <li>Up/Down Arrow Keys: get previous commands
 </ul> 
+
+###Reserved Characters
+
+The following characters are reserved for special usage and should not be used in task names:
+<ul>
+  <li>! : Used for specifying task priorities (low:!, medium: !!, high: !!!)
+  <li># : Used for specifying hashtags for a task 
+  <li>^ : For our AutoComplete feature to suggest a list of dates for you
+</ul>
 
 ###Accepted date/time formats
 <ul>
@@ -23,10 +38,19 @@ PS: Take note of stuff in bold as they are important keywords.
 </ul>
 
 ###Adding a task
+
+Format: 
+
+- Floating: add \<taskname\> 
+- Deadline: add \<taskname\> on/by \<date/time\> 
+- Event: add \<taskname\> from \<date/time\> to \<date/time\>
+- Adding hashtags/ priorities: [any of the above 3] + "#hashtags !!!" (adding of priorities must come after adding of hashtags)
+
 Examples: 
 <ul> 
   <li><b>add</b> learn cooking
-  <li><b>add</b> do homework <b>by</b> tomorrow
+  <li><b>add</b> learn cooking #leisure
+  <li><b>add</b> do homework <b>by</b> tomorrow !!! 
   <li><b>add</b> meet friends <b>on</b> 20 feb 2016 
   <li><b>add</b> project meeting <b>from</b> 4pm <b>to</b> 5pm on 19 feb 
   <li><b>add</b> project meeting <b>from</b> 19 feb 3pm <b>to</b> 4pm
@@ -44,9 +68,10 @@ Examples:
 </ul> 
 
 ###Editing a task
-A task's name or its date details can be changed when required.
+A task's name, priority or its date details can be changed when required.
 
 Format: set \<old taskname/id\> "new taskname"/[new date] 
+<br> set \<old taskname/id\> \<new priority\>
 
 Examples:
 <ul> 
@@ -55,6 +80,7 @@ Examples:
   <li><b>set</b> learn cooking [19 feb] 
   <li><b>set</b> 1 [19 feb 3pm, 19 feb 4pm] 
   <li><b>set</b> 1 "learn golf" [19 feb 5pm,19 feb 6pm]
+  <li><b>set</b> 1 !!!
 </ul> 
 
 ###Archive a task

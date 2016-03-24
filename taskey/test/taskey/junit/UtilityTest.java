@@ -41,7 +41,7 @@ public class UtilityTest {
 		TaskeyLog.getInstance().log(LogSystems.UI, longString,  Level.ALL);
 		File fileOne = new File("logs/test.out");
 		assertTrue(fileOne.exists());	
-		assertTrue( fileOne.length() < 1000); // overwrites repeatel
+		assertTrue( fileOne.length() < 1000); // overwrites repeatedly
 		File fileTwo = new File("logs/test2.out");
 		assertTrue(fileTwo.exists());	
 		assertTrue( fileTwo.length() < 1000);

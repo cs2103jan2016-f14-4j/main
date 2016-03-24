@@ -3,6 +3,7 @@ package taskey.ui.utility;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
@@ -74,6 +75,16 @@ public class UiAnimationManager {
 		return shift;	
 	}
 	
+	
+	public ScaleTransition createScaleTransition(Node theNode, double scaleByX, double scaleByY, int cycleCount, 
+												 boolean autoReverse, int animDuration) {
+		ScaleTransition scale = new ScaleTransition(Duration.millis(animDuration), theNode);
+		scale.setByX(scaleByX);
+		scale.setByY(scaleByY);
+		scale.setCycleCount(cycleCount);
+		scale.setAutoReverse(autoReverse);
+		return scale;
+	}
 	/**
 	 * Creates the timeline animation for shifting text around based on frames
 	 * This is a little choppy at the moment, a better alternative is based on translation

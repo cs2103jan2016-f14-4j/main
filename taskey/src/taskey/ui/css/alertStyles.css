@@ -1,0 +1,26 @@
+/* @@author A0125419H */
+/* Note: Affects all scroll panes */
+.root {
+	-fx-background-color: rgba(0,0,0,0.0);
+}
+.scroll-pane {
+	 -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport { /* Needed to color scroll pane's view port */
+ 	 -fx-background-color: transparent;
+}
+
+#main {
+	 -fx-background-color: red;
+}
+.highlightBox {
+	-fx-background-color: #234187;
+}
+
+.numberIcon {
+	-fx-background-color: 
+        radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
+    -fx-padding: 3px;
+    -fx-effect: dropshadow(  gaussian  , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 3 );
+}

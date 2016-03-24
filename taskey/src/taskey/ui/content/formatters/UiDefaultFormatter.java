@@ -59,12 +59,17 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	@Override
 	public void processArrowKey(KeyEvent event) {
-		myTaskView.getView().processArrowKey(event);
+		myTaskView.getView().processKey(event);
 	}
 
 	@Override
 	public int processDeleteKey() {
 		return myTaskView.getView().getSelection() + 1;
+	}
+	
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {
+		myTaskView.getView().processKey(event);
 	}
 	
 	@Override
@@ -97,5 +102,5 @@ public class UiDefaultFormatter extends UiFormatter {
 	public void cleanUp() {
 		myTaskView.clear();
 		clearCurrentGridContents();
-	}
+	}	
 }

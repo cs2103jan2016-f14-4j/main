@@ -119,4 +119,10 @@ public class UiContentManager {
 		UiFormatter myFormatter = myFormatters.get(arrayIndex);
 		myFormatter.processEnterKey();
 	}
+	
+	public void processPageUpAndDown(KeyEvent event, ContentBox currentContent) {
+		int arrayIndex = currentContent.getValue();
+		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		myFormatter.processPageUpAndDown(event);
+	}
 }

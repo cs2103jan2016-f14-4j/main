@@ -21,6 +21,7 @@ public class UserTagDatabase {
 	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
 	Storage db; 
 	
+	//@@author A0134177E
 	public UserTagDatabase(Storage storage) {
 		db = storage;
 		//initialise the database of tags. 
@@ -40,6 +41,7 @@ public class UserTagDatabase {
 	}
 	
 	/**
+	 * @@author A0107345L
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
 	 */
@@ -85,6 +87,7 @@ public class UserTagDatabase {
 		return false;
 	}
 	
+	//@@author A0134177E
 	public boolean removeTagCategory(String tag) {
 		for (Iterator<TagCategory> it = userTags.iterator(); it.hasNext();) {
 			TagCategory tc = it.next();
@@ -99,6 +102,7 @@ public class UserTagDatabase {
 	}
 
 	/**
+	 * @@author A0107345L
 	 * For Logic: Get the entire tagList so that 
 	 * it can be displayed by the UI.
 	 * @return
@@ -108,6 +112,7 @@ public class UserTagDatabase {
 	}
 	
 	/**
+	 * @@author A0134177E
 	 * Save the tag hash map into a file for persistent storage. 
 	 * @return true if save was successful; false otherwise
 	 */
@@ -116,7 +121,6 @@ public class UserTagDatabase {
 			db.saveTaglist(cloneTagList(userTags));
 			return true;
 		} catch (IOException e) {
-			System.out.println("save fail");
 			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 
 		} 
@@ -147,6 +151,7 @@ public class UserTagDatabase {
 	}
    
     /*
+     * @@author A0107345L
      * FOR DEBUGGING
      */
 	@Override

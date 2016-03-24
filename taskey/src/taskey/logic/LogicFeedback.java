@@ -3,10 +3,11 @@ package taskey.logic;
 import java.util.ArrayList;
 
 /**
+ * @@author A0134177E
  * This class is the default feedback mechanism from Logic to UI.
  * Objects of this class encapsulate ArrayLists of Task objects for updating the UI display,
  * a ProcessedObject which by itself encapsulates information on the executed command and its associated
- * task, and an integer status code to reflect the outcome of command execution.
+ * task, and an Exception reflect the outcome of command execution.
  * 
  * @author Hubert
  */
@@ -23,7 +24,7 @@ public class LogicFeedback {
 	 */
 	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
 		assert (taskLists != null);
-		assert (taskLists.size() == 7); //taskLists should be fully initialized
+		assert (taskLists.size() == 8); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
 		assert (po != null);
 		

@@ -2,6 +2,8 @@ package taskey.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 import javafx.collections.ObservableList;
@@ -32,6 +34,7 @@ import taskey.logic.LogicConstants.ListID;
 import taskey.parser.AutoComplete;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
+import taskey.logic.TagCategory;
 import taskey.logic.Task;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiImageManager;
@@ -72,6 +75,8 @@ public class UiController {
 	private UiContentManager myContentManager;
 	private int currentTab;
 	private ContentBox currentContent;
+	private ArrayList<String> inputHistory;
+	private int historyIterator;
 	/**
 	 * Sets the up nodes.
 	 *
@@ -88,10 +93,14 @@ public class UiController {
 		setUpTabDisplay();
 		registerEventHandlersToNodes(root);
 		myDropDown = new UiDropDown();
-		logic = new Logic();
-		updateAll(logic.getAllTaskLists());
 		input.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-		input.getStyleClass().add(UiConstants.STYLE_INPUT_NORMAL);
+		input.getStyleClass().add(UiConstants.STYLE_INPUT_NORMAL);		
+		inputHistory = new ArrayList<String>();
+		historyIterator = 0;
+		myTabs.requestFocus(); // to display prompt at the start
+		
+		logic = new Logic();
+		updateAll(logic.getTagList(),logic.getAllTaskLists());
 	}
 
 	/**
@@ -186,65 +195,37 @@ public class UiController {
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
 				displayTabContents(ContentBox.PENDING);
-				updateAll(allLists);
+				updateAll(logic.getTagList(),allLists);
 				break;
-			case "DELETE_BY_INDEX":
-			case "DELETE_BY_NAME":
-				updateAll(allLists);
-				break;		
-			case "VIEW":
-				String viewType = processed.getViewType();
-				if (viewType.equals("GENERAL")) {
-					updateActionDisplay(allLists.get(ListID.GENERAL.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("DEADLINES")) {
-					updateActionDisplay(allLists.get(ListID.DEADLINE.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("EVENTS")) {
-					updateActionDisplay(allLists.get(ListID.EVENT.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("ARCHIVE")) {
-					updateActionDisplay(allLists.get(ListID.COMPLETED.getIndex()), ActionMode.LIST);
-				} else if (viewType.equals("HELP")) {
-					updateActionDisplay(null, ActionMode.HELP);
-				}
-				displayTabContents(ContentBox.ACTION);
-				break;
+			case "VIEW_BASIC":
+			case "VIEW_TAGS":
 			case "SEARCH":
-				updateActionDisplay(allLists.get(ListID.SEARCH.getIndex()), ActionMode.LIST);
+				updateActionDisplay(allLists.get(ListID.ACTION.getIndex()), ActionMode.LIST);
 				displayTabContents(ContentBox.ACTION);
 				break;	
-			case "DONE_BY_INDEX":
-			case "DONE_BY_NAME":
-				updateAll(allLists);
-				break;	
-			case "UPDATE_BY_INDEX_CHANGE_NAME":
-			case "UPDATE_BY_INDEX_CHANGE_DATE":
-			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-			case "UPDATE_BY_NAME_CHANGE_NAME":
-			case "UPDATE_BY_NAME_CHANGE_DATE":
-			case "UPDATE_BY_NAME_CHANGE_BOTH":
-				updateAll(allLists);
-				break;
-			case "UNDO":
-				updateAll(allLists);
-			case "ERROR":
 			default:
-				updateAll(allLists); 
+				updateAll(logic.getTagList(),allLists);
 				break;
 		}
 	}
 	
-	public void updateAll(ArrayList<ArrayList<Task>> allLists) {
-		ArrayList<Triplet<Color,String,Integer>> categoryList;
-		categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
+	public void updateAll(ArrayList<TagCategory> tagList, ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
 				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
 				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
 				));
+		// Add tags in addition to the default lists
+		for ( int i = 0 ; i < tagList.size(); i++ ) {
+			categoryList.add(new Triplet<Color,String,Integer>(Color.DARKGRAY,tagList.get(i).getTagName(), tagList.get(i).getNumTags()));
+		}
 		updateCategoryDisplay(categoryList);
 		
 		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
 		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
 		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
+		updateDisplay(allLists.get(ListID.ACTION.getIndex()), UiConstants.ContentBox.ACTION);	
 		expiredIcon.setText(String.valueOf(allLists.get(ListID.EXPIRED.getIndex()).size()));
 	}
 	
@@ -275,7 +256,7 @@ public class UiController {
 				if (event.getCode() == KeyCode.ENTER) {	
 					String selection = myDropDown.getSelectedItem();
 					if ( selection.isEmpty() == false ) { // make selected item as input text
-						input.setText(selection);
+						input.setText(selection + " ");
 						input.selectEnd();
 						input.deselect();
 						myDropDown.closeMenu();
@@ -286,6 +267,12 @@ public class UiController {
 							handleFeedback(logic.executeCommand(getCurrentContent(),line));
 							event.consume();
 							myDropDown.closeMenu();
+							inputHistory.add(line);
+							if ( inputHistory.size() > UiConstants.MAX_INPUT_HISTORY ) {
+								inputHistory.remove(0);
+								inputHistory.trimToSize();
+							}
+							historyIterator = inputHistory.size(); // set to size instead of size()-1, for up key to work properly
 						} else {
 							myContentManager.processEnter(getCurrentContent());
 						}
@@ -294,18 +281,35 @@ public class UiController {
 			}
 		});
 	
-		// to override the default events which shift the caret / cursor position to the start and end
+		// to override default events such as shifting the caret / cursor position to the start and end
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-	          public void handle(KeyEvent event) {
-	        	  if ( event.getCode().isArrowKey()) {
-	        		  if ( event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN ) {
-	        			  event.consume();
-	        		  }
-	        	  } else if (event.getCode() == KeyCode.TAB) {
-	        		  event.consume();
-	        	  }
-	          };
-	        });	
+			public void handle(KeyEvent event) {
+				if (event.getCode().isArrowKey()) {
+					if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) { // get previous / next input history
+						event.consume();
+						if (inputHistory.size() != 0) {
+							String line;
+							if (event.getCode() == KeyCode.UP) {
+								historyIterator = Math.max(historyIterator - 1, 0);
+							} else if (event.getCode() == KeyCode.DOWN) {
+								historyIterator++; 
+							}
+							if ( historyIterator > inputHistory.size()-1) {
+								historyIterator = inputHistory.size(); // out of bounds
+								line = "";
+							} else {
+								line = inputHistory.get(historyIterator);
+							}
+							input.setText(line);
+						} 
+						input.selectEnd();
+						input.deselect();
+					}
+				} else if (event.getCode() == KeyCode.TAB) {
+					event.consume();
+				}
+			};
+		});
 	}
 
 	/**
@@ -317,21 +321,26 @@ public class UiController {
 		root.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				input.requestFocus(); // give focus to textfield
-				 if ( event.getCode().isArrowKey()) {
-	        		  if ( input.getText().isEmpty() == false ) {
-	        			  myDropDown.processArrowKey(event);
-	        		  } else {
-	        			  myContentManager.processArrowKey(event, getCurrentContent());
-	        		  }	  
-	        	  }  
-	        	  if ( event.getCode() == KeyCode.DELETE ) {
-	        		  if (input.getText().isEmpty() == true ) {
-	        			  int id = myContentManager.processDelete(getCurrentContent()); 
-	        			  if ( id != 0 ) {
-	        				  handleFeedback(logic.executeCommand(getCurrentContent(),"del " + id));
-	        			  }
-	        		  }
-	        	  }
+				if (myDropDown.isMenuShowing()) {
+					if (event.getCode().isArrowKey()) {
+						myDropDown.processArrowKey(event);
+						event.consume();
+					}
+				} else {
+					if (event.getCode() == KeyCode.DELETE) {
+						int id = myContentManager.processDelete(getCurrentContent());
+						if (id != 0) {
+							handleFeedback(logic.executeCommand(getCurrentContent(), "del " + id));
+						}
+					} else if ( event.getCode().isArrowKey()) {
+						if  ( event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.RIGHT) {
+							myContentManager.processArrowKey(event, getCurrentContent());
+						}
+					}
+				}
+				if ( event.getCode() == KeyCode.PAGE_UP || event.getCode() == KeyCode.PAGE_DOWN) {
+					myContentManager.processPageUpAndDown(event, getCurrentContent());
+				}
 			}
 		});
 		
@@ -354,7 +363,7 @@ public class UiController {
 					setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 				} else if (event.getCode() == KeyCode.F3) {
 					setStyleSheets(UiConstants.STYLE_UI_LIGHT);
-				}
+				} 
 			}
 		});
 

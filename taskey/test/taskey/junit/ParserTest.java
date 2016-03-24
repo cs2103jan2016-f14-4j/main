@@ -19,6 +19,9 @@ public class ParserTest {
 	PrettyTimeParser p = new PrettyTimeParser();
 	
 	@Test
+	/**
+	 * Test that adding floating tasks get parsed correctly 
+	 */
 	public void testFloating() {		
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
@@ -33,6 +36,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that adding deadline tasks gets parsed correctly 
+	 */
 	public void testDeadline() {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
@@ -52,18 +58,10 @@ public class ParserTest {
 				parser.parseInput("add meeting 222 on 17 Feb").toString());
 	}
 	
-	public void testDeadlineHuman() {
-		//tests the SpecialDateConverter, which is based on relative dates.
-		//thus, cannot to assert this 
-		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
-		System.out.println(parser.parseInput("add do homework by tonight")); 
-		System.out.println(parser.parseInput("add complete essay by today")); 
-		System.out.println(parser.parseInput("add complete essay by tmr")); 
-		System.out.println(parser.parseInput("add complete essay by this Wed"));
-		System.out.println(parser.parseInput("add complete essay by next Wed"));
-	}
-	
 	@Test
+	/**
+	 * Test that adding events get parsed correctly. 
+	 */
 	public void testEvents() {
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 "
 				+ "to 20 Feb 2016\n",
@@ -92,14 +90,10 @@ public class ParserTest {
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
-	public void testEventsHuman() {
-		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
-	}
-	
 	@Test
+	/**
+	 * Test that tagging gets parsed correctly 
+	 */
 	public void testTag() {
 		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
 				parser.parseInput("add meeting #sua #serious").toString());
@@ -120,7 +114,23 @@ public class ParserTest {
 		
 	}
 	
+	//TODO 
+	/**
+	 * Test the adding of tasks with priority 
+	 */
+	public void testAddPriority() {
+		//test setting of priority here 
+		System.out.println(parser.parseInput("add meeting !"));
+		System.out.println(parser.parseInput("add meeting on 18 feb !!!"));
+		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb !!"));
+		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb #boo !!"));
+		System.out.println(parser.parseInput("add meeting #sua !!"));
+	}
+	
 	@Test 
+	/**
+	 * Test setting of changes via using task index
+	 */
 	public void testChangesById() {
 		//set <task name>/<id> "new task name" 
 		//by task id
@@ -143,6 +153,9 @@ public class ParserTest {
 	}
 	
 	@Test 
+	/**
+	 * Test setting of changes via using task name 
+	 */
 	public void testChangesByName() {
 		//by task name
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_NAME\nmeeting, \n"
@@ -164,6 +177,9 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test the setting of new time 
+	 */
 	public void testChangesTimeUsage() { 
 		//test time usage
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_DATE\nDEADLINE, due on 16 "
@@ -176,6 +192,9 @@ public class ParserTest {
 	}
 	
 	@Test 
+	/**
+	 * Test the parsing of setting both name and task name in 1 command
+	 */
 	public void testChangesBothNameDate() { 
 		//test combination
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
@@ -189,12 +208,29 @@ public class ParserTest {
 				parser.parseInput("set 1 [14 mar,15 mar] \"task 2\"").toString());
 	}
 	
-	public void testChangesHuman() {
-		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
-		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
+	//TODO
+	/**
+	 * Test the changing of task priorities 
+	 */
+	public void testChangesTaskPriority() {
+		//test boundary case 
+		System.out.println(parser.parseInput("set 1 !!!")); 
+		//test out of bound case 
+		System.out.println(parser.parseInput("set 1 !!!!"));
+		System.out.println(parser.parseInput("set do homework !!"));
+		//test boundary case 
+		System.out.println(parser.parseInput("set 2 !")); 
+		//test no task name given 
+		System.out.println(parser.parseInput("set !")); 
+		//test no priority given
+		System.out.println(parser.parseInput("set 2")); 
 	}
 	
 	@Test
+	/**
+	 * Tests that the delete by index and by task name parses correctly
+	 * Also tests that it parses a category to be deleted correctly. 
+	 */
 	public void testDelete() {
 		assertEquals("Command: DELETE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("del 5").toString());
@@ -205,14 +241,18 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that the search feature parses correctly 
+	 */
 	public void testSearch() {
 		assertEquals("Command: SEARCH\nsearch phrase: hello world\n",
 				parser.parseInput("search hello world").toString());
-		assertEquals("Command: SEARCH\nsearch phrase: #mycategory\n",
-				parser.parseInput("search #mycategory").toString());
 	}
 	
 	@Test
+	/**
+	 * Test that done parses correctly by both index and task name 
+	 */
 	public void testDone() {
 		assertEquals("Command: DONE_BY_INDEX\nat index: 4\n",
 				parser.parseInput("done 5").toString());
@@ -222,21 +262,72 @@ public class ParserTest {
 	}
 	
 	@Test
+	/**
+	 * Test that the undo feature parses correctly
+	 */
 	public void testUndo() {
 		assertEquals("Command: UNDO\n",parser.parseInput("undo").toString());	
 	}
 	
+	
 	@Test 
+	/**
+	 * Test that the basic view types are all working correctly 
+	 */
 	public void testView() {
-		assertEquals("Command: VIEW\nview type: ALL\n",
+		assertEquals("Command: VIEW_BASIC\nview type: all, \n",
 				parser.parseInput("view all").toString());
-		assertEquals("Command: VIEW\nview type: GENERAL\n",
+		assertEquals("Command: VIEW_BASIC\nview type: general, \n",
 				parser.parseInput("View general").toString());
-		assertEquals("Command: VIEW\nview type: DEADLINES\n",
+		assertEquals("Command: VIEW_BASIC\nview type: deadlines, \n",
 				parser.parseInput("vieW deadlines").toString());
-		assertEquals("Command: VIEW\nview type: EVENTS\n",
+		assertEquals("Command: VIEW_BASIC\nview type: events, \n",
 				parser.parseInput("view Events").toString());
-		assertEquals("Command: VIEW\nview type: ARCHIVE\n",
+		assertEquals("Command: VIEW_BASIC\nview type: archive, \n",
 				parser.parseInput("view archive").toString());
+		
+	}
+	
+	//TODO 
+	/**
+	 * Test the viewing of tasks by tag categories 
+	 */
+	public void testViewTags() {
+		parser.parseInput("view #work");
+		parser.parseInput("view #work #homework #yolo");
+		parser.parseInput("view lala #yolo");
+	}
+	
+	
+	/*
+	 * All the methods below will be manually tested because 
+	 * dates like "tomorrow" and "today" are relative, and the time/date will
+	 * change every time the the unit test is run 
+	 */
+	
+	/**
+	 * Tests that the methods return the correct dates for human defined events 
+	 */
+	public void testEventsHuman() {
+		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
+	}
+	
+	public void testChangesHuman() {
+		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
+		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
+	}
+	
+	public void testDeadlineHuman() {
+		//tests the SpecialDateConverter, which is based on relative dates.
+		//thus, cannot to assert this 
+		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
+		System.out.println(parser.parseInput("add do homework by tonight")); 
+		System.out.println(parser.parseInput("add complete essay by today")); 
+		System.out.println(parser.parseInput("add complete essay by tmr")); 
+		System.out.println(parser.parseInput("add complete essay by this Wed"));
+		System.out.println(parser.parseInput("add complete essay by next Wed"));
 	}
 }

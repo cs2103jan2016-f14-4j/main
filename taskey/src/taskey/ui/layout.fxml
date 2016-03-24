@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- @@author A0125419H -->
+
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
@@ -70,7 +70,7 @@
             <Image url="@utility/images/minusDefault.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="crossButton" fitHeight="13.0" fitWidth="13.0" layoutX="724.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="crossButton" fitHeight="12.0" fitWidth="12.0" layoutX="724.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@utility/images/crossDefault.png" />
          </image>

@@ -162,6 +162,4 @@ public class UiGridHelper {
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;
 	}
-	
-	
 }

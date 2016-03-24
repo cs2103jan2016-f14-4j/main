@@ -46,6 +46,7 @@ class StorageReader {
     		return null;
     	}
     }
+    
 
     /*================*
      * Load task list *
@@ -79,7 +80,7 @@ class StorageReader {
      * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
      */
     ArrayList<TagCategory> loadTaglist(File src) {
-    	ArrayList<TagCategory> tags = new ArrayList<TagCategory>(); //unnecessary?
+    	ArrayList<TagCategory> tags;
     	try {
     		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
     		System.out.println("{Tags loaded} " + src.getName());

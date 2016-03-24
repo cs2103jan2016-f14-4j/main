@@ -68,8 +68,10 @@ public class StorageTest {
 	public void saveAndLoadTasklists() throws IOException {
 		ArrayList<ArrayList<Task>> superlist = createSuperlist();
 		storage.saveAllTasklists(superlist); //TODO use temp folder
+		print(superlist);
 		
 		ArrayList<ArrayList<Task>> loadedlist = storage.loadAllTasklists();
+		print(loadedlist);
 		assertEquals(TasklistEnum.values().length, loadedlist.size()); //loaded list must be size 7
 		assertEquals(superlistToString(superlist), superlistToString(loadedlist));
 	}
@@ -95,8 +97,9 @@ public class StorageTest {
 	private static String superlistToString(ArrayList<ArrayList<Task>> superlist) {
 		String str = "";
 		for (ArrayList<Task> list : superlist) {
-			for (Task t : list)
+			for (Task t : list) {
 				str.concat(t.toString());
+			}
 		}
 		return str;
 	}
@@ -109,5 +112,11 @@ public class StorageTest {
 		return str;
 	}
 	
-
+	private static void print(ArrayList<ArrayList<Task>> lists) {
+		for (ArrayList<Task> list : lists) {
+			for (Task t : list) {
+				System.out.println(t);
+			}
+		}
+	}
 }

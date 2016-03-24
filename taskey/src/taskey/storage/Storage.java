@@ -11,9 +11,9 @@ import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
+ * @@author A0121618M
  * This class exposes public IO methods for saving tasklists and tags.
  * It also manages the storage directory.
- * @@author A0121618M
  */
 public class Storage {
 	private StorageReader storageReader;
@@ -71,7 +71,6 @@ public class Storage {
 		//System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
 
 		// Initialize - tasklist
-		System.out.println("\nInitial load ======================================");
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -100,7 +99,6 @@ public class Storage {
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
-    		//System.out.println("{Setting default directory}");
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
     		//System.out.println("{Storage directory loaded}");

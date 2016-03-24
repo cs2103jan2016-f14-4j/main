@@ -8,6 +8,7 @@ import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
+ * @@author A0121618M
  * This class is to allow Storage to easily retrieve the last successfully saved tasklist/tagmap from memory
  * so that Storage can throw it to Logic when an error is encountered during saving.
  * This will in turn allow Logic to undo the last operation so that its data remains in sync with Storage.
@@ -15,8 +16,6 @@ import taskey.logic.Task;
  * For now, this class is only meant to be used by Storage for the above purpose.
  * But, in the future, if more methods are added to this class, Logic could also use this for the undo command.
  * TODO: multiple undos/redos using stacks?
- *
- * @@author A0121618M
  */
 public class History {
 	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;

@@ -128,9 +128,10 @@ public class UiTaskView {
 		line += "Tags: ";
 		if ( theTask.getTaskTags() != null ) {
 			ArrayList<String> tags = theTask.getTaskTags();
-			for ( String s : tags) {
-				line += s + " ";
+			for ( int i = 0; i < tags.size()-1 ; i++ ) {
+				line += tags.get(i) + ", ";
 			}
+			line += tags.get(tags.size()-1);
 		} else {
 			line += "None";
 		}

@@ -37,7 +37,7 @@ public class UiTrayModule {
 	 * @param main - main Stage
 	 * @param alerts - alerts Stage
 	 */
-	public void doLinkage(Stage main, Stage alerts) {
+	public void createLinkage(Stage main, Stage alerts) {
 		main.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
@@ -55,8 +55,7 @@ public class UiTrayModule {
 		});
 	}
 	public void createTrayIcon(final Stage stage) {
-		
-		
+	
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
 			SystemTray tray = SystemTray.getSystemTray();

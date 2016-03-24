@@ -69,22 +69,23 @@ public class UiActionFormatter extends UiFormatter {
 	}
 
 	/**
-	 * Update content based on the mode provided
+	 * Update content mode 
 	 *
-	 * @param myList - the task list
 	 * @param mode - the mode of display
 	 */
-	public void updateContents(ArrayList<Task> myList, ActionMode mode) {
+	public void updateMode(ActionMode mode) {
 		switch ( mode ) {
 			case HELP: 
 				helpView.resetView();
 				currentView = helpView.getView();
 				mainPane.setContent(currentView.getPagination());				
 				break;
-			default:
+			case LIST:
 				currentView = taskView.getView();
 				mainPane.setContent(currentView.getPagination());
-				format(myList);
+				break;
+			default:
+				System.out.println("Mode invalid For ActionFormatter");
 		}
 	}
 	

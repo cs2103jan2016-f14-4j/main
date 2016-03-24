@@ -71,7 +71,7 @@ public class UiMain extends Application {
 		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
 		trayModule = new UiTrayModule();
 		trayModule.createTrayIcon(primaryStage);
-		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
+		trayModule.createLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
 	}
 	
 	/**
@@ -129,15 +129,12 @@ public class UiMain extends Application {
 	private void setUpScene(Stage primaryStage, Parent root) {
 		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
-		
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
-		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		
-		//testUI();
+		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on primaryStage.show()
 		
 		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
 		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
@@ -154,24 +151,5 @@ public class UiMain extends Application {
 	
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
-	}
-
-	/**
-	 * ************************************ MY TESTING **********************************.
-	 */
-	private void testUI() {
-		ArrayList<Task> myTaskList = new ArrayList<Task>();
-		// Temporary;
-		for ( int i = 0; i < 8; i ++ ) {
-			Task temp = new Task("General Task " + i);
-			temp.setTaskType("FLOATING");
-			myTaskList.add(temp);
-		}
-		
-		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
-		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
-		myController.displayTabContents(ContentBox.ACTION);
-		
 	}
 }

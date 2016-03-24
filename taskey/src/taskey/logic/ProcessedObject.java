@@ -337,8 +337,9 @@ public class ProcessedObject {
 		}
 		
 		if (viewType != null) {
+			stringRep += "view type: "; 
 			for(int i = 0; i < viewType.size(); i++) {
-				stringRep += "view type: " + viewType.get(i) + ", "; 
+				stringRep += viewType.get(i) + ", "; 
 			}
 			stringRep += "\n"; 
 		}
@@ -358,6 +359,11 @@ public class ProcessedObject {
 		if (category != null) {
 			stringRep += "category: " + category + "\n";
 		}
+		
+		if (newPriority != -1) {
+			stringRep += "newPriority: " + newPriority + "\n"; 
+		}
+		
 		return stringRep; 
 	}
 }

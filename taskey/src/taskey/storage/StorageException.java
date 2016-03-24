@@ -10,7 +10,7 @@ import taskey.logic.Task;
  * This exception class has fields that hold the last successfully saved tasklist/tagmap by Storage.
  * If Storage encounters an error during write, it will throw an instance of this class to Logic,
  * so that Logic can get the last modified tasklist/tagmap.
- * @author Dylan
+ * @@author A0121618M
  */
 @SuppressWarnings("serial")
 public class StorageException extends IOException {

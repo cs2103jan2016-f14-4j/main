@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
- * @author Dylan
+ * @@author A0121618M
  */
 class StorageWriter {
     /**
@@ -25,9 +26,9 @@ class StorageWriter {
      */
     private <T> void writeToFile(File dest, T object, TypeToken<T> typeToken) throws IOException {
     	FileWriter writer = new FileWriter(dest);
-    	Gson gson = new Gson();
-    	String json = gson.toJson(object, typeToken.getType());
-    	writer.write(json);
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    	String jsonOutput = gson.toJson(object, typeToken.getType());
+    	writer.write(jsonOutput);
     	writer.close();
     }
 

@@ -16,7 +16,7 @@ import taskey.logic.Task;
  * But, in the future, if more methods are added to this class, Logic could also use this for the undo command.
  * TODO: multiple undos/redos using stacks?
  *
- * @author Dylan
+ * @@author A0121618M
  */
 public class History {
 	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;

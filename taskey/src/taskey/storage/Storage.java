@@ -13,7 +13,7 @@ import taskey.logic.Task;
 /**
  * This class exposes public IO methods for saving tasklists and tags.
  * It also manages the storage directory.
- * @author Dylan
+ * @@author A0121618M
  */
 public class Storage {
 	private StorageReader storageReader;
@@ -64,7 +64,6 @@ public class Storage {
 	 * For testing of the Storage class. This is how Logic will interface with Storage.
 	 */
 	public static void main(String args[]) {
-		// Get the Storage singleton instance
 		// The default or last-used directory is automatically set in the constructor method.
 		Storage storage = new Storage();
 
@@ -122,7 +121,7 @@ public class Storage {
 	 * Logic calls this on program startup.
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
-	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK list.
+	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
 	 * @return the superlist of tasklists read from disk, or empty if any constituent list is missing
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
@@ -131,14 +130,10 @@ public class Storage {
 		for (TasklistEnum e : TasklistEnum.values()) {
 			File src = new File(directory, e.filename());
 			ArrayList<Task> loadedList = storageReader.loadTasklist(src);
-			// If any constituent list is missing, just return an empty superlist to prevent weird behaviour
-			if (loadedList.isEmpty()) {
-				return new ArrayList<ArrayList<Task>>();
-			}
 			superlist.add(loadedList);
 		}
 
-		//history.add(superlist); //Logic will add the initial loaded list to History
+		// Logic will add this loaded list to History
 		return superlist;
 	}
 
@@ -171,9 +166,9 @@ public class Storage {
 	}
 
 
-    /*==============================*
-     * Load/Save tags - new methods *
-     *==============================*/
+    /*================*
+     * Load/Save tags *
+     *================*/
 	/**
      * Returns the ArrayList of Tags loaded from Storage.
      * An empty ArrayList is returned if the tags file was not found.

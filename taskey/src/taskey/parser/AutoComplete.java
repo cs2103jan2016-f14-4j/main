@@ -147,7 +147,7 @@ public class AutoComplete {
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("view", ""); 
 		String[] parts = phrase.split(" ");
-		//only want to autocomplete the latest word
+		//only want to auto-complete the latest word
 		String word = parts[parts.length-1].trim(); 
 		
 		//check if basic view exists 

@@ -1,7 +1,6 @@
 package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -14,9 +13,7 @@ import org.junit.Test;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.Logic;
 import taskey.logic.LogicException;
-import taskey.logic.LogicFeedback;
 import taskey.logic.LogicMemory;
-import taskey.logic.ProcessedObject;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
 import taskey.parser.Parser;
@@ -24,39 +21,11 @@ import taskey.parser.TimeConverter;
 
 /**
  * @@author A0134177E
- * @author Hubert
  */
 public class LogicTest {
 	public static final int NUM_SECONDS_1_DAY = 86400;
 	public static final int NUM_SECONDS_1_WEEK = 604800;
-	public static final int NUM_SECONDS_BUFFER_TIME = 100;
-	public static final String STRING_ADD_FLOATING = "add g2 a?b ,  ";
-	public static final String STRING_ADD_DEADLINE = "add g2 a?b ,   on %1$s";
-	public static final String STRING_ADD_EVENT = "add g2 a?b ,   from %1$s to %2$s";
-	public static final String STRING_DELETE_BY_INDEX = "del 1";
-	public static final String STRING_DELETE_BY_INVALID_INDEX = "del 2";
-	public static final String STRING_DELETE_BY_NAME = "del g2 a?b ,  ";
-	public static final String STRING_DELETE_BY_INVALID_NAME = "del ayy lmao";
-	public static final String STRING_SEARCH = "search ?B , ";
-	public static final String STRING_SEARCH_NOT_FOUND = "search ayy lmao";
-	public static final String STRING_SEARCH_EMPTY = "search ";
-	public static final String STRING_DONE_BY_INDEX = "done 1";
-	public static final String STRING_DONE_BY_INVALID_INDEX = "done 2";
-	public static final String STRING_DONE_BY_NAME = "done g2 a?b ,  ";
-	public static final String STRING_DONE_BY_INVALID_NAME = "del ayy lmao";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_NAME = "set 1 \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_DEADLINE = "set 1 [%1$s]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_EVENT = "set 1 [%1$s, %2$s]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_FLOATING = "set 1 [none]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_BOTH = "set 1 \"ayy lmao\" [none]";
-	public static final String STRING_UPDATE_BY_INVALID_INDEX = "set 2 \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_NAME = "set g2 a?b ,   \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_DEADLINE = "set add g2 a?b ,   [%1$s]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_EVENT = "set add g2 a?b ,   [%1$s, %2$s]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_FLOATING = "set add g2 a?b ,   [none]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_BOTH = "set g2 a?b ,   \"ayy lmao\" [none]";
-	public static final String STRING_UPDATE_BY_INVALID_NAME = "set g3 a?b ,  \"ayy lmao\"";
-	public static final String STRING_UNDO = "undo";
+	public static final int NUM_SECONDS_BUFFER_TIME = 100; // Used for safety in dealing with boundary conditions
 	
 	private Logic logic;
 	private Parser parser;
@@ -283,24 +252,6 @@ public class LogicTest {
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 	}
 	
-	/*
-	@Ignore
-	public void testDeleteTaskByName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = getEmptyLists();
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}*/
-	
 	// Test inputs: 2 is out of range, 0 is an impossible index, -1 is a negative index and should not be allowed.
 	@Test
 	public void deletingTaskByInvalidIndexShouldThrowException() {
@@ -336,26 +287,6 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "del -1");
 		assertEquals(expected, logic.getAllTaskLists());
 	}
-	
-	/*
-	@Ignore
-	public void testDeleteTaskByInvalidName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_INVALID_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_NAME_NOT_FOUND, po.getTask().getTaskName());
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	// This test might fail once PowerSearch is implemented.
 	@Test
@@ -805,7 +736,7 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void deletingTagCategoryShouldOnlyRemoveAllTasksWithThatTag() {
+	public void deletingTagCategoryShouldUpdateTaskLists() {
 		logic.executeCommand(ContentBox.PENDING, "add task #tag1");
 		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
@@ -828,6 +759,17 @@ public class LogicTest {
 		expected.add(new TagCategory("tag1")); // #tag2 and #tag3 should not be in tag database
 		assertEquals(expected, logic.getTagCategoryList());
 	}
+	
+	@Test
+	public void deletingNonExistentTagCategoryShouldThrowException() {
+		logic.executeCommand(ContentBox.PENDING, "add task #tag1");
+		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
+		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
+		LogicException actual = logic.executeCommand(ContentBox.PENDING, "del #tag4").getException();
+		assertEquals(expected, actual);
+	}
+	
 	/*
 	// The order of displayed tasks is not tested here.
 	// This test also checks that there are no duplicate tasks in the displayed list.

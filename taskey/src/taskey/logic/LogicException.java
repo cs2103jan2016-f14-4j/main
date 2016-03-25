@@ -3,7 +3,8 @@ package taskey.logic;
 /**
  * @@author A0134177E
  * Whenever the Logic component encounters an error in command execution, or wishes to pass a message to UI, it
- * encapsulates the message in an instance of this class.
+ * encapsulates the message in an instance of this class. This class is made public to facilitate testing, but components 
+ * other than Logic should not have any reason to create objects of this class.
  */
 @SuppressWarnings("serial")
 public class LogicException extends Exception {
@@ -30,11 +31,18 @@ public class LogicException extends Exception {
 	public static final String MSG_ERROR_UNDO = "Nothing to undo!";
 	public static final String MSG_ERROR_TAG_NOT_FOUND = "No matches found.";
 	public static final String MSG_ERROR_SEARCH_NOT_FOUND = "No matches found!";
-
 	
-	LogicException(String message) {
+    //================================================================================
+    // Constructor
+    //================================================================================
+
+	public LogicException(String message) {
 		super(message);
 	}
+	
+    //================================================================================
+    // Overriding Methods
+    //================================================================================
 	
 	@Override
 	public int hashCode() {

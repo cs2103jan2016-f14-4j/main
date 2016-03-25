@@ -85,6 +85,7 @@ public class LogicMemory {
 	/**
 	 * Adds a floating task to the task lists.
 	 * @param taskToAdd
+	 * @throws LogicException if the task to add is a duplicate
 	 */
 	void addFloating(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
@@ -99,6 +100,7 @@ public class LogicMemory {
 	/**
 	 * Adds a deadline task to the task lists.
 	 * @param taskToAdd
+	 * @throws LogicException if the task to add is a duplicate, or is already expired
 	 */
 	void addDeadline(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
@@ -121,6 +123,7 @@ public class LogicMemory {
 	/**
 	 * Adds an event task to the task lists.
 	 * @param taskToAdd
+	 * @throws LogicException if the task to add is a duplicate, or is already expired
 	 */
 	void addEvent(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
@@ -145,6 +148,7 @@ public class LogicMemory {
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be deleted
 	 * @return           the Task that was deleted
+	 * @throws LogicException if the index is invalid
 	 */
 	Task deleteByIndex(ContentBox contentBox, int taskIndex) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -168,10 +172,16 @@ public class LogicMemory {
 	 * Deletes all tasks with the given tag name from the expired and pending lists, and updates the tag category list 
 	 * accordingly.
 	 * @param tagName
+	 * @throws LogicException if the tag name was not found in the expired and pending lists
 	 */
-	void deleteByTagName(String tagName) {
-		removeTaggedTasks(taskLists.get(INDEX_EXPIRED), tagName);
-		removeTaggedTasks(taskLists.get(INDEX_PENDING), tagName);
+	void deleteByTagName(String tagName) throws LogicException {
+		boolean tagFound = removeTaggedTasks(taskLists.get(INDEX_EXPIRED), tagName);
+		tagFound = tagFound || removeTaggedTasks(taskLists.get(INDEX_PENDING), tagName);
+		
+		if (!tagFound) {
+			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
+		}
+		
 		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 	}
 	
@@ -179,6 +189,7 @@ public class LogicMemory {
 	 * Marks an indexed task from the specified task list as done, and deletes all its tags from the tag category list.
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be completed
+	 * @throws LogicException if index is invalid or the user is trying to mark an archived task as done
 	 */
 	void doneByIndex(ContentBox contentBox, int taskIndex) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -207,6 +218,7 @@ public class LogicMemory {
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be updated
 	 * @param newName    the new name to update the task to
+	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
 	 */
 	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -225,6 +237,7 @@ public class LogicMemory {
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be updated
 	 * @param newTask    the task with the new date
+	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
 	 */
 	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -243,6 +256,7 @@ public class LogicMemory {
 	 * @param taskIndex  the index of task to be updated
 	 * @param newName    the new name to update the task to
 	 * @param newTask    the task with the new date
+	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
 	 */
 	void updateByIndexChangeBoth(ContentBox contentBox, int taskIndex, String newName, Task newTask) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -280,6 +294,7 @@ public class LogicMemory {
 	 * is not case sensitive.
 	 * TODO: improved search
 	 * @param searchPhrase
+	 * @throws LogicException if no matches were found
 	 */
 	void search(String searchPhrase) throws LogicException {
 		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
@@ -420,18 +435,25 @@ public class LogicMemory {
 	 * 
 	 * @param list
 	 * @param tagName
+	 * @return true if and only if at least one task was removed from the given list
 	 */
-	private void removeTaggedTasks(ArrayList<Task> list, String tagName) {
+	private boolean removeTaggedTasks(ArrayList<Task> list, String tagName) {
+		boolean taskRemoved = false;
+		
 		for (Iterator<Task> it = list.iterator(); it.hasNext();) { // Iterator is for save removal of elements while 
 			                                                       // iterating
+
 			Task task = it.next();
 			
 			if (task.getTaskTags().contains(tagName)) {
 				it.remove();
 				removeFromAllLists(task); // This is safe because the task has already been removed from the current list.
 				removeTaskTags(task.getTaskTags());
+				taskRemoved = true;
 			}
 		}
+		
+		return taskRemoved;
 	}
 	
 	/** 

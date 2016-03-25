@@ -12,15 +12,15 @@ import java.util.ArrayList;
 public class LogicFeedback {
 	private ArrayList<ArrayList<Task>> taskLists;
 	private ProcessedObject po;
-	private Exception e;
+	private LogicException le;
 	
 	/** This is the only constructor for the LogicFeedback class. taskLists and po should not be null.
 	 * 
 	 * @param taskLists  a list of task lists for the purposes of updating the UI display
 	 * @param po         an object encapsulating information on the executed command and its associated task
-	 * @param e          an exception containing an error message. If not error occurred, this will be null.
+	 * @param le         an exception containing a message to reflect the outcome of command execution. It can be null.
 	 */
-	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
+	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, LogicException le) {
 		assert (taskLists != null);
 		assert (taskLists.size() == 8); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
@@ -28,7 +28,7 @@ public class LogicFeedback {
 		
 		this.taskLists = taskLists;
 		this.po = po;
-		this.e = e;
+		this.le = le;
 	}
 
 	public ArrayList<ArrayList<Task>> getTaskLists() {
@@ -49,11 +49,11 @@ public class LogicFeedback {
 		this.po = po;
 	}
 
-	public Exception getException() {
-		return e;
+	public LogicException getException() {
+		return le;
 	}
 	
-	protected void setException(Exception e) {
-		this.e = e;
+	protected void setException(LogicException le) {
+		this.le = le;
 	}
 }

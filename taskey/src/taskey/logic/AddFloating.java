@@ -1,7 +1,5 @@
 package taskey.logic;
 
-import java.util.ArrayList;
-
 /** 
  * @@author A0134177E
  * This class encapsulates the instructions that the receiver, LogicMemory, must perform in order to facilitate the 
@@ -14,8 +12,8 @@ final class AddFloating extends Add {
 	}
 	
 	@Override
-	ArrayList<ArrayList<Task>> execute(LogicMemory logicMemory) {
+	void execute(LogicMemory logicMemory) throws Exception {
 		addTagsToMemory(logicMemory, taskToAdd.getTaskTags());
-		return logicMemory.addFloating(taskToAdd);
+		logicMemory.addFloating(taskToAdd);
 	}
 }

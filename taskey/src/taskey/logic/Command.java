@@ -10,5 +10,5 @@ import java.util.ArrayList;
  */
 abstract class Command {
 	
-	abstract ArrayList<ArrayList<Task>> execute(LogicMemory logicMemory);
+	abstract void execute(LogicMemory logicMemory) throws Exception;
 }

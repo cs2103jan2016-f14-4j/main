@@ -102,7 +102,6 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
 	@Test
 	public void addingDeadlineTaskEndingThisWeekShouldUpdateOnlyPendingAndDeadlineAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -132,6 +131,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
+	/*
 	@Test
 	public void addingEventTaskStartingThisWeekShouldUpdateOnlyPendingAndEventAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();

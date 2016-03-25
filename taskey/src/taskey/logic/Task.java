@@ -471,7 +471,6 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
-	
 	/**
 	 * @@author A0134177E
 	 * Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.

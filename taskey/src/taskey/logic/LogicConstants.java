@@ -8,7 +8,7 @@ public class LogicConstants {
 			                                                        + "which one you want to delete via del <index>.";
 			                                             
 	public static final String MSG_EXCEPTION_SAVING_TAGS = "Error saving tags!";
-	public static final String MSG_EXCEPTION_DATE_EXPIRED = "The date \"%1$s\" is already past!";
+	public static final String MSG_EXCEPTION_DATE_EXPIRED = "The deadline/end date is already past!";
 	public static final String MSG_EXCEPTION_DELETE_INVALID_TAB = "Cannot delete from this tab!";
 	public static final String MSG_EXCEPTION_INVALID_INDEX = "\"%1$d\" is not a valid index!";
 	public static final String MSG_EXCEPTION_NAME_NOT_FOUND = "\"%1$s\" not found in this tab!";

@@ -59,10 +59,15 @@ public class Logic {
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
+    	Command cmd;
     	
     	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
-			Command cmd = new Clear();
-			cmdExecutor.execute(cmd, logicMemory);
+			cmd = new Clear();
+			try {
+				cmdExecutor.execute(cmd, logicMemory);
+			} catch (Exception e) {
+				return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), e);
+			}
 			updateHistory();
 			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
 					                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
@@ -70,15 +75,26 @@ public class Logic {
     	
     	switch (command) {
 			case "ADD_FLOATING":
-				Command cmd = new AddFloating(po.getTask());
-				cmdExecutor.execute(cmd, logicMemory);
+				cmd = new AddFloating(po.getTask());
+				try {
+					cmdExecutor.execute(cmd, logicMemory);
+				} catch (Exception e) {
+					return new LogicFeedback(getAllTaskLists(), po, e);
+				}
 				updateHistory();
 				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 				
-			/*case "ADD_DEADLINE":
-				return addDeadline(originalCopy, modifiedCopy, po);
+			case "ADD_DEADLINE":
+				cmd = new AddDeadline(po.getTask());
+				try {
+					cmdExecutor.execute(cmd, logicMemory);
+				} catch (Exception e) {
+					return new LogicFeedback(getAllTaskLists(), po, e);
+				}
+				updateHistory();
+				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 
-			case "ADD_EVENT":
+			/*case "ADD_EVENT":
 				return addEvent(originalCopy, modifiedCopy, po);
 
 			case "DELETE_BY_INDEX":

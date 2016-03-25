@@ -90,12 +90,35 @@ class LogicMemory {
 	/**
 	 * Adds a floating task to the task lists.
 	 * @param taskToAdd
-	 * @return the task lists after the task was added
 	 */
-	ArrayList<ArrayList<Task>> addFloating(Task taskToAdd) {
+	void addFloating(Task taskToAdd) throws Exception {
+		if (taskAlreadyExists(taskToAdd)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+		}
+		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_GENERAL).add(taskToAdd);
-		return getTaskLists();
+	}
+	
+	/**
+	 * Adds a deadline task to the task lists.
+	 * @param taskToAdd
+	 */
+	void addDeadline(Task taskToAdd) throws Exception {
+		if (taskAlreadyExists(taskToAdd)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+		}
+		
+		if (taskToAdd.isExpired()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+		}
+		
+		taskLists.get(INDEX_PENDING).add(taskToAdd);
+		taskLists.get(INDEX_DEADLINE).add(taskToAdd);
+		
+		if (taskToAdd.isThisWeek()) {
+			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
+		}
 	}
 	
 	private void initializeTaskLists() {
@@ -119,8 +142,6 @@ class LogicMemory {
 	 *  tag category list is not affected.
 	 */
 	private void synchroniseTaskLists() {
-		TimeConverter timeConverter = new TimeConverter();
-		long currTime = timeConverter.getCurrTime();
 		ArrayList<Task> thisWeekList = taskLists.get(INDEX_THIS_WEEK);
 		ArrayList<Task> expiredList = taskLists.get(INDEX_EXPIRED);
 		ArrayList<Task> pendingList = taskLists.get(INDEX_PENDING);
@@ -161,5 +182,11 @@ class LogicMemory {
 		taskLists.get(INDEX_EVENT).remove(toRemove);
 		taskLists.get(INDEX_COMPLETED).remove(toRemove);
 		taskLists.get(INDEX_ACTION).remove(toRemove);
+	}
+	
+	// Returns true if and only if the given task already exists in any of the task lists.
+	private boolean taskAlreadyExists(Task task) {
+		return (taskLists.get(INDEX_PENDING).contains(task) || taskLists.get(INDEX_COMPLETED).contains(task)
+				|| taskLists.get(INDEX_EXPIRED).contains(task));
 	}
 }

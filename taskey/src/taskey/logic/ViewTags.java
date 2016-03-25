@@ -16,7 +16,7 @@ final class ViewTags extends Command {
 	}
 	
 	@Override
-	ArrayList<ArrayList<Task>> execute(LogicMemory logicMemory) {
-		return null; // TODO
+	void execute(LogicMemory logicMemory) {
+		// TODO
 	}
 }

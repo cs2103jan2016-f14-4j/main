@@ -1,7 +1,5 @@
 package taskey.logic;
 
-import java.util.ArrayList;
-
 /** 
  * @@author A0134177E
  * This class encapsulates the instructions that the receiver, LogicMemory, must perform in order to facilitate the 
@@ -16,7 +14,7 @@ final class DoneByIndex extends Command {
 	}
 	
 	@Override
-	ArrayList<ArrayList<Task>> execute(LogicMemory logicMemory) {
-		return null; // TODO
+	void execute(LogicMemory logicMemory) {
+		// TODO
 	}
 }

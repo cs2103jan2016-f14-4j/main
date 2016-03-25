@@ -62,15 +62,7 @@ public class Logic {
     	Command cmd;
     	
     	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
-			cmd = new Clear();
-			try {
-				cmdExecutor.execute(cmd, logicMemory);
-			} catch (Exception e) {
-				return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), e);
-			}
-			updateHistory();
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
-					                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
+			return executeClear();
     	}
     	
     	switch (command) {
@@ -124,6 +116,19 @@ public class Logic {
 		}
 
 		return null; // Stub
+	}
+
+	private LogicFeedback executeClear() {
+		Command cmd;
+		cmd = new Clear();
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
+				                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
 	}
 
 	private LogicFeedback executeAdd(ProcessedObject po, Command cmd) {

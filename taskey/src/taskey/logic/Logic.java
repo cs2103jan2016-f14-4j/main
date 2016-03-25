@@ -21,10 +21,19 @@ import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
  * command.
  */
 public class Logic {
+	
+    //================================================================================
+    // Fields
+    //================================================================================
+	
 	private Parser parser;
 	private History history;
 	private CommandExecutor cmdExecutor;
 	private LogicMemory logicMemory;
+	
+    //================================================================================
+    // Constructors
+    //================================================================================
 	
 	public Logic() {
 		parser = new Parser();
@@ -33,6 +42,10 @@ public class Logic {
 		logicMemory = new LogicMemory();
 		updateHistory();
 	}
+	
+    //================================================================================
+    // Accessors
+    //================================================================================
 	
 	/**
 	 * Returns a deep copy of all task lists.
@@ -47,6 +60,10 @@ public class Logic {
 	public ArrayList<TagCategory> getTagCategoryList() {
 		return ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
 	}
+	
+    //================================================================================
+    // Interface Methods
+    //================================================================================
 	
 	/**
 	 * Executes the user supplied command.
@@ -121,6 +138,10 @@ public class Logic {
 		return null; // Stub
 	}
 	
+    //================================================================================
+    // Command Methods
+    //================================================================================
+	
 	private LogicFeedback executeClear() {
 		Command cmd;
 		cmd = new Clear();
@@ -173,6 +194,10 @@ public class Logic {
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, null);
 	}
+	
+    //================================================================================
+    // Miscellaneous
+    //================================================================================
 	
 	// Push the latest task lists and tag category list to history.
 	private void updateHistory() {

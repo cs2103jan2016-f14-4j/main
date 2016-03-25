@@ -13,6 +13,10 @@ import taskey.storage.Storage;
  */
 public class LogicMemory {
 	
+    //================================================================================
+    // Constants
+    //================================================================================
+	
 	public static final int NUM_TASK_LISTS = 8;
 	
 	// Indices of each list
@@ -25,15 +29,27 @@ public class LogicMemory {
 	public static final int INDEX_COMPLETED = 6;
 	public static final int INDEX_ACTION = 7;
 	
+    //================================================================================
+    // Fields
+    //================================================================================
+	
 	private Storage storage;
 	private ArrayList<ArrayList<Task>> taskLists;
 	private ArrayList<TagCategory> tagCategoryList;
+	
+    //================================================================================
+    // Constructors
+    //================================================================================
 	
 	LogicMemory() {
 		storage = new Storage();
 		initializeTaskLists();
 		initializeTagCategoryList();
 	}
+	
+    //================================================================================
+    // Accessors
+    //================================================================================
 
 	ArrayList<ArrayList<Task>> getTaskLists() {
 		assert(taskLists != null);
@@ -61,42 +77,9 @@ public class LogicMemory {
 		this.tagCategoryList = tagCategoryList;
 	}
 	
-	/**
-	 * Add a new tag to the tag category list.
-	 */
-	void addTag(String tagToAdd) { 
-		int tagIndex = getTagIndex(tagToAdd);
-		
-		if (tagIndex == -1) { // Tag category list does not contain the tag to be added; add a new category for that tag.
-			tagCategoryList.add(new TagCategory(tagToAdd)); 
-		} else { // Tag category list already contains the tag to be added; increase the number of tags in that 
-			     // category by one.
-			tagCategoryList.get(tagIndex).increaseCount();
-		}
-	}
-	
-	// Remove a tag from the tag category list. The tag should currently exist in the tag category list.
-	private void removeTag(String tagToRemove) {
-		int tagIndex = getTagIndex(tagToRemove);
-		assert(tagIndex != -1);
-		
-		if (tagCategoryList.get(tagIndex).getNumTags() == 1) {
-			tagCategoryList.remove(tagIndex);
-		} else {
-			tagCategoryList.get(tagIndex).decreaseCount();
-		}
-	}
-	
-	// Returns the index of the specified tag name in the tag category list. If the tag name is not found, -1 is returned.
-	private int getTagIndex(String tagName) {
-		for (int i = 0; i < tagCategoryList.size(); i++) {
-			if (tagCategoryList.get(i).getTagName().equals(tagName)) {
-				return i;
-			}
-		}
-		
-		return -1;
-	}
+    //================================================================================
+    // Command Methods
+    //================================================================================
 	
 	/**
 	 * Adds a floating task to the task lists.
@@ -209,17 +192,9 @@ public class LogicMemory {
 		}
 	}
 	
-	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
-		ArrayList<Task> searchResults = new ArrayList<Task>();
-		
-		for (Task t : list) {
-			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				searchResults.add(t);
-			}
-		}
-		
-		return searchResults;
-	}
+    //================================================================================
+    // Miscellaneous
+    //================================================================================
 	
 	private void initializeTaskLists() {
 		taskLists = storage.loadAllTasklists();
@@ -288,5 +263,54 @@ public class LogicMemory {
 	private boolean taskAlreadyExists(Task task) {
 		return (taskLists.get(INDEX_PENDING).contains(task) || taskLists.get(INDEX_COMPLETED).contains(task)
 				|| taskLists.get(INDEX_EXPIRED).contains(task));
+	}
+	
+	/**
+	 * Add a new tag to the tag category list.
+	 */
+	void addTag(String tagToAdd) { 
+		int tagIndex = getTagIndex(tagToAdd);
+		
+		if (tagIndex == -1) { // Tag category list does not contain the tag to be added; add a new category for that tag.
+			tagCategoryList.add(new TagCategory(tagToAdd)); 
+		} else { // Tag category list already contains the tag to be added; increase the number of tags in that 
+			     // category by one.
+			tagCategoryList.get(tagIndex).increaseCount();
+		}
+	}
+	
+	// Remove a tag from the tag category list. The tag should currently exist in the tag category list.
+	private void removeTag(String tagToRemove) {
+		int tagIndex = getTagIndex(tagToRemove);
+		assert(tagIndex != -1);
+		
+		if (tagCategoryList.get(tagIndex).getNumTags() == 1) {
+			tagCategoryList.remove(tagIndex);
+		} else {
+			tagCategoryList.get(tagIndex).decreaseCount();
+		}
+	}
+	
+	// Returns the index of the specified tag name in the tag category list. If the tag name is not found, -1 is returned.
+	private int getTagIndex(String tagName) {
+		for (int i = 0; i < tagCategoryList.size(); i++) {
+			if (tagCategoryList.get(i).getTagName().equals(tagName)) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
+		ArrayList<Task> searchResults = new ArrayList<Task>();
+		
+		for (Task t : list) {
+			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
+				searchResults.add(t);
+			}
+		}
+		
+		return searchResults;
 	}
 }

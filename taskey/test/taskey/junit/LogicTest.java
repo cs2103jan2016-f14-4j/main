@@ -71,59 +71,15 @@ public class LogicTest {
 		
 		return lists;
 	}
-	/*
-	public static ArrayList<ArrayList<Task>> addTaskToLists(Task task) {
-		TimeConverter timeConverter = new TimeConverter();
-		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
-		
-		while (temp.size() < 7) {
-			temp.add(new ArrayList<Task>());
-		}
-		
-		String taskType = task.getTaskType();
-		long currTime = timeConverter.getCurrTime();
-		
-		if (taskType.equals("FLOATING")) {
-			temp.get(ListID.GENERAL.getIndex()).add(task);
-		} else if (taskType.equals("DEADLINE")) {
-			long deadline = task.getDeadlineEpoch();
-			
-			if (deadline < currTime) {
-				return temp;
-			}
-			
-			temp.get(ListID.DEADLINE.getIndex()).add(task);
-			
-			if (timeConverter.isSameWeek(deadline, currTime)) {
-				temp.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		} else if (taskType.equals("EVENT")) {
-			long endDate = task.getEndDateEpoch();
-			
-			if (endDate < currTime) {
-				return temp;
-			}
-			
-			temp.get(ListID.EVENT.getIndex()).add(task);
-			
-			if (timeConverter.isSameWeek(task.getStartDateEpoch(), currTime)) {
-				temp.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		}
-		
-		temp.get(ListID.PENDING.getIndex()).add(task);
-		
-		return temp;
-	}*/
 	
-	// Make sure clear command works because it is used in setUp().
-	// clear command is supposed to clear all task and tag data in storage.
+	// Make sure "clear" command works because it is used in setUp().
+	// "clear" command is supposed to clear all task and tag data in memory.
 	@BeforeClass
 	public static void testClear() {
 		Logic logic = new Logic();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
 	@Before
@@ -145,7 +101,8 @@ public class LogicTest {
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
-	 
+	
+	/*
 	@Test
 	public void addingDeadlineTaskEndingThisWeekShouldUpdateOnlyPendingAndDeadlineAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -327,7 +284,6 @@ public class LogicTest {
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 	}
 	
-	/*
 	@Ignore
 	public void testDeleteTaskByName() {
 		long currTime = timeConverter.getCurrTime();
@@ -361,7 +317,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(LogicConstants.MSG_EXCEPTION_DELETE_INVALID_TAB));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	// Test inputs: 2 is out of range, 0 is an impossible index, -1 is a negative index and should not be allowed.
 	@Test
@@ -401,7 +357,6 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists());
 	}
 	
-	/*
 	@Ignore
 	public void testDeleteTaskByInvalidName() {
 		long currTime = timeConverter.getCurrTime();
@@ -419,7 +374,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	// This test might fail once PowerSearch is implemented.
 	@Test
@@ -451,7 +406,6 @@ public class LogicTest {
 		assertEquals(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND, actual.getMessage());
 	}
 	
-	/*
 	@Ignore
 	public void testSearchPhraseNotFound() {
 		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
@@ -478,7 +432,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	// The completed task should be removed from all lists and then inserted into the COMPLETED list.
 	@Test
@@ -503,10 +457,9 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag3"));
-		assertEquals(expected, logic.getTagList());
+		assertEquals(expected, logic.getTagCategoryList());
 	}
 	
-	/*
 	@Ignore
 	public void testDoneTaskFromWrongTab() {
 		long currTime = timeConverter.getCurrTime();
@@ -522,7 +475,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void doneTaskByInvalidIndexShouldThrowException() {
@@ -561,7 +514,6 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists());
 	}
 	
-	/*
 	@Test
 	public void testDoneTaskByName() {
 		long currTime = timeConverter.getCurrTime();
@@ -598,7 +550,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	// Every list that contains the updated task should also be updated.
 	@Test
@@ -617,7 +569,7 @@ public class LogicTest {
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
-	/*
+	
 	@Ignore
 	public void testUpdateTaskByIndexFromWrongTab() {
 		long currTime = timeConverter.getCurrTime();
@@ -635,7 +587,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void updateTaskByInvalidIndexShouldThrowExceptionMessage() {
@@ -673,7 +625,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "set -1 \"new name\"");
 		assertEquals(expected, logic.getAllTaskLists());
 	}
-	/*
+	
 	@Ignore
 	public void testUpdateTaskByIndexChangeDateSameWeek() {
 		long currTime = timeConverter.getCurrTime();
@@ -718,7 +670,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void changingTaskDateFromFloatingToDeadlineShouldUpdateTaskLists() {
@@ -801,8 +753,8 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
-	@Test
+
+	@Ignore
 	public void testUpdateTaskByNameChangeName() {
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
@@ -821,7 +773,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	@Test
+	@Ignore
 	public void testUpdateTaskByNameFromWrongTab() {
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
@@ -840,7 +792,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	@Test
+	@Ignore
 	public void testUpdateTaskByInvalidName() {
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
@@ -857,7 +809,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void changingTaskNameAndDateShouldUpdateTaskLists() {
@@ -877,8 +829,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
-	@Test
+	@Ignore
 	public void testUpdateTaskByNameChangeBoth() {
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
@@ -895,7 +846,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void undoAddShouldUpdateTaskLists() {
@@ -912,7 +863,7 @@ public class LogicTest {
 		String input = "add task #tag1 #tag2";
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "undo");
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
 	@Test
@@ -938,7 +889,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -979,7 +930,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -989,7 +940,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -999,7 +950,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -1009,7 +960,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -1017,10 +968,10 @@ public class LogicTest {
 	public void deletingTaggedTaskByIndexShouldUpdateTagDatabase() {
 		logic.executeCommand(ContentBox.PENDING, "add task #tag1 #tag2");
 		logic.executeCommand(ContentBox.PENDING,"del 1");
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
-	/*
+
 	@Ignore
 	public void deletingTaggedTaskByNameShouldUpdateTagDatabase() {
 		ProcessedObject po = parser.parseInput("add task #tag1 #tag2");
@@ -1028,7 +979,7 @@ public class LogicTest {
 		po = parser.parseInput("del task");
 		logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
 		assertTrue(logic.getTagList().isEmpty());
-	}*/
+	}
 	
 	@Test
 	public void deletingTagCategoryShouldOnlyRemoveAllTasksWithThatTag() {
@@ -1052,7 +1003,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "del #tag3");
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1")); // #tag2 and #tag3 should not be in tag database
-		assertEquals(expected, logic.getTagList());
+		assertEquals(expected, logic.getTagCategoryList());
 	}
 	
 	// The order of displayed tasks is not tested here.
@@ -1092,5 +1043,5 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "view archive");
 		Exception actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
 		assertEquals(LogicConstants.MSG_EXCEPTION_DONE_INVALID, actual.getMessage());
-	}
+	}*/
 }

@@ -1,6 +1,6 @@
 package taskey.logic;
 
-//@@author A0134177E
+// @@author A0134177E
 public class LogicConstants {
 	public static final String MSG_EXCEPTION_COMMAND_EXECUTION = "Failed to execute command.";
 	public static final String MSG_EXCEPTION_DUPLICATE_TASKS = "The task you are trying to add already exists!";
@@ -23,6 +23,7 @@ public class LogicConstants {
 	public static final String MSG_DELETE_TAGS_SUCCESSFUL = "Successfully deleted tagged task(s).";
 	public static final String MSG_DONE_SUCCESSFUL = "Task moved to archive.";
 	public static final String MSG_UPDATE_SUCCESSFUL = "Successfully updated task.";
+	public static final String MSG_CLEAR_SUCCESSFUL = "Successfully cleared memory.";
 	
 	public enum ListID {
 		THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6), ACTION(7);

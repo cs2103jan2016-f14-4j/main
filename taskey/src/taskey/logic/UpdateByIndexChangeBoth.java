@@ -2,7 +2,8 @@ package taskey.logic;
 
 import java.util.ArrayList;
 
-/** @@author A0134177E
+/** 
+ * @@author A0134177E
  * This class encapsulates the instructions that the receiver, LogicMemory, must perform in order to facilitate the 
  * updating of indexed tasks by changing both their name and date. 
  */

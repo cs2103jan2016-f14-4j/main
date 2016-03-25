@@ -7,9 +7,7 @@ import java.util.ArrayList;
  * This class is the default feedback mechanism from Logic to UI.
  * Objects of this class encapsulate ArrayLists of Task objects for updating the UI display,
  * a ProcessedObject which by itself encapsulates information on the executed command and its associated
- * task, and an Exception reflect the outcome of command execution.
- * 
- * @author Hubert
+ * task, and an Exception reflecting the outcome of command execution.
  */
 public class LogicFeedback {
 	private ArrayList<ArrayList<Task>> taskLists;

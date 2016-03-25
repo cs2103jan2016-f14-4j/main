@@ -62,6 +62,42 @@ class LogicMemory {
 		this.tagCategoryList = tagCategoryList;
 	}
 	
+	/**
+	 * Add a new tag to the tag category list.
+	 */
+	void addTag(String tagToAdd) { 
+		int indexOfTag = getTagIndex(tagToAdd);
+		
+		if (indexOfTag == -1) { // Tag category list does not contain the tag to be added; add a new category for that tag.
+			tagCategoryList.add(new TagCategory(tagToAdd)); 
+		} else { // Tag category list already contains the tag to be added; increase the number of tags in that 
+			     // category by one.
+			tagCategoryList.get(indexOfTag).increaseCount();
+		}
+	}
+	
+	// Returns the index of the specified tag name in the tag category list. If the tag name is not found, -1 is returned.
+	private int getTagIndex(String tagName) {
+		for (int i = 0; i < tagCategoryList.size(); i++) {
+			if (tagCategoryList.get(i).getTagName().equals(tagName)) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * Adds a floating task to the task lists.
+	 * @param taskToAdd
+	 * @return the task lists after the task was added
+	 */
+	ArrayList<ArrayList<Task>> addFloating(Task taskToAdd) {
+		taskLists.get(INDEX_PENDING).add(taskToAdd);
+		taskLists.get(INDEX_GENERAL).add(taskToAdd);
+		return getTaskLists();
+	}
+	
 	private void initializeTaskLists() {
 		taskLists = storage.loadAllTasklists();
 		assert(taskLists != null);
@@ -114,6 +150,18 @@ class LogicMemory {
 				}
 			}
 		}
+	}
+	
+	// Clears all task lists.
+	void clearAllTaskLists() {
+		for (int i = 0; i < taskLists.size(); i++) {
+			taskLists.get(i).clear();
+		}
+	}
+	
+	// Clear the tag category list.
+	void clearTagCategoryList() {
+		tagCategoryList.clear();
 	}
 	
 	// Removes the given Task from all task lists.

@@ -2,17 +2,10 @@ package taskey.logic;
 
 import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
-import taskey.parser.TimeConverter;
-import taskey.parser.UserTagDatabase;
-import taskey.storage.History;
-import taskey.storage.Storage;
-import taskey.storage.StorageException;
 import taskey.logic.Task;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import taskey.logic.LogicConstants.ListID;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.ProcessedObject;
 
@@ -25,178 +18,34 @@ import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
  * The Logic class handles the execution of user commands. It contains an internal memory of task lists which facilitate 
  * the addition, deletion and updating of tasks. Each time a command is executed, these lists are modified and then saved 
  * to disk accordingly.
- *
- * @author Hubert Wong
  */
 public class Logic {
 	private Parser parser;
-	private TimeConverter timeConverter;
-	private UserTagDatabase utd;
-	private Storage storage;
 	private History history;
-	private ArrayList<ArrayList<Task>> taskLists; // Can be moved to a LogicMemory component next time
+	private CommandExecutor cmdExecutor;
+	private LogicMemory logicMemory;
 	
 	public Logic() {
 		parser = new Parser();
-		timeConverter = new TimeConverter();
-		storage = new Storage();
-		utd = new UserTagDatabase(storage);
-		history = storage.getHistory();
-
-		// Get lists from Storage
-		ArrayList<ArrayList<Task>> listsFromStorage = storage.loadAllTasklists();
-		listsFromStorage.add(ListID.THIS_WEEK.getIndex(), new ArrayList<Task>()); // Reserve first slot for 
-		                                                                          // this week's task list
-		listsFromStorage.add(ListID.ACTION.getIndex(), new ArrayList<Task>()); //Reserve last slot for action list
-		taskLists = cloneLists(listsFromStorage);
-
-		// Update EXPIRED and THIS_WEEK lists based on the current date and time.
-		// Tags from newly expired tasks are not removed from the tag database.
-		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		long currTime = timeConverter.getCurrTime();
-		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) { // Iterator is used for safe removal of
-			                                                              // elements while iterating
-			Task t = it.next();
-			if (t.getTaskType().equals("DEADLINE")) { // TODO: remove magic strings
-				long deadline = t.getDeadlineEpoch();
-				if (deadline < currTime) {
-					it.remove();
-					removeFromAllLists(taskLists, t); 
-					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
-				} else if (timeConverter.isSameWeek(deadline, currTime)) {
-					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
-				}
-			}
-			
-			if (t.getTaskType().equals("EVENT")) {
-				long startDate = t.getStartDateEpoch();
-				long endDate = t.getEndDateEpoch();
-				if (endDate < currTime) {
-					it.remove();
-					removeFromAllLists(taskLists, t);
-					taskLists.get(ListID.EXPIRED.getIndex()).add(t);
-				} else if (timeConverter.isSameWeek(startDate, currTime)) {
-					taskLists.get(ListID.THIS_WEEK.getIndex()).add(t);
-				}
-			}
-		}
-		
-		history.add(cloneLists(taskLists));
-		history.addTagList(utd.getTagList());
+		history = new History();
+		cmdExecutor = new CommandExecutor();
+		logicMemory = new LogicMemory();
+		history.add(getAllTaskLists());
+		history.addTagList(getTagCategoryList());
 	}
 	
 	/**
 	 * Returns a deep copy of all task lists.
 	 */
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		assert (!taskLists.contains(null));
-		
-		return cloneLists(taskLists);
+		return ListCloner.cloneTaskLists(logicMemory.getTaskLists());
 	}
 	
 	/**
-	 * Returns a deep copy of THIS_WEEK list.
+	 * Returns a deep copy of the current tag category list.
 	 */
-	public ArrayList<Task> getThisWeekList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> thisWeekList = taskLists.get(ListID.THIS_WEEK.getIndex());
-		assert (thisWeekList != null);
-		
-		return cloneList(thisWeekList);
-	}
-	
-	/**
-	 * Returns a deep copy of PENDING list.
-	 */
-	public ArrayList<Task> getPendingList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> pendingList = taskLists.get(ListID.PENDING.getIndex());
-		assert (pendingList != null);
-
-		return cloneList(pendingList);
-	}
-	
-	/**
-	 * Returns a deep copy of EXPIRED list.
-	 */
-	public ArrayList<Task> getExpiredList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> expiredList = taskLists.get(ListID.EXPIRED.getIndex());
-		assert (expiredList != null);
-
-		return cloneList(expiredList);
-	}
-	
-	/**
-	 * Returns a deep copy of GENERAL list.
-	 */
-	public ArrayList<Task> getGeneralList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> generalList = taskLists.get(ListID.GENERAL.getIndex());
-		assert (generalList != null);
-
-		return cloneList(generalList);
-	}
-	
-	/**
-	 * Returns a deep copy of DEADLINE list.
-	 */
-	public ArrayList<Task> getDeadlineList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> deadlineList = taskLists.get(ListID.DEADLINE.getIndex());
-		assert (deadlineList != null);
-
-		return cloneList(deadlineList);
-	}
-
-	/**
-	 * Returns a deep copy of EVENT list.
-	 */
-	public ArrayList<Task> getEventList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> eventList = taskLists.get(ListID.EVENT.getIndex());
-		assert (eventList != null);
-
-		return cloneList(eventList);
-	}
-
-	/**
-	 * Returns a deep copy of COMPLETED list.
-	 */
-	public ArrayList<Task> getCompletedList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> completedList = taskLists.get(ListID.COMPLETED.getIndex());
-		assert (completedList != null);
-
-		return cloneList(completedList);
-	}
-	
-	/**
-	 * Returns a deep copy of ACTION list.
-	 */
-	public ArrayList<Task> getActionList() {
-		assert (taskLists != null);
-		assert (taskLists.size() == 8);
-		ArrayList<Task> actionList = taskLists.get(ListID.ACTION.getIndex());
-		assert (actionList != null);
-
-		return cloneList(actionList);
-	}
-	
-	/**
-	 * Returns a deep copy of the current tag list.
-	 */
-	public ArrayList<TagCategory> getTagList() {
-		return utd.getTagList();
+	public ArrayList<TagCategory> getTagCategoryList() {
+		return ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
 	}
 	
 	/**
@@ -209,23 +58,23 @@ public class Logic {
 	 * @return               an object encapsulating the information required to update UI display
 	 */
 	public LogicFeedback executeCommand(ContentBox currentContent, String input) {
-		ArrayList<ArrayList<Task>> originalCopy = cloneLists(taskLists); // A deep copy of the existing task lists to 
-		                                                                 // remember the state before list operations
-		                                                                 // were applied.
-		ArrayList<ArrayList<Task>> modifiedCopy = cloneLists(taskLists); // A deep copy of the existing task lists to 
-		                                                                 // perform list operations on.
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	
     	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
-			return clear(originalCopy, modifiedCopy);
+			Command cmd = new Clear();
+			cmdExecutor.execute(cmd, logicMemory);
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
+					                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
     	}
-
+    	
     	switch (command) {
 			case "ADD_FLOATING":
-				return addFloating(originalCopy, modifiedCopy, po);
+				Command cmd = new AddFloating(po.getTask());
+				cmdExecutor.execute(cmd, logicMemory);
+				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 				
-			case "ADD_DEADLINE":
+			/*case "ADD_DEADLINE":
 				return addDeadline(originalCopy, modifiedCopy, po);
 
 			case "ADD_EVENT":
@@ -233,9 +82,6 @@ public class Logic {
 
 			case "DELETE_BY_INDEX":
 				return deleteByIndex(currentContent, originalCopy, modifiedCopy, po);
-
-			/*case "DELETE_BY_NAME":
-				return deleteByName(currentContent, originalCopy, modifiedCopy, po);*/
 				
 			case "DELETE_BY_CATEGORY":
 				return deleteByCategory(originalCopy, modifiedCopy, po);
@@ -252,9 +98,6 @@ public class Logic {
 			case "DONE_BY_INDEX":
 				return doneByIndex(currentContent, originalCopy, modifiedCopy, po);
 
-			/*case "DONE_BY_NAME":
-				return doneByName(currentContent, originalCopy, modifiedCopy, po);*/
-
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 				return updateByIndexChangeName(currentContent, originalCopy, modifiedCopy, po);
 
@@ -264,28 +107,19 @@ public class Logic {
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
 				return updateByIndexChangeBoth(currentContent, originalCopy, modifiedCopy, po);
 
-			/*case "UPDATE_BY_NAME_CHANGE_NAME":
-				return updateByNameChangeName(currentContent, originalCopy, modifiedCopy, po);
-
-			case "UPDATE_BY_NAME_CHANGE_DATE":
-				return updateByNameChangeDate(currentContent, originalCopy, modifiedCopy, po);
-				
-			case "UPDATE_BY_NAME_CHANGE_BOTH":
-				return updateByNameChangeBoth(currentContent, originalCopy, modifiedCopy, po);*/
-
 			case "UNDO":
 				return undo(po);
 				
 			case "ERROR":
-				return new LogicFeedback(originalCopy, po, new Exception(po.getErrorType()));
+				return new LogicFeedback(originalCopy, po, new Exception(po.getErrorType()));*/
 
 			default:
 				break;
 		}
 
-		return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_COMMAND_EXECUTION));
+		return null; // Stub
 	}
-	
+	/*
 	// Searches for all expired and pending tasks that are tagged with at least one of the tag categories that the user 
 	// wants to view.
 	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
@@ -917,28 +751,6 @@ public class Logic {
 		return new LogicFeedback(previousSuperList, po, null);
 	}
 	
-	// Creates a deep copy of the given task list.
-	private ArrayList<Task> cloneList(ArrayList<Task> list) {
-		ArrayList<Task> copy = new ArrayList<Task>();
-		
-		for (Task t : list) {
-			copy.add(t.getDuplicate());
-		}
-		
-		return copy;
-	}
-	
-	// Creates a deep copy of the given task lists.
-	ArrayList<ArrayList<Task>> cloneLists(ArrayList<ArrayList<Task>> lists) {
-		ArrayList<ArrayList<Task>> copy = new ArrayList<ArrayList<Task>>();	
-		
-		for (int i = 0; i < lists.size(); i++) {
-			copy.add(cloneList(lists.get(i)));
-		}
-		
-		return copy;
-	}
-	
 	// Gets the list corresponding to the given ContentBox.
 	private ArrayList<Task> getListFromContentBox(ArrayList<ArrayList<Task>> taskLists, ContentBox currentContent) {
 		ArrayList<Task> targetList = null;
@@ -975,12 +787,6 @@ public class Logic {
 		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
 		taskLists.get(ListID.COMPLETED.getIndex()).remove(toRemove);
 		taskLists.get(ListID.ACTION.getIndex()).remove(toRemove);
-	}
-
-	private void clearAllLists(ArrayList<ArrayList<Task>> taskLists) {
-		for (int i = 0; i < taskLists.size(); i++) {
-			taskLists.get(i).clear();
-		}
 	}
 	
 	private ArrayList<ArrayList<Task>> getEmptyLists() {
@@ -1058,7 +864,7 @@ public class Logic {
 		} catch (StorageException se) {
 			throw new Exception (se.getMessage());
 		}
-	}
+	}*/
 	
 	
 	public ArrayList<String> autoCompleteLine(String line, ContentBox currentContent) {
@@ -1103,24 +909,4 @@ public class Logic {
 			}
 		}
 	}
-	
-	/**
-	 * This function takes in a ProcessedObject, checks whether there are
-	 * tags that can be added to the UserTagDatabase, else do nothing. 
-	 * @param po
-	 */
-	public void trackTags(ProcessedObject po) {
-		Task task = po.getTask();
-		if (task != null) {
-			ArrayList<String> tags = task.getTaskTags(); 
-			
-			if (tags != null) {
-				for(int i = 0; i < tags.size(); i++) {
-					if (!utd.containsTagName(tags.get(i))) {
-						utd.addTag(tags.get(i));
-					}
-				}
-			}	 
-		}
-	} 
 }

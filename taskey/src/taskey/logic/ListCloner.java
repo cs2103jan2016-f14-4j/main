@@ -2,7 +2,8 @@ package taskey.logic;
 
 import java.util.ArrayList;
 
-/** @@author A0134177E
+/** 
+ * @@author A0134177E
  * This class provides methods for creating deep copies of ArrayList<Task>, ArrayList<ArrayList<Task>>, and
  * ArrayList<TagCategory> objects.
  */

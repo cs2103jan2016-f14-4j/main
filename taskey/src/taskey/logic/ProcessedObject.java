@@ -266,8 +266,8 @@ public class ProcessedObject {
 	
 	@Override
 	/**
-	 * @@author A0134177E
-	 * Compare if a ProcessedObject is equal to another ProcessedObject
+	 * @@author A0134177E-unused
+	 * Previously used to compare LogicFeedback objects for testing purposes. Now not in use.
 	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ProcessedObject)) {

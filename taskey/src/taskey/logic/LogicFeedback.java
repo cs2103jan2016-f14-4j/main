@@ -57,6 +57,8 @@ public class LogicFeedback {
 		this.e = e;
 	}
 	
+	// @@author A0134177E-unused
+	// Previously used to compare LogicFeedback objects for testing purposes. Now not in use.
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof LogicFeedback)) {

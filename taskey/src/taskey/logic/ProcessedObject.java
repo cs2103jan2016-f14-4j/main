@@ -264,63 +264,8 @@ public class ProcessedObject {
 		this.newPriority = newPriority; 
 	}
 	
-	@Override
-	/**
-	 * @@author A0134177E-unused
-	 * Previously used to compare LogicFeedback objects for testing purposes. Now not in use.
-	 */
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ProcessedObject)) {
-		    return false;
-		  }
-		
-		ProcessedObject other = (ProcessedObject) obj;
-		
-		if ((command == null && other.command != null) || (command != null 
-			 && (other.command == null || !command.equals(other.command)))) {
-			return false;
-		}	
-		
-		if ((task == null && other.task != null) || (task != null 
-			 && (other.task == null || !task.equals(other.task)))) {
-			return false;
-		}	
-		
-		if (index != other.index) {
-			return false;
-		}
-		
-		if ((viewType == null && other.viewType != null) || (viewType != null 
-			 && (other.viewType == null || !viewType.equals(other.viewType)))) {
-			return false;
-		}	
-		
-		if ((errorType == null && other.errorType != null) || (errorType != null 
-			 && (other.errorType == null || !errorType.equals(other.errorType)))) {
-			return false;
-		}	
-		
-		if ((searchPhrase == null && other.searchPhrase != null) || (searchPhrase != null 
-			 && (other.searchPhrase == null || !searchPhrase.equals(other.searchPhrase)))) {
-			return false;
-		}	
-		
-		if ((newTaskName == null && other.newTaskName != null) || (newTaskName != null 
-			 && (other.newTaskName == null || !newTaskName.equals(other.newTaskName)))) {
-			return false;
-		}	
-		
-		if ((newFileLoc == null && other.newFileLoc != null) || (newFileLoc != null 
-			 && (other.newFileLoc == null || !newFileLoc.equals(other.newFileLoc)))) {
-			return false;
-		}	
-		
-		return true;
-	}
-	
 	@Override 
 	/**
-	 * @@author A0107345L
 	 * For debugging
 	 */
 	public String toString() {

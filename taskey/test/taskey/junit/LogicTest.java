@@ -870,7 +870,7 @@ public class LogicTest {
 		expected.add(new TagCategory("tag2"));
 		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
-	}
+	}*/
 	
 	@Test
 	public void addingTaggedFloatingTaskShouldUpdateTagDatabase() {
@@ -909,16 +909,6 @@ public class LogicTest {
 		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
-
-	@Ignore
-	public void deletingTaggedTaskByNameShouldUpdateTagDatabase() {
-		ProcessedObject po = parser.parseInput("add task #tag1 #tag2");
-		logic.addFloating(originalCopy, modifiedCopy, po);
-		po = parser.parseInput("del task");
-		logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		assertTrue(logic.getTagList().isEmpty());
-	}
-	
 	@Test
 	public void deletingTagCategoryShouldOnlyRemoveAllTasksWithThatTag() {
 		logic.executeCommand(ContentBox.PENDING, "add task #tag1");
@@ -943,7 +933,7 @@ public class LogicTest {
 		expected.add(new TagCategory("tag1")); // #tag2 and #tag3 should not be in tag database
 		assertEquals(expected, logic.getTagCategoryList());
 	}
-	
+	/*
 	// The order of displayed tasks is not tested here.
 	// This test also checks that there are no duplicate tasks in the displayed list.
 	@Test

@@ -156,17 +156,18 @@ public class LogicMemory {
 		return toDelete;
 	}
 	
-	// Removes all task tags in the given list from the tag category list.
-	private void removeTaskTags(ArrayList<String> taskTags) {
-		if (taskTags != null) {
-			for (String s : taskTags) {
-				removeTag(s);
-			}
-		}
+	/**
+	 * Deletes all tasks with the given tag name from the expired and pending lists, and updates the tag category list 
+	 * accordingly.
+	 * @param tagName
+	 */
+	void deleteByTagName(String tagName) {
+		removeTaggedTasks(taskLists.get(INDEX_EXPIRED), tagName);
+		removeTaggedTasks(taskLists.get(INDEX_PENDING), tagName);
 	}
 	
 	/**
-	 * Marks an indexed task from the specified task list as done.
+	 * Marks an indexed task from the specified task list as done, and deletes all its tags from the tag category list.
 	 * @param listIndex
 	 * @param taskIndex
 	 */
@@ -257,6 +258,40 @@ public class LogicMemory {
 		taskLists.get(INDEX_EVENT).remove(toRemove);
 		taskLists.get(INDEX_COMPLETED).remove(toRemove);
 		taskLists.get(INDEX_ACTION).remove(toRemove);
+	}
+	
+	/** 
+	 * Removes all tasks which contain a tag with the given name, from the given list. The tasks will be removed from
+	 * other lists that contain them as well. For each task that is removed, the tag category list will be updated 
+	 * accordingly.
+	 * 
+	 * @param list
+	 * @param tagName
+	 */
+	private void removeTaggedTasks(ArrayList<Task> list, String tagName) {
+		for (Iterator<Task> it = list.iterator(); it.hasNext();) { // Iterator is for save removal of elements while 
+			                                                       // iterating
+			Task task = it.next();
+			
+			if (task.getTaskTags().contains(tagName)) {
+				it.remove();
+				removeFromAllLists(task); // This is safe because the task has already been removed from the current list.
+				removeTaskTags(task.getTaskTags());
+			}
+		}
+	}
+	
+	/** 
+	 * Removes all task tags in the given list from the tag category list.
+	 * 
+	 * @param taskTags
+	 */
+	private void removeTaskTags(ArrayList<String> taskTags) {
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				removeTag(s);
+			}
+		}
 	}
 	
 	// Returns true if and only if the given task already exists in any of the task lists.

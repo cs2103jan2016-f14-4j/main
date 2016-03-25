@@ -98,9 +98,11 @@ public class Logic {
 				cmd = new DeleteByIndex(getListIndex(currentContent), po.getIndex());
 				return executeDelete(po, cmd);
 						
-			/*case "DELETE_BY_CATEGORY":
-				return deleteByCategory(originalCopy, modifiedCopy, po);
+			case "DELETE_BY_CATEGORY":
+				cmd = new DeleteByTagName(po.getCategory());
+				return executeDelete(po, cmd);
 
+			/*
 			case "VIEW_BASIC":
 				return viewBasic(originalCopy, po);
 			
@@ -303,111 +305,6 @@ public class Logic {
 		
 		taskLists = cloneLists(originalCopy);
 		return new LogicFeedback(originalCopy, po, null);
-	}
-	
-	// Delete all tasks with the tag category specified within the ProcessedObject po.
-	LogicFeedback deleteByCategory(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-								   ProcessedObject po) {
-		String category = po.getCategory();
-		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		boolean categoryExists = false;
-		
-		// Remove all tasks pending tasks tagged with the specified category
-		for (Iterator<Task> it = pendingList.iterator(); it.hasNext();) {
-			Task task = it.next();
-			ArrayList<String> taskTags = task.getTaskTags();
-			if (taskTags != null && taskTags.contains(category)) {
-				categoryExists = true;
-				it.remove();
-				removeFromAllLists(modifiedCopy, task); 
-				for (String s : taskTags) {
-					utd.removeTag(s);
-				}
-			}
-		}
-		
-		// Remove all expired tasks tagged with the specified category
-		for (Iterator<Task> it = expiredList.iterator(); it.hasNext();) {
-			Task task = it.next();
-			ArrayList<String> taskTags = task.getTaskTags();
-			if (taskTags != null && taskTags.contains(category)) {
-				categoryExists = true;
-				it.remove();
-				removeFromAllLists(modifiedCopy, task); 
-				for (String s : taskTags) {
-					utd.removeTag(s);
-				}
-			}
-		}
-		
-		if (!categoryExists) {
-			String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND, category);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_TAGS_SUCCESSFUL));
-	}
-
-	// Marks an indexed task from the current tab as done and saves the updated lists to disk.
-	public LogicFeedback doneByIndex(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-			                  ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
-		Task toComplete;
-		int taskIndex = po.getIndex();
-		String exceptionMsg;
-		ArrayList<Task> targetList = getListFromContentBox(modifiedCopy, currentContent);
-		
-		try {
-			toComplete = targetList.get(taskIndex);
-		} catch (IndexOutOfBoundsException e) {
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		// User is trying to complete a task that is already done
-		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toComplete)) {
-			exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		removeFromAllLists(modifiedCopy, toComplete);
-		modifiedCopy.get(ListID.COMPLETED.getIndex()).add(toComplete);
-		
-		// Check if user used "done" from the ACTION tab. If so, don't clear the ACTION list.
-		if (!currentContent.equals(ContentBox.ACTION)) {
-			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		}
-		
-		ArrayList<String> taskTags = toComplete.getTaskTags();
-		if (taskTags != null) {
-			for (String s : taskTags) {
-				utd.removeTag(s);
-			}
-		}	
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DONE_SUCCESSFUL));
 	}
 
 	// Updates an indexed task's name on the current tab and saves the updated lists to disk.

@@ -129,25 +129,12 @@ class LogicMemory {
 			                                                              // elements while iterating
 			Task task = it.next();
 			
-			if (task.getTaskType().equals("DEADLINE")) { // TODO: remove magic strings
-				long deadline = task.getDeadlineEpoch();
-				if (deadline < currTime) {
-					it.remove();
-					removeFromAllLists(task); 
-					expiredList.add(task);
-				} else if (timeConverter.isSameWeek(deadline, currTime)) {
-					thisWeekList.add(task);
-				}
-			} else if (task.getTaskType().equals("EVENT")) {
-				long startDate = task.getStartDateEpoch();
-				long endDate = task.getEndDateEpoch();
-				if (endDate < currTime) {
-					it.remove();
-					removeFromAllLists(task); 
-					expiredList.add(task);
-				} else if (timeConverter.isSameWeek(startDate, currTime)) {
-					thisWeekList.add(task);
-				}
+			if (task.isExpired()) {
+				it.remove();
+				removeFromAllLists(task);
+				expiredList.add(task);
+			} else if (task.isThisWeek()) {
+				thisWeekList.add(task);
 			}
 		}
 	}

@@ -78,7 +78,8 @@ public class Logic {
     	Command cmd;
     	
     	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
-			return executeClear();
+    		cmd = new Clear();
+			return executeClear(cmd);
     	}
     	
     	switch (command) {
@@ -101,27 +102,27 @@ public class Logic {
 			case "DELETE_BY_CATEGORY":
 				cmd = new DeleteByTagName(po.getCategory());
 				return executeDelete(po, cmd);
-
-			/*
-			case "VIEW_BASIC":
-				return viewBasic(originalCopy, po);
-			
-			case "VIEW_TAGS":
-				return viewTags(originalCopy, modifiedCopy, po);*/
 			
 			case "DONE_BY_INDEX":
 				cmd = new DoneByIndex(getListIndex(currentContent), po.getIndex());
 				return executeDone(po, cmd);			
 				
-			/*
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				return updateByIndexChangeName(currentContent, originalCopy, modifiedCopy, po);
-
+				cmd = new UpdateByIndexChangeName(getListIndex(currentContent), po.getIndex(), po.getNewTaskName());
+				return executeUpdate(po, cmd);
+				
+			/*
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
 				return updateByIndexChangeDate(currentContent, originalCopy, modifiedCopy, po);
 				
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
 				return updateByIndexChangeBoth(currentContent, originalCopy, modifiedCopy, po);
+				
+			case "VIEW_BASIC":
+				return viewBasic(originalCopy, po);
+			
+			case "VIEW_TAGS":
+				return viewTags(originalCopy, modifiedCopy, po);
 
 			case "UNDO":
 				return undo(po);
@@ -143,10 +144,8 @@ public class Logic {
     //================================================================================
     // Command Methods
     //================================================================================
-	
-	private LogicFeedback executeClear() {
-		Command cmd;
-		cmd = new Clear();
+
+	private LogicFeedback executeClear(Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (Exception e) {
@@ -185,6 +184,16 @@ public class Logic {
 		}
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DONE_SUCCESSFUL));
+	}
+	
+	private LogicFeedback executeUpdate(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 	
 	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {

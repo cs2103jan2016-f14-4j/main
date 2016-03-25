@@ -177,6 +177,23 @@ public class LogicMemory {
 	}
 	
 	/**
+	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
+	 * @param listIndex
+	 * @param taskIndex
+	 */
+	void updateByIndexChangeName(int listIndex, int taskIndex, String newName) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(listIndex);
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		toUpdate.setTaskName(newName); // This should also update the task in the other lists, provided that their
+		                               // references point to the same task object. Could be buggy?
+	}
+	
+	/**
 	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 
 	 * is not case sensitive.
 	 * TODO: improved search

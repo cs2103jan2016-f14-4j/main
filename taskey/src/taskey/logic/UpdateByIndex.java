@@ -7,9 +7,11 @@ package taskey.logic;
  */
 abstract class UpdateByIndex extends Command {
 	
-	protected int updateIndex;
+	protected int listIndex;
+	protected int taskIndex;
 	
-	protected UpdateByIndex(int updateIndex) {
-		this.updateIndex = updateIndex;
+	protected UpdateByIndex(int listIndex, int taskIndex) {
+		this.listIndex = listIndex;
+		this.taskIndex = taskIndex;
 	}
 }

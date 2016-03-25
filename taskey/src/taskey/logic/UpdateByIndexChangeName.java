@@ -9,13 +9,13 @@ final class UpdateByIndexChangeName extends UpdateByIndex {
 	
 	private String newName;
 
-	UpdateByIndexChangeName(int updateIndex, String newName) {
-		super(updateIndex);
+	UpdateByIndexChangeName(int listIndex, int taskIndex, String newName) {
+		super(listIndex, taskIndex);
 		this.newName = newName;
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws Exception {
+		logicMemory.updateByIndexChangeName(listIndex, taskIndex, newName);
 	}
 }

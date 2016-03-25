@@ -1,5 +1,7 @@
 package taskey.logic;
 
+import taskey.constants.UiConstants.ContentBox;
+
 /** 
  * @@author A0134177E
  * This class provides the basic resources necessary for subclasses to encapsulate the instructions that the receiver, 
@@ -7,11 +9,11 @@ package taskey.logic;
  */
 abstract class UpdateByIndex extends Command {
 	
-	protected int listIndex;
-	protected int taskIndex;
+	protected ContentBox contentBox;
+	protected int updateIndex;
 	
-	protected UpdateByIndex(int listIndex, int taskIndex) {
-		this.listIndex = listIndex;
-		this.taskIndex = taskIndex;
+	protected UpdateByIndex(ContentBox contentBox, int updateIndex) {
+		this.contentBox = contentBox;
+		this.updateIndex = updateIndex;
 	}
 }

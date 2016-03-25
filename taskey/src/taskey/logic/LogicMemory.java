@@ -3,6 +3,7 @@ package taskey.logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import taskey.constants.UiConstants.ContentBox;
 import taskey.storage.Storage;
 
 /**
@@ -92,6 +93,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_GENERAL).add(taskToAdd);
+		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 	}
 	
 	/**
@@ -109,6 +111,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_DEADLINE).add(taskToAdd);
+		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 		
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
@@ -130,6 +133,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_EVENT).add(taskToAdd);
+		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 		
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
@@ -138,12 +142,12 @@ public class LogicMemory {
 	
 	/**
 	 * Removes an indexed task from the specified task list, and deletes all its tags from the tag category list.
-	 * @param listIndex
-	 * @param taskIndex
-	 * @return the Task that was deleted
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be deleted
+	 * @return           the Task that was deleted
 	 */
-	Task deleteByIndex(int listIndex, int taskIndex) throws Exception {
-		ArrayList<Task> targetList = taskLists.get(listIndex);
+	Task deleteByIndex(ContentBox contentBox, int taskIndex) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
 			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
@@ -152,6 +156,10 @@ public class LogicMemory {
 		Task toDelete = targetList.get(taskIndex);
 		removeFromAllLists(toDelete);
 		removeTaskTags(toDelete.getTaskTags());
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			taskLists.get(INDEX_ACTION).clear();
+		}
 		
 		return toDelete;
 	}
@@ -164,25 +172,26 @@ public class LogicMemory {
 	void deleteByTagName(String tagName) {
 		removeTaggedTasks(taskLists.get(INDEX_EXPIRED), tagName);
 		removeTaggedTasks(taskLists.get(INDEX_PENDING), tagName);
+		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 	}
 	
 	/**
 	 * Marks an indexed task from the specified task list as done, and deletes all its tags from the tag category list.
-	 * @param listIndex
-	 * @param taskIndex
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be completed
 	 */
-	void doneByIndex(int listIndex, int taskIndex) throws Exception {
-		Task toComplete = deleteByIndex(listIndex, taskIndex);
+	void doneByIndex(ContentBox contentBox, int taskIndex) throws Exception {
+		Task toComplete = deleteByIndex(contentBox, taskIndex);
 		taskLists.get(INDEX_COMPLETED).add(toComplete);
 	}
 	
 	/**
 	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
-	 * @param listIndex
-	 * @param taskIndex
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be updated
 	 */
-	void updateByIndexChangeName(int listIndex, int taskIndex, String newName) throws Exception {
-		ArrayList<Task> targetList = taskLists.get(listIndex);
+	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
 			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
@@ -191,6 +200,10 @@ public class LogicMemory {
 		Task toUpdate = targetList.get(taskIndex);
 		toUpdate.setTaskName(newName); // This should also update the task in the other lists, provided that their
 		                               // references point to the same task object. Could be buggy?
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			taskLists.get(INDEX_ACTION).clear();
+		}
 	}
 	
 	/**
@@ -263,6 +276,26 @@ public class LogicMemory {
 	// Clear the tag category list.
 	void clearTagCategoryList() {
 		tagCategoryList.clear();
+	}
+	
+	// Returns the index of the list corresponding to the current ContentBox.
+	private int getListIndex(ContentBox currentContent) {
+		switch (currentContent) {
+			case THIS_WEEK:
+				return INDEX_THIS_WEEK;
+			
+			case PENDING:
+				return INDEX_PENDING;
+			
+			case EXPIRED:
+				return INDEX_EXPIRED;
+				
+			case ACTION:
+				return INDEX_ACTION;
+			
+			default:
+				return -1; // Stub
+		}
 	}
 	
 	// Removes the given Task from all task lists.

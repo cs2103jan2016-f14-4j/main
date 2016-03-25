@@ -1,5 +1,7 @@
 package taskey.logic;
 
+import taskey.constants.UiConstants.ContentBox;
+
 /** 
  * @@author A0134177E
  * This class encapsulates the instructions that the receiver, LogicMemory, must perform in order to facilitate the 
@@ -9,8 +11,8 @@ final class UpdateByIndexChangeDate extends UpdateByIndex {
 	
 	private Task newTask; // Contains the new date
 
-	UpdateByIndexChangeDate(int updateIndex, Task newTask) {
-		super(updateIndex);
+	UpdateByIndexChangeDate(ContentBox contentBox, int updateIndex, Task newTask) {
+		super(contentBox, updateIndex);
 		this.newTask = newTask;
 	}
 	

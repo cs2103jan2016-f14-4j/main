@@ -96,7 +96,7 @@ public class Logic {
 				return executeAdd(po, cmd);
 
 			case "DELETE_BY_INDEX":
-				cmd = new DeleteByIndex(getListIndex(currentContent), po.getIndex());
+				cmd = new DeleteByIndex(currentContent, po.getIndex());
 				return executeDelete(po, cmd);
 						
 			case "DELETE_BY_CATEGORY":
@@ -104,11 +104,11 @@ public class Logic {
 				return executeDelete(po, cmd);
 			
 			case "DONE_BY_INDEX":
-				cmd = new DoneByIndex(getListIndex(currentContent), po.getIndex());
+				cmd = new DoneByIndex(currentContent, po.getIndex());
 				return executeDone(po, cmd);			
 				
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				cmd = new UpdateByIndexChangeName(getListIndex(currentContent), po.getIndex(), po.getNewTaskName());
+				cmd = new UpdateByIndexChangeName(currentContent, po.getIndex(), po.getNewTaskName());
 				return executeUpdate(po, cmd);
 				
 			/*
@@ -214,26 +214,6 @@ public class Logic {
 	private void updateHistory() {
 		history.add(getAllTaskLists());
 		history.addTagList(getTagCategoryList());
-	}
-	
-	// Returns the index of the list corresponding to the current ContentBox.
-	private int getListIndex(ContentBox currentContent) {
-		switch (currentContent) {
-			case THIS_WEEK:
-				return LogicMemory.INDEX_THIS_WEEK;
-			
-			case PENDING:
-				return LogicMemory.INDEX_PENDING;
-			
-			case EXPIRED:
-				return LogicMemory.INDEX_EXPIRED;
-				
-			case ACTION:
-				return LogicMemory.INDEX_ACTION;
-			
-			default:
-				return -1; // Stub
-		}
 	}
 	
 	/*

@@ -1,5 +1,7 @@
 package taskey.logic;
 
+import taskey.constants.UiConstants.ContentBox;
+
 /** 
  * @@author A0134177E
  * This class encapsulates the instructions that the receiver, LogicMemory, must perform in order to facilitate the 
@@ -7,16 +9,16 @@ package taskey.logic;
  */
 final class DeleteByIndex extends Command {
 	
-	private int listIndex;
-	private int taskIndex;
+	private ContentBox contentBox;
+	private int deleteIndex;
 	
-	DeleteByIndex(int listIndex, int taskIndex) {
-		this.listIndex = listIndex;
-		this.taskIndex = taskIndex;
+	DeleteByIndex(ContentBox contentBox, int deleteIndex) {
+		this.contentBox = contentBox;
+		this.deleteIndex = deleteIndex;
 	}
 	
 	@Override
 	void execute(LogicMemory logicMemory) throws Exception {
-		logicMemory.deleteByIndex(listIndex, taskIndex);
+		logicMemory.deleteByIndex(contentBox, deleteIndex);
 	}
 }

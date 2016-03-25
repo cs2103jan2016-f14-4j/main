@@ -497,6 +497,37 @@ public class Task implements Comparable<Task> {
 		return false;
 	}
 	
+	// Returns true if and only if the task is expired, according to the current time on the user's computer clock.
+	public boolean isExpired() {
+		long currTime = timeConverter.getCurrTime();
+		
+		if (taskType.equals("DEADLINE")) { // TODO: remove magic strings
+			long deadline = getDeadlineEpoch();
+			return (deadline < currTime);
+		} else if (taskType.equals("EVENT")) {
+			long endDate = getEndDateEpoch();
+			return (endDate < currTime);
+		} else { // Floating tasks are never expired
+			return false;
+		}
+	}
+	
+	// Returns true if and only if the task is occurring this week, according to the current time on the user's computer 
+	// clock.
+	public boolean isThisWeek() {
+		long currTime = timeConverter.getCurrTime();
+		
+		if (taskType.equals("DEADLINE")) { // TODO: remove magic strings
+			long deadline = getDeadlineEpoch();
+			return (timeConverter.isSameWeek(currTime, deadline));
+		} else if (taskType.equals("EVENT")) {
+			long startDate = getStartDateEpoch();
+			return (timeConverter.isSameWeek(currTime, startDate));
+		} else { // Floating tasks are never this week
+			return false;
+		}
+	}
+	
 	@Override 
 	/**
 	 * @@author A0107345L 

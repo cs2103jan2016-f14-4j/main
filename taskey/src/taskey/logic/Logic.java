@@ -111,10 +111,11 @@ public class Logic {
 				cmd = new UpdateByIndexChangeName(currentContent, po.getIndex(), po.getNewTaskName());
 				return executeUpdate(po, cmd);
 				
-			/*
 			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				return updateByIndexChangeDate(currentContent, originalCopy, modifiedCopy, po);
-				
+				cmd = new UpdateByIndexChangeDate(currentContent, po.getIndex(), po.getTask());
+				return executeUpdate(po, cmd);
+			
+			/*
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
 				return updateByIndexChangeBoth(currentContent, originalCopy, modifiedCopy, po);
 				
@@ -494,52 +495,6 @@ public class Logic {
 		taskLists = cloneLists(previousSuperList);
 		return new LogicFeedback(previousSuperList, po, null);
 	}
-	
-	// Gets the list corresponding to the given ContentBox.
-	private ArrayList<Task> getListFromContentBox(ArrayList<ArrayList<Task>> taskLists, ContentBox currentContent) {
-		ArrayList<Task> targetList = null;
-		switch (currentContent) {
-			case PENDING:
-				targetList = taskLists.get(ListID.PENDING.getIndex());
-				break;
-				
-			case EXPIRED:
-				targetList = taskLists.get(ListID.EXPIRED.getIndex());
-				break;
-				
-			case THIS_WEEK:
-				targetList = taskLists.get(ListID.THIS_WEEK.getIndex());
-				break;
-				
-			case ACTION:
-				targetList = taskLists.get(ListID.ACTION.getIndex());
-				break;
-
-			default:
-				System.out.println("ContentBox invalid");
-		}
-		return targetList;
-	}
-
-	// Removes the given Task from all task lists.
-	private void removeFromAllLists(ArrayList<ArrayList<Task>> taskLists, Task toRemove) {
-		taskLists.get(ListID.THIS_WEEK.getIndex()).remove(toRemove);
-		taskLists.get(ListID.PENDING.getIndex()).remove(toRemove);
-		taskLists.get(ListID.EXPIRED.getIndex()).remove(toRemove);
-		taskLists.get(ListID.GENERAL.getIndex()).remove(toRemove);
-		taskLists.get(ListID.DEADLINE.getIndex()).remove(toRemove);
-		taskLists.get(ListID.EVENT.getIndex()).remove(toRemove);
-		taskLists.get(ListID.COMPLETED.getIndex()).remove(toRemove);
-		taskLists.get(ListID.ACTION.getIndex()).remove(toRemove);
-	}
-	
-	private ArrayList<ArrayList<Task>> getEmptyLists() {
-		ArrayList<ArrayList<Task>> emptyLists = new ArrayList<ArrayList<Task>>();
-		while (emptyLists.size() < 8) {
-			emptyLists.add(new ArrayList<Task>());
-		}
-		return emptyLists;
-	}
 
 	// Change the old Task, if any, to have a new name newTaskName.
 	// Also updates all lists containing the updated Task.
@@ -567,26 +522,6 @@ public class Logic {
 		}
 	}
 
-	// Returns true if and only if a given pending task should be classified under the list specified by listIndex.
-	private boolean belongsToList(Task task, int listIndex) {
-		String taskType = task.getTaskType();
-
-		if (listIndex == ListID.THIS_WEEK.getIndex()) {
-			return (timeConverter.isSameWeek(task.getDeadlineEpoch(), timeConverter.getCurrTime())
-					|| timeConverter.isSameWeek(task.getStartDateEpoch(), timeConverter.getCurrTime()));
-		} else if (listIndex == ListID.PENDING.getIndex() || listIndex == ListID.ACTION.getIndex()) {
-			return true;
-		} else if (listIndex == ListID.GENERAL.getIndex()) {
-			return (taskType.equals("FLOATING"));
-		} else if (listIndex == ListID.DEADLINE.getIndex()) {
-			return (taskType.equals("DEADLINE"));
-		} else if (listIndex == ListID.EVENT.getIndex()) {
-			return (taskType.equals("EVENT"));
-		}
-
-		return false; // Stub
-	}
-	
 	// Returns all Tasks in the given list whose name matches taskName. If no such Task is found, an empty list is
 	// returned.
 	private ArrayList<Task> getTasksByName(ArrayList<Task> list, String taskName) {

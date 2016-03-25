@@ -181,14 +181,32 @@ public class LogicMemory {
 	 * @param taskIndex  the index of task to be completed
 	 */
 	void doneByIndex(ContentBox contentBox, int taskIndex) throws Exception {
-		Task toComplete = deleteByIndex(contentBox, taskIndex);
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+		}
+		
+		Task toComplete = targetList.get(taskIndex);
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toComplete)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DONE_INVALID);
+		}
+		
+		removeFromAllLists(toComplete);
 		taskLists.get(INDEX_COMPLETED).add(toComplete);
+		removeTaskTags(toComplete.getTaskTags());
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			taskLists.get(INDEX_ACTION).clear();
+		}
 	}
 	
 	/**
 	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be updated
+	 * @param newName    the new name to update the task to
 	 */
 	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws Exception {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
@@ -198,14 +216,59 @@ public class LogicMemory {
 		}
 		
 		Task toUpdate = targetList.get(taskIndex);
-		toUpdate.setTaskName(newName); // This should also update the task in the other lists, provided that their
-		                               // references point to the same task object. Could be buggy?
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
+		}
+		
+		Task toUpdateCopy = new Task(toUpdate);
+		toUpdateCopy.setTaskName(newName);
+		
+		if (taskAlreadyExists(toUpdateCopy)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+		}
+		
+		removeFromAllLists(toUpdate);
+		toUpdate.setTaskName(newName);
+		addTaskToLists(contentBox, toUpdate);
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
 			taskLists.get(INDEX_ACTION).clear();
 		}
 	}
 	
+	/**
+	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be updated
+	 * @param newTask    the task with the new date
+	 */
+	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
+		}
+		
+		if (newTask.isExpired()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+		}
+		
+		removeFromAllLists(toUpdate);
+		newTask.setTaskName(toUpdate.getTaskName());
+		addTaskToLists(contentBox, newTask);
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			taskLists.get(INDEX_ACTION).clear();
+		}
+	}
+
 	/**
 	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 
 	 * is not case sensitive.
@@ -295,6 +358,40 @@ public class LogicMemory {
 			
 			default:
 				return -1; // Stub
+		}
+	}
+	
+	// Adds the new Task to all the lists it should belong to, depending on the current tab the user is in.
+	private void addTaskToLists(ContentBox contentBox, Task newTask) {
+		for (int i = 0; i < taskLists.size(); i++) {
+			if (belongsToList(contentBox, i, newTask)) {
+				taskLists.get(i).add(newTask);
+			}
+		}
+	}
+	
+	// Returns true if and only if the new Task belongs to the list specified by listIndex, depending on the current 
+	// tab the user is in.
+	private boolean belongsToList(ContentBox contentBox, int listIndex, Task newTask) {
+		String taskType = newTask.getTaskType();
+		boolean isExpired = newTask.isExpired();
+
+		if (listIndex == INDEX_THIS_WEEK) {
+			return (!isExpired && newTask.isThisWeek());
+		} else if (listIndex == INDEX_PENDING) {
+			return !isExpired;
+		} else if (listIndex == INDEX_EXPIRED) {
+			return isExpired;
+		} else if (listIndex == INDEX_GENERAL) {
+			return (taskType.equals("FLOATING")); // TODO: remove magic Strings
+		} else if (listIndex == INDEX_DEADLINE) {
+			return (!isExpired && taskType.equals("DEADLINE"));
+		} else if (listIndex == INDEX_EVENT) {
+			return (!isExpired && taskType.equals("EVENT"));
+		} else if (listIndex == INDEX_ACTION) {
+			return contentBox.equals(ContentBox.ACTION);
+		} else {
+			return false;
 		}
 	}
 	

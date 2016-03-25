@@ -549,7 +549,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertEquals(expected, actual);
-	}
+	}*/
 	
 	@Test
 	public void changingTaskDateFromFloatingToDeadlineShouldUpdateTaskLists() {
@@ -612,7 +612,7 @@ public class LogicTest {
 		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		input = "set 1 [" + deadline + "]";
 		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
-		String expected = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, deadline);
+		String expected = LogicConstants.MSG_EXCEPTION_DATE_EXPIRED;
 		assertEquals(expected, actual);
 	}
 	
@@ -633,7 +633,7 @@ public class LogicTest {
 	}
 	
 
-	@Ignore
+	/*@Ignore
 	public void testUpdateTaskByNameChangeName() {
 		long currTime = timeConverter.getCurrTime();
 		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));

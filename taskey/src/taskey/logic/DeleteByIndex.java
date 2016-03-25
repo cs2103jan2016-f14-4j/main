@@ -7,14 +7,16 @@ package taskey.logic;
  */
 final class DeleteByIndex extends Command {
 	
-	private int deleteIndex;
+	private int listIndex;
+	private int taskIndex;
 	
-	DeleteByIndex(int deleteIndex) {
-		this.deleteIndex = deleteIndex;
+	DeleteByIndex(int listIndex, int taskIndex) {
+		this.listIndex = listIndex;
+		this.taskIndex = taskIndex;
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws Exception {
+		logicMemory.deleteByIndex(listIndex, taskIndex);
 	}
 }

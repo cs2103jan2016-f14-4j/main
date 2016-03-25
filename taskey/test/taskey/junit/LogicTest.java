@@ -238,7 +238,6 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
 	@Test
 	public void deletingFloatingTaskByIndexShouldUpdatePendingAndGeneralLists() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
@@ -284,6 +283,7 @@ public class LogicTest {
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 	}
 	
+	/*
 	@Ignore
 	public void testDeleteTaskByName() {
 		long currTime = timeConverter.getCurrTime();

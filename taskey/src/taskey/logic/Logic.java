@@ -78,10 +78,17 @@ public class Logic {
 				cmd = new AddEvent(po.getTask());
 				return executeAdd(po, cmd);
 
-			/*case "DELETE_BY_INDEX":
-				return deleteByIndex(currentContent, originalCopy, modifiedCopy, po);
-				
-			case "DELETE_BY_CATEGORY":
+			case "DELETE_BY_INDEX":
+				cmd = new DeleteByIndex(getListIndex(currentContent), po.getIndex());
+				try {
+					cmdExecutor.execute(cmd, logicMemory);
+				} catch (Exception e) {
+					return new LogicFeedback(getAllTaskLists(), po, e);
+				}
+				updateHistory();
+				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
+						
+			/*case "DELETE_BY_CATEGORY":
 				return deleteByCategory(originalCopy, modifiedCopy, po);
 
 			case "VIEW_BASIC":
@@ -145,6 +152,26 @@ public class Logic {
 	private void updateHistory() {
 		history.add(getAllTaskLists());
 		history.addTagList(getTagCategoryList());
+	}
+	
+	// Returns the index of the list corresponding to the current ContentBox.
+	private int getListIndex(ContentBox currentContent) {
+		switch (currentContent) {
+			case THIS_WEEK:
+				return LogicMemory.INDEX_THIS_WEEK;
+			
+			case PENDING:
+				return LogicMemory.INDEX_PENDING;
+			
+			case EXPIRED:
+				return LogicMemory.INDEX_EXPIRED;
+				
+			case ACTION:
+				return LogicMemory.INDEX_ACTION;
+			
+			default:
+				return -1; // Stub
+		}
 	}
 	
 	/*
@@ -281,27 +308,6 @@ public class Logic {
 		taskLists = cloneLists(modifiedCopy);
 		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_TAGS_SUCCESSFUL));
 	}
-
-	// Clears all task lists and the tag database, and saves the updated lists to disk.
-	public LogicFeedback clear(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy) {
-		ProcessedObject po = new ProcessedObject("CLEAR"); // Stub
-		
-		utd.deleteAllTags();
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		
-		clearAllLists(modifiedCopy);	
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
-	}
-
 
 	// Adds a floating task to the relevant lists, and saves the updated lists to disk.
 	public LogicFeedback addFloating(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 

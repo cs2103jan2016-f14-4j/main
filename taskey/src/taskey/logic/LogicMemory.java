@@ -14,17 +14,17 @@ import taskey.storage.Storage;
  */
 class LogicMemory {
 	
-	private static final int NUM_TASK_LISTS = 8;
+	static final int NUM_TASK_LISTS = 8;
 	
 	// Indices of each list
-	private static final int INDEX_THIS_WEEK = 0;
-	private static final int INDEX_PENDING = 1;
-	private static final int INDEX_EXPIRED = 2;
-	private static final int INDEX_GENERAL = 3;
-	private static final int INDEX_DEADLINE = 4;
-	private static final int INDEX_EVENT = 5;
-	private static final int INDEX_COMPLETED = 6;
-	private static final int INDEX_ACTION = 7;
+	static final int INDEX_THIS_WEEK = 0;
+	static final int INDEX_PENDING = 1;
+	static final int INDEX_EXPIRED = 2;
+	static final int INDEX_GENERAL = 3;
+	static final int INDEX_DEADLINE = 4;
+	static final int INDEX_EVENT = 5;
+	static final int INDEX_COMPLETED = 6;
+	static final int INDEX_ACTION = 7;
 	
 	private Storage storage;
 	private ArrayList<ArrayList<Task>> taskLists;
@@ -140,6 +140,22 @@ class LogicMemory {
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
 		}
+	}
+	
+	/**
+	 * Adds an indexed task from the specified task list.
+	 * @param listIndex index of the list to delete the task from
+	 * @param taskIndex index of the task to delete 
+	 */
+	void deleteByIndex(int listIndex, int taskIndex) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(listIndex);
+		
+		if (taskIndex >= targetList.size()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+		}
+		
+		Task toDelete = targetList.get(taskIndex);
+		removeFromAllLists(toDelete);
 	}
 	
 	private void initializeTaskLists() {

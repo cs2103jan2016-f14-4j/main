@@ -30,8 +30,7 @@ public class Logic {
 		history = new History();
 		cmdExecutor = new CommandExecutor();
 		logicMemory = new LogicMemory();
-		history.add(getAllTaskLists());
-		history.addTagList(getTagCategoryList());
+		updateHistory();
 	}
 	
 	/**
@@ -64,6 +63,7 @@ public class Logic {
     	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
 			Command cmd = new Clear();
 			cmdExecutor.execute(cmd, logicMemory);
+			updateHistory();
 			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
 					                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
     	}
@@ -72,6 +72,7 @@ public class Logic {
 			case "ADD_FLOATING":
 				Command cmd = new AddFloating(po.getTask());
 				cmdExecutor.execute(cmd, logicMemory);
+				updateHistory();
 				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 				
 			/*case "ADD_DEADLINE":
@@ -119,6 +120,13 @@ public class Logic {
 
 		return null; // Stub
 	}
+	
+	// Push the latest task lists and tag category list to history.
+	private void updateHistory() {
+		history.add(getAllTaskLists());
+		history.addTagList(getTagCategoryList());
+	}
+	
 	/*
 	// Searches for all expired and pending tasks that are tagged with at least one of the tag categories that the user 
 	// wants to view.

@@ -121,6 +121,27 @@ class LogicMemory {
 		}
 	}
 	
+	/**
+	 * Adds an event task to the task lists.
+	 * @param taskToAdd
+	 */
+	void addEvent(Task taskToAdd) throws Exception {
+		if (taskAlreadyExists(taskToAdd)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+		}
+		
+		if (taskToAdd.isExpired()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+		}
+		
+		taskLists.get(INDEX_PENDING).add(taskToAdd);
+		taskLists.get(INDEX_EVENT).add(taskToAdd);
+		
+		if (taskToAdd.isThisWeek()) {
+			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
+		}
+	}
+	
 	private void initializeTaskLists() {
 		taskLists = storage.loadAllTasklists();
 		assert(taskLists != null);

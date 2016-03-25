@@ -12,7 +12,8 @@ final class AddEvent extends Add {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws Exception {
+		logicMemory.addEvent(taskToAdd);
+		addTagsToMemory(logicMemory, taskToAdd.getTaskTags());
 	}
 }

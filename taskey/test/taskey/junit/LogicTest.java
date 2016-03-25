@@ -131,7 +131,6 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
 	@Test
 	public void addingEventTaskStartingThisWeekShouldUpdateOnlyPendingAndEventAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -168,7 +167,7 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		String input = "add task on " + deadline;
-		String expected = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, deadline);
+		String expected = LogicConstants.MSG_EXCEPTION_DATE_EXPIRED;
 		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
 		assertEquals(expected, actual);
 	}
@@ -188,7 +187,7 @@ public class LogicTest {
 		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
 		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		String input = "add task from " + startDate + " to " + endDate;
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, endDate);
+		String exceptionMsg = LogicConstants.MSG_EXCEPTION_DATE_EXPIRED;
 		Exception expected = new Exception(exceptionMsg);
 		Exception actual = logic.executeCommand(ContentBox.PENDING, input).getException();
 		assertEquals(expected.getMessage(), actual.getMessage());
@@ -209,9 +208,9 @@ public class LogicTest {
 	public void addingTasksWithSameNameButDifferentDatesShouldNotThrowException() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception e = logic.executeCommand(ContentBox.PENDING, "add task on 31 dec 3pm").getException();
-		assertNull(e);
+		assertEquals(LogicConstants.MSG_ADD_SUCCESSFUL, e.getMessage());
 		e = logic.executeCommand(ContentBox.PENDING, "add task from 30 dec 5pm to 31 dec 6pm").getException();
-		assertNull(e);
+		assertEquals(LogicConstants.MSG_ADD_SUCCESSFUL, e.getMessage());
 	}
 	
 	@Test
@@ -239,6 +238,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
+	/*
 	@Test
 	public void deletingFloatingTaskByIndexShouldUpdatePendingAndGeneralLists() {
 		logic.executeCommand(ContentBox.PENDING, "add task");

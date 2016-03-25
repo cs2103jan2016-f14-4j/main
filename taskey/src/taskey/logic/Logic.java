@@ -94,10 +94,17 @@ public class Logic {
 				updateHistory();
 				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 
-			/*case "ADD_EVENT":
-				return addEvent(originalCopy, modifiedCopy, po);
+			case "ADD_EVENT":
+				cmd = new AddEvent(po.getTask());
+				try {
+					cmdExecutor.execute(cmd, logicMemory);
+				} catch (Exception e) {
+					return new LogicFeedback(getAllTaskLists(), po, e);
+				}
+				updateHistory();
+				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 
-			case "DELETE_BY_INDEX":
+			/*case "DELETE_BY_INDEX":
 				return deleteByIndex(currentContent, originalCopy, modifiedCopy, po);
 				
 			case "DELETE_BY_CATEGORY":

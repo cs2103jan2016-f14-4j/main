@@ -388,7 +388,6 @@ public class LogicTest {
 		assertEquals(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND, actual.getMessage());
 	}
 	
-	/*
 	// The completed task should be removed from all lists and then inserted into the COMPLETED list.
 	@Test
 	public void doneTaskByIndexShouldUpdateTaskLists() {
@@ -413,23 +412,6 @@ public class LogicTest {
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag3"));
 		assertEquals(expected, logic.getTagCategoryList());
-	}
-	
-	@Ignore
-	public void testDoneTaskFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DONE_BY_INDEX);
-		LogicFeedback actual = logic.doneByIndex(ContentBox.EXPIRED, originalCopy, modifiedCopy, po);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID_TAB;
-		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
 	}
 	
 	@Test
@@ -469,6 +451,7 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists());
 	}
 	
+	/*
 	@Test
 	public void testDoneTaskByName() {
 		long currTime = timeConverter.getCurrTime();

@@ -79,13 +79,7 @@ public class Logic {
 
 			case "DELETE_BY_INDEX":
 				cmd = new DeleteByIndex(getListIndex(currentContent), po.getIndex());
-				try {
-					cmdExecutor.execute(cmd, logicMemory);
-				} catch (Exception e) {
-					return new LogicFeedback(getAllTaskLists(), po, e);
-				}
-				updateHistory();
-				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
+				return executeDelete(po, cmd);
 						
 			/*case "DELETE_BY_CATEGORY":
 				return deleteByCategory(originalCopy, modifiedCopy, po);
@@ -95,15 +89,12 @@ public class Logic {
 			
 			case "VIEW_TAGS":
 				return viewTags(originalCopy, modifiedCopy, po);*/
-
-			case "SEARCH":
-				cmd = new Search(po.getSearchPhrase());
-				return executeSearch(po, cmd);
-
-			/*
+			
 			case "DONE_BY_INDEX":
-				return doneByIndex(currentContent, originalCopy, modifiedCopy, po);
-
+				cmd = new DoneByIndex(getListIndex(currentContent), po.getIndex());
+				return executeDone(po, cmd);			
+				
+			/*
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 				return updateByIndexChangeName(currentContent, originalCopy, modifiedCopy, po);
 
@@ -118,6 +109,10 @@ public class Logic {
 				
 			case "ERROR":
 				return new LogicFeedback(originalCopy, po, new Exception(po.getErrorType()));*/
+				
+			case "SEARCH":
+				cmd = new Search(po.getSearchPhrase());
+				return executeSearch(po, cmd);
 
 			default:
 				break;
@@ -125,17 +120,7 @@ public class Logic {
 
 		return null; // Stub
 	}
-
-	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
-		try {
-			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
-		}
-		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, null);
-	}
-
+	
 	private LogicFeedback executeClear() {
 		Command cmd;
 		cmd = new Clear();
@@ -148,7 +133,7 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
 				                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
 	}
-
+	
 	private LogicFeedback executeAdd(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
@@ -157,6 +142,36 @@ public class Logic {
 		}
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
+	}
+	
+	private LogicFeedback executeDelete(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
+	}
+	
+	private LogicFeedback executeDone(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DONE_SUCCESSFUL));
+	}
+	
+	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, null);
 	}
 	
 	// Push the latest task lists and tag category list to history.
@@ -318,233 +333,6 @@ public class Logic {
 		
 		taskLists = cloneLists(modifiedCopy);
 		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_TAGS_SUCCESSFUL));
-	}
-
-	// Adds a floating task to the relevant lists, and saves the updated lists to disk.
-	public LogicFeedback addFloating(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-			                  	     ProcessedObject po) {
-		Task task = po.getTask();
-		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> completedList = modifiedCopy.get(ListID.COMPLETED.getIndex());
-		
-		// Check that the Task does not exist in the pending, expired or completed lists.
-		if (pendingList.contains(task) || expiredList.contains(task) || completedList.contains(task)) {
-			String exceptionMsg = LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		// Add the Task to the PENDING and GENERAL lists.
-		pendingList.add(task);
-		modifiedCopy.get(ListID.GENERAL.getIndex()).add(task);
-		
-		// Add the Task tags, if any, to the tag database.
-		ArrayList<String> taskTags = task.getTaskTags();
-		if (taskTags != null) {
-			for (String s : taskTags) {
-				utd.addTag(s);
-			}
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		// At this point, all saves succeeded, so clear the action list because the "add" command is not relevant for
-		// this list.
-		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
-	}
-
-	// Adds a deadline task to the relevant lists, and saves the updated lists to disk.
-	public LogicFeedback addDeadline(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-									 ProcessedObject po) {
-		Task task = po.getTask();
-		long deadline = task.getDeadlineEpoch();
-		long currTime = timeConverter.getCurrTime();
-		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> completedList = modifiedCopy.get(ListID.COMPLETED.getIndex());
-		String exceptionMsg;
-		
-		// Check that the Task does not exist in the pending, expired or completed lists.
-		if (pendingList.contains(task) || expiredList.contains(task) || completedList.contains(task)) {
-			exceptionMsg = LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		if (deadline < currTime) { // Cannot add tasks whose deadline already passed.
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, timeConverter.getDate(deadline));
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		} else {
-			pendingList.add(task);
-			modifiedCopy.get(ListID.DEADLINE.getIndex()).add(task);
-
-			if (timeConverter.isSameWeek(deadline, currTime)) {
-				modifiedCopy.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		}
-		
-		// Add the Task tags, if any, to the tag database.
-		ArrayList<String> taskTags = task.getTaskTags();
-		if (taskTags != null) {
-			for (String s : taskTags) {
-				utd.addTag(s);
-			}
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		// At this point, all saves succeeded, so clear the action list because the "add" command is not relevant for
-		// this list.
-		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
-	}
-	
-	// Adds an event task to the relevant lists, and saves the updated lists to disk.
-	public LogicFeedback addEvent(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-            	           ProcessedObject po) {
-		Task task = po.getTask();
-		long startDate = task.getStartDateEpoch();
-		long endDate = task.getEndDateEpoch();
-		long currTime = timeConverter.getCurrTime();
-		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> completedList = modifiedCopy.get(ListID.COMPLETED.getIndex());
-		String exceptionMsg;
-		
-		// Check that the Task does not exist in the pending, expired or completed lists.
-		if (pendingList.contains(task) || expiredList.contains(task) || completedList.contains(task)) {
-			exceptionMsg = LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-
-		if (endDate < currTime) { // Cannot add events which are already over.
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, timeConverter.getDate(endDate));
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		} else {
-			pendingList.add(task);
-			modifiedCopy.get(ListID.EVENT.getIndex()).add(task);
-
-			if (timeConverter.isSameWeek(startDate, currTime)) { // TODO: how to determine if events are in same week?
-				modifiedCopy.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		}
-		
-		// Add the Task tags, if any, to the tag database.
-		ArrayList<String> taskTags = task.getTaskTags();
-		if (taskTags != null) {
-			for (String s : taskTags) {
-				utd.addTag(s);
-			}
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		// At this point, all saves succeeded, so clear the action list because the "add" command is not relevant for
-		// this list.
-		modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
-	}
-	
-	// Removes an indexed task from the current tab and saves the updated lists to disk.
-	public LogicFeedback deleteByIndex(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-			                    	   ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
-		int taskIndex = po.getIndex();
-    	ArrayList<Task> targetList = getListFromContentBox(modifiedCopy, currentContent);
-    	Task toDelete;
-    	String exceptionMsg;
-
-		try {
-			toDelete = targetList.get(taskIndex);
-		} catch (IndexOutOfBoundsException e) {
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
-		}
-		
-		// If the Task is not archived, remove its task tags, if any, from the tag database.
-		ArrayList<String> taskTags = toDelete.getTaskTags();
-		if (!(modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toDelete)) && taskTags != null) {
-			for (String s : taskTags) {
-				utd.removeTag(s);
-			}
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		
-		removeFromAllLists(modifiedCopy, toDelete);
-		
-		// Check if user deleted from the ACTION tab. If so, don't clear the ACTION list.
-		if (!currentContent.equals(ContentBox.ACTION)) {
-			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		}
-
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-
-		taskLists = cloneLists(modifiedCopy);		
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
-	}
-
-	// Search for all expired and pending Tasks whose names contain searchPhrase. searchPhrase is not case sensitive.
-	// TODO: search list includes completed tasks as well?
-	// TODO: improved search
-	public LogicFeedback search(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-			                    ProcessedObject po) {
-		String searchPhrase = po.getSearchPhrase(); // Validity of searchPhrase is already checked in ParseSearch
-
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
-		actionList.clear();
-		for (Task t : expiredList) {
-			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				actionList.add(t);
-			}
-		}
-		
-		ArrayList<Task> pendingList = originalCopy.get(ListID.PENDING.getIndex());
-		for (Task t : pendingList) {
-			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				actionList.add(t);
-			}
-		}
-		
-		if (actionList.isEmpty()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND));
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
 	}
 
 	// Marks an indexed task from the current tab as done and saves the updated lists to disk.

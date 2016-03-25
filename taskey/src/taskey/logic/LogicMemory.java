@@ -65,13 +65,25 @@ public class LogicMemory {
 	 * Add a new tag to the tag category list.
 	 */
 	void addTag(String tagToAdd) { 
-		int indexOfTag = getTagIndex(tagToAdd);
+		int tagIndex = getTagIndex(tagToAdd);
 		
-		if (indexOfTag == -1) { // Tag category list does not contain the tag to be added; add a new category for that tag.
+		if (tagIndex == -1) { // Tag category list does not contain the tag to be added; add a new category for that tag.
 			tagCategoryList.add(new TagCategory(tagToAdd)); 
 		} else { // Tag category list already contains the tag to be added; increase the number of tags in that 
 			     // category by one.
-			tagCategoryList.get(indexOfTag).increaseCount();
+			tagCategoryList.get(tagIndex).increaseCount();
+		}
+	}
+	
+	// Remove a tag from the tag category list. The tag should currently exist in the tag category list.
+	private void removeTag(String tagToRemove) {
+		int tagIndex = getTagIndex(tagToRemove);
+		assert(tagIndex != -1);
+		
+		if (tagCategoryList.get(tagIndex).getNumTags() == 1) {
+			tagCategoryList.remove(tagIndex);
+		} else {
+			tagCategoryList.get(tagIndex).decreaseCount();
 		}
 	}
 	
@@ -142,11 +154,12 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Adds an indexed task from the specified task list.
-	 * @param listIndex index of the list to delete the task from
-	 * @param taskIndex index of the task to delete 
+	 * Removes an indexed task from the specified task list, and deletes all its tags from the tag category list.
+	 * @param listIndex
+	 * @param taskIndex
+	 * @return the Task that was deleted
 	 */
-	void deleteByIndex(int listIndex, int taskIndex) throws Exception {
+	Task deleteByIndex(int listIndex, int taskIndex) throws Exception {
 		ArrayList<Task> targetList = taskLists.get(listIndex);
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
@@ -155,10 +168,33 @@ public class LogicMemory {
 		
 		Task toDelete = targetList.get(taskIndex);
 		removeFromAllLists(toDelete);
+		removeTaskTags(toDelete.getTaskTags());
+		
+		return toDelete;
+	}
+	
+	// Removes all task tags in the given list from the tag category list.
+	private void removeTaskTags(ArrayList<String> taskTags) {
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				removeTag(s);
+			}
+		}
 	}
 	
 	/**
-	 * Search for all expired and pending tasks that contain the given search phrase in their name.
+	 * Marks an indexed task from the specified task list as done.
+	 * @param listIndex
+	 * @param taskIndex
+	 */
+	void doneByIndex(int listIndex, int taskIndex) throws Exception {
+		Task toComplete = deleteByIndex(listIndex, taskIndex);
+		taskLists.get(INDEX_COMPLETED).add(toComplete);
+	}
+	
+	/**
+	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 
+	 * is not case sensitive.
 	 * TODO: improved search
 	 * @param searchPhrase
 	 */
@@ -173,7 +209,6 @@ public class LogicMemory {
 		}
 	}
 	
-	// Returns a list of search results for all tasks from the given list that contain searchPhrase in their name.
 	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
 		ArrayList<Task> searchResults = new ArrayList<Task>();
 		

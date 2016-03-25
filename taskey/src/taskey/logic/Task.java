@@ -63,6 +63,34 @@ public class Task implements Comparable<Task> {
 		this.taskTags = taskTags;
 	}
 	
+	public Task(Task other) {
+		if (other.taskName != null) {
+			taskName = other.taskName;
+		}
+		
+		if (other.taskTags != null) {
+			taskTags = new ArrayList<String>(other.taskTags);
+		}
+		
+		priority = other.priority;
+		
+		if (other.taskType != null) {
+			taskType = other.taskType;
+			
+			switch(taskType) {
+				case "FLOATING":
+					//nothing else to add. 
+					break;
+				case "DEADLINE":
+					setDeadline(other.getDeadlineEpoch());
+					break;
+				case "EVENT":
+					setStartDate(other.getStartDateEpoch());
+					setEndDate(other.getEndDateEpoch());
+					break; 
+			}
+		}	
+	}	
 	
 	//BASIC GET/SET METHODS =====================================
 	
@@ -337,42 +365,6 @@ public class Task implements Comparable<Task> {
 		if (taskTags.isEmpty()) {
 			taskTags = null; 
 		}
-	}
-	
-	/**
-	 * Get a duplicate of this task object at a different address 
-	 * @return duplicate of this task object at a different address
-	 */
-	public Task getDuplicate() {
-		Task duplicate = new Task();
-		
-		if (taskName != null) {
-			duplicate.setTaskName(new String(taskName));
-		}
-		
-		if (taskTags != null) {
-			duplicate.setTaskTags(new ArrayList<String>(taskTags));
-		}
-		
-		duplicate.setPriority(new Integer(priority));
-		
-		if (taskType != null) {
-			duplicate.setTaskType(this.getTaskType());
-			
-			switch(taskType) {
-				case "FLOATING":
-					//nothing else to add. 
-					break;
-				case "DEADLINE":
-					duplicate.setDeadline(new Long(this.getDeadlineEpoch()));
-					break;
-				case "EVENT":
-					duplicate.setStartDate(new Long(this.getStartDateEpoch()));
-					duplicate.setEndDate(new Long(this.getEndDateEpoch()));
-					break; 
-			}
-		}	
-		return duplicate; 
 	}
 	
 	@Override

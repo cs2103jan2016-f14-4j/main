@@ -37,18 +37,28 @@ class LogicMemory {
 	}
 
 	ArrayList<ArrayList<Task>> getTaskLists() {
+		assert(taskLists != null);
+		assert(!taskLists.contains(null));
+		assert(taskLists.size() == NUM_TASK_LISTS);
 		return taskLists;
 	}
 
 	void setTaskLists(ArrayList<ArrayList<Task>> taskLists) {
+		assert(taskLists != null);
+		assert(!taskLists.contains(null));
+		assert(taskLists.size() == NUM_TASK_LISTS);
 		this.taskLists = taskLists;
 	}
 
 	ArrayList<TagCategory> getTagCategoryList() {
+		assert(tagCategoryList != null);
+		assert(!tagCategoryList.contains(null));
 		return tagCategoryList;
 	}
 
 	void setTagCategoryList(ArrayList<TagCategory> tagCategoryList) {
+		assert(tagCategoryList != null);
+		assert(!tagCategoryList.contains(null));
 		this.tagCategoryList = tagCategoryList;
 	}
 	
@@ -61,7 +71,7 @@ class LogicMemory {
 		taskLists.add(INDEX_ACTION, new ArrayList<Task>());
 		assert(taskLists.size() == NUM_TASK_LISTS);
 		
-		synchroniseLists();
+		synchroniseTaskLists();
 	}
 	
 	private void initializeTagCategoryList() {
@@ -72,7 +82,7 @@ class LogicMemory {
 	 *  are newly expired will be removed from the DEADLINE list and PENDING lists and added to the EXPIRED list. The 
 	 *  tag category list is not affected.
 	 */
-	private void synchroniseLists() {
+	private void synchroniseTaskLists() {
 		TimeConverter timeConverter = new TimeConverter();
 		long currTime = timeConverter.getCurrTime();
 		ArrayList<Task> thisWeekList = taskLists.get(INDEX_THIS_WEEK);

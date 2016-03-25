@@ -17,7 +17,7 @@ final class UpdateByIndexChangeName extends UpdateByIndex {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.updateByIndexChangeName(contentBox, updateIndex, newName);
 	}
 }

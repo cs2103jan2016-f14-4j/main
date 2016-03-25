@@ -130,7 +130,7 @@ public class Logic {
 				return undo(po);
 				
 			case "ERROR":
-				return new LogicFeedback(originalCopy, po, new Exception(po.getErrorType()));*/
+				return new LogicFeedback(originalCopy, po, new LogicException(po.getErrorType()));*/
 				
 			case "SEARCH":
 				cmd = new Search(po.getSearchPhrase());
@@ -150,59 +150,59 @@ public class Logic {
 	private LogicFeedback executeClear(Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), le);
 		}
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
-				                 new Exception(LogicConstants.MSG_CLEAR_SUCCESSFUL));
+				                 new LogicException(LogicException.MSG_SUCCESS_CLEAR));
 	}
 	
 	private LogicFeedback executeAdd(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_ADD));
 	}
 	
 	private LogicFeedback executeDelete(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DELETE_SUCCESSFUL));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_DELETE));
 	}
 	
 	private LogicFeedback executeDone(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_DONE_SUCCESSFUL));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_DONE));
 	}
 	
 	private LogicFeedback executeUpdate(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_UPDATE));
 	}
 	
 	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
-		} catch (Exception e) {
-			return new LogicFeedback(getAllTaskLists(), po, e);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, null);
@@ -253,7 +253,7 @@ public class Logic {
 			}
 		}
 		if (actionList.isEmpty()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND));
+			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND));
 		}
 			
 		taskLists = cloneLists(modifiedCopy);
@@ -312,14 +312,14 @@ public class Logic {
 			toUpdate = targetList.get(taskIndex).getDuplicate();
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 		}
 		
 		// Cannot update expired or completed tasks
 		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
 			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
 			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 		}
 
 		updateAllLists(modifiedCopy, toUpdate, newTaskName);
@@ -330,17 +330,17 @@ public class Logic {
 		}
 		
 		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
 		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
+		} catch (LogicException le) {
 			return new LogicFeedback(originalCopy, po, e);
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
+		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 
 	// Updates an indexed task's date on the current tab and saves the updated lists to disk.
@@ -357,27 +357,27 @@ public class Logic {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 		}
 		
 		// Cannot update expired or completed tasks
 		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
 			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
 			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 		}
 		
 		if (changedTask.getTaskType().equals("DEADLINE")) {
 			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
 				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getDeadline());
-				return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 			}
 		}
 		
 		if (changedTask.getTaskType().equals("EVENT")) {
 			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
 				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getEndDate());
-				return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 			}
 		}
 
@@ -390,17 +390,17 @@ public class Logic {
 		}
 		
 		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
 		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
+		} catch (LogicException le) {
 			return new LogicFeedback(originalCopy, po, e);
 		}
 		
 		taskLists = cloneLists(modifiedCopy);	
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
+		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 	
 	// Updates an indexed task's name and date on the current tab and saves the updated lists to disk. 
@@ -418,20 +418,20 @@ public class Logic {
 			toUpdate = targetList.get(taskIndex);
 		} catch (IndexOutOfBoundsException e) {
 			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 		}
 		
 		if (changedTask.getTaskType().equals("DEADLINE")) {
 			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
 				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getDeadline());
-				return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 			}
 		}
 		
 		if (changedTask.getTaskType().equals("EVENT")) {
 			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
 				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getEndDate());
-				return new LogicFeedback(originalCopy, po, new Exception(exceptionMsg));
+				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
 			}
 		}
 
@@ -444,17 +444,17 @@ public class Logic {
 		}
 		
 		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
+			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
 		}
 		
 		try {
 			saveAllTasks(modifiedCopy);
-		} catch (Exception e) {
+		} catch (LogicException le) {
 			return new LogicFeedback(originalCopy, po, e);
 		}
 		
 		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new Exception(LogicConstants.MSG_UPDATE_SUCCESSFUL));
+		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 
 	// Undo the last change to the task lists.
@@ -470,7 +470,7 @@ public class Logic {
 		if (previousSuperList == null) {
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
-			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_UNDO));
+			return new LogicFeedback(currentSuperList, po, new LogicException(LogicConstants.MSG_EXCEPTION_UNDO));
 		}
 		
 		utd.setTags(previousTagList); 
@@ -478,14 +478,14 @@ public class Logic {
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
 			utd.setTags(currentTagList);
-			return new LogicFeedback(currentSuperList, po, new Exception(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
+			return new LogicFeedback(currentSuperList, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
 		}
 		history.popTags(); // To remove the extra copy mentioned above
 		
 		try {
 			saveAllTasks(previousSuperList); // Same as above, this tries to add another copy of previousSuperList to 
 			                                 // history.
-		} catch (Exception e) {
+		} catch (LogicException le) {
 			utd.setTags(currentTagList);
 			history.add(currentSuperList);
 			history.addTagList(currentTagList);
@@ -538,11 +538,11 @@ public class Logic {
 
 	// Save all task lists to Storage. If the save failed, the task lists will be reverted to the states
 	// they were in before they were modified.
-	private void saveAllTasks(ArrayList<ArrayList<Task>> taskLists) throws Exception {
+	private void saveAllTasks(ArrayList<ArrayList<Task>> taskLists) throws LogicException {
 		try {
 			storage.saveAllTasklists(taskLists);
 		} catch (StorageException se) {
-			throw new Exception (se.getMessage());
+			throw new LogicException (se.getMessage());
 		}
 	}*/
 	

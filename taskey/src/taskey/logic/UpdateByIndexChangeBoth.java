@@ -19,7 +19,7 @@ final class UpdateByIndexChangeBoth extends UpdateByIndex {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.updateByIndexChangeBoth(contentBox, updateIndex, newName, newTask);
 	}
 }

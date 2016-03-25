@@ -12,7 +12,7 @@ final class AddFloating extends Add {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.addFloating(taskToAdd);
 		addTagsToMemory(logicMemory, taskToAdd.getTaskTags());
 	}

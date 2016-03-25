@@ -17,7 +17,7 @@ final class UpdateByIndexChangeDate extends UpdateByIndex {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.updateByIndexChangeDate(contentBox, updateIndex, newTask);
 	}
 }

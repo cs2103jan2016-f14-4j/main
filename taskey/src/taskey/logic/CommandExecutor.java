@@ -7,7 +7,7 @@ package taskey.logic;
  */
 class CommandExecutor {
 	
-	void execute(Command cmd, LogicMemory logicMemory) throws Exception {
+	void execute(Command cmd, LogicMemory logicMemory) throws LogicException {
 		cmd.execute(logicMemory);
 	}
 }

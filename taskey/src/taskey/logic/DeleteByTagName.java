@@ -14,7 +14,7 @@ final class DeleteByTagName extends Command {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.deleteByTagName(tagName);
 	}
 }

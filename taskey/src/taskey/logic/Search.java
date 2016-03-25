@@ -14,7 +14,7 @@ final class Search extends Command {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.search(searchPhrase);
 	}
 }

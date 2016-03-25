@@ -12,7 +12,7 @@ final class AddDeadline extends Add {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) throws Exception {
+	void execute(LogicMemory logicMemory) throws LogicException {
 		logicMemory.addDeadline(taskToAdd);
 		addTagsToMemory(logicMemory, taskToAdd.getTaskTags());
 	}

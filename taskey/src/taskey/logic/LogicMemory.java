@@ -24,7 +24,7 @@ public class LogicMemory {
 	public static final int INDEX_THIS_WEEK = 0;
 	public static final int INDEX_PENDING = 1;
 	public static final int INDEX_EXPIRED = 2;
-	public static final int INDEX_GENERAL = 3;
+	public static final int INDEX_FLOATING = 3;
 	public static final int INDEX_DEADLINE = 4;
 	public static final int INDEX_EVENT = 5;
 	public static final int INDEX_COMPLETED = 6;
@@ -86,13 +86,13 @@ public class LogicMemory {
 	 * Adds a floating task to the task lists.
 	 * @param taskToAdd
 	 */
-	void addFloating(Task taskToAdd) throws Exception {
+	void addFloating(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
-		taskLists.get(INDEX_GENERAL).add(taskToAdd);
+		taskLists.get(INDEX_FLOATING).add(taskToAdd);
 		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
 	}
 	
@@ -100,13 +100,13 @@ public class LogicMemory {
 	 * Adds a deadline task to the task lists.
 	 * @param taskToAdd
 	 */
-	void addDeadline(Task taskToAdd) throws Exception {
+	void addDeadline(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
 		if (taskToAdd.isExpired()) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
@@ -122,13 +122,13 @@ public class LogicMemory {
 	 * Adds an event task to the task lists.
 	 * @param taskToAdd
 	 */
-	void addEvent(Task taskToAdd) throws Exception {
+	void addEvent(Task taskToAdd) throws LogicException {
 		if (taskAlreadyExists(taskToAdd)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
 		if (taskToAdd.isExpired()) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
@@ -146,11 +146,11 @@ public class LogicMemory {
 	 * @param taskIndex  the index of task to be deleted
 	 * @return           the Task that was deleted
 	 */
-	Task deleteByIndex(ContentBox contentBox, int taskIndex) throws Exception {
+	Task deleteByIndex(ContentBox contentBox, int taskIndex) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
 		}
 		
 		Task toDelete = targetList.get(taskIndex);
@@ -180,17 +180,17 @@ public class LogicMemory {
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be completed
 	 */
-	void doneByIndex(ContentBox contentBox, int taskIndex) throws Exception {
+	void doneByIndex(ContentBox contentBox, int taskIndex) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
 		}
 		
 		Task toComplete = targetList.get(taskIndex);
 		
 		if (taskLists.get(INDEX_COMPLETED).contains(toComplete)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DONE_INVALID);
+			throw new LogicException(LogicException.MSG_ERROR_DONE_INVALID);
 		}
 		
 		removeFromAllLists(toComplete);
@@ -208,33 +208,16 @@ public class LogicMemory {
 	 * @param taskIndex  the index of task to be updated
 	 * @param newName    the new name to update the task to
 	 */
-	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws Exception {
+	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
 		}
 		
 		Task toUpdate = targetList.get(taskIndex);
-		
-		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
-		}
-		
 		Task toUpdateCopy = new Task(toUpdate);
-		toUpdateCopy.setTaskName(newName);
-		
-		if (taskAlreadyExists(toUpdateCopy)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
-		}
-		
-		removeFromAllLists(toUpdate);
-		toUpdate.setTaskName(newName);
-		addTaskToLists(contentBox, toUpdate);
-		
-		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
-			taskLists.get(INDEX_ACTION).clear();
-		}
+		updateByIndexChangeBoth(contentBox, taskIndex, newName, toUpdateCopy);
 	}
 	
 	/**
@@ -243,30 +226,15 @@ public class LogicMemory {
 	 * @param taskIndex  the index of task to be updated
 	 * @param newTask    the task with the new date
 	 */
-	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws Exception {
+	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
 		}
 		
 		Task toUpdate = targetList.get(taskIndex);
-		
-		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
-		}
-		
-		if (newTask.isExpired()) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
-		}
-		
-		removeFromAllLists(toUpdate);
-		newTask.setTaskName(toUpdate.getTaskName());
-		addTaskToLists(contentBox, newTask);
-		
-		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
-			taskLists.get(INDEX_ACTION).clear();
-		}
+		updateByIndexChangeBoth(contentBox, taskIndex, toUpdate.getTaskName(), newTask);
 	}
 	
 	/**
@@ -276,27 +244,27 @@ public class LogicMemory {
 	 * @param newName    the new name to update the task to
 	 * @param newTask    the task with the new date
 	 */
-	void updateByIndexChangeBoth(ContentBox contentBox, int taskIndex, String newName, Task newTask) throws Exception {
+	void updateByIndexChangeBoth(ContentBox contentBox, int taskIndex, String newName, Task newTask) throws LogicException {
 		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
 		
 		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
 		}
 		
 		Task toUpdate = targetList.get(taskIndex);
 		
 		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
+			throw new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
 		}
 		
 		if (newTask.isExpired()) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
 		}
 		
 		newTask.setTaskName(newName);
 		
 		if (taskAlreadyExists(newTask)) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
 		removeFromAllLists(toUpdate);
@@ -313,14 +281,14 @@ public class LogicMemory {
 	 * TODO: improved search
 	 * @param searchPhrase
 	 */
-	void search(String searchPhrase) throws Exception {
+	void search(String searchPhrase) throws LogicException {
 		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
 		actionList.clear();
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
 		
 		if (actionList.isEmpty()) {
-			throw new Exception(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND);
+			throw new LogicException(LogicException.MSG_ERROR_SEARCH_NOT_FOUND);
 		}
 	}
 	
@@ -420,7 +388,7 @@ public class LogicMemory {
 			return !isExpired;
 		} else if (listIndex == INDEX_EXPIRED) {
 			return isExpired;
-		} else if (listIndex == INDEX_GENERAL) {
+		} else if (listIndex == INDEX_FLOATING) {
 			return (taskType.equals("FLOATING")); // TODO: remove magic Strings
 		} else if (listIndex == INDEX_DEADLINE) {
 			return (!isExpired && taskType.equals("DEADLINE"));
@@ -438,7 +406,7 @@ public class LogicMemory {
 		taskLists.get(INDEX_THIS_WEEK).remove(toRemove);
 		taskLists.get(INDEX_PENDING).remove(toRemove);
 		taskLists.get(INDEX_EXPIRED).remove(toRemove);
-		taskLists.get(INDEX_GENERAL).remove(toRemove);
+		taskLists.get(INDEX_FLOATING).remove(toRemove);
 		taskLists.get(INDEX_DEADLINE).remove(toRemove);
 		taskLists.get(INDEX_EVENT).remove(toRemove);
 		taskLists.get(INDEX_COMPLETED).remove(toRemove);

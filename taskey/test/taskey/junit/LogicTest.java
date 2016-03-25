@@ -299,42 +299,22 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, null);
 		
 		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testDeleteFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.ACTION, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(LogicConstants.MSG_EXCEPTION_DELETE_INVALID_TAB));
-		
-		assertEquals(expected, actual);
-	}
+	}*/
 	
 	// Test inputs: 2 is out of range, 0 is an impossible index, -1 is a negative index and should not be allowed.
 	@Test
 	public void deletingTaskByInvalidIndexShouldThrowException() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception actual = logic.executeCommand(ContentBox.PENDING, "del 2").getException();
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 2);
+		String exceptionMsg = LogicConstants.MSG_EXCEPTION_INVALID_INDEX;
 		Exception expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "del 0").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 0);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "del -1").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, -1);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 	}
@@ -357,6 +337,7 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists());
 	}
 	
+	/*
 	@Ignore
 	public void testDeleteTaskByInvalidName() {
 		long currTime = timeConverter.getCurrTime();

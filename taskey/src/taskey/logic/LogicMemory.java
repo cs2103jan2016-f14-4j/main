@@ -150,7 +150,7 @@ class LogicMemory {
 	void deleteByIndex(int listIndex, int taskIndex) throws Exception {
 		ArrayList<Task> targetList = taskLists.get(listIndex);
 		
-		if (taskIndex >= targetList.size()) {
+		if (taskIndex >= targetList.size() || taskIndex <= -1) {
 			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
 		}
 		

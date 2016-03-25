@@ -16,6 +16,7 @@ import taskey.logic.Logic;
 import taskey.logic.LogicConstants;
 import taskey.logic.LogicConstants.ListID;
 import taskey.logic.LogicFeedback;
+import taskey.logic.LogicMemory;
 import taskey.logic.ProcessedObject;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
@@ -355,7 +356,7 @@ public class LogicTest {
 		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
 		
 		assertEquals(expected, actual);
-	}
+	}*/
 	
 	// This test might fail once PowerSearch is implemented.
 	@Test
@@ -371,12 +372,12 @@ public class LogicTest {
 		expected.add(task2);
 		// Both task1 and task2 match
 		logic.executeCommand(ContentBox.PENDING, "search t");
-		assertEquals(expected, logic.getActionList());
+		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 		
 		// Only task2 matches
 		logic.executeCommand(ContentBox.PENDING, "search 2");
 		expected.remove(task1);
-		assertEquals(expected, logic.getActionList());
+		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 	}
 	
 	@Test
@@ -387,34 +388,7 @@ public class LogicTest {
 		assertEquals(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND, actual.getMessage());
 	}
 	
-	@Ignore
-	public void testSearchPhraseNotFound() {
-		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
-		logic.addFloating(originalCopy, modifiedCopy, po);
-
-		originalCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_SEARCH_NOT_FOUND);
-		LogicFeedback actual = logic.search(originalCopy, po);
-		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testSearchPhraseEmpty() {
-		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
-		logic.addFloating(originalCopy, modifiedCopy, po);
-
-		originalCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_SEARCH_EMPTY);
-		LogicFeedback actual = logic.search(originalCopy, po);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_SEARCH_PHRASE_EMPTY;
-		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}
-	
+	/*
 	// The completed task should be removed from all lists and then inserted into the COMPLETED list.
 	@Test
 	public void doneTaskByIndexShouldUpdateTaskLists() {

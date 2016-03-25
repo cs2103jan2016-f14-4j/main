@@ -15,9 +15,10 @@ import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 /**
  * @@author A0134177E
- * The Logic class handles the execution of user commands. It contains an internal memory of task lists which facilitate 
- * the addition, deletion and updating of tasks. Each time a command is executed, these lists are modified and then saved 
- * to disk accordingly.
+ * The Logic class provides a simplified interface to the Logic component and hides the more complex aspects, 
+ * such as memory management and the internal details of the execution of each specific command. As a result, from the 
+ * perspective of UI, all UI needs to do is call the executeCommand() method of Logic whenever the user enters a 
+ * command.
  */
 public class Logic {
 	private Parser parser;
@@ -48,9 +49,7 @@ public class Logic {
 	}
 	
 	/**
-	 * Executes the user supplied command by performing list operations on a copy of the existing task lists, and saving
-	 * the copy to disk. If save errors occurred, the existing task lists remain intact. If no save errors occurred, the 
-	 * existing task lists are updated with the modified copy. Adding tasks with the same name is currently not supported.
+	 * Executes the user supplied command.
 	 *
 	 * @param currentContent specifies the current tab that user is in.
 	 * @param input			 the input String entered by the user
@@ -95,11 +94,13 @@ public class Logic {
 				return viewBasic(originalCopy, po);
 			
 			case "VIEW_TAGS":
-				return viewTags(originalCopy, modifiedCopy, po);
+				return viewTags(originalCopy, modifiedCopy, po);*/
 
 			case "SEARCH":
-				return search(originalCopy, modifiedCopy, po);
+				cmd = new Search(po.getSearchPhrase());
+				return executeSearch(po, cmd);
 
+			/*
 			case "DONE_BY_INDEX":
 				return doneByIndex(currentContent, originalCopy, modifiedCopy, po);
 
@@ -123,6 +124,16 @@ public class Logic {
 		}
 
 		return null; // Stub
+	}
+
+	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, null);
 	}
 
 	private LogicFeedback executeClear() {

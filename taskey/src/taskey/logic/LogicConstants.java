@@ -17,7 +17,7 @@ public class LogicConstants {
 	public static final String MSG_EXCEPTION_UPDATE_INVALID_TAB = "Cannot use \"set\" command from this tab!";
 	public static final String MSG_EXCEPTION_UNDO = "Nothing to undo!";
 	public static final String MSG_EXCEPTION_TAG_NOT_FOUND = "No matches found.";
-	public static final String MSG_EXCEPTION_SEARCH_NOT_FOUND = "No matches found.";
+	public static final String MSG_EXCEPTION_SEARCH_NOT_FOUND = "No matches found!";
 	public static final String MSG_ADD_SUCCESSFUL = "Successfully added task.";
 	public static final String MSG_DELETE_SUCCESSFUL = "Successfully deleted task.";
 	public static final String MSG_DELETE_TAGS_SUCCESSFUL = "Successfully deleted tagged task(s).";

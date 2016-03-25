@@ -3,7 +3,6 @@ package taskey.logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 
 /**
@@ -12,19 +11,19 @@ import taskey.storage.Storage;
  * objects in use for the session. Each time a command is executed, the data in this component will be modified. 
  * Note that the data in this component will not be saved to disk unless the user enters the "save" command.  
  */
-class LogicMemory {
+public class LogicMemory {
 	
-	static final int NUM_TASK_LISTS = 8;
+	public static final int NUM_TASK_LISTS = 8;
 	
 	// Indices of each list
-	static final int INDEX_THIS_WEEK = 0;
-	static final int INDEX_PENDING = 1;
-	static final int INDEX_EXPIRED = 2;
-	static final int INDEX_GENERAL = 3;
-	static final int INDEX_DEADLINE = 4;
-	static final int INDEX_EVENT = 5;
-	static final int INDEX_COMPLETED = 6;
-	static final int INDEX_ACTION = 7;
+	public static final int INDEX_THIS_WEEK = 0;
+	public static final int INDEX_PENDING = 1;
+	public static final int INDEX_EXPIRED = 2;
+	public static final int INDEX_GENERAL = 3;
+	public static final int INDEX_DEADLINE = 4;
+	public static final int INDEX_EVENT = 5;
+	public static final int INDEX_COMPLETED = 6;
+	public static final int INDEX_ACTION = 7;
 	
 	private Storage storage;
 	private ArrayList<ArrayList<Task>> taskLists;
@@ -150,12 +149,41 @@ class LogicMemory {
 	void deleteByIndex(int listIndex, int taskIndex) throws Exception {
 		ArrayList<Task> targetList = taskLists.get(listIndex);
 		
-		if (taskIndex >= targetList.size() || taskIndex <= -1) {
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
 			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
 		}
 		
 		Task toDelete = targetList.get(taskIndex);
 		removeFromAllLists(toDelete);
+	}
+	
+	/**
+	 * Search for all expired and pending tasks that contain the given search phrase in their name.
+	 * TODO: improved search
+	 * @param searchPhrase
+	 */
+	void search(String searchPhrase) throws Exception {
+		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
+		actionList.clear();
+		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
+		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
+		
+		if (actionList.isEmpty()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND);
+		}
+	}
+	
+	// Returns a list of search results for all tasks from the given list that contain searchPhrase in their name.
+	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
+		ArrayList<Task> searchResults = new ArrayList<Task>();
+		
+		for (Task t : list) {
+			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
+				searchResults.add(t);
+			}
+		}
+		
+		return searchResults;
 	}
 	
 	private void initializeTaskLists() {

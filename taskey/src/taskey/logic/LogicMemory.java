@@ -268,6 +268,44 @@ public class LogicMemory {
 			taskLists.get(INDEX_ACTION).clear();
 		}
 	}
+	
+	/**
+	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be updated
+	 * @param newName    the new name to update the task to
+	 * @param newTask    the task with the new date
+	 */
+	void updateByIndexChangeBoth(ContentBox contentBox, int taskIndex, String newName, Task newTask) throws Exception {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID);
+		}
+		
+		if (newTask.isExpired()) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED);
+		}
+		
+		newTask.setTaskName(newName);
+		
+		if (taskAlreadyExists(newTask)) {
+			throw new Exception(LogicConstants.MSG_EXCEPTION_DUPLICATE_TASKS);
+		}
+		
+		removeFromAllLists(toUpdate);
+		addTaskToLists(contentBox, newTask);
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			taskLists.get(INDEX_ACTION).clear();
+		}
+	}
 
 	/**
 	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 

@@ -633,63 +633,6 @@ public class LogicTest {
 	}
 	
 
-	/*@Ignore
-	public void testUpdateTaskByNameChangeName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		task.setTaskName(po.getNewTaskName());
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testUpdateTaskByNameFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.EXPIRED, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID_TAB;
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testUpdateTaskByInvalidName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_INVALID_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_NAME_NOT_FOUND, po.getTask().getTaskName());
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}
-	
 	@Test
 	public void changingTaskNameAndDateShouldUpdateTaskLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -708,25 +651,7 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	@Ignore
-	public void testUpdateTaskByNameChangeBoth() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_BOTH);
-		LogicFeedback actual = logic.updateByNameChangeBoth(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		Task task = po.getTask();
-		task.setTaskName(po.getNewTaskName());
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
+	/*
 	@Test
 	public void undoAddShouldUpdateTaskLists() {
 		String input = "add task";

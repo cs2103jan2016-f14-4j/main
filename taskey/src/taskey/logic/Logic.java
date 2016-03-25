@@ -115,10 +115,11 @@ public class Logic {
 				cmd = new UpdateByIndexChangeDate(currentContent, po.getIndex(), po.getTask());
 				return executeUpdate(po, cmd);
 			
-			/*
 			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-				return updateByIndexChangeBoth(currentContent, originalCopy, modifiedCopy, po);
-				
+				cmd = new UpdateByIndexChangeBoth(currentContent, po.getIndex(), po.getNewTaskName(), po.getTask());
+				return executeUpdate(po, cmd);
+			
+			/*
 			case "VIEW_BASIC":
 				return viewBasic(originalCopy, po);
 			

@@ -76,33 +76,15 @@ public class Logic {
     	switch (command) {
 			case "ADD_FLOATING":
 				cmd = new AddFloating(po.getTask());
-				try {
-					cmdExecutor.execute(cmd, logicMemory);
-				} catch (Exception e) {
-					return new LogicFeedback(getAllTaskLists(), po, e);
-				}
-				updateHistory();
-				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
+				return executeAdd(po, cmd);
 				
 			case "ADD_DEADLINE":
 				cmd = new AddDeadline(po.getTask());
-				try {
-					cmdExecutor.execute(cmd, logicMemory);
-				} catch (Exception e) {
-					return new LogicFeedback(getAllTaskLists(), po, e);
-				}
-				updateHistory();
-				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
+				return executeAdd(po, cmd);
 
 			case "ADD_EVENT":
 				cmd = new AddEvent(po.getTask());
-				try {
-					cmdExecutor.execute(cmd, logicMemory);
-				} catch (Exception e) {
-					return new LogicFeedback(getAllTaskLists(), po, e);
-				}
-				updateHistory();
-				return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
+				return executeAdd(po, cmd);
 
 			/*case "DELETE_BY_INDEX":
 				return deleteByIndex(currentContent, originalCopy, modifiedCopy, po);
@@ -142,6 +124,16 @@ public class Logic {
 		}
 
 		return null; // Stub
+	}
+
+	private LogicFeedback executeAdd(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (Exception e) {
+			return new LogicFeedback(getAllTaskLists(), po, e);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, new Exception(LogicConstants.MSG_ADD_SUCCESSFUL));
 	}
 	
 	// Push the latest task lists and tag category list to history.

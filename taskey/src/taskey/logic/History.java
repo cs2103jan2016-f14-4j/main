@@ -16,16 +16,16 @@ import java.util.HashMap;
  * @author Dylan
  */
 public class History {
-	private ArrayDeque<ArrayList<ArrayList<Task>>> stack;
-	private ArrayDeque<ArrayList<TagCategory>> tagStack; //for exception handling when saving tags
+	private ArrayDeque<ArrayList<ArrayList<Task>>> taskStack;
+	private ArrayDeque<ArrayList<TagCategory>> tagStack;
 
 	public History() {
-		stack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
+		taskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
 		tagStack = new ArrayDeque<ArrayList<TagCategory>>();
 	}
 
-	public boolean listStackIsEmpty() {
-		return stack.isEmpty();
+	public boolean taskStackIsEmpty() {
+		return taskStack.isEmpty();
 	}
 	
 	public boolean tagStackIsEmpty() {
@@ -37,71 +37,38 @@ public class History {
 	 *========*/
 	/**
 	 * @@author A0134177E
-	 * Pushes the given superlist to History.
-	 * Has a check that prevents superlist from being added, if all of its constituent lists
-	 * are equal to those of the most recently added superlist.
-	 * @param superlist to be added
+	 * Pushes the given task lists to History.
+	 * @param taskLists
 	 */
-	public void add(ArrayList<ArrayList<Task>> superlist) {
-		ArrayList<ArrayList<Task>> mostRecentSuperlist = stack.peek();
-		if (mostRecentSuperlist == null) {
-			stack.push(superlist);
-			return;
-		}
-		
-		stack.push(superlist);
-		/*
-		// Don't add superlist to history if it's identical to the most recent superlist
-		for (int i=0; i<superlist.size(); i++) {
-			if (! superlist.get(i).equals(mostRecentSuperlist.get(i)) ) {
-				stack.push(superlist);
-				break;
-			}
-		}*/
+	public void addTaskLists(ArrayList<ArrayList<Task>> taskLists) {
+		taskStack.push(taskLists);
 	}
 	
 	/**
-	 * Pushes the given tag list to History.
-	 * Has a check that prevents tagList from being added, if it is identical to the tag list at
-	 * the top of the stack
-	 * @param taglist to be added
+	 * Pushes the given tag category list to History.
+	 * @param tagCategoryList
 	 */
-	public void addTagList(ArrayList<TagCategory> tagList) {
-		ArrayList<TagCategory> mostRecentTagList = tagStack.peek();
-		if (mostRecentTagList == null) {
-			tagStack.push(tagList);
-			return;
-		}
-		
-		tagStack.push(tagList);
-		/*
-		// Don't add tag list to history if it's identical to the most recent tag list
-		if (!tagList.equals(mostRecentTagList) ) {
-			tagStack.push(tagList);
-		}*/
-	}
-	
-	public void addTags(HashMap<String, Integer> tags){
+	public void addTagCategoryList(ArrayList<TagCategory> tagCategoryList) {
+		tagStack.push(tagCategoryList);
+
 	}
 
 	/*=========*
 	 * Getters *
 	 *=========*/
 	/**
-	 * Peeks at the last added superlist in History.
-	 * @return the superlist last added to History
+	 * Peeks at the last added task lists in History.
+	 * @return
 	 */
-	public ArrayList<ArrayList<Task>> peek() {
-		return stack.peek();
+	public ArrayList<ArrayList<Task>> peekTaskStack() {
+		return taskStack.peek();
 	}
 
 	/**
-	 * @@author //To Dylan: you can fill in your matric number here
-	 * Peeks at the last added tagmap in History.
-	 * Not in use.
-	 * @return the tagmap last added to History
+	 * Peeks at the last added tag category list in History.
+	 * @return
 	 */
-	public ArrayList<TagCategory> peekTags() {
+	public ArrayList<TagCategory> peekTagStack() {
 		return tagStack.peek();
 	}
 
@@ -110,20 +77,18 @@ public class History {
 	 * For undo *
 	 *==========*/
 	/**
-	 * Pop the last added superlist from History.
-	 * Used for undo.
-	 * @return the removed superlist
+	 * Pop the last added task lists from History.
+	 * @return 
 	 */
-	public ArrayList<ArrayList<Task>> pop() {
-		return stack.pop();
+	public ArrayList<ArrayList<Task>> popTaskStack() {
+		return taskStack.pop();
 	}
 
 	/**
-	 * Pop the last added tagmap from History.
-	 * For undo (not in use).
-	 * @return the removed tagmap
+	 * Pop the last added tag category list from History.
+	 * @return 
 	 */
-	public ArrayList<TagCategory> popTags() {
+	public ArrayList<TagCategory> popTagStack() {
 		return tagStack.pop();
 	}
 

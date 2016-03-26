@@ -126,16 +126,16 @@ public class Logic {
 			case "VIEW_TAGS":
 				cmd = new ViewTags(po.getViewType());
 				return executeView(po, cmd);
-
+				
+			case "SEARCH":
+				cmd = new Search(po.getSearchPhrase());
+				return executeSearch(po, cmd);
+				
 			case "UNDO":
 				return executeUndo(po);
 				
 			case "ERROR":
 				return new LogicFeedback(getAllTaskLists(), po, new LogicException(po.getErrorType()));
-				
-			case "SEARCH":
-				cmd = new Search(po.getSearchPhrase());
-				return executeSearch(po, cmd);
 
 			default:
 				break;
@@ -214,16 +214,16 @@ public class Logic {
 	
 	private LogicFeedback executeUndo(ProcessedObject po) {
 		// History stacks must always have at least one item, which is inserted at startup
-		assert(!history.listStackIsEmpty());
+		assert(!history.taskStackIsEmpty());
 		assert(!history.tagStackIsEmpty()); 
-		ArrayList<ArrayList<Task>> currentTaskLists = history.pop();
-		ArrayList<ArrayList<Task>> previousTaskLists = history.peek();
-		ArrayList<TagCategory> currentTagCategoryList = history.popTags();
-		ArrayList<TagCategory> previousTagCategoryList = history.peekTags();
+		ArrayList<ArrayList<Task>> currentTaskLists = history.popTaskStack();
+		ArrayList<ArrayList<Task>> previousTaskLists = history.peekTaskStack();
+		ArrayList<TagCategory> currentTagCategoryList = history.popTagStack();
+		ArrayList<TagCategory> previousTagCategoryList = history.peekTagStack();
 		
 		if (previousTaskLists == null) {
-			history.add(currentTaskLists);
-			history.addTagList(currentTagCategoryList);
+			history.addTaskLists(currentTaskLists);
+			history.addTagCategoryList(currentTagCategoryList);
 			return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_ERROR_UNDO));
 		}
 		
@@ -239,8 +239,8 @@ public class Logic {
 	
 	// Push the latest task lists and tag category list to history.
 	private void updateHistory() {
-		history.add(getAllTaskLists());
-		history.addTagList(getTagCategoryList());
+		history.addTaskLists(getAllTaskLists());
+		history.addTagCategoryList(getTagCategoryList());
 	}
 	
 	/*

@@ -61,7 +61,7 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 				}
 			}
 			checkAspectRatio();
-			UiPopupManager.getInstance().resizeAllPopups(stage);
+			UiPopupManager.getInstance().updateWindowRatios(stage);
 		}
 	}
 

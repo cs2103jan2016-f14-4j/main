@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
 import javafx.stage.Window;
+import javafx.stage.PopupWindow.AnchorLocation;
 import taskey.constants.UiConstants;
 
 /**
@@ -24,7 +25,7 @@ import taskey.constants.UiConstants;
  */
 
 public class UiPopupManager {
-	private double X_Ratio = 1, Y_Ratio = 1;
+	private double X_Ratio = 1, Y_Ratio = 1; // window ratios
 	private static UiPopupManager instance = null;
 	private ArrayList<PopupWindow> popupList = new ArrayList<PopupWindow>();
 	private UiPopupManager() {
@@ -51,13 +52,12 @@ public class UiPopupManager {
 		Bounds bounds = node.getBoundsInLocal();
 		Bounds screenBounds = node.localToScreen(bounds);
 		Label content = new Label();
-		content.setScaleX(X_Ratio);
-		content.setScaleY(Y_Ratio);
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		newPopup.getContent().add(content);
-		newPopup.show(node, screenBounds.getMinX() + offsetX, screenBounds.getMinY() + offsetY); // lower left hand corner  
+		
+		newPopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
 		popupList.add(newPopup);
 		
 		if ( deleteAfter == true ) {
@@ -74,19 +74,23 @@ public class UiPopupManager {
 	}
 
 	/**
-	 * This method resizes all existing popups
+	 * This method sets the X and Y ratio of the stage
+	 * such that when pop ups are created, they are positioned correctly
+	 * but not scaled, or shifted when window changes
+	 * these need to depend on anchor points which makes it difficult to alter 
 	 * @param mainStage
 	 */
-	public void resizeAllPopups(Window mainStage) {
+	public void updateWindowRatios(Window mainStage) {
 		X_Ratio = mainStage.getWidth()/2/UiConstants.WINDOW_MIN_SIZE.getWidth();
 		Y_Ratio = mainStage.getHeight()/2/UiConstants.WINDOW_MIN_SIZE.getHeight();
-		
-		for ( int i = 0; i < popupList.size(); i++ ) {
-			Popup thePopup = (Popup) popupList.get(i);
-			Node content = thePopup.getContent().get(0);
-			content.setScaleX(X_Ratio);
-			content.setScaleY(Y_Ratio);
-		}
+	}
+	
+	public double getYRatio() {
+		return Y_Ratio;
+	}
+	
+	public double getXRatio() {
+		return X_Ratio;
 	}
 	
 	/**

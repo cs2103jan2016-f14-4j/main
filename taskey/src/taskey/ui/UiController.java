@@ -419,6 +419,7 @@ public class UiController {
 			  @Override public void handle(MouseEvent mouseEvent) {
 			  	stage.setX(mouseEvent.getScreenX() + mouseX);
 			    stage.setY(mouseEvent.getScreenY() + mouseY);
+			    myDropDown.closeMenu();
 			  }
 		});
 	}

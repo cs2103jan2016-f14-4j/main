@@ -98,7 +98,7 @@ public class History {
 	}
 
 	/**
-	 * @@author //To Dylan: you can fill in your matric number here
+	 * @@author A0121618M
 	 * Peeks at the last added tagmap in History.
 	 * Not in use.
 	 * @return the tagmap last added to History

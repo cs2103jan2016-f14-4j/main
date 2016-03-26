@@ -35,7 +35,7 @@ public class TaskeyLog {
 	private static final String defaultLocation = "logs/";
 	private static TaskeyLog instance = null;	
 	private ArrayList<Logger> myLoggers;
-	private static final int MAX_BYTES = 1000;
+	private static final int MAX_BYTES = 100000;
 	private TaskeyLog() {
 		myLoggers = new ArrayList<Logger>();
 		// add loggers

@@ -11,19 +11,18 @@ import taskey.constants.UiConstants;
 
 /**
  * @@author A0125419H
- * This class performs a background service, which updates the UI clock.
+ * This class performs a background service, which updates the UI date
+ * and performs polling of logic
  *
  * @author JunWei
  */
 
-public class UiClockService extends ScheduledService<Void> {
+public class UiUpdateService extends ScheduledService<Void> {
 
-	private Label timeLabelRef;
 	private Label dateLabelRef;
 
-	public UiClockService(Label timeLabel, Label dateLabel) {
+	public UiUpdateService(Label dateLabel) {
 		assert(dateLabel != null);
-		timeLabelRef = timeLabel;
 		dateLabelRef = dateLabel;
 		this.setDelay(new Duration(0));
 		this.setPeriod(new Duration(UiConstants.ClOCK_UPDATE_INTERVAL));
@@ -38,7 +37,8 @@ public class UiClockService extends ScheduledService<Void> {
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
 					public void run() {		
-						//timeLabelRef.setText(formatTime(cal)); (Time will not be in the program for now)
+						taskey.logic.Task t = new taskey.logic.Task(); // to do, prompt for expiring tasks
+						UiAlertsWindow.getInstance().addEntry(t);
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});
@@ -46,18 +46,5 @@ public class UiClockService extends ScheduledService<Void> {
 			}
 		};
 		return myTask;
-	}
-
-	private String formatTime(Calendar cal) {
-		String myTime = "";
-		int hour = cal.get(Calendar.HOUR);
-		if (cal.get(Calendar.AM_PM) == 1 && hour == 0) { // Calender.Hour defaults to 0 for 12, for pm we usually say 12:30 pm
-			hour = 12;
-		}
-		int minute = cal.get(Calendar.MINUTE);
-		String minutePrefix = minute < 10 ? "0" : "";
-		String timeOfDay = (cal.get(Calendar.AM_PM) == 1 ? UiConstants.PM_SUFFIX : UiConstants.AM_SUFFIX); // AM or PM
-		myTime += hour + ":" + minutePrefix + minute + " " + timeOfDay;
-		return myTime;
 	}
 }

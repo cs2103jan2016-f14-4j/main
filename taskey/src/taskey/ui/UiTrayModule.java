@@ -11,11 +11,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
+
 import javax.imageio.ImageIO;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import taskey.constants.UiConstants;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 
 /**
 * @@author A0125419H
@@ -37,33 +42,33 @@ public class UiTrayModule {
 	 * @param main - main Stage
 	 * @param alerts - alerts Stage
 	 */
-	public void doLinkage(Stage main, Stage alerts) {
+	public void createLinkage(Stage main, Stage alerts) {
 		main.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
 				hide(main);
-				UiAlertController.getInstance().show();
+				UiAlertsWindow.getInstance().show();
 			}
 		});
 		
 		alerts.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
-				UiAlertController.getInstance().hide();
+				UiAlertsWindow.getInstance().hide();
 				main.show();
 			}
 		});
 	}
-	public void createTrayIcon(final Stage stage) {
-		
-		
+	
+	public void initTrayVariables(final Stage stage) {
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Tray...", Level.ALL);
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
 			SystemTray tray = SystemTray.getSystemTray();
 			
 			// create a action listener to listen for default action executed on
 			// the tray icon
-			final ActionListener closeListener = new ActionListener() {
+			ActionListener closeListener = new ActionListener() {
 				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					System.exit(0);
@@ -76,48 +81,52 @@ public class UiTrayModule {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							UiAlertController.getInstance().hide();
+							UiAlertsWindow.getInstance().hide();
 							stage.show();
 						}
 					});
 				}
 			};
-			// create a popup menu
-			PopupMenu popup = new PopupMenu();
-
-			MenuItem showItem = new MenuItem("Show Taskey");
-			showItem.addActionListener(showListener);
-			popup.add(showItem);
-
-			MenuItem closeItem = new MenuItem("Close Program");
-			closeItem.addActionListener(closeListener);
-			popup.add(closeItem);
-
-			// construct a TrayIcon
-			BufferedImage trayIconImage = null;
-			try {
-				trayIconImage = ImageIO.read(getClass().getResource("utility/images/windowIcon.png"));
-			} catch (IOException e1) {
-				System.out.println("Failed to load tray icon");
-			}
-			int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
-
-			trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH), "Taskey", popup);
+			createTrayIcon(tray,closeListener,showListener);
+		}
+		TaskeyLog.getInstance().log(LogSystems.UI, "Tray has been set up...", Level.ALL);
+	}
 	
-			// set the TrayIcon properties
-			trayIcon.addActionListener(showListener);
-			
-			// add the tray image
-			try {
-				tray.add(trayIcon);
-			} catch (AWTException e) {
-				System.err.println(e);
-			}
+	private void createTrayIcon(SystemTray tray, ActionListener closeListener, ActionListener showListener) {
+		// create a popup menu
+		PopupMenu popup = new PopupMenu();
+		MenuItem showItem = new MenuItem(UiConstants.TRAY_SHOW_OPTION);
+		showItem.addActionListener(showListener);
+		popup.add(showItem);
+
+		MenuItem closeItem = new MenuItem(UiConstants.TRAY_CLOSE_OPTION);
+		closeItem.addActionListener(closeListener);
+		popup.add(closeItem);
+
+		// construct a TrayIcon
+		BufferedImage trayIconImage = null;
+		try {
+			trayIconImage = ImageIO.read(getClass().getResource(UiConstants.TRAY_IMAGE_PATH));
+		} catch (IOException e1) {
+			System.out.println(UiConstants.TRAY_IMAGE_LOAD_FAIL);
+		}
+		int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+
+		trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH), UiConstants.PROGRAM_NAME, popup);
+
+		// set the TrayIcon properties
+		trayIcon.addActionListener(showListener);
+		
+		// add the tray image
+		try {
+			tray.add(trayIcon);
+		} catch (AWTException e) {
+			System.err.println(e);
 		}
 	}
 
-	public void showProgramIsMinimizedMsg() {
-		trayIcon.displayMessage("Taskey has been minimized.", "Taskey will continue running in the background, click to resume planning your tasks.", TrayIcon.MessageType.INFO);
+	private void showProgramIsMinimizedMsg() {
+		trayIcon.displayMessage(UiConstants.MINIMIZE_MESSAGE_HEADER, UiConstants.MINIMIZE_MESSAGE_BODY, TrayIcon.MessageType.INFO);
 	}
 
 	private void hide(final Stage stage) {

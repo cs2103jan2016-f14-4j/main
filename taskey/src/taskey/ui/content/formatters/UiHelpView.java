@@ -35,7 +35,7 @@ public class UiHelpView {
 	
 	public UiHelpView() {
 		gridHelper = new UiGridHelper("");
-		helpView = new UiPagination(UiConstants.STYLE_HELP_SELECTOR);
+		helpView = new UiPagination(UiConstants.STYLE_HELP_MENU_SELECTOR);
 		commandViews = new ArrayList<UiPagination>();
 		setUpHelpView();
 		currentView = helpView;

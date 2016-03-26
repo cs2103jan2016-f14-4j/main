@@ -1,6 +1,7 @@
 package taskey.ui;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import javafx.animation.FadeTransition;
 import javafx.collections.ObservableList;
@@ -21,6 +22,8 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import taskey.constants.UiConstants;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiPopupManager;
 
@@ -44,6 +47,9 @@ public class UiDropDown {
 	public void createMenu(Stage primaryStage, TextField input) {
 		assert(input != null);
 		assert(primaryStage != null);
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Drop down Menu...", Level.ALL);
+		
 		myInput = input; // set up reference
 		myMenu = UiPopupManager.getInstance().createPopupMenu(MAX_ITEMS);
 		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 5000, 1000, 1.0, 0.0);
@@ -58,6 +64,8 @@ public class UiDropDown {
 		currentItemSize = 0;
 		currentSelection = -1;
 		selectedPane = null;
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, "Drop down menu has been set up...", Level.ALL);
 	}
 
 	public void updateMenuItems(ArrayList<String> items) {
@@ -117,7 +125,6 @@ public class UiDropDown {
 		text.setFont(field.getFont()); // Set the same font, so the size is the same
 		double width = text.getLayoutBounds().getWidth();
 		return width;
-
 	}
 	
 	public String getSelectedItem() {
@@ -164,6 +171,7 @@ public class UiDropDown {
 		fade.getNode().setOpacity(1);
 		fade.playFromStart();
 	}
+	
 	private void deSelect() {
 		if ( selectedPane != null ) {
 			Label toStyle = (Label) selectedPane.getChildren().get(0);
@@ -173,6 +181,7 @@ public class UiDropDown {
 			currentSelection = -1;
 		}	
 	}
+	
 	private void select(int selection) {
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		assert(selection >= 0 && selection < myContent.getChildren().size());
@@ -200,5 +209,4 @@ public class UiDropDown {
 			select((currentSelection - 1) < 0 ? currentItemSize - 1 : currentSelection - 1);
 		}
 	}
-
 }

@@ -13,7 +13,7 @@ import taskey.logic.Task;
 
 /**
  * @@author A0125419H
- * This class contains a default grid-based formatter for the content windows.
+ * This class contains a default grid-based formatter for the content panes.
  * It is extended by specialized classes to provide extended functionalities
  * 
  * @author Junwei

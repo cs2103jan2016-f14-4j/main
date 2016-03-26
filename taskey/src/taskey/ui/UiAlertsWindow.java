@@ -1,11 +1,11 @@
 package taskey.ui;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -29,6 +28,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiTextBuilder;
@@ -45,13 +46,11 @@ public class UiAlertsWindow {
 
 	@FXML
 	private ScrollPane scrollPane;
-	private PieChart chart;
 	private GridPane theGrid;
 	private AnchorPane root;
 	private Stage stage;
 	private UiGridHelper gridHelper = new UiGridHelper("");
 	private ArrayList<Boolean> isSlotFree = new ArrayList<Boolean>();
-	private int MAX_SLOTS = 10;
 	
 	private static UiAlertsWindow instance = null;
 	private UiAlertsWindow(){
@@ -64,40 +63,54 @@ public class UiAlertsWindow {
 	}
 		
 	public void setUpStage(Region contentRootRegion) {
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Alert Window...", Level.ALL);
+		
 		stage = new Stage();
         stage.initStyle(StageStyle.TRANSPARENT);
 		stage.setScene(new Scene(contentRootRegion));
 		stage.getScene().setFill(null);
+		
+        root = (AnchorPane) contentRootRegion;
+        root.setOpacity(UiConstants.ALERTS_OPACITY);
+        
+        setUpScene();
+        addRootEventHandlers();
+        for ( int i = 0; i < UiConstants.MAX_ALERTS; i++ ) {
+        	isSlotFree.add(new Boolean(true));
+        }
+        
+        TaskeyLog.getInstance().log(LogSystems.UI, "Alert Window has been set up...", Level.ALL);
+	}
+	
+	private void setUpScene() {
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
-		myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + "sharedStyles.css").toExternalForm());
-        myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + "alertStyles.css").toExternalForm());
-
+        for ( int i = 0; i < UiConstants.STYLE_UI_ALERT_WINDOW.size(); i++ ) {
+        	myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + UiConstants.STYLE_UI_ALERT_WINDOW.get(i)).toExternalForm());
+        }
         theGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT);
         theGrid.setAlignment(Pos.BOTTOM_CENTER);
         scrollPane.setContent(theGrid);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-       
-        root = (AnchorPane) contentRootRegion;
-        root.setOpacity(0.8f);
-        
-        for ( int i = 0; i < MAX_SLOTS; i++ ) {
-        	isSlotFree.add(new Boolean(true));
-        }
-       // setUpChart();
-        // show();
-        root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+	}
+	
+	private void addRootEventHandlers() {
+		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if ( event.getCode() == KeyCode.F5) {
+				if (event.getCode() == KeyCode.F5) {
 					Task temp = new Task();
 					temp.setPriority(1);
 					temp.setTaskName(String.valueOf(Math.random()));
 					addEntry(temp);
-				} else if ( event.getCode() == KeyCode.W && event.isControlDown() ) {
+				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
 					hide();
 				}
 			}
 		});
+	}	
+	
+	public Stage getStage() {
+		return stage;
 	}
 	
 	public void hide() {
@@ -113,30 +126,12 @@ public class UiAlertsWindow {
         root.setMinHeight(primaryScreenBounds.getHeight()); // resize anchorPane, scrollpane will resize to fit    
         root.requestFocus();
 	}
-	private void setUpChart() {
-		ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                new PieChart.Data("Grapefruit", 13),
-                new PieChart.Data("Oranges", 25),
-                new PieChart.Data("Plums", 10),
-                new PieChart.Data("Pears", 22),
-                new PieChart.Data("Apples", 30));
-        chart = new PieChart(pieChartData);
-        chart.getStyleClass().add("numberIcon");
-
-        StackPane wrapper = gridHelper.getWrapperAtCell(0, 0, theGrid);
-        wrapper.getChildren().add(chart);
-        isSlotFree.set(0, false);		
-	}
-	public void updateChart( ArrayList<ArrayList<Task>> theLists) {
-		
-	}
 	
-	private void addClickHandler(StackPane theEntry) {
-		theEntry.setOnMouseReleased(new EventHandler<MouseEvent>() {
+	private void addClickHandler(StackPane thePane) {
+		thePane.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
-				FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(theEntry, 0,
+				FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(thePane, 0,
 						UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
 				fade.play();
 				fade.setOnFinished(new EventHandler<ActionEvent>() {
@@ -149,11 +144,27 @@ public class UiAlertsWindow {
 						removeEntry(index);
 					}
 				});
-				theEntry.setOnMouseReleased(null);
-
+				thePane.setOnMouseReleased(null);
 			}
 		});	
 	}
+	
+	private void addStartAnimation(StackPane thePane) {
+		// animate within the grid, hence coordinates are 0
+		TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
+				new Pair<Double,Double>(stage.getWidth(), 0.0), 
+				new Pair<Double,Double>(0.0, 0.0), 500);
+		shift.play();
+		shift.setOnFinished(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ScaleTransition scale = UiAnimationManager.getInstance().
+						createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 200);
+				scale.play();
+			}
+		});
+	}
+	
 	public void addEntry(Task newEntry) {
 		int gridIndex = findFirstFreeSlot();
 		if ( gridIndex == -1 ) {
@@ -176,26 +187,15 @@ public class UiAlertsWindow {
 			gridHelper.createScaledRectInCell(0, 0, theColor, entryGrid);
 			gridHelper.addTextFlowToCell(1, 0, myBuilder.build(line),TextAlignment.LEFT, entryGrid);	
 			thePane.getChildren().add(entryGrid);
-			// animate within the grid, hence coordinates are 0
-			TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
-					new Pair<Double,Double>(stage.getWidth(), 0.0), 
-					new Pair<Double,Double>(0.0, 0.0), 500);
-			shift.play();
-			shift.setOnFinished(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					ScaleTransition scale = UiAnimationManager.getInstance().
-							createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 200);
-					scale.play();
-				}
-			});
+			
+			addStartAnimation(thePane);
 			addClickHandler(thePane);					
 			isSlotFree.set(gridIndex, false);			
 		}
 	}
 	
 	private int findFirstFreeSlot() {
-		for ( int i = MAX_SLOTS-1; i >= 0; i -- ) {
+		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
 			if ( isSlotFree.get(i) == true ) {
 				return i;
 			}
@@ -206,7 +206,7 @@ public class UiAlertsWindow {
 	private void removeEntry( int gridIndex ) {
 		isSlotFree.set(gridIndex, true);
 		 // shift all entries down
-		for ( int i = MAX_SLOTS-1; i >= 0; i -- ) {
+		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
 			if ( isSlotFree.get(i) == true ) {
 				int swapIndex = -1;
 				for ( int j = i-1; j >= 0; j -- ) {
@@ -224,8 +224,5 @@ public class UiAlertsWindow {
 				}
 			}	
 		}
-	}
-	public Stage getStage() {
-		return stage;
 	}
 }

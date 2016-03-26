@@ -1,6 +1,7 @@
 package taskey.ui.content;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
@@ -8,6 +9,8 @@ import javafx.scene.paint.Color;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Task;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
@@ -50,6 +53,8 @@ public class UiContentManager {
 			break;
 		}
 		myFormatters.add(myFormatter);
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, contentID.toString() + " tab has been added to ContentManager...", Level.ALL);
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class UiContentManager {
 	/**
 	 * Update display mode of action content box
 	 *
-	 * @param mode - Content LIST, HELP
+	 * @param mode - LIST, HELP
 	 */
 	public void setActionMode(ActionMode mode) {
 		int arrayIndex = ContentBox.ACTION.getValue();
@@ -101,26 +106,23 @@ public class UiContentManager {
 	
 	public void processArrowKey(KeyEvent event, ContentBox currentContent) {
 		assert(event != null);
-		int arrayIndex = currentContent.getValue();
-		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		myFormatter.processArrowKey(event);
 	}
 
 	public int processDelete(ContentBox currentContent) {
-		int arrayIndex = currentContent.getValue();
-		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		return myFormatter.processDeleteKey();
 	}
 
 	public void processEnter(ContentBox currentContent) {
-		int arrayIndex = currentContent.getValue();
-		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		myFormatter.processEnterKey();
 	}
 	
 	public void processPageUpAndDown(KeyEvent event, ContentBox currentContent) {
-		int arrayIndex = currentContent.getValue();
-		UiFormatter myFormatter = myFormatters.get(arrayIndex);
+		assert(event != null);
+		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		myFormatter.processPageUpAndDown(event);
 	}
 }

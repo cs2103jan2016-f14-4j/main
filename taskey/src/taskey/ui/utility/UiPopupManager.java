@@ -78,8 +78,8 @@ public class UiPopupManager {
 	 * @param mainStage
 	 */
 	public void resizeAllPopups(Window mainStage) {
-		X_Ratio = mainStage.getWidth()/2/UiConstants.MIN_SIZE.getWidth();
-		Y_Ratio = mainStage.getHeight()/2/UiConstants.MIN_SIZE.getHeight();
+		X_Ratio = mainStage.getWidth()/2/UiConstants.WINDOW_MIN_SIZE.getWidth();
+		Y_Ratio = mainStage.getHeight()/2/UiConstants.WINDOW_MIN_SIZE.getHeight();
 		
 		for ( int i = 0; i < popupList.size(); i++ ) {
 			Popup thePopup = (Popup) popupList.get(i);

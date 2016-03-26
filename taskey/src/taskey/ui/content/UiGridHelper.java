@@ -22,15 +22,15 @@ import taskey.constants.UiConstants;
 
 /**
  * @@author A0125419H
- * This class contains methods to manipulate a GridPane,
- * It is used by all the UiFormatter objects
+ * This class contains convenience methods to manipulate a GridPane,
+ * It is used by all operations that involve a gridpane.
  * 
  * @author junwei
  */
 
 public class UiGridHelper {
 	
-	private String defaultWrapperStyle; // use the style the StackPane in a cell on creation if it does not exist
+	private String defaultWrapperStyle; // used to style the initial StackPane in a cell on creation if it does not exist
 	
 	public UiGridHelper(String wrapperStyle) {
 		defaultWrapperStyle = wrapperStyle;
@@ -157,10 +157,8 @@ public class UiGridHelper {
 		scaledRect.setFill(Paint.valueOf(theColor.toString()));
 		cellWrapper.getChildren().add(scaledRect);
 		StackPane.setAlignment(scaledRect, Pos.CENTER_LEFT);
-		GridPane.setVgrow(scaledRect, Priority.NEVER);
-		GridPane.setHgrow(scaledRect, Priority.NEVER);
-		scaledRect.widthProperty().bind(cellWrapper.widthProperty()); // problem with precision which shifts the whole row
-		//scaledRect.setTranslateX(0.75f); // this mitigates the issue
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1.5f)); // problem with precision which shifts the whole row
+		scaledRect.setTranslateX(0.75f); // this mitigates the issue
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;
 	}

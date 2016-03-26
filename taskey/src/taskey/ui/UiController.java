@@ -2,9 +2,7 @@ package taskey.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.logging.Level;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -29,9 +27,10 @@ import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
 import taskey.logic.LogicConstants.ListID;
-import taskey.parser.AutoComplete;
 import taskey.logic.LogicFeedback;
 import taskey.logic.ProcessedObject;
 import taskey.logic.TagCategory;
@@ -70,7 +69,7 @@ public class UiController {
 	private int mouseX, mouseY;
 	private Stage stage;
 	private Logic logic;
-	private UiClockService clockService;
+	private UiUpdateService updateService;
 	private UiDropDown myDropDown;
 	private UiContentManager myContentManager;
 	private int currentTab;
@@ -87,6 +86,7 @@ public class UiController {
 	public void setUpNodes(Stage primaryStage, Parent root) {
 		assert(primaryStage != null);
 		assert(root != null);
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Main Controller...", Level.ALL);
 		stage = primaryStage; // set up reference
 		myDropDown = new UiDropDown();
 		setUpContentBoxes();
@@ -95,9 +95,11 @@ public class UiController {
 		setUpInput();
 		registerEventHandlersToNodes(root);	
 		setUpLogic();	
-		setUpClockService();
+		setUpUpdateService();
 		
 		myTabs.requestFocus(); // to display prompt at the start
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, "Main Controller has been set up...", Level.ALL);
 	}
 	
 	/**
@@ -153,9 +155,9 @@ public class UiController {
 		updateAllContents(logic.getTagList(),logic.getAllTaskLists());
 	}
 
-	private void setUpClockService() {
-		clockService = new UiClockService(null, dateLabel);
-		clockService.start();
+	private void setUpUpdateService() {
+		updateService = new UiUpdateService(dateLabel);
+		updateService.start();
 	}
 	
 	public void displayTabContents(ContentBox toContent) {
@@ -184,7 +186,7 @@ public class UiController {
 				myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + styleSheets.get(i)).toExternalForm());
 			}
 		} catch (Exception excep) {
-			System.out.println(excep + " loading style sheets");
+			System.out.println(excep + UiConstants.STYLE_SHEETS_LOAD_FAIL);
 		}
 	}
 	
@@ -241,7 +243,7 @@ public class UiController {
 	}
 	
 	public void cleanUp() {
-		clockService.restart();
+		updateService.restart();
 		myContentManager.cleanUp();
 		UiPopupManager.getInstance().cleanUp();
 	}
@@ -314,6 +316,12 @@ public class UiController {
 		}
 	}
 	
+	/**
+	 * This method sets the textfield input depending on up and down arrows,
+	 * which mean previous and next respectively.
+	 * 
+	 * @param code - KeyCode up or down
+	 */
 	private void setInputFromHistory( KeyCode code ) {
 		if (inputHistory.size() != 0) {
 			String line;
@@ -360,7 +368,7 @@ public class UiController {
 				myDropDown.processArrowKey(event);
 				event.consume();
 			}
-		} else {
+		} else if (input.getText().isEmpty()) {
 			if (event.getCode() == KeyCode.DELETE) {
 				int id = myContentManager.processDelete(getCurrentContent());
 				if (id != 0) {

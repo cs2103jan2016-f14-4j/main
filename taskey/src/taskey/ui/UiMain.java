@@ -56,6 +56,9 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 1);
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up the program UI...", Level.ALL);
+		
 		UiImageManager.getInstance().loadImages();
 		myController = new UiController();
 		// set up main window
@@ -66,6 +69,8 @@ public class UiMain extends Application {
 		trayModule = new UiTrayModule();
 		trayModule.initTrayVariables(primaryStage);
 		trayModule.createLinkage(primaryStage, UiAlertsWindow.getInstance().getStage()); 
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, "UI has been set up...", Level.ALL);
 	}
 	
 	/**
@@ -76,8 +81,8 @@ public class UiMain extends Application {
 	 */
 	private Region setUpResize(Stage primaryStage, Region contentRootRegion) {
 		 //Set a default "standard" or "100%" resolution
-	    double origW = UiConstants.MIN_SIZE.getWidth()*2;
-	    double origH = UiConstants.MIN_SIZE.getHeight()*2;
+	    double origW = UiConstants.WINDOW_MIN_SIZE.getWidth()*2;
+	    double origH = UiConstants.WINDOW_MIN_SIZE.getHeight()*2;
 		// If the Region containing the GUI does not already have a preferred
 		// width and height, set it.
 		// But, if it does, we can use that setting as the "standard"
@@ -128,10 +133,7 @@ public class UiMain extends Application {
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
-		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on primaryStage.show()
-		
-		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
-		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
+		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on primaryStage.show()	
 	}
 
 	/**

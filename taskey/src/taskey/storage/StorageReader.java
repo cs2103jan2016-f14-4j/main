@@ -60,7 +60,7 @@ class StorageReader {
     	ArrayList<Task> tasks;
 		try {
 			tasks = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-			System.out.println("{Tasklist loaded} " + src.getName()); //debug info
+			//System.out.println("{Tasklist loaded} " + src.getName()); //debug info
 		} catch (FileNotFoundException e) {
 			System.out.println("{Tasklist not found} " + src.getName()); //debug info
 			tasks = new ArrayList<Task>();
@@ -82,7 +82,7 @@ class StorageReader {
     	ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
     	try {
     		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-    		System.out.println("{Tags loaded} " + src.getName()); //debug info
+    		//System.out.println("{Tags loaded} " + src.getName()); //debug info
     	} catch (FileNotFoundException e) {
     		System.out.println("{Tags not found} " + src.getName()); //debug info
     		tags = new ArrayList<TagCategory>();

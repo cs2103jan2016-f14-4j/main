@@ -611,7 +611,7 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists());
 	}
 	
-	/*
+	
 	@Test
 	public void undoAddShouldUpdateTaskLists() {
 		String input = "add task";
@@ -696,7 +696,7 @@ public class LogicTest {
 		expected.add(new TagCategory("tag2"));
 		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
-	}*/
+	}
 	
 	@Test
 	public void addingTaggedFloatingTaskShouldUpdateTagDatabase() {

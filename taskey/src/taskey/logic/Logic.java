@@ -128,10 +128,10 @@ public class Logic {
 				cmd = new ViewTags(po.getViewType());
 				return executeView(po, cmd);
 
-			/*case "UNDO":
-				return undo(po);
+			case "UNDO":
+				return executeUndo(po);
 				
-			case "ERROR":
+			/*case "ERROR":
 				return new LogicFeedback(originalCopy, po, new LogicException(po.getErrorType()));*/
 				
 			case "SEARCH":
@@ -213,6 +213,27 @@ public class Logic {
 		return executeView(po, cmd);
 	}
 	
+	private LogicFeedback executeUndo(ProcessedObject po) {
+		// History stacks must always have at least one item, which is inserted at startup
+		assert(!history.listStackIsEmpty());
+		assert(!history.tagStackIsEmpty()); 
+		ArrayList<ArrayList<Task>> currentTaskLists = history.pop();
+		ArrayList<ArrayList<Task>> previousTaskLists = history.peek();
+		ArrayList<TagCategory> currentTagCategoryList = history.popTags();
+		ArrayList<TagCategory> previousTagCategoryList = history.peekTags();
+		
+		if (previousTaskLists == null) {
+			history.add(currentTaskLists);
+			history.addTagList(currentTagCategoryList);
+			return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_ERROR_UNDO));
+		}
+		
+		logicMemory.setTaskLists(ListCloner.cloneTaskLists(previousTaskLists));
+		logicMemory.setTagCategoryList(ListCloner.cloneTagCategoryList(previousTagCategoryList));
+		
+		return new LogicFeedback(getAllTaskLists(), po, null);
+	}
+	
     //================================================================================
     // Miscellaneous
     //================================================================================
@@ -224,126 +245,6 @@ public class Logic {
 	}
 	
 	/*
-	// Searches for all expired and pending tasks that are tagged with at least one of the tag categories that the user 
-	// wants to view.
-	LogicFeedback viewTags(ArrayList<ArrayList<Task>> originalCopy, ArrayList<ArrayList<Task>> modifiedCopy, 
-			               ProcessedObject po) {
-		ArrayList<String> tagsToView = po.getViewType();
-		ArrayList<Task> pendingList = modifiedCopy.get(ListID.PENDING.getIndex());
-		ArrayList<Task> expiredList = modifiedCopy.get(ListID.EXPIRED.getIndex());
-		ArrayList<Task> actionList = modifiedCopy.get(ListID.ACTION.getIndex());
-		actionList.clear();
-		
-		for (Task t : expiredList) {
-			ArrayList<String> tagList = t.getTaskTags();
-			if (tagList != null) {
-				for (String s : tagsToView) {
-					if (tagList.contains(s)) {
-						actionList.add(t);
-						break;
-					}
-				}
-			}
-		}
-		
-		for (Task t : pendingList) {
-			ArrayList<String> tagList = t.getTaskTags();
-			if (tagList != null) {
-				for (String s : tagsToView) {
-					if (tagList.contains(s)) {
-						actionList.add(t);
-						break;
-					}
-				}
-			}
-		}
-		if (actionList.isEmpty()) {
-			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_TAG_NOT_FOUND));
-		}
-			
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, null);
-	}
-
-	// Undo the last change to the task lists.
-	public LogicFeedback undo(ProcessedObject po) {
-		// History stacks must always have at least one item, which is inserted at startup
-		assert(!history.listStackIsEmpty());
-		assert(!history.tagStackIsEmpty()); 
-		ArrayList<ArrayList<Task>> currentSuperList = history.pop();
-		ArrayList<ArrayList<Task>> previousSuperList = history.peek();
-		ArrayList<TagCategory> currentTagList = history.popTags();
-		ArrayList<TagCategory> previousTagList = history.peekTags();
-		
-		if (previousSuperList == null) {
-			history.add(currentSuperList);
-			history.addTagList(currentTagList);
-			return new LogicFeedback(currentSuperList, po, new LogicException(LogicConstants.MSG_EXCEPTION_UNDO));
-		}
-		
-		utd.setTags(previousTagList); 
-		if (!utd.saveTagDatabase()) { // This tries to adds another copy of previousTagList to history, be mindful
-			history.add(currentSuperList);
-			history.addTagList(currentTagList);
-			utd.setTags(currentTagList);
-			return new LogicFeedback(currentSuperList, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS));
-		}
-		history.popTags(); // To remove the extra copy mentioned above
-		
-		try {
-			saveAllTasks(previousSuperList); // Same as above, this tries to add another copy of previousSuperList to 
-			                                 // history.
-		} catch (LogicException le) {
-			utd.setTags(currentTagList);
-			history.add(currentSuperList);
-			history.addTagList(currentTagList);
-			return new LogicFeedback(currentSuperList, po, e);
-		}
-		history.pop();
-		
-		taskLists = cloneLists(previousSuperList);
-		return new LogicFeedback(previousSuperList, po, null);
-	}
-
-	// Change the old Task, if any, to have a new name newTaskName.
-	// Also updates all lists containing the updated Task.
-	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, Task oldTask, String newTaskName) {
-		for (int i = 0; i < taskLists.size(); i++) {
-			int taskIndex = taskLists.get(i).indexOf(oldTask);
-
-			if (taskIndex != -1) { // List contains the Task
-				taskLists.get(i).get(taskIndex).setTaskName(newTaskName);
-			}
-		}
-	}
-
-	// Replace the old Task with another task changedTask.
-	// Lists that previously contained oldTask but should not contain changedTask are updated.
-	// Lists that should contain changedTask are updated as well.
-	// This method may mess up the order of lists.
-	private void updateAllLists(ArrayList<ArrayList<Task>> taskLists, Task oldTask, Task changedTask) {
-		removeFromAllLists(taskLists, oldTask);
-		
-		for (int i = 0; i < taskLists.size(); i++) {
-			if (belongsToList(changedTask, i)) {
-				taskLists.get(i).add(changedTask);
-			}
-		}
-	}
-
-	// Returns all Tasks in the given list whose name matches taskName. If no such Task is found, an empty list is
-	// returned.
-	private ArrayList<Task> getTasksByName(ArrayList<Task> list, String taskName) {
-		ArrayList<Task> matches = new ArrayList<Task>();
-		for (Task t : list) {
-			if (t.getTaskName().equals(taskName)) {
-				matches.add(t);
-			}
-		}
-		
-		return matches;
-	}
-
 	// Save all task lists to Storage. If the save failed, the task lists will be reverted to the states
 	// they were in before they were modified.
 	private void saveAllTasks(ArrayList<ArrayList<Task>> taskLists) throws LogicException {

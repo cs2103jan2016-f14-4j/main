@@ -56,7 +56,7 @@ public class UiTaskView {
 				Task theTask = myTaskList.get(entryNo);
 				addTaskID(theTask, entryNo, j, categoryList, newGrid); // add to main grid
 				addTaskDescription(theTask,paneGrid);
-				//addImage(theTask,paneGrid);
+				addImage(theTask,paneGrid);
 				entryNo++;
 				
 				pageEntries.add(entryPane);

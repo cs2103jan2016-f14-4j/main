@@ -3,8 +3,6 @@ package taskey.logic;
 /**
  * @@author A0134177E-unused
  * This file is used to store all my unused codes so that they do not clutter the active codebase.
- * 
- * @author Hubert
  */
 public class HubertUnusedCodes {
 	/* Team decided to do away from updating tasks by name because done by index is sufficient and can handle
@@ -934,5 +932,133 @@ public class HubertUnusedCodes {
 	    	
 	    	return true;
 	    }
+	}*/
+	
+	/* I stopped using this because I felt that it was better for constants to be localized in the classes they were
+	 * used in, for easier cross referencing, rather than placed in a central file which is tedious to refer to
+	public class LogicConstants {
+		
+		public enum ListID {
+			THIS_WEEK(0), PENDING(1), EXPIRED(2), GENERAL(3), DEADLINE(4), EVENT(5), COMPLETED(6), ACTION(7);
+			
+			private int index;
+			
+			private ListID(int index) {
+				this.index = index;
+			}
+			
+			public int getIndex() {
+				return index;
+			}
+		}
+		
+		public enum CategoryID {
+			GENERAL(0), DEADLINE(1), EVENT(2), COMPLETED(3);
+			
+			private int index;
+			
+			private CategoryID(int index) {
+				this.index = index;
+			}
+			
+			public int getIndex() {
+				return index;
+			}
+		}
+	}*/
+	
+	/* Previously used to compare LogicFeedback objects for testing purposes. Now not in use.
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof LogicFeedback)) {
+			System.out.println("Objects not of the same type");
+		    return false;
+		  }
+		
+		LogicFeedback other = (LogicFeedback) obj;
+		
+		if (this.taskLists.size() != other.taskLists.size()) {
+			System.out.println("List sizes not equal");
+			System.out.println(this.taskLists.size());
+			System.out.println(other.taskLists.size());
+			return false;
+		}
+		
+		//Check if both objects' task lists are equal and in the same order
+		for (int i = 0; i < this.taskLists.size(); i++) {
+			if (!(this.taskLists.get(i).equals(other.taskLists.get(i)))) {
+				System.out.println("Lists unequal at list index " + i);
+				System.out.println(this.taskLists.get(i));
+				System.out.println(other.taskLists.get(i));
+				return false;
+			}
+		}
+		
+		if (!po.equals(other.po)) {
+			System.out.println("Processed objects not equal");
+			return false;
+		}
+		
+		if (e == null && other.e != null || e != null 
+			&& (other.e == null || !e.getMessage().equals(other.e.getMessage()))) {
+			System.out.println("Exceptions not equal");
+			return false;
+		}
+		
+		return true;
+	}*/
+
+	/*
+	 * @@author A0134177E-unused
+	 * Previously used to compare LogicFeedback objects for testing purposes. Now not in use.
+	 *
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof ProcessedObject)) {
+		    return false;
+		  }
+		
+		ProcessedObject other = (ProcessedObject) obj;
+		
+		if ((command == null && other.command != null) || (command != null 
+			 && (other.command == null || !command.equals(other.command)))) {
+			return false;
+		}	
+		
+		if ((task == null && other.task != null) || (task != null 
+			 && (other.task == null || !task.equals(other.task)))) {
+			return false;
+		}	
+		
+		if (index != other.index) {
+			return false;
+		}
+		
+		if ((viewType == null && other.viewType != null) || (viewType != null 
+			 && (other.viewType == null || !viewType.equals(other.viewType)))) {
+			return false;
+		}	
+		
+		if ((errorType == null && other.errorType != null) || (errorType != null 
+			 && (other.errorType == null || !errorType.equals(other.errorType)))) {
+			return false;
+		}	
+		
+		if ((searchPhrase == null && other.searchPhrase != null) || (searchPhrase != null 
+			 && (other.searchPhrase == null || !searchPhrase.equals(other.searchPhrase)))) {
+			return false;
+		}	
+		
+		if ((newTaskName == null && other.newTaskName != null) || (newTaskName != null 
+			 && (other.newTaskName == null || !newTaskName.equals(other.newTaskName)))) {
+			return false;
+		}	
+		
+		if ((newFileLoc == null && other.newFileLoc != null) || (newFileLoc != null 
+			 && (other.newFileLoc == null || !newFileLoc.equals(other.newFileLoc)))) {
+			return false;
+		}	
+		
+		return true;
 	}*/
 }

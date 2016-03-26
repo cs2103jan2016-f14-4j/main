@@ -43,7 +43,7 @@ class StorageWriter {
     	File dest = new File(filename);
     	try {
     		writeToFile(dest, dir, new TypeToken<File>() {});
-    		System.out.println("{New storage directory saved}"); //debug info
+    		//System.out.println("{New storage directory saved}"); //debug info
     	} catch (IOException e) {
     		e.printStackTrace();
     		System.out.println("{Error saving new directory}"); //debug info

@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import taskey.logic.LogicMemory;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
@@ -19,7 +20,6 @@ import taskey.logic.Task;
 public class Storage {
 	private StorageReader storageReader;
 	private StorageWriter storageWriter;
-	private History history;
 	private File directory;
 
 	private static final String DEFAULT_DIRECTORY = "Taskey savefiles";
@@ -94,12 +94,13 @@ public class Storage {
 		for (int i=0; i<5; i++) {
 			superlist.add(new ArrayList<Task>());
 		}
+		/*
 		try {
 			storage.saveAllTasklists(superlist);
 		} catch (StorageException e) {
 			System.err.println(e.getMessage());
 			print(e.getLastModifiedTasklists());
-		}
+		}*/
 		loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 
@@ -130,8 +131,7 @@ public class Storage {
 	 */
 	public Storage() {
 		storageReader = new StorageReader();
-		storageWriter = new StorageWriter();
-		history = new History();
+		storageWriter = new StorageWriter();;
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
@@ -142,11 +142,6 @@ public class Storage {
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
-
-    public History getHistory() {
-    	return history;
-    }
-
 
     /*=====================*
      * Load/Save tasklists *
@@ -168,7 +163,6 @@ public class Storage {
 			superlist.add(loadedList);
 		}
 
-		//history.add(superlist); //Logic will add the initial loaded list to History
 		return superlist;
 	}
 
@@ -183,8 +177,8 @@ public class Storage {
 	 * @param superlist the list of tasklists to be saved
 	 * @throws StorageException contains the last saved tasklist
 	 */
-	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == 8);
+	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws Exception {
+		assert (superlist.size() == LogicMemory.NUM_TASK_LISTS);
 
 		for (TasklistEnum e : TasklistEnum.values()) {
 			ArrayList<Task> listToSave = superlist.get(e.index());
@@ -193,13 +187,10 @@ public class Storage {
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (IOException ioe) {
 				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-				assert (!history.listStackIsEmpty());
-				throw new StorageException(ioe, history.peek());
+				throw new Exception();
 			}
 		}
-		history.add(superlist); //to Hubert: moved the check to History's add method
 	}
-
 
     /*==============================*
      * Load/Save tags - new methods *
@@ -222,7 +213,6 @@ public class Storage {
     public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-    	history.addTagList(tags); //TODO: KIV
 		return true; 
     }
 	
@@ -248,7 +238,6 @@ public class Storage {
     	File dest = new File(directory, FILENAME_TAGS);
     	try {
     		storageWriter.saveTags(tags, dest);
-        	history.addTags(tags);
         	return true;
     	} catch (IOException e) {
     		//throw new StorageException(e, history.peekTags()); //TODO: KIV

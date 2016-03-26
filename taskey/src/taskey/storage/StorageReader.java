@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -13,9 +12,13 @@ import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
- * @author Dylan
+ * @@author A0121618M
  */
 class StorageReader {
+	@SuppressWarnings("serial")
+	public class InvalidTaskException extends Exception {
+	}
+	
     /**
      * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
      * @param src JSON file to be read
@@ -41,11 +44,15 @@ class StorageReader {
     File loadDirectory(String filename) {
     	File src = new File(filename);
     	try {
-    		return readFromFile(src, new TypeToken<File>() {});
+    		//TODO: buggyPath will somehow always have user.dir prefixed in the actual pathname
+    		File buggyPath = readFromFile(src, new TypeToken<File>() {});
+    		File fixedPath = new File(buggyPath.getPath());
+    		return fixedPath;
     	} catch (FileNotFoundException e) {
     		return null;
     	}
     }
+    
 
     /*================*
      * Load task list *
@@ -55,23 +62,40 @@ class StorageReader {
      * An empty ArrayList is returned if src was not found.
      * @param src the source file to be read from
      * @return the tasklist read from file; or an empty list if the file was not found
+     * @throws FileNotFoundException 
+     * @throws InvalidTaskException 
      */
-    ArrayList<Task> loadTasklist(File src) {
-    	ArrayList<Task> tasks;
+    ArrayList<Task> loadTasklist(File src) throws FileNotFoundException, InvalidTaskException {
+    	ArrayList<Task> tasklist;
 		try {
-			tasks = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-			//System.out.println("{Tasklist loaded} " + src.getName()); //debug info
+			tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
+			verifyTasklist(tasklist);
 		} catch (FileNotFoundException e) {
-			System.out.println("{Tasklist not found} " + src.getName()); //debug info
-			tasks = new ArrayList<Task>();
+			System.out.println("{A tasklist was not found} " + src.getName());
+			throw e;
+		} catch (InvalidTaskException e) {
+			System.out.println("{Tasklist invalid} " + src.getName());
+			throw e;
 		}
-    	return tasks;
+    	return tasklist;
     }
     
+    /**
+     * Sanity check for when reading tasklists.
+     * @param tasklist
+     * @throws StorageException
+     */
+    void verifyTasklist(ArrayList<Task> tasklist) throws InvalidTaskException {
+    	for (Task t : tasklist) {
+    		if (t.getTaskType() == null) {
+    			throw new InvalidTaskException();
+    		}
+    	}
+    }
     
-    /*========================*
-     * Load tags - new method *
-     *========================*/
+    /*===========*
+     * Load tags *
+     *===========*/
     /**
      * Returns an ArrayList of Tags read from the File src.
      * An empty ArrayList is returned if src was not found.
@@ -79,35 +103,11 @@ class StorageReader {
      * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
      */
     ArrayList<TagCategory> loadTaglist(File src) {
-    	ArrayList<TagCategory> tags = new ArrayList<TagCategory>();
+    	ArrayList<TagCategory> tags;
     	try {
     		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-    		//System.out.println("{Tags loaded} " + src.getName()); //debug info
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName()); //debug info
     		tags = new ArrayList<TagCategory>();
-    	}
-    	return tags;
-    }
-    
-
-    /*===========================*
-     * Load tags - Legacy method *
-     *===========================*/
-    /**
-     * Returns a HashMap containing the user-defined tags read from the File src.
-     * An empty HashMap is returned if src was not found.
-     * @param src source file to be read
-     * @return the HashMap read from file, or an empty HashMap if the file was not found
-     */
-    HashMap<String, Integer> loadTags(File src) {
-    	HashMap<String, Integer> tags;
-    	try {
-    		tags = readFromFile(src, new TypeToken<HashMap<String, Integer>>() {});
-    		System.out.println("{Tags loaded} " + src.getName()); //debug info
-    	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName()); //debug info
-    		tags = new HashMap<String, Integer>();
     	}
     	return tags;
     }

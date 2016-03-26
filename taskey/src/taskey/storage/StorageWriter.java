@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
 
 /**
- * @author Dylan
+ * @@author A0121618M
  */
 class StorageWriter {
     /**
@@ -25,9 +26,9 @@ class StorageWriter {
      */
     private <T> void writeToFile(File dest, T object, TypeToken<T> typeToken) throws IOException {
     	FileWriter writer = new FileWriter(dest);
-    	Gson gson = new Gson();
-    	String json = gson.toJson(object, typeToken.getType());
-    	writer.write(json);
+    	Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    	String jsonOutput = gson.toJson(object, typeToken.getType());
+    	writer.write(jsonOutput);
     	writer.close();
     }
 
@@ -42,11 +43,11 @@ class StorageWriter {
     void saveDirectory(File dir, String filename) {
     	File dest = new File(filename);
     	try {
-    		writeToFile(dest, dir, new TypeToken<File>() {});
-    		//System.out.println("{New storage directory saved}"); //debug info
+    		writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
+    		System.out.println("{New storage directory saved}");
     	} catch (IOException e) {
     		e.printStackTrace();
-    		System.out.println("{Error saving new directory}"); //debug info
+    		System.out.println("{Error saving new directory}");
     	}
     }
 
@@ -82,25 +83,6 @@ class StorageWriter {
     void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
     	try {
     		writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    		throw e;
-    	}
-    }
-
-    /*============================*
-     * Save tags - Leagacy method *
-     *============================*/
-    /**
-     * Saves the given HashMap containing user-defined tags to the File dest.
-     * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
-     * @param tags HashMap that maps tag strings to their corresponding multiplicities
-     * @param dest the destination file to be written to
-     * @throws IOException when there is error writing to file
-     */
-    void saveTags(HashMap<String, Integer> tags, File dest) throws IOException {
-    	try {
-    		writeToFile(dest, tags, new TypeToken<HashMap<String, Integer>>() {});
     	} catch (IOException e) {
     		e.printStackTrace();
     		throw e;

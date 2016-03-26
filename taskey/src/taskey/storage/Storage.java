@@ -1,21 +1,21 @@
 package taskey.storage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import taskey.logic.LogicMemory;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
+import taskey.storage.StorageReader.InvalidTaskException;
 
 /**
+ * @@author A0121618M
  * This class exposes public IO methods for saving tasklists and tags.
  * It also manages the storage directory.
- * @author Dylan
  */
 public class Storage {
 	private StorageReader storageReader;
@@ -26,18 +26,20 @@ public class Storage {
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	private static final String FILENAME_EXTENSION = ".taskey";
+	private static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
 	public enum TasklistEnum {
-		// Index 0 is to  be ignored
+		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
 	    PENDING		("PENDING.taskey", 1),
 	    EXPIRED		("EXPIRED.taskey", 2),
-	    GENERAL		("GENERAL.taskey", 3),
-	    DEADLINE	("DEADLINE.taskey", 4),
-	    EVENT		("EVENT.taskey", 5),
+	    GENERAL		("GENERAL.taskey", 3),	//
+	    DEADLINE	("DEADLINE.taskey", 4),	//
+	    EVENT		("EVENT.taskey", 5),	//
 	    COMPLETED	("COMPLETED.taskey", 6);
 
 	    private final String filename;
 	    private final int index;
+	    private static final int size = TasklistEnum.values().length;
 
 	    TasklistEnum(String filename, int index) {
 	        this.filename = filename;
@@ -49,6 +51,9 @@ public class Storage {
 	    }
 	    public int index() {
 	    	return index;
+	    }
+	    public static int size() {
+	    	return size;
 	    }
 	    
 	    public static boolean contains(String filename) {
@@ -62,61 +67,29 @@ public class Storage {
 	}
 
 	/**
-	 * For testing of the Storage class. This is how Logic will interface with Storage.
+	 * For testing
 	 */
 	public static void main(String args[]) {
-		// Get the Storage singleton instance
 		// The default or last-used directory is automatically set in the constructor method.
 		Storage storage = new Storage();
 
 		// Can optionally set the directory again, if requested by user.
-		//System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
+		System.out.println(storage.setDirectory("c:\\taskey"));
 
 		// Initialize - tasklist
-		System.out.println("\nInitial load ======================================");
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
-
-		// Initialize - tags hashmap
-		HashMap<String, Integer> loadedTags = storage.loadTags();
-		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
-
-		// Load after save - tasklists
-		System.out.println("\n\nLoad after save ===================================");
-		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
-		ArrayList<Task> ignoredList = new ArrayList<Task>();
-		ArrayList<Task> pendingList = new ArrayList<Task>();
-		pendingList.add(new Task("1. This is a test task"));
-		pendingList.add(new Task("2. This is a test task"));
-		pendingList.add(new Task("3. This is a test task"));
-		superlist.add(ignoredList);
-		superlist.add(pendingList);
-		for (int i=0; i<5; i++) {
-			superlist.add(new ArrayList<Task>());
-		}
-		/*
-		try {
-			storage.saveAllTasklists(superlist);
-		} catch (StorageException e) {
-			System.err.println(e.getMessage());
-			print(e.getLastModifiedTasklists());
-		}*/
-		loadedLists = storage.loadAllTasklists();
-		print(loadedLists);
-
-		// Load after save - tagsmap
-		HashMap<String, Integer> tags = new HashMap<String, Integer>();
-		tags.put("foo", 1); tags.put("bar", 1); tags.put("foobar", 1);
-		storage.saveTags(tags);
-		loadedTags = storage.loadTags();
-		System.out.print("" + loadedTags.containsKey("foo") + loadedTags.containsKey("bar") + loadedTags.containsKey("foobar"));
 	}
 
 	private static void print(ArrayList<ArrayList<Task>> lists) {
+		int i=1;
 		for (ArrayList<Task> list : lists) {
-			for (Task t : list)
+			System.out.println(i++);
+			for (Task t : list) {
 				System.out.println(t);
+			}
 		}
+		System.out.println("end print");
 	}
 
 
@@ -135,10 +108,9 @@ public class Storage {
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
-    		//System.out.println("{Setting default directory}"); //debug info
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
-    		//System.out.println("{Storage directory loaded}"); //debug info
+    		//System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
@@ -151,16 +123,25 @@ public class Storage {
 	 * Logic calls this on program startup.
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
-	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK list.
-	 * @return the list of tasklists read from disk
+	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
+	 * <br>- If any one list was not found, or is invalid, an empty superlist is returned.
+	 * @return the superlist of tasklists read from disk, or an empty superlist
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (TasklistEnum e : TasklistEnum.values()) {
-			File src = new File(directory, e.filename());
-			ArrayList<Task> loadedList = storageReader.loadTasklist(src);
-			superlist.add(loadedList);
+		for (TasklistEnum tasklist : TasklistEnum.values()) {
+			try {
+				File src = new File(directory, tasklist.filename());
+				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
+				superlist.add(loadedList);
+			} catch (FileNotFoundException | InvalidTaskException e) {
+				superlist.clear();
+				while (superlist.size() < TasklistEnum.size()) {
+					superlist.add(new ArrayList<Task>());
+				}
+				return superlist;
+			}
 		}
 
 		return superlist;
@@ -175,26 +156,22 @@ public class Storage {
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
 	 * <br>- Index 7 is reserved for the ACTION list and is not saved to disk because it is session-dependent.
 	 * @param superlist the list of tasklists to be saved
-	 * @throws StorageException contains the last saved tasklist
+	 * @throws IOException
 	 */
-	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws Exception {
-		assert (superlist.size() == LogicMemory.NUM_TASK_LISTS);
+	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
+		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
-		for (TasklistEnum e : TasklistEnum.values()) {
-			ArrayList<Task> listToSave = superlist.get(e.index());
-			File dest = new File(directory, e.filename());
-			try {
-				storageWriter.saveTasklist(listToSave, dest);
-			} catch (IOException ioe) {
-				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-				throw new Exception();
-			}
+		for (TasklistEnum tasklist : TasklistEnum.values()) {
+			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+			File dest = new File(directory, tasklist.filename());
+			storageWriter.saveTasklist(listToSave, dest);
 		}
 	}
 
-    /*==============================*
-     * Load/Save tags - new methods *
-     *==============================*/
+
+    /*================*
+     * Load/Save tags *
+     *================*/
 	/**
      * Returns the ArrayList of Tags loaded from Storage.
      * An empty ArrayList is returned if the tags file was not found.
@@ -210,41 +187,12 @@ public class Storage {
      * @param tags the ArrayList containing the user-defined tags
      * @throws IOException in case Logic wants to handle the exception
      */
-    public boolean saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+    public void saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+    	assert (tags != null);
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-		return true; 
     }
 	
-    /*=================================*
-     * Load/Save tags - Legacy methods *
-     *=================================*/
-	/**
-     * Returns a HashMap the containing user-defined tags loaded from Storage.
-     * An empty HashMap is returned if the tags file was not found.
-     * @return the HashMap read from file, or an empty HashMap if the file was not found
-     */
-    public HashMap<String, Integer> loadTags() {
-    	File src = new File(directory, FILENAME_TAGS);
-    	return storageReader.loadTags(src);
-    }
-
-    /**
-     * Saves the given HashMap containing user-defined tags to Storage.
-     * @param tags the HashMap that maps tag strings to their corresponding multiplicities
-     * @return true if save was successful; false otherwise
-     */
-    public boolean saveTags(HashMap<String, Integer> tags) {
-    	File dest = new File(directory, FILENAME_TAGS);
-    	try {
-    		storageWriter.saveTags(tags, dest);
-        	return true;
-    	} catch (IOException e) {
-    		//throw new StorageException(e, history.peekTags()); //TODO: KIV
-    		return false;
-    	}
-    }
-
 
     /*=====================*
      * Set/get directories *
@@ -280,11 +228,13 @@ public class Storage {
 			// Compare the new directory with the old to see if it should be saved and moved
 			if (isNewDirectory(dir)) {
 	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+	    		//TODO check for existing files: move them only if the new dir does not have existing savefiles OR it contains invalid savefiles that can be overwritten
+	    		//TODO else if there are existing and valid savefiles, load them
 				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
 	    	}
 			
 			directory = dir;
-			//System.out.println("{Storage directory set} " + getDirectory()); //debug info
+			System.out.println("{Storage directory set} " + directory.getAbsolutePath());
 			return true;
 		} else {
 			return false;
@@ -301,9 +251,7 @@ public class Storage {
     	// If directory == null, then dir must be the default directory, which we do not want to save
     	if (directory != null) {
 			// If the new dir is different from the old directory
-    		System.out.println(dir.getAbsolutePath());
-    		System.out.println(directory.getAbsolutePath());
-    		if (! dir.getAbsolutePath().equals(directory.getAbsolutePath()) ) {
+    		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
     			return true;
     		}
     	}
@@ -334,9 +282,9 @@ public class Storage {
     	}
     	
 		if (isSuccessful) {
-			System.out.println("{Storage files moved}"); //debug info
+			System.out.println("{Storage files moved}");
 		} else {
-			System.out.println("Error moving directory"); //debug info
+			System.out.println("Error moving directory");
 		}
     	return isSuccessful;
     }

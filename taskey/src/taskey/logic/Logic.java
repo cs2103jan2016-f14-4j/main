@@ -119,7 +119,6 @@ public class Logic {
 				cmd = new UpdateByIndexChangeBoth(currentContent, po.getIndex(), po.getNewTaskName(), po.getTask());
 				return executeUpdate(po, cmd);
 			
-			
 			case "VIEW_BASIC":
 				cmd = new ViewBasic(po.getViewType().get(0));
 				return executeView(po, cmd);
@@ -131,8 +130,8 @@ public class Logic {
 			case "UNDO":
 				return executeUndo(po);
 				
-			/*case "ERROR":
-				return new LogicFeedback(originalCopy, po, new LogicException(po.getErrorType()));*/
+			case "ERROR":
+				return new LogicFeedback(getAllTaskLists(), po, new LogicException(po.getErrorType()));
 				
 			case "SEARCH":
 				cmd = new Search(po.getSearchPhrase());
@@ -142,7 +141,7 @@ public class Logic {
 				break;
 		}
 
-		return null; // Stub
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_ERROR_COMMAND_EXECUTION));
 	}
 	
     //================================================================================

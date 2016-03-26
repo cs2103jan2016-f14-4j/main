@@ -44,10 +44,10 @@ class StorageWriter {
     	File dest = new File(filename);
     	try {
     		writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
-    		System.out.println("{New storage directory saved}"); //debug info
+    		System.out.println("{New storage directory saved}");
     	} catch (IOException e) {
     		e.printStackTrace();
-    		System.out.println("{Error saving new directory}"); //debug info
+    		System.out.println("{Error saving new directory}");
     	}
     }
 
@@ -83,26 +83,6 @@ class StorageWriter {
     void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
     	try {
     		writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    		throw e;
-    	}
-    }
-
-    /*============================*
-     * Save tags - Leagacy method *
-     *============================*/
-    /**
-     * Deprecated
-     * Saves the given HashMap containing user-defined tags to the File dest.
-     * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
-     * @param tags HashMap that maps tag strings to their corresponding multiplicities
-     * @param dest the destination file to be written to
-     * @throws IOException when there is error writing to file
-     */
-    void saveTags(HashMap<String, Integer> tags, File dest) throws IOException {
-    	try {
-    		writeToFile(dest, tags, new TypeToken<HashMap<String, Integer>>() {});
     	} catch (IOException e) {
     		e.printStackTrace();
     		throw e;

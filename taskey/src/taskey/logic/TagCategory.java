@@ -80,20 +80,47 @@ public class TagCategory implements Comparable<TagCategory> {
 		return false; 
 	}
 	
+	// @@author A0134177E
 	@Override
-	/**
-	 * @@author A0134177E
-	 * Overriding this method for ArrayList's .contains() method 
-	 */
-    public boolean equals(Object object) {
-        if (object != null && object instanceof TagCategory) {
-        	TagCategory other = (TagCategory) object;
-            if (this.tagName.equals(other.getTagName())) {
-            	return (this.numTags == other.numTags);
-            }
-        }
-        return false;
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + numTags;
+		result = prime * result + ((tagName == null) ? 0 : tagName.hashCode());
+		
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (obj == null) {
+			return false;
+		}
+		
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		
+		TagCategory other = (TagCategory) obj;
+		
+		if (numTags != other.numTags) {
+			return false;
+		}
+		
+		if (tagName == null) {
+			if (other.tagName != null) {
+				return false;
+			}
+		} else if (!tagName.equals(other.tagName)) {
+			return false;
+		}
+		
+		return true;
+	}
 
 	@Override
 	//@@author A0107345L

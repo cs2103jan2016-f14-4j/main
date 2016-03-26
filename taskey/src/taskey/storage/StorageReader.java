@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -72,7 +71,7 @@ class StorageReader {
 			tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
 			verifyTasklist(tasklist);
 		} catch (FileNotFoundException e) {
-			System.out.println("{Tasklist not found} " + src.getName());
+			System.out.println("{A tasklist was not found} " + src.getName());
 			throw e;
 		} catch (InvalidTaskException e) {
 			System.out.println("{Tasklist invalid} " + src.getName());
@@ -107,33 +106,8 @@ class StorageReader {
     	ArrayList<TagCategory> tags;
     	try {
     		tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-    		System.out.println("{Tags loaded} " + src.getName());
     	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName());
     		tags = new ArrayList<TagCategory>();
-    	}
-    	return tags;
-    }
-    
-
-    /*===========================*
-     * Load tags - Legacy method *
-     *===========================*/
-    /**
-     * Deprecated
-     * Returns a HashMap containing the user-defined tags read from the File src.
-     * An empty HashMap is returned if src was not found.
-     * @param src source file to be read
-     * @return the HashMap read from file, or an empty HashMap if the file was not found
-     */
-    HashMap<String, Integer> loadTags(File src) {
-    	HashMap<String, Integer> tags;
-    	try {
-    		tags = readFromFile(src, new TypeToken<HashMap<String, Integer>>() {});
-    		System.out.println("{Tags loaded} " + src.getName());
-    	} catch (FileNotFoundException e) {
-    		System.out.println("{Tags not found} " + src.getName());
-    		tags = new HashMap<String, Integer>();
     	}
     	return tags;
     }

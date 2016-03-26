@@ -20,14 +20,13 @@ import taskey.storage.StorageReader.InvalidTaskException;
 public class Storage {
 	private StorageReader storageReader;
 	private StorageWriter storageWriter;
-	private History history;
 	private File directory;
 
 	private static final String DEFAULT_DIRECTORY = "Taskey savefiles";
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	private static final String FILENAME_EXTENSION = ".taskey";
-	private static final int NUM_LISTS_FROM_LOGIC = 8;
+	private static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
 	public enum TasklistEnum {
 		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
@@ -105,22 +104,16 @@ public class Storage {
 	 */
 	public Storage() {
 		storageReader = new StorageReader();
-		storageWriter = new StorageWriter();
-		history = new History();
+		storageWriter = new StorageWriter();;
 		directory = storageReader.loadDirectory(FILENAME_CONFIG);
 
 		if (directory == null) {
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
-    		System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
+    		//System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
-
-    public History getHistory() {
-    	return history;
-    }
-
 
     /*=====================*
      * Load/Save tasklists *
@@ -131,7 +124,7 @@ public class Storage {
 	 * <p>Post-conditions:
 	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
 	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
-	 * <br>- If any single list was not found, or is invalid, an empty superlist is returned.
+	 * <br>- If any one list was not found, or is invalid, an empty superlist is returned.
 	 * @return the superlist of tasklists read from disk, or an empty superlist
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
@@ -150,7 +143,7 @@ public class Storage {
 				return superlist;
 			}
 		}
-		// Logic will add this loaded list to History
+
 		return superlist;
 	}
 
@@ -163,22 +156,16 @@ public class Storage {
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
 	 * <br>- Index 7 is reserved for the ACTION list and is not saved to disk because it is session-dependent.
 	 * @param superlist the list of tasklists to be saved
-	 * @throws StorageException contains the last saved tasklist
+	 * @throws IOException
 	 */
-	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws StorageException {
-		assert (superlist.size() == NUM_LISTS_FROM_LOGIC);
+	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
+		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			try {
-				ArrayList<Task> listToSave = superlist.get(tasklist.index());
-				File dest = new File(directory, tasklist.filename());
-				storageWriter.saveTasklist(listToSave, dest);
-			} catch (IOException ioe) {
-				// When exception is encountered during write-after-modified, throw the last-modified superlist to Logic.
-				throw new StorageException(ioe, history.peek()); //TODO retire StorageException
-			}
+			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+			File dest = new File(directory, tasklist.filename());
+			storageWriter.saveTasklist(listToSave, dest);
 		}
-		history.add(superlist);
 	}
 
 
@@ -204,7 +191,6 @@ public class Storage {
     	assert (tags != null);
     	File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-    	history.addTagList(tags);
     }
 	
 

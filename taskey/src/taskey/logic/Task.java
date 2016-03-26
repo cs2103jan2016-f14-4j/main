@@ -63,6 +63,34 @@ public class Task implements Comparable<Task> {
 		this.taskTags = taskTags;
 	}
 	
+	public Task(Task other) {
+		if (other.taskName != null) {
+			taskName = other.taskName;
+		}
+		
+		if (other.taskTags != null) {
+			taskTags = new ArrayList<String>(other.taskTags);
+		}
+		
+		priority = other.priority;
+		
+		if (other.taskType != null) {
+			taskType = other.taskType;
+			
+			switch(taskType) {
+				case "FLOATING":
+					//nothing else to add. 
+					break;
+				case "DEADLINE":
+					setDeadline(other.getDeadlineEpoch());
+					break;
+				case "EVENT":
+					setStartDate(other.getStartDateEpoch());
+					setEndDate(other.getEndDateEpoch());
+					break; 
+			}
+		}	
+	}	
 	
 	//BASIC GET/SET METHODS =====================================
 	
@@ -339,42 +367,6 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
-	/**
-	 * Get a duplicate of this task object at a different address 
-	 * @return duplicate of this task object at a different address
-	 */
-	public Task getDuplicate() {
-		Task duplicate = new Task();
-		
-		if (taskName != null) {
-			duplicate.setTaskName(new String(taskName));
-		}
-		
-		if (taskTags != null) {
-			duplicate.setTaskTags(new ArrayList<String>(taskTags));
-		}
-		
-		duplicate.setPriority(new Integer(priority));
-		
-		if (taskType != null) {
-			duplicate.setTaskType(this.getTaskType());
-			
-			switch(taskType) {
-				case "FLOATING":
-					//nothing else to add. 
-					break;
-				case "DEADLINE":
-					duplicate.setDeadline(new Long(this.getDeadlineEpoch()));
-					break;
-				case "EVENT":
-					duplicate.setStartDate(new Long(this.getStartDateEpoch()));
-					duplicate.setEndDate(new Long(this.getEndDateEpoch()));
-					break; 
-			}
-		}	
-		return duplicate; 
-	}
-	
 	@Override
 	/**
 	 * tasks are comparable by their start time. 
@@ -479,30 +471,92 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
-	
-	/**
-	 * @@author A0134177E
-	 * Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.
-	 * used for UPDATE_BY_NAME and DELETE_BY_NAME
-	 * @param anotherTask
-	 * @return true if the two Tasks are equal
-	 */
+	// @@author A0134177E
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(datesEpoch);
+		result = prime * result + Arrays.hashCode(datesHuman);
+		result = prime * result + ((taskName == null) ? 0 : taskName.hashCode());
+		result = prime * result + ((taskType == null) ? 0 : taskType.hashCode());
+		
+		return result;
+	}
+
+	// Two Tasks are considered to be equal if and only if they have the same name, task type, and dates.
+	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Task)) {
-		    return false;
-		  }
+		if (this == obj) {
+			return true;
+		}
+		
+		if (obj == null) {
+			return false;
+		}
+		
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 		
 		Task other = (Task) obj;
 		
-		// All Task objects are created by Parser, and should not have a null task name or task type
-		assert(taskName != null && other.taskName != null); 
-		assert(taskType != null && other.taskType != null);
-		
-		if (taskName.equals(other.taskName) && taskType.equals(other.taskType)) {
-			return (Arrays.equals(datesEpoch, other.datesEpoch) && Arrays.equals(datesHuman, other.datesHuman));
+		if (taskName == null) {
+			if (other.taskName != null) {
+				return false;
+			}
+		} else if (!taskName.equals(other.taskName)) {
+			return false;
 		}
 		
-		return false;
+		if (taskType == null) {
+			if (other.taskType != null) {
+				return false;
+			}
+		} else if (!taskType.equals(other.taskType)) {
+			return false;
+		}
+		
+		if (!Arrays.equals(datesEpoch, other.datesEpoch)) {
+			return false;
+		}
+		
+		if (!Arrays.equals(datesHuman, other.datesHuman)) {
+			return false;
+		}
+			
+		return true;
+	}
+	
+	// Returns true if and only if the task is expired, according to the current time on the user's computer clock.
+	public boolean isExpired() {
+		long currTime = timeConverter.getCurrTime();
+		
+		if (taskType.equals("DEADLINE")) { // TODO: remove magic strings
+			long deadline = getDeadlineEpoch();
+			return (deadline < currTime);
+		} else if (taskType.equals("EVENT")) {
+			long endDate = getEndDateEpoch();
+			return (endDate < currTime);
+		} else { // Floating tasks are never expired
+			return false;
+		}
+	}
+	
+	// Returns true if and only if the task is occurring this week, according to the current time on the user's computer 
+	// clock.
+	public boolean isThisWeek() {
+		long currTime = timeConverter.getCurrTime();
+		
+		if (taskType.equals("DEADLINE")) { // TODO: remove magic strings
+			long deadline = getDeadlineEpoch();
+			return (timeConverter.isSameWeek(currTime, deadline));
+		} else if (taskType.equals("EVENT")) {
+			long startDate = getStartDateEpoch();
+			return (timeConverter.isSameWeek(currTime, startDate));
+		} else { // Floating tasks are never this week
+			return false;
+		}
 	}
 	
 	@Override 

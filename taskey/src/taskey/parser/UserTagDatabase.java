@@ -116,7 +116,7 @@ public class UserTagDatabase {
 	 * Save the tag hash map into a file for persistent storage. 
 	 * @return true if save was successful; false otherwise
 	 */
-	public boolean saveTagDatabase() {
+	/*public boolean saveTagDatabase() {
 		try {
 			db.saveTaglist(cloneTagList(userTags));
 			return true;
@@ -124,7 +124,7 @@ public class UserTagDatabase {
 			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 
 		} 
-	}
+	}*/
 	
 	public ArrayList<TagCategory> cloneTagList(ArrayList<TagCategory> tagList) {
 		ArrayList<TagCategory> clone = new ArrayList<TagCategory>();

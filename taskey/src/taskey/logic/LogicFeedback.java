@@ -7,22 +7,20 @@ import java.util.ArrayList;
  * This class is the default feedback mechanism from Logic to UI.
  * Objects of this class encapsulate ArrayLists of Task objects for updating the UI display,
  * a ProcessedObject which by itself encapsulates information on the executed command and its associated
- * task, and an Exception reflect the outcome of command execution.
- * 
- * @author Hubert
+ * task, and an Exception reflecting the outcome of command execution.
  */
 public class LogicFeedback {
 	private ArrayList<ArrayList<Task>> taskLists;
 	private ProcessedObject po;
-	private Exception e;
+	private LogicException le;
 	
 	/** This is the only constructor for the LogicFeedback class. taskLists and po should not be null.
 	 * 
 	 * @param taskLists  a list of task lists for the purposes of updating the UI display
 	 * @param po         an object encapsulating information on the executed command and its associated task
-	 * @param e          an exception containing an error message. If not error occurred, this will be null.
+	 * @param le         an exception containing a message to reflect the outcome of command execution. It can be null.
 	 */
-	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, Exception e) {
+	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, LogicException le) {
 		assert (taskLists != null);
 		assert (taskLists.size() == 8); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
@@ -30,7 +28,7 @@ public class LogicFeedback {
 		
 		this.taskLists = taskLists;
 		this.po = po;
-		this.e = e;
+		this.le = le;
 	}
 
 	public ArrayList<ArrayList<Task>> getTaskLists() {
@@ -51,51 +49,11 @@ public class LogicFeedback {
 		this.po = po;
 	}
 
-	public Exception getException() {
-		return e;
+	public LogicException getException() {
+		return le;
 	}
 	
-	protected void setException(Exception e) {
-		this.e = e;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof LogicFeedback)) {
-			System.out.println("Objects not of the same type");
-		    return false;
-		  }
-		
-		LogicFeedback other = (LogicFeedback) obj;
-		
-		if (this.taskLists.size() != other.taskLists.size()) {
-			System.out.println("List sizes not equal");
-			System.out.println(this.taskLists.size());
-			System.out.println(other.taskLists.size());
-			return false;
-		}
-		
-		//Check if both objects' task lists are equal and in the same order
-		for (int i = 0; i < this.taskLists.size(); i++) {
-			if (!(this.taskLists.get(i).equals(other.taskLists.get(i)))) {
-				System.out.println("Lists unequal at list index " + i);
-				System.out.println(this.taskLists.get(i));
-				System.out.println(other.taskLists.get(i));
-				return false;
-			}
-		}
-		
-		if (!po.equals(other.po)) {
-			System.out.println("Processed objects not equal");
-			return false;
-		}
-		
-		if (e == null && other.e != null || e != null 
-			&& (other.e == null || !e.getMessage().equals(other.e.getMessage()))) {
-			System.out.println("Exceptions not equal");
-			return false;
-		}
-		
-		return true;
+	protected void setException(LogicException le) {
+		this.le = le;
 	}
 }

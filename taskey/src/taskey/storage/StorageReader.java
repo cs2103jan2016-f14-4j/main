@@ -44,9 +44,9 @@ class StorageReader {
     File loadDirectory(String filename) {
     	File src = new File(filename);
     	try {
-    		//TODO: buggyPath will somehow always have user.dir prefixed in the actual pathname
+    		//TODO: buggyPath will somehow always have user.dir prefixed in its absolute path
     		File buggyPath = readFromFile(src, new TypeToken<File>() {});
-    		File fixedPath = new File(buggyPath.getPath());
+    		File fixedPath = new File(buggyPath.getPath()); //hackey solution
     		return fixedPath;
     	} catch (FileNotFoundException e) {
     		return null;
@@ -71,7 +71,7 @@ class StorageReader {
 			tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
 			verifyTasklist(tasklist);
 		} catch (FileNotFoundException e) {
-			System.out.println("{A tasklist was not found} " + src.getName());
+			System.out.println("{At least one tasklist file was not found} " + src.getName());
 			throw e;
 		} catch (InvalidTaskException e) {
 			System.out.println("{Tasklist invalid} " + src.getName());

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,7 +43,7 @@ class StorageWriter {
     	File dest = new File(filename);
     	try {
     		writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
-    		System.out.println("{New storage directory saved}");
+    		//System.out.println("{New storage directory saved}");
     	} catch (IOException e) {
     		e.printStackTrace();
     		System.out.println("{Error saving new directory}");

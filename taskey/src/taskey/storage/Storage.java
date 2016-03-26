@@ -3,10 +3,12 @@ package taskey.storage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
@@ -22,7 +24,7 @@ public class Storage {
 	private StorageWriter storageWriter;
 	private File directory;
 
-	private static final String DEFAULT_DIRECTORY = "Taskey savefiles";
+	private static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
 	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	private static final String FILENAME_EXTENSION = ".taskey";
@@ -30,40 +32,61 @@ public class Storage {
 
 	public enum TasklistEnum {
 		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
-	    PENDING		("PENDING.taskey", 1),
-	    EXPIRED		("EXPIRED.taskey", 2),
-	    GENERAL		("GENERAL.taskey", 3),	//
-	    DEADLINE	("DEADLINE.taskey", 4),	//
-	    EVENT		("EVENT.taskey", 5),	//
-	    COMPLETED	("COMPLETED.taskey", 6);
+		PENDING		("PENDING.taskey", 1),
+		EXPIRED		("EXPIRED.taskey", 2),
+		GENERAL		("GENERAL.taskey", 3),	//
+		DEADLINE	("DEADLINE.taskey", 4),	//
+		EVENT		("EVENT.taskey", 5),	//
+		COMPLETED	("COMPLETED.taskey", 6);
 
-	    private final String filename;
-	    private final int index;
-	    private static final int size = TasklistEnum.values().length;
+		private static final int size = TasklistEnum.values().length;
+		public static int size() {
+			return size;
+		}
 
-	    TasklistEnum(String filename, int index) {
-	        this.filename = filename;
-	        this.index = index;
-	    }
+		private final String filename;
+		private final int index;
 
-	    public String filename() {
-	    	return filename;
-	    }
-	    public int index() {
-	    	return index;
-	    }
-	    public static int size() {
-	    	return size;
-	    }
-	    
-	    public static boolean contains(String filename) {
-	    	for (TasklistEnum e : TasklistEnum.values()) {
-	    		if (e.filename.equals(filename)) {
-	    			return true;
-	    		}
-	    	}
-	    	return false;
-	    }
+		TasklistEnum(String filename, int index) {
+			this.filename = filename;
+			this.index = index;
+		}
+
+		public String filename() {
+			return filename;
+		}
+
+		public int index() {
+			return index;
+		}
+
+		/**
+		 * Checks whether TasklistEnum contains the given filename string.
+		 * @param fileName
+		 * @return
+		 */
+		public static boolean contains(String fileName) {
+			for (TasklistEnum e : TasklistEnum.values()) {
+				if (e.filename.equals(fileName)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Get the corresponding index of the given filename string.
+		 * @param fileName
+		 * @return
+		 */
+		public static int indexOf(String fileName) {
+			for (TasklistEnum e : TasklistEnum.values()) {
+				if (e.filename.equals(fileName)) {
+					return e.index;
+				}
+			}
+			return -1;
+		}
 	}
 
 	/**
@@ -74,13 +97,17 @@ public class Storage {
 		Storage storage = new Storage();
 
 		// Can optionally set the directory again, if requested by user.
-		System.out.println(storage.setDirectory("c:\\taskey"));
+		//System.out.println(storage.setDirectory("c:\\taskey"));
 
-		// Initialize - tasklist
+		// Initialize tasklists
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
 
+	/**
+	 * For testing
+	 * @param lists
+	 */
 	private static void print(ArrayList<ArrayList<Task>> lists) {
 		int i=1;
 		for (ArrayList<Task> list : lists) {
@@ -93,9 +120,9 @@ public class Storage {
 	}
 
 
-    /*=============*
-     * Constructor *
-     *=============*/
+	/*=============*
+	 * Constructor *
+	 *=============*/
 	/**
 	 * Storage constructor and initializer.
 	 * Attempts to load and set the last used directory.
@@ -104,21 +131,26 @@ public class Storage {
 	 */
 	public Storage() {
 		storageReader = new StorageReader();
-		storageWriter = new StorageWriter();;
-		directory = storageReader.loadDirectory(FILENAME_CONFIG);
+		storageWriter = new StorageWriter();
 
-		if (directory == null) {
-    		setDirectory(DEFAULT_DIRECTORY);
+		File loadedDirectory = storageReader.loadDirectory(FILENAME_CONFIG);
+		if (loadedDirectory == null) {
+			createDirectory(DEFAULT_DIRECTORY);
+			directory = DEFAULT_DIRECTORY;
 		} else {
-    		//System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
-			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
+			if (createDirectory(loadedDirectory) == true) {
+				directory = loadedDirectory;
+				System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
+			} else { //loaded directory is invalid
+				directory = DEFAULT_DIRECTORY;
+			}
 		}
-    }
+	}
 
-    /*=====================*
-     * Load/Save tasklists *
-     *=====================*/
-    /**
+	/*=====================*
+	 * Load/Save tasklists *
+	 *=====================*/
+	/**
 	 * Returns the superlist of tasklists loaded from Storage.
 	 * Logic calls this on program startup.
 	 * <p>Post-conditions:
@@ -143,7 +175,6 @@ public class Storage {
 				return superlist;
 			}
 		}
-
 		return superlist;
 	}
 
@@ -169,94 +200,146 @@ public class Storage {
 	}
 
 
-    /*================*
-     * Load/Save tags *
-     *================*/
+	/*================*
+	 * Load/Save tags *
+	 *================*/
 	/**
-     * Returns the ArrayList of Tags loaded from Storage.
-     * An empty ArrayList is returned if the tags file was not found.
-     * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
+	 * Returns the ArrayList of Tags loaded from Storage.
+	 * An empty ArrayList is returned if the tags file was not found.
+	 * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
 	 */
 	public ArrayList<TagCategory> loadTaglist() {
 		File src = new File(directory, FILENAME_TAGS);
 		return storageReader.loadTaglist(src);
 	}
-	
-    /**
-     * Saves the given ArrayList of Tags to Storage.
-     * @param tags the ArrayList containing the user-defined tags
-     * @throws IOException in case Logic wants to handle the exception
-     */
-    public void saveTaglist(ArrayList<TagCategory> tags) throws IOException {
-    	assert (tags != null);
-    	File dest = new File(directory, FILENAME_TAGS);
+
+	/**
+	 * Saves the given ArrayList of Tags to Storage.
+	 * @param tags the ArrayList containing the user-defined tags
+	 * @throws IOException in case Logic wants to handle the exception
+	 */
+	public void saveTaglist(ArrayList<TagCategory> tags) throws IOException {
+		assert (tags != null);
+		File dest = new File(directory, FILENAME_TAGS);
 		storageWriter.saveTaglist(tags, dest);
-    }
-	
+	}
 
-    /*=====================*
-     * Set/get directories *
-     *=====================*/
-    /**
-     * Returns the current storage directory.
-     * When the user asks to change directory, Logic can return it as feedback.
-     * @return absolute path of the default or user-set directory
-     */
-    public String getDirectory() {
-    	return directory.getAbsolutePath();
-    }
 
-    /**
-     * Sets the storage directory to the given pathname string after checking that the path is valid.
-     * This method is invoked by Logic, should the end user request to change it.
-     * <p>Post-conditions:
-     * <br>- Creates the directory if it does not exist yet.
-     * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
-     * <br>- Moves the .taskey storage files from the existing directory to the new one.
-     * @return True if the new directory was successfully created and/or set;
-     * 		   <br>False if the path is invalid due to illegal characters (e.g. *), 
-     * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
-     * @param pathname can be a relative or absolute path
-     */
-    public boolean setDirectory(String pathname) {
-    	File dir = new File(pathname);
+	/*=====================*
+	 * Set/get directories *
+	 *=====================*/
+	/**
+	 * Returns the current storage directory.
+	 * When the user asks to change directory, Logic can return it as feedback.
+	 * @return absolute path of the default or user-set directory
+	 */
+	public String getDirectory() {
+		return directory.getAbsolutePath();
+	}
+
+	/**
+	 * Sets the storage directory to the given pathname string after checking that the path is valid.
+	 * This method is invoked by Logic, should the end user request to change it.
+	 * <p>Post-conditions:
+	 * <br>- Creates the directory if it does not exist yet.
+	 * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
+	 * <br>- Moves the .taskey storage files from the existing directory to the new one, 
+	 * 		 provided the new directory does not contain existing tasklist files.
+	 * @return True if the new directory was successfully created and set;
+	 * 		   <br>False if the path was invalid due to illegal characters (e.g. *), 
+	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
+	 * @param pathname can be a relative or absolute path
+	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists;
+	 * 									  signal Logic to call loadAllTasklists
+	 */
+	public boolean setDirectory(String pathname) throws FileAlreadyExistsException {
+		File dir = new File(pathname);
+		if (createDirectory(dir) == false) {
+			return false;
+		}
+
+		// Compare the new directory with the old to see if it should be moved and saved
+		if (isNewDirectory(dir)) {
+			// Check for existing files in the new dir
+			if (!haveExistingTaskFilesIn(dir)) {
+				// Perform move only if the new dir does not contain existing savefiles
+				moveFiles(directory, dir);
+				storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+			} else {
+				// Else if there are existing savefiles, signal Logic to load them
+				System.out.println("{New directory contains existing tasklist files!}");
+				throw new FileAlreadyExistsException(null);
+			}
+		}
+
+		directory = dir;
+		System.out.println("{Storage directory set} " + directory.getAbsolutePath());
+		return true;
+	}
+
+	/**
+	 * Creates the full path of dir.
+	 * @param dir
+	 * @return true if successful; false otherwise
+	 */
+	private boolean createDirectory(File dir) {
 		if (!dir.exists()) {
-			dir.mkdirs();
+			if (dir.mkdirs() == false) { //mkdirs() failed
+				return false;
+			}
 		}
 
 		if (dir.isDirectory()) {
-			// Compare the new directory with the old to see if it should be saved and moved
-			if (isNewDirectory(dir)) {
-	    		storageWriter.saveDirectory(dir, FILENAME_CONFIG);
-	    		//TODO check for existing files: move them only if the new dir does not have existing savefiles OR it contains invalid savefiles that can be overwritten
-	    		//TODO else if there are existing and valid savefiles, load them
-				moveFiles(directory.getAbsoluteFile(), dir.getAbsoluteFile());
-	    	}
-			
-			directory = dir;
-			System.out.println("{Storage directory set} " + directory.getAbsolutePath());
 			return true;
 		} else {
 			return false;
 		}
-    }
+	}
 
-    /**
-     * Private helper method. Checks whether dir is a new/different directory that should be saved.
-     * This check is done to avoid unnecessary calls to saveDirectory().
-     * @param dir the new candidate directory
-     * @return true if dir is a new directory; false otherwise
-     */
-    private boolean isNewDirectory(File dir) {
-    	// If directory == null, then dir must be the default directory, which we do not want to save
-    	if (directory != null) {
+	/**
+	 * Private helper method. Checks whether dir is a new/different directory that should be saved.
+	 * This check is done to avoid unnecessary calls to saveDirectory().
+	 * @param dir the new candidate directory
+	 * @return true if dir is a new directory; false otherwise
+	 */
+	private boolean isNewDirectory(File dir) {
+		if (directory != null) {
 			// If the new dir is different from the old directory
-    		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
-    			return true;
-    		}
-    	}
-    	return false;
-    }
+			if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if the given directory contains a full set of existing tasklists.
+	 * @param dir
+	 * @return true if dir contains the full set of tasklist files; false otherwise
+	 */
+	private boolean haveExistingTaskFilesIn(File dir) {
+		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
+
+		// dir is empty
+		if (dir.listFiles().length == 0) {
+			return false;
+		}
+
+		for (File file : dir.listFiles()) {
+			String filename = file.getName();
+			//System.out.println(filename);
+			if (TasklistEnum.contains(filename)) {
+				//System.out.println(TasklistEnum.indexOf(filename) + ". " + filename);
+				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
+			}
+		}
+
+		if (!Arrays.asList(tasklistFlags).contains(false)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Moves the .taskey savefiles in the existing directory to the new one.
@@ -264,28 +347,28 @@ public class Storage {
 	 * @param destDir the destination diectory
 	 * @returns TODO: error handling?
 	 */
-    private boolean moveFiles(File srcDir, File destDir) {
-    	boolean isSuccessful = true;
-    	    	
-    	for (File srcFile : srcDir.listFiles()) {
-        	if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
-        		Path srcPath = srcFile.toPath();
-        		Path destPath = destDir.toPath().resolve(srcFile.getName());
+	private boolean moveFiles(File srcDir, File destDir) {
+		boolean isSuccessful = true;
 
-            	try {
-        			Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
-        		} catch (IOException e) {
-        			isSuccessful = false;
-        			e.printStackTrace();
-        		}
-        	}
-    	}
-    	
+		for (File srcFile : srcDir.listFiles()) {
+			if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
+				Path srcPath = srcFile.toPath();
+				Path destPath = destDir.toPath().resolve(srcFile.getName());
+
+				try {
+					Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					isSuccessful = false;
+					e.printStackTrace();
+				}
+			}
+		}
+
 		if (isSuccessful) {
 			System.out.println("{Storage files moved}");
 		} else {
-			System.out.println("Error moving directory");
+			System.out.println("{IOException moving directory}");
 		}
-    	return isSuccessful;
-    }
+		return isSuccessful;
+	}
 }

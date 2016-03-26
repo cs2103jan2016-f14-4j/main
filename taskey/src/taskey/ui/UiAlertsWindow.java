@@ -1,34 +1,24 @@
 package taskey.ui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.geometry.Side;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -37,17 +27,12 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.Window;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ActionMode;
-import taskey.constants.UiConstants.ContentBox;
-import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiAnimationManager;
-import taskey.ui.utility.UiImageManager;
 
 /**
  * @@author A0125419H
@@ -56,7 +41,7 @@ import taskey.ui.utility.UiImageManager;
  * @author Junwei
  *
  */
-public class UiAlertController {
+public class UiAlertsWindow {
 
 	@FXML
 	private ScrollPane scrollPane;
@@ -68,12 +53,12 @@ public class UiAlertController {
 	private ArrayList<Boolean> isSlotFree = new ArrayList<Boolean>();
 	private int MAX_SLOTS = 10;
 	
-	private static UiAlertController instance = null;
-	private UiAlertController(){
+	private static UiAlertsWindow instance = null;
+	private UiAlertsWindow(){
 	}
-	public static UiAlertController getInstance() {
+	public static UiAlertsWindow getInstance() {
 		if ( instance == null ) {
-			instance = new UiAlertController();
+			instance = new UiAlertsWindow();
 		}
 		return instance;
 	}

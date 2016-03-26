@@ -1,7 +1,6 @@
 package taskey.ui;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javafx.application.Application;
@@ -14,15 +13,10 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ActionMode;
-import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.logic.Task;
-import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiPopupManager;
 
 /**
  * @@author A0125419H
@@ -68,10 +62,10 @@ public class UiMain extends Application {
 		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 		// set up alert window
-		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
+		UiAlertsWindow.getInstance().setUpStage(loadFXML(UiAlertsWindow.getInstance(),UiConstants.FXML_ALERT_PATH));
 		trayModule = new UiTrayModule();
 		trayModule.initTrayVariables(primaryStage);
-		trayModule.createLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
+		trayModule.createLinkage(primaryStage, UiAlertsWindow.getInstance().getStage()); 
 	}
 	
 	/**

@@ -39,6 +39,8 @@ public class UiClockService extends ScheduledService<Void> {
 					@Override
 					public void run() {		
 						//timeLabelRef.setText(formatTime(cal)); (Time will not be in the program for now)
+						taskey.logic.Task t = new taskey.logic.Task(); // to do, prompt for expiring tasks
+						UiAlertsWindow.getInstance().addEntry(t);
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}
 				});

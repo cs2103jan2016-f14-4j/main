@@ -42,14 +42,14 @@ public class UiTrayModule {
 			@Override
 			public void handle(WindowEvent t) {	
 				hide(main);
-				UiAlertController.getInstance().show();
+				UiAlertsWindow.getInstance().show();
 			}
 		});
 		
 		alerts.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
-				UiAlertController.getInstance().hide();
+				UiAlertsWindow.getInstance().hide();
 				main.show();
 			}
 		});
@@ -75,7 +75,7 @@ public class UiTrayModule {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							UiAlertController.getInstance().hide();
+							UiAlertsWindow.getInstance().hide();
 							stage.show();
 						}
 					});

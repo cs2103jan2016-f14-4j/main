@@ -8,7 +8,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
@@ -49,7 +48,8 @@ public class UiPopupManager {
 	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY, boolean deleteAfter) {
 		assert(node != null);
 		Popup newPopup = new Popup();
-		Bounds screenBounds = getScreenBoundsOfNode(node);
+		Bounds bounds = node.getBoundsInLocal();
+		Bounds screenBounds = node.localToScreen(bounds);
 		Label content = new Label();
 		content.setScaleX(X_Ratio);
 		content.setScaleY(Y_Ratio);
@@ -103,13 +103,6 @@ public class UiPopupManager {
 		newPopup.getContent().add(container);
 		popupList.add(newPopup);
 		return newPopup;
-	}
-
-	public Bounds getScreenBoundsOfNode(Node node) {
-		assert(node != null);
-		Bounds bounds = node.getBoundsInLocal();
-		Bounds screenBounds = node.localToScreen(bounds);
-		return screenBounds;
 	}
 	
 	public void removePopup(Popup thePopup) {

@@ -75,6 +75,7 @@ public class UiImageManager {
 		loadTagMenuImages();
 		loadViewMenuImages();
 	}
+	
 	private void loadAddMenuImages() {
 		myImageContainer.put(IMAGE_ID.ADD_FLOAT, 
 				new Image(getClass().getResourceAsStream(helpFolder + "addFloat.png")));

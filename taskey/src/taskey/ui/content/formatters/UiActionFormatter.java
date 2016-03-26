@@ -20,7 +20,7 @@ import taskey.ui.content.UiTextBuilder;
 
 /**
  * @@author A0125419H
- * This class is responsible to formatting the Action Tab
+ * This class is responsible to formatting the Action Content box
  * It provides additional functions like the help menu
  * @author junwei
  */
@@ -29,7 +29,7 @@ public class UiActionFormatter extends UiFormatter {
 	private UiTaskView taskView;
 	private UiHelpView helpView;
 	private UiPagination currentView;
-	private int entriesPerPage = 6;
+	private static final int entriesPerPage = 6;
 	
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
@@ -69,22 +69,23 @@ public class UiActionFormatter extends UiFormatter {
 	}
 
 	/**
-	 * Update content based on the mode provided
+	 * Update content mode 
 	 *
-	 * @param myList - the task list
 	 * @param mode - the mode of display
 	 */
-	public void updateContents(ArrayList<Task> myList, ActionMode mode) {
+	public void updateMode(ActionMode mode) {
 		switch ( mode ) {
 			case HELP: 
 				helpView.resetView();
 				currentView = helpView.getView();
 				mainPane.setContent(currentView.getPagination());				
 				break;
-			default:
+			case LIST:
 				currentView = taskView.getView();
 				mainPane.setContent(currentView.getPagination());
-				format(myList);
+				break;
+			default:
+				System.out.println("Mode invalid For ActionFormatter");
 		}
 	}
 	

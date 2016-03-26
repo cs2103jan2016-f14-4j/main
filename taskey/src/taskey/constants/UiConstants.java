@@ -24,7 +24,8 @@ public class UiConstants {
 	public static final String FXML_ALERT_PATH = "alert.fxml";
 	public static final String FXML_LOAD_FAIL = "Fxml file not found";
 	
-	public static final Dimension MIN_SIZE = new Dimension(370,285); // half of original size
+	public static final Dimension WINDOW_MIN_SIZE = new Dimension(370,285); // half of original window size
+	
 	// Content Boxes
 	public enum ContentBox {
 		THIS_WEEK(0), PENDING(1), EXPIRED(2), ACTION(3), CATEGORY(4);
@@ -69,7 +70,7 @@ public class UiConstants {
 		VIEW_GENERAL, VIEW_DEADLINE, VIEW_EVENT;
 	}
 	
-	// For action 5
+	// For action tab
 	public enum ActionMode {
 		LIST, HELP;
 	}
@@ -79,9 +80,10 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 5, 20, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
-	public static final UiGridSettings GRID_SETTINGS_SINGLE = new UiGridSettings(0, 0, 0, 100);
+	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 15, 100);
 	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 80,10);
+	
 	// Resources 
 	// Note that getResourceByStream uses relative Package directory. 
 	// In this case, images has to be a sub package of utility for a runnable JAR to work
@@ -100,7 +102,7 @@ public class UiConstants {
 	public static final String STYLE_CATEGORY_BOX = "categoryBox";
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
-	public static final String STYLE_HELP_SELECTOR = "helpSelector";
+	public static final String STYLE_HELP_MENU_SELECTOR = "helpSelector";
 	public static final String STYLE_PROMPT = "prompt";
 	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
@@ -110,12 +112,26 @@ public class UiConstants {
 			Arrays.asList("sharedStyles.css", "defaultStyle.css", "defaultTab.css" ));
 	public static final ArrayList<String> STYLE_UI_LIGHT = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "lightStyle.css", "lightTab.css" ));
+	public static final ArrayList<String> STYLE_UI_ALERT_WINDOW = new ArrayList<String>(
+			Arrays.asList("sharedStyles.css", "alertStyles.css"));
+	
+	public static String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
+	
+	// Tray
+	public static String TRAY_SHOW_OPTION = "Show Taskey";
+	public static String TRAY_CLOSE_OPTION = "Close Program";
+	public static String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
+	public static String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
+	public static String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";
+	public static String MINIMIZE_MESSAGE_BODY = "Taskey will continue running in the background, click to resume planning your tasks.";
+	
+	// Alert Window
+	public static final int MAX_ALERTS = 10; 
+	public static final float ALERTS_OPACITY = 0.8f;
 	
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	public static final int ClOCK_UPDATE_INTERVAL = 1000; // in milliseconds
-	public static final String PM_SUFFIX = "PM";
-	public static final String AM_SUFFIX = "AM";
-	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation (mostly for feedback pop up)
+	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
 }

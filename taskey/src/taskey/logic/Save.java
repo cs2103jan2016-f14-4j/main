@@ -8,7 +8,7 @@ package taskey.logic;
 final class Save extends Command {
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws LogicException {
+		logicMemory.save();
 	}
 }

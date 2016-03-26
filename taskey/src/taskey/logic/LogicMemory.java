@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import taskey.constants.UiConstants.ContentBox;
 import taskey.storage.Storage;
+import taskey.storage.StorageException;
 
 /**
  * @@author A0134177E
@@ -351,6 +352,19 @@ public class LogicMemory {
 		
 		if (actionList.isEmpty()) {
 			throw new LogicException(LogicException.MSG_ERROR_SEARCH_NOT_FOUND);
+		}
+	}
+	
+	/**
+	 * Saves the current task lists and tag category list in memory to disk.
+	 * @throws LogicException if error occurred during save
+	 */
+	void save() throws LogicException {
+		try {
+			storage.saveAllTasklists(ListCloner.cloneTaskLists(taskLists));
+			storage.saveTaglist(ListCloner.cloneTagCategoryList(tagCategoryList));
+		} catch (Exception e) {
+			throw new LogicException(LogicException.MSG_ERROR_SAVE);
 		}
 	}
 	

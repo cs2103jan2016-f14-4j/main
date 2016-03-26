@@ -77,9 +77,14 @@ public class Logic {
     	String command = po.getCommand();
     	Command cmd;
     	
-    	if (input.equalsIgnoreCase("clear")) { // "clear" command is for developer testing only
+    	if (input.equalsIgnoreCase("clear")) { // TODO: implement "clear" in Parser
     		cmd = new Clear();
 			return executeClear(cmd);
+    	}
+    	
+    	if (input.equalsIgnoreCase("save")) { // TODO: implement "save" in Parser
+    		cmd = new Save();
+			return executeSave(cmd);
     	}
     	
     	switch (command) {
@@ -231,6 +236,16 @@ public class Logic {
 		logicMemory.setTagCategoryList(ListCloner.cloneTagCategoryList(previousTagCategoryList));
 		
 		return new LogicFeedback(getAllTaskLists(), po, null);
+	}
+	
+	private LogicFeedback executeSave(Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), le);
+		}
+		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), 
+				                 new LogicException(LogicException.MSG_SUCCESS_SAVE));
 	}
 	
     //================================================================================

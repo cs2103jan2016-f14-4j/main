@@ -298,19 +298,19 @@ public class LogicMemory {
 	void viewBasic(String viewType) {
 		switch (viewType) {
 			case "general":
-				taskLists.set(INDEX_ACTION, ListCloner.cloneTaskList(taskLists.get(INDEX_FLOATING)));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
 				break;
 			
 			case "deadlines":
-				taskLists.set(INDEX_ACTION, ListCloner.cloneTaskList(taskLists.get(INDEX_DEADLINE)));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
 				break;
 				
 			case "events":
-				taskLists.set(INDEX_ACTION, ListCloner.cloneTaskList(taskLists.get(INDEX_EVENT)));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_EVENT)));
 				break;
 				
 			case "archive":
-				taskLists.set(INDEX_ACTION, ListCloner.cloneTaskList(taskLists.get(INDEX_COMPLETED)));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_COMPLETED)));
 				break;
 				
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.

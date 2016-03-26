@@ -45,7 +45,10 @@ class StorageReader {
     File loadDirectory(String filename) {
     	File src = new File(filename);
     	try {
-    		return readFromFile(src, new TypeToken<File>() {});
+    		//TODO: buggyPath will somehow always have user.dir prefixed in the actual pathname
+    		File buggyPath = readFromFile(src, new TypeToken<File>() {});
+    		File fixedPath = new File(buggyPath.getPath());
+    		return fixedPath;
     	} catch (FileNotFoundException e) {
     		return null;
     	}

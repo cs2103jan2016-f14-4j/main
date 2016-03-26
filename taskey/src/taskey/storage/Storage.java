@@ -75,7 +75,7 @@ public class Storage {
 		Storage storage = new Storage();
 
 		// Can optionally set the directory again, if requested by user.
-		//System.out.println(storage.setDirectory(DEFAULT_DIRECTORY + "\\fubar"));
+		System.out.println(storage.setDirectory("c:\\taskey"));
 
 		// Initialize - tasklist
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
@@ -112,7 +112,7 @@ public class Storage {
 		if (directory == null) {
     		setDirectory(DEFAULT_DIRECTORY);
 		} else {
-    		//System.out.println("{Storage directory loaded}");
+    		System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
 			setDirectory(directory.getPath()); //must call setDirectory to create the folder path
 		}
     }
@@ -248,7 +248,7 @@ public class Storage {
 	    	}
 			
 			directory = dir;
-			System.out.println("{Storage directory set} " + getDirectory());
+			System.out.println("{Storage directory set} " + directory.getAbsolutePath());
 			return true;
 		} else {
 			return false;
@@ -265,7 +265,7 @@ public class Storage {
     	// If directory == null, then dir must be the default directory, which we do not want to save
     	if (directory != null) {
 			// If the new dir is different from the old directory
-    		if (! dir.getAbsolutePath().equals(directory.getAbsolutePath()) ) {
+    		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
     			return true;
     		}
     	}

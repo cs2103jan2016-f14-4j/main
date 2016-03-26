@@ -57,11 +57,13 @@ public class UiPopupManager {
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		newPopup.getContent().add(content);
 		
-		newPopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
+		newPopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
+							screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
 		popupList.add(newPopup);
 		
 		if ( deleteAfter == true ) {
-			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(newPopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(
+					newPopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
 			fade.play();
 			fade.setOnFinished(new EventHandler<ActionEvent>() {
 				@Override

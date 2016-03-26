@@ -38,10 +38,12 @@ public class UiCategoryFormatter extends UiFormatter {
 			gridHelper.createScaledRectInCell(0, i, categoryList.get(i).getA(), currentGrid);
 			// add tag name
 			gridHelper.createStyledCell(1, i, UiConstants.STYLE_CATEGORY_BOX, currentGrid);
-			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryList.get(i).getB()),TextAlignment.LEFT,currentGrid);
+			gridHelper.addTextFlowToCell(1,i,myBuilder.build(categoryList.get(i).getB()),
+															 TextAlignment.LEFT,currentGrid);
 			// add tag numbers
 			gridHelper.createStyledCell(2, i, UiConstants.STYLE_CATEGORY_BOX, currentGrid);
-			gridHelper.addTextFlowToCell(2,i,myBuilder.build(""+ categoryList.get(i).getC()),TextAlignment.CENTER,currentGrid);
+			gridHelper.addTextFlowToCell(2,i,myBuilder.build("" + categoryList.get(i).getC()),
+															 TextAlignment.CENTER,currentGrid);
 		}
 	}
 	

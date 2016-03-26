@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.ui.content.UiGridHelper;
@@ -82,7 +81,8 @@ public class UiHelpView {
 				if ( entryNo >= numCommmands ) {
 					break;
 				}
-				Label current = gridHelper.createLabelInCell( 0, j, headers.get(entryNo), UiConstants.STYLE_PROMPT_SELECTED, newGrid);
+				Label current = gridHelper.createLabelInCell(0, j, headers.get(entryNo), 
+															 UiConstants.STYLE_PROMPT_SELECTED, newGrid);
 				GridPane.setFillWidth(current.getParent(), false);
 				GridPane.setFillHeight(current.getParent(), false);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);

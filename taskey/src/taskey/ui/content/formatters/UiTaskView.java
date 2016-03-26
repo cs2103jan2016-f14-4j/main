@@ -7,7 +7,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Task;
@@ -39,7 +38,7 @@ public class UiTaskView {
 	public UiPagination getView() {
 		return taskView;
 	}
-	public void createPaginationGrids(ArrayList<Task> myTaskList, ArrayList<Triplet<Color,String,Integer>> categoryList, int totalPages) {
+	public void createPaginationGrids(ArrayList<Task> myTaskList, int totalPages) {
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
@@ -54,7 +53,7 @@ public class UiTaskView {
 				entryPane.getChildren().add(paneGrid);
 				
 				Task theTask = myTaskList.get(entryNo);
-				addTaskID(theTask, entryNo, j, categoryList, newGrid); // add to main grid
+				addTaskID(theTask, entryNo, j, newGrid); // add to main grid
 				addTaskDescription(theTask,paneGrid);
 				addImage(theTask,paneGrid);
 				entryNo++;
@@ -66,7 +65,7 @@ public class UiTaskView {
 		taskView.initialize(totalPages); // update UI and bind call back
 	}
 
-	private void addTaskID(Task theTask, int id, int row, ArrayList<Triplet<Color,String,Integer>> categoryList, GridPane theGrid) {
+	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myBuilder = new UiTextBuilder();
 		myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
@@ -80,23 +79,6 @@ public class UiTaskView {
 			default:
 					theColor = Color.GREEN;
 		}
-		/*
-		 * Color theColor = Color.WHITE;
-		for ( int i = 0; i < categoryList.size(); i ++ ) {
-			String tag = theTask.getTaskType();
-			if ( tag != null ) {
-				if ( tag.equals("FLOATING")) { // testing since no tags yet
-					tag = new String("general");
-				} 
-				tag = tag.toLowerCase();
-			}
-			String categoryTag = categoryList.get(i).getB().toLowerCase();
-			if ( categoryTag.contains(tag)) {
-				theColor = categoryList.get(i).getA();
-				break;
-			}
-		}
-		 */
 		gridHelper.createStyledCell(0, row, "", theGrid);
 		gridHelper.createScaledRectInCell(0, row, theColor, theGrid);
 		gridHelper.addTextFlowToCell(0, row, myBuilder.build(line),TextAlignment.CENTER, theGrid);	

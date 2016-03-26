@@ -25,7 +25,6 @@ import taskey.ui.content.formatters.UiDefaultFormatter;
  */
 
 public class UiContentManager {
-	private ArrayList<Triplet<Color,String,Integer>> myCategoryList; // for using to set colors
 	private ArrayList<UiFormatter> myFormatters; // for each content box
 
 	public UiContentManager() {
@@ -67,7 +66,6 @@ public class UiContentManager {
 	public void updateContentBox(ArrayList<Task> myTaskList, ContentBox contentID) {
 		assert(myTaskList != null);
 		UiFormatter myFormatter = myFormatters.get(contentID.getValue());
-		myFormatter.setCategories(myCategoryList);
 		myFormatter.format(myTaskList);
 	}
 	
@@ -91,7 +89,6 @@ public class UiContentManager {
 	 */
 	public void updateCategoryContentBox(ArrayList<Triplet<Color,String,Integer>> categoryList) {
 		assert(categoryList != null);
-		myCategoryList = categoryList;
 		int arrayIndex = ContentBox.CATEGORY.getValue();
 		UiCategoryFormatter myFormatter = (UiCategoryFormatter) myFormatters.get(arrayIndex);
 		myFormatter.updateCategories(categoryList);

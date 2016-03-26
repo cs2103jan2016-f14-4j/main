@@ -85,7 +85,8 @@ public class UiAlertsWindow {
 	private void setUpScene() {
 		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
         for ( int i = 0; i < UiConstants.STYLE_UI_ALERT_WINDOW.size(); i++ ) {
-        	myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + UiConstants.STYLE_UI_ALERT_WINDOW.get(i)).toExternalForm());
+        	myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET 
+        										     + UiConstants.STYLE_UI_ALERT_WINDOW.get(i)).toExternalForm());
         }
         theGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT);
         theGrid.setAlignment(Pos.BOTTOM_CENTER);

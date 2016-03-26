@@ -112,7 +112,8 @@ public class UiTrayModule {
 		}
 		int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
 
-		trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH), UiConstants.PROGRAM_NAME, popup);
+		trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH), 
+																UiConstants.PROGRAM_NAME, popup);
 
 		// set the TrayIcon properties
 		trayIcon.addActionListener(showListener);
@@ -126,7 +127,8 @@ public class UiTrayModule {
 	}
 
 	private void showProgramIsMinimizedMsg() {
-		trayIcon.displayMessage(UiConstants.MINIMIZE_MESSAGE_HEADER, UiConstants.MINIMIZE_MESSAGE_BODY, TrayIcon.MessageType.INFO);
+		trayIcon.displayMessage(UiConstants.MINIMIZE_MESSAGE_HEADER, UiConstants.MINIMIZE_MESSAGE_BODY, 
+								TrayIcon.MessageType.INFO);
 	}
 
 	private void hide(final Stage stage) {

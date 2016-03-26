@@ -52,7 +52,8 @@ public class UiDropDown {
 		
 		myInput = input; // set up reference
 		myMenu = UiPopupManager.getInstance().createPopupMenu(MAX_ITEMS);
-		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 5000, 1000, 1.0, 0.0);
+		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
+																	 5000, 1000, 1.0, 0.0);
 		// create custom handler
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override

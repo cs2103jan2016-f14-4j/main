@@ -27,7 +27,7 @@ import taskey.constants.UiConstants;
 public class UiPopupManager {
 	private double X_Ratio = 1, Y_Ratio = 1; // window ratios
 	private static UiPopupManager instance = null;
-	private ArrayList<PopupWindow> popupList = new ArrayList<PopupWindow>();
+	private ArrayList<Popup> popupList = new ArrayList<Popup>();
 	private UiPopupManager() {
 	}
 	public static UiPopupManager getInstance() {
@@ -83,6 +83,12 @@ public class UiPopupManager {
 	public void updateWindowRatios(Window mainStage) {
 		X_Ratio = mainStage.getWidth()/2/UiConstants.WINDOW_MIN_SIZE.getWidth();
 		Y_Ratio = mainStage.getHeight()/2/UiConstants.WINDOW_MIN_SIZE.getHeight();
+		
+		// one solution is to hide the pop up when window changes
+		for ( int i = 0; i < popupList.size(); i ++  ) {
+			Popup thePopup = (Popup) popupList.get(i);
+			thePopup.hide();
+		}
 	}
 	
 	public double getYRatio() {

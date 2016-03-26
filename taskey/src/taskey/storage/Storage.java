@@ -301,6 +301,8 @@ public class Storage {
     	// If directory == null, then dir must be the default directory, which we do not want to save
     	if (directory != null) {
 			// If the new dir is different from the old directory
+    		System.out.println(dir.getAbsolutePath());
+    		System.out.println(directory.getAbsolutePath());
     		if (! dir.getAbsolutePath().equals(directory.getAbsolutePath()) ) {
     			return true;
     		}

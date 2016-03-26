@@ -368,6 +368,20 @@ public class LogicMemory {
 		}
 	}
 	
+	/**
+	 * Change the directory where task and tag category data are saved. If this method succeeds, all saved files are 
+	 * moved from the current save directory to the new directory.
+	 * @param pathName        the new directory pathname
+	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
+	 */
+	void changeSaveDirectory(String pathName) throws LogicException {
+		try {
+			storage.setDirectory(pathName);
+		} catch (Exception e) {
+			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+		}
+	}
+	
     //================================================================================
     // Miscellaneous
     //================================================================================

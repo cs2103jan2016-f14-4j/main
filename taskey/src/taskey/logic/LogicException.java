@@ -22,15 +22,12 @@ public class LogicException extends Exception {
 	public static final String MSG_ERROR_DUPLICATE_TASKS = "Duplicate tasks are not allowed.";	                                             
 	public static final String MSG_ERROR_SAVING_TAGS = "Error saving tags!";
 	public static final String MSG_ERROR_DATE_EXPIRED = "The deadline/end date is already past!";
-	public static final String MSG_ERROR_DELETE_INVALID_TAB = "Cannot delete from this tab!";
 	public static final String MSG_ERROR_INVALID_INDEX = "Invalid index specified!";
-	public static final String MSG_ERROR_NAME_NOT_FOUND = "\"%1$s\" not found in this tab!";
 	public static final String MSG_ERROR_DONE_INVALID = "This task is already archived!";
 	public static final String MSG_ERROR_UPDATE_INVALID = "Cannot update archived tasks!";
-	public static final String MSG_ERROR_UPDATE_INVALID_TAB = "Cannot use \"set\" command from this tab!";
 	public static final String MSG_ERROR_UNDO = "Nothing to undo!";
-	public static final String MSG_ERROR_TAG_NOT_FOUND = "No matches found.";
-	public static final String MSG_ERROR_SEARCH_NOT_FOUND = "No matches found!";
+	public static final String MSG_ERROR_TAG_NOT_FOUND = "The tag(s) you specified were not found.";
+	public static final String MSG_ERROR_SEARCH_NOT_FOUND = "No search results found.";
 	
     //================================================================================
     // Constructor

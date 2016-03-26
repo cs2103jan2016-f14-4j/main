@@ -94,7 +94,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_FLOATING).add(taskToAdd);
-		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
+		clearActionList();
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_DEADLINE).add(taskToAdd);
-		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
+		clearActionList();
 		
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
@@ -136,7 +136,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_EVENT).add(taskToAdd);
-		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
+		clearActionList();
 		
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
@@ -162,7 +162,7 @@ public class LogicMemory {
 		removeTaskTags(toDelete.getTaskTags());
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
-			taskLists.get(INDEX_ACTION).clear();
+			clearActionList();
 		}
 		
 		return toDelete;
@@ -182,7 +182,7 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
 		}
 		
-		taskLists.get(INDEX_ACTION).clear(); // Action list is not relevant for this command, clear it to reduce clutter
+		clearActionList();
 	}
 	
 	/**
@@ -209,7 +209,7 @@ public class LogicMemory {
 		removeTaskTags(toComplete.getTaskTags());
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
-			taskLists.get(INDEX_ACTION).clear();
+			clearActionList();
 		}
 	}
 	
@@ -285,7 +285,54 @@ public class LogicMemory {
 		addTaskToLists(contentBox, newTask);
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
-			taskLists.get(INDEX_ACTION).clear();
+			clearActionList();
+		}
+	}
+	
+	/**
+	 * Updates the action list based on the view type.
+	 * @param viewType
+	 * @throws LogicException 
+	 */
+	void viewBasic(String viewType) {
+		switch (viewType) {
+			case "general":
+				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_FLOATING));
+				break;
+			
+			case "deadlines":
+				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_DEADLINE));
+				break;
+				
+			case "events":
+				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_EVENT));
+				break;
+				
+			case "archive":
+				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_COMPLETED));
+				break;
+				
+			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
+				clearActionList();
+				break;
+			
+			default: // Should not reach this point
+		}
+	}
+	
+	/**
+	 * Updates the action list with all the expired and pending tasks that contain at least one of the tag categories 
+	 * that the user wants to view.
+	 * @param tagNames
+	 * @throws LogicException if the tag categories do not exist
+	 */
+	void viewTags(ArrayList<String> tagNames) throws LogicException {
+		clearActionList();
+		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
+		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
+		
+		if (!tagFound) {
+			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
 		}
 	}
 
@@ -298,7 +345,7 @@ public class LogicMemory {
 	 */
 	void search(String searchPhrase) throws LogicException {
 		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
-		actionList.clear();
+		clearActionList();
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
 		
@@ -350,19 +397,25 @@ public class LogicMemory {
 		}
 	}
 	
-	// Clears all task lists.
 	void clearAllTaskLists() {
 		for (int i = 0; i < taskLists.size(); i++) {
 			taskLists.get(i).clear();
 		}
 	}
 	
-	// Clear the tag category list.
+	private void clearActionList() {
+		taskLists.get(INDEX_ACTION).clear();
+	}
+	
 	void clearTagCategoryList() {
 		tagCategoryList.clear();
 	}
 	
-	// Returns the index of the list corresponding to the current ContentBox.
+	/** 
+	 * Returns the index of the list corresponding to the current tab user is in.
+	 * @param currentContent the current tab user is in
+	 * @return
+	 */
 	private int getListIndex(ContentBox currentContent) {
 		switch (currentContent) {
 			case THIS_WEEK:
@@ -382,7 +435,11 @@ public class LogicMemory {
 		}
 	}
 	
-	// Adds the new Task to all the lists it should belong to, depending on the current tab the user is in.
+	/** 
+	 * Adds the new Task to all the lists it should belong to, depending on the current tab the user is in.
+	 * @param contentBox the current tab user is in
+	 * @param newTask
+	 */
 	private void addTaskToLists(ContentBox contentBox, Task newTask) {
 		for (int i = 0; i < taskLists.size(); i++) {
 			if (belongsToList(contentBox, i, newTask)) {
@@ -391,8 +448,14 @@ public class LogicMemory {
 		}
 	}
 	
-	// Returns true if and only if the new Task belongs to the list specified by listIndex, depending on the current 
-	// tab the user is in.
+	/** 
+	 * Returns true if and only if the new Task belongs to the list specified by listIndex, depending on the current
+	 * tab the user is in 
+	 * @param contentBox the current tab user is in
+	 * @param listIndex
+	 * @param newTask
+	 * @return
+	 */
 	private boolean belongsToList(ContentBox contentBox, int listIndex, Task newTask) {
 		String taskType = newTask.getTaskType();
 		boolean isExpired = newTask.isExpired();
@@ -416,7 +479,6 @@ public class LogicMemory {
 		}
 	}
 	
-	// Removes the given Task from all task lists.
 	private void removeFromAllLists(Task toRemove) {
 		taskLists.get(INDEX_THIS_WEEK).remove(toRemove);
 		taskLists.get(INDEX_PENDING).remove(toRemove);
@@ -429,7 +491,7 @@ public class LogicMemory {
 	}
 	
 	/** 
-	 * Removes all tasks which contain a tag with the given name, from the given list. The tasks will be removed from
+	 * Removes all tasks from the given list which contain a tag with the given name. The tasks will be removed from
 	 * other lists that contain them as well. For each task that is removed, the tag category list will be updated 
 	 * accordingly.
 	 * 
@@ -442,7 +504,6 @@ public class LogicMemory {
 		
 		for (Iterator<Task> it = list.iterator(); it.hasNext();) { // Iterator is for save removal of elements while 
 			                                                       // iterating
-
 			Task task = it.next();
 			
 			if (task.getTaskTags().contains(tagName)) {
@@ -454,6 +515,31 @@ public class LogicMemory {
 		}
 		
 		return taskRemoved;
+	}
+	
+	/** 
+	 * Views all tasks from the given list which contain at least one of the tags specified in tagNames. 
+	 * 
+	 * @param list
+	 * @param tagName
+	 * @return true if and only if at least one task was removed from the given list
+	 */
+	private boolean viewTaggedTasks(ArrayList<Task> list, ArrayList<String> tagNames) {
+		boolean taskFound = false;
+		
+		for (Iterator<Task> it = list.iterator(); it.hasNext();) { 
+			Task task = it.next();
+			
+			for (String s : tagNames) {
+				if (task.getTaskTags().contains(s)) {
+					taskLists.get(INDEX_ACTION).add(task);
+					taskFound = true;
+					break;
+				}
+			}
+		}
+		
+		return taskFound;
 	}
 	
 	/** 
@@ -469,14 +555,19 @@ public class LogicMemory {
 		}
 	}
 	
-	// Returns true if and only if the given task already exists in any of the task lists.
+	/**
+	 *  Returns true if and only if the given task already exists in any of the task lists.
+	 * @param task
+	 * @return
+	 */
 	private boolean taskAlreadyExists(Task task) {
 		return (taskLists.get(INDEX_PENDING).contains(task) || taskLists.get(INDEX_COMPLETED).contains(task)
 				|| taskLists.get(INDEX_EXPIRED).contains(task));
 	}
 	
 	/**
-	 * Add a new tag to the tag category list.
+	 * Add a new tag to the tag category list
+	 * @param tagToAdd
 	 */
 	void addTag(String tagToAdd) { 
 		int tagIndex = getTagIndex(tagToAdd);
@@ -489,7 +580,10 @@ public class LogicMemory {
 		}
 	}
 	
-	// Remove a tag from the tag category list. The tag should currently exist in the tag category list.
+	/**
+	 * Remove a tag from the tag category list. The tag should currently exist in the tag category list.
+	 * @param tagToRemove
+	 */
 	private void removeTag(String tagToRemove) {
 		int tagIndex = getTagIndex(tagToRemove);
 		assert(tagIndex != -1);
@@ -501,7 +595,12 @@ public class LogicMemory {
 		}
 	}
 	
-	// Returns the index of the specified tag name in the tag category list. If the tag name is not found, -1 is returned.
+	/**
+	 * Returns the index of the specified tag name in the tag category list. If the tag name is not found, 
+	 * -1 is returned.
+	 * @param tagName
+	 * @return
+	 */
 	private int getTagIndex(String tagName) {
 		for (int i = 0; i < tagCategoryList.size(); i++) {
 			if (tagCategoryList.get(i).getTagName().equals(tagName)) {
@@ -512,6 +611,12 @@ public class LogicMemory {
 		return -1;
 	}
 	
+	/**
+	 * Get all tasks from the given list that contain searchPhrase in their name. searchPhrase is not case sensitive.
+	 * @param list
+	 * @param searchPhrase
+	 * @return
+	 */
 	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
 		ArrayList<Task> searchResults = new ArrayList<Task>();
 		

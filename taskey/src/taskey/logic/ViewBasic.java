@@ -14,7 +14,7 @@ final class ViewBasic extends Command {
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws LogicException {
+		logicMemory.viewBasic(viewType);
 	}
 }

@@ -9,14 +9,14 @@ import java.util.ArrayList;
  */
 final class ViewTags extends Command {
 	
-	private ArrayList<String> tagList;
+	private ArrayList<String> tagNames;
 	
-	ViewTags(ArrayList<String> tagList) {
-		this.tagList = tagList;
+	ViewTags(ArrayList<String> tagNames) {
+		this.tagNames = tagNames;
 	}
 	
 	@Override
-	void execute(LogicMemory logicMemory) {
-		// TODO
+	void execute(LogicMemory logicMemory) throws LogicException {
+		logicMemory.viewTags(tagNames);
 	}
 }

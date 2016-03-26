@@ -770,7 +770,6 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	/*
 	// The order of displayed tasks is not tested here.
 	// This test also checks that there are no duplicate tasks in the displayed list.
 	@Test
@@ -779,8 +778,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task4 #tag2 #tag4");
-		LogicFeedback lf = logic.executeCommand(ContentBox.PENDING, "view #tag1 #tag3 #tag5");
-		ArrayList<Task> viewList = lf.getTaskLists().get(ListID.ACTION.getIndex());
+		logic.executeCommand(ContentBox.PENDING, "view #tag1 #tag3 #tag5");
+		ArrayList<Task> viewList = logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION);
 		Task task1 = parser.parseInput("add task1 #tag1").getTask();
 		assertTrue(viewList.contains(task1));
 		Task task2 = parser.parseInput("add task2 on 31 dec 3pm #tag2 #tag3").getTask();
@@ -796,8 +795,9 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "view archive");
-		Exception actual = logic.executeCommand(ContentBox.ACTION, "set 1 \"new name\"").getException();
-		assertEquals(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID, actual.getMessage());
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
+		LogicException actual = logic.executeCommand(ContentBox.ACTION, "set 1 \"new name\"").getException();
+		assertEquals(expected, actual);
 	}
 	
 	@Test
@@ -806,7 +806,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "view archive");
-		Exception actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
-		assertEquals(LogicConstants.MSG_EXCEPTION_DONE_INVALID, actual.getMessage());
-	}*/
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_DONE_INVALID);
+		LogicException actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
+		assertEquals(expected, actual);
+	}
 }

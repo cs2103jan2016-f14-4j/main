@@ -119,14 +119,16 @@ public class Logic {
 				cmd = new UpdateByIndexChangeBoth(currentContent, po.getIndex(), po.getNewTaskName(), po.getTask());
 				return executeUpdate(po, cmd);
 			
-			/*
+			
 			case "VIEW_BASIC":
-				return viewBasic(originalCopy, po);
+				cmd = new ViewBasic(po.getViewType().get(0));
+				return executeView(po, cmd);
 			
 			case "VIEW_TAGS":
-				return viewTags(originalCopy, modifiedCopy, po);
+				cmd = new ViewTags(po.getViewType());
+				return executeView(po, cmd);
 
-			case "UNDO":
+			/*case "UNDO":
 				return undo(po);
 				
 			case "ERROR":
@@ -198,14 +200,17 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_UPDATE));
 	}
 	
-	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
+	private LogicFeedback executeView(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
-		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, null);
+	}
+	
+	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
+		return executeView(po, cmd);
 	}
 	
     //================================================================================
@@ -258,203 +263,6 @@ public class Logic {
 			
 		taskLists = cloneLists(modifiedCopy);
 		return new LogicFeedback(modifiedCopy, po, null);
-	}
-	
-	// Views one of the task categories.
-	LogicFeedback viewBasic(ArrayList<ArrayList<Task>> originalCopy, ProcessedObject po) {
-		String viewType = po.getViewType().get(0);
-		switch (viewType) {
-			case "general":
-				ArrayList<Task> generalList = originalCopy.get(ListID.GENERAL.getIndex());
-				originalCopy.set(ListID.ACTION.getIndex(), generalList);
-				break;
-			
-			case "deadlines":
-				ArrayList<Task> deadlineList = originalCopy.get(ListID.DEADLINE.getIndex());
-				originalCopy.set(ListID.ACTION.getIndex(), deadlineList);
-				break;
-				
-			case "events":
-				ArrayList<Task> eventList = originalCopy.get(ListID.EVENT.getIndex());
-				originalCopy.set(ListID.ACTION.getIndex(), eventList);
-				break;
-				
-			case "archive":
-				ArrayList<Task> completedList = originalCopy.get(ListID.COMPLETED.getIndex());
-				originalCopy.set(ListID.ACTION.getIndex(), completedList);
-				break;
-				
-			case "expired":
-				ArrayList<Task> expiredList = originalCopy.get(ListID.EXPIRED.getIndex());
-				originalCopy.set(ListID.ACTION.getIndex(), expiredList);
-				break;
-			
-			default:
-				break;
-				
-		}
-		
-		taskLists = cloneLists(originalCopy);
-		return new LogicFeedback(originalCopy, po, null);
-	}
-
-	// Updates an indexed task's name on the current tab and saves the updated lists to disk.
-	public LogicFeedback updateByIndexChangeName(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-			                                     ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
-		int taskIndex = po.getIndex();
-		String newTaskName = po.getNewTaskName();
-		String exceptionMsg;
-
-		ArrayList<Task> targetList = getListFromContentBox(modifiedCopy, currentContent);
-		Task toUpdate;
-
-		try {
-			toUpdate = targetList.get(taskIndex).getDuplicate();
-		} catch (IndexOutOfBoundsException e) {
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-		}
-		
-		// Cannot update expired or completed tasks
-		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
-			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
-			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
-			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-		}
-
-		updateAllLists(modifiedCopy, toUpdate, newTaskName);
-		
-		// Check if user used "set" from the ACTION tab. If so, don't clear the ACTION list.
-		if (!currentContent.equals(ContentBox.ACTION)) {
-			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (LogicException le) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
-	}
-
-	// Updates an indexed task's date on the current tab and saves the updated lists to disk.
-	public LogicFeedback updateByIndexChangeDate(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-            							  		 ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
-		int taskIndex = po.getIndex();
-		Task changedTask = po.getTask();
-		String exceptionMsg;
-
-		ArrayList<Task> targetList = getListFromContentBox(modifiedCopy, currentContent);
-		Task toUpdate;
-
-		try {
-			toUpdate = targetList.get(taskIndex);
-		} catch (IndexOutOfBoundsException e) {
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-		}
-		
-		// Cannot update expired or completed tasks
-		if (modifiedCopy.get(ListID.COMPLETED.getIndex()).contains(toUpdate)
-			|| modifiedCopy.get(ListID.EXPIRED.getIndex()).contains(toUpdate)) {
-			exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID;
-			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-		}
-		
-		if (changedTask.getTaskType().equals("DEADLINE")) {
-			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getDeadline());
-				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-			}
-		}
-		
-		if (changedTask.getTaskType().equals("EVENT")) {
-			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
-				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getEndDate());
-				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-			}
-		}
-
-		changedTask.setTaskName(toUpdate.getTaskName());
-		updateAllLists(modifiedCopy, toUpdate, changedTask);
-		
-		// Check if user used "set" from the ACTION tab. If so, don't clear the ACTION list.
-		if (!currentContent.equals(ContentBox.ACTION)) {
-			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (LogicException le) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);	
-		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
-	}
-	
-	// Updates an indexed task's name and date on the current tab and saves the updated lists to disk. 
-	public LogicFeedback updateByIndexChangeBoth(ContentBox currentContent, ArrayList<ArrayList<Task>> originalCopy, 
-												 ArrayList<ArrayList<Task>> modifiedCopy, ProcessedObject po) {
-		int taskIndex = po.getIndex();
-		String newTaskName = po.getNewTaskName();
-		Task changedTask = po.getTask();
-		String exceptionMsg;
-
-		ArrayList<Task> targetList = getListFromContentBox(modifiedCopy, currentContent);
-		Task toUpdate;
-
-		try {
-			toUpdate = targetList.get(taskIndex);
-		} catch (IndexOutOfBoundsException e) {
-			exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, taskIndex + 1);
-			return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-		}
-		
-		if (changedTask.getTaskType().equals("DEADLINE")) {
-			if (changedTask.getDeadlineEpoch() < timeConverter.getCurrTime()) {
-				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getDeadline());
-				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-			}
-		}
-		
-		if (changedTask.getTaskType().equals("EVENT")) {
-			if (changedTask.getEndDateEpoch() < timeConverter.getCurrTime()) {
-				exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, changedTask.getEndDate());
-				return new LogicFeedback(originalCopy, po, new LogicException(exceptionMsg));
-			}
-		}
-
-		changedTask.setTaskName(newTaskName);
-		updateAllLists(modifiedCopy, toUpdate, changedTask);
-		
-		// Check if user used "set" from the ACTION tab. If so, don't clear the ACTION list.
-		if (!currentContent.equals(ContentBox.ACTION)) {
-			modifiedCopy.get(ListID.ACTION.getIndex()).clear();
-		}
-		
-		if (!utd.saveTagDatabase()) {
-			return new LogicFeedback(originalCopy, po, new LogicException(LogicConstants.MSG_EXCEPTION_SAVING_TAGS)); 
-		}
-		
-		try {
-			saveAllTasks(modifiedCopy);
-		} catch (LogicException le) {
-			return new LogicFeedback(originalCopy, po, e);
-		}
-		
-		taskLists = cloneLists(modifiedCopy);
-		return new LogicFeedback(modifiedCopy, po, new LogicException(LogicConstants.MSG_UPDATE_SUCCESSFUL));
 	}
 
 	// Undo the last change to the task lists.

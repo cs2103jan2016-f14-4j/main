@@ -24,6 +24,7 @@ public class TimeConverter {
 	 * @return the value of the variable, currTime 
 	 */
 	public long getCurrTime() {
+		currTime = System.currentTimeMillis()/1000;
 		return currTime; 
 	}	
 	

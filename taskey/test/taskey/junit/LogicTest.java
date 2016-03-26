@@ -1,7 +1,6 @@
 package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -13,10 +12,8 @@ import org.junit.Test;
 
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.Logic;
-import taskey.logic.LogicConstants;
-import taskey.logic.LogicConstants.ListID;
-import taskey.logic.LogicFeedback;
-import taskey.logic.ProcessedObject;
+import taskey.logic.LogicException;
+import taskey.logic.LogicMemory;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
 import taskey.parser.Parser;
@@ -24,39 +21,11 @@ import taskey.parser.TimeConverter;
 
 /**
  * @@author A0134177E
- * @author Hubert
  */
 public class LogicTest {
 	public static final int NUM_SECONDS_1_DAY = 86400;
 	public static final int NUM_SECONDS_1_WEEK = 604800;
-	public static final int NUM_SECONDS_BUFFER_TIME = 100;
-	public static final String STRING_ADD_FLOATING = "add g2 a?b ,  ";
-	public static final String STRING_ADD_DEADLINE = "add g2 a?b ,   on %1$s";
-	public static final String STRING_ADD_EVENT = "add g2 a?b ,   from %1$s to %2$s";
-	public static final String STRING_DELETE_BY_INDEX = "del 1";
-	public static final String STRING_DELETE_BY_INVALID_INDEX = "del 2";
-	public static final String STRING_DELETE_BY_NAME = "del g2 a?b ,  ";
-	public static final String STRING_DELETE_BY_INVALID_NAME = "del ayy lmao";
-	public static final String STRING_SEARCH = "search ?B , ";
-	public static final String STRING_SEARCH_NOT_FOUND = "search ayy lmao";
-	public static final String STRING_SEARCH_EMPTY = "search ";
-	public static final String STRING_DONE_BY_INDEX = "done 1";
-	public static final String STRING_DONE_BY_INVALID_INDEX = "done 2";
-	public static final String STRING_DONE_BY_NAME = "done g2 a?b ,  ";
-	public static final String STRING_DONE_BY_INVALID_NAME = "del ayy lmao";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_NAME = "set 1 \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_DEADLINE = "set 1 [%1$s]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_EVENT = "set 1 [%1$s, %2$s]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_DATE_FLOATING = "set 1 [none]";
-	public static final String STRING_UPDATE_BY_INDEX_CHANGE_BOTH = "set 1 \"ayy lmao\" [none]";
-	public static final String STRING_UPDATE_BY_INVALID_INDEX = "set 2 \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_NAME = "set g2 a?b ,   \"ayy lmao\"";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_DEADLINE = "set add g2 a?b ,   [%1$s]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_EVENT = "set add g2 a?b ,   [%1$s, %2$s]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_DATE_FLOATING = "set add g2 a?b ,   [none]";
-	public static final String STRING_UPDATE_BY_NAME_CHANGE_BOTH = "set g2 a?b ,   \"ayy lmao\" [none]";
-	public static final String STRING_UPDATE_BY_INVALID_NAME = "set g3 a?b ,  \"ayy lmao\"";
-	public static final String STRING_UNDO = "undo";
+	public static final int NUM_SECONDS_BUFFER_TIME = 100; // Used for safety in dealing with boundary conditions
 	
 	private Logic logic;
 	private Parser parser;
@@ -71,59 +40,15 @@ public class LogicTest {
 		
 		return lists;
 	}
-	/*
-	public static ArrayList<ArrayList<Task>> addTaskToLists(Task task) {
-		TimeConverter timeConverter = new TimeConverter();
-		ArrayList<ArrayList<Task>> temp = new ArrayList<ArrayList<Task>>();
-		
-		while (temp.size() < 7) {
-			temp.add(new ArrayList<Task>());
-		}
-		
-		String taskType = task.getTaskType();
-		long currTime = timeConverter.getCurrTime();
-		
-		if (taskType.equals("FLOATING")) {
-			temp.get(ListID.GENERAL.getIndex()).add(task);
-		} else if (taskType.equals("DEADLINE")) {
-			long deadline = task.getDeadlineEpoch();
-			
-			if (deadline < currTime) {
-				return temp;
-			}
-			
-			temp.get(ListID.DEADLINE.getIndex()).add(task);
-			
-			if (timeConverter.isSameWeek(deadline, currTime)) {
-				temp.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		} else if (taskType.equals("EVENT")) {
-			long endDate = task.getEndDateEpoch();
-			
-			if (endDate < currTime) {
-				return temp;
-			}
-			
-			temp.get(ListID.EVENT.getIndex()).add(task);
-			
-			if (timeConverter.isSameWeek(task.getStartDateEpoch(), currTime)) {
-				temp.get(ListID.THIS_WEEK.getIndex()).add(task);
-			}
-		}
-		
-		temp.get(ListID.PENDING.getIndex()).add(task);
-		
-		return temp;
-	}*/
 	
-	// Make sure clear command works because it is used in setUp().
-	// clear command is supposed to clear all task and tag data in storage.
+	// Make sure "clear" command works because it is used in setUp().
+	// "clear" command is supposed to clear all task and tag data in memory.
 	@BeforeClass
 	public static void testClear() {
 		Logic logic = new Logic();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
 	@Before
@@ -140,12 +65,12 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.GENERAL.getIndex()).add(task);
-		expected.get(ListID.PENDING.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
-	 
+	
 	@Test
 	public void addingDeadlineTaskEndingThisWeekShouldUpdateOnlyPendingAndDeadlineAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -154,9 +79,9 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.DEADLINE.getIndex()).add(task);
-		expected.get(ListID.THIS_WEEK.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -169,8 +94,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.DEADLINE.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -184,9 +109,9 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.EVENT.getIndex()).add(task);
-		expected.get(ListID.THIS_WEEK.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_EVENT).add(task);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -200,8 +125,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.EVENT.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_EVENT).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -211,7 +136,7 @@ public class LogicTest {
 		long currTime = timeConverter.getCurrTime();
 		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		String input = "add task on " + deadline;
-		String expected = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, deadline);
+		String expected = LogicException.MSG_ERROR_DATE_EXPIRED;
 		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
 		assertEquals(expected, actual);
 	}
@@ -231,7 +156,7 @@ public class LogicTest {
 		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
 		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		String input = "add task from " + startDate + " to " + endDate;
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, endDate);
+		String exceptionMsg = LogicException.MSG_ERROR_DATE_EXPIRED;
 		Exception expected = new Exception(exceptionMsg);
 		Exception actual = logic.executeCommand(ContentBox.PENDING, input).getException();
 		assertEquals(expected.getMessage(), actual.getMessage());
@@ -252,9 +177,9 @@ public class LogicTest {
 	public void addingTasksWithSameNameButDifferentDatesShouldNotThrowException() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception e = logic.executeCommand(ContentBox.PENDING, "add task on 31 dec 3pm").getException();
-		assertNull(e);
+		assertEquals(LogicException.MSG_SUCCESS_ADD, e.getMessage());
 		e = logic.executeCommand(ContentBox.PENDING, "add task from 30 dec 5pm to 31 dec 6pm").getException();
-		assertNull(e);
+		assertEquals(LogicException.MSG_SUCCESS_ADD, e.getMessage());
 	}
 	
 	@Test
@@ -263,20 +188,20 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.GENERAL.getIndex()).add(task);
-		expected.get(ListID.PENDING.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		
 		input = "add task on 31 dec 3pm";
 		logic.executeCommand(ContentBox.PENDING, input);
 		task = parser.parseInput(input).getTask();
-		expected.get(ListID.DEADLINE.getIndex()).add(task);
-		expected.get(ListID.PENDING.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		
 		input = "add task from 30 dec 5pm to 31 dec 6pm";
 		logic.executeCommand(ContentBox.PENDING, input);
 		task = parser.parseInput(input).getTask();
-		expected.get(ListID.EVENT.getIndex()).add(task);
-		expected.get(ListID.PENDING.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_EVENT).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
@@ -327,58 +252,20 @@ public class LogicTest {
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 	}
 	
-	/*
-	@Ignore
-	public void testDeleteTaskByName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = getEmptyLists();
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testDeleteFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.ACTION, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(LogicConstants.MSG_EXCEPTION_DELETE_INVALID_TAB));
-		
-		assertEquals(expected, actual);
-	}*/
-	
 	// Test inputs: 2 is out of range, 0 is an impossible index, -1 is a negative index and should not be allowed.
 	@Test
 	public void deletingTaskByInvalidIndexShouldThrowException() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception actual = logic.executeCommand(ContentBox.PENDING, "del 2").getException();
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 2);
+		String exceptionMsg = LogicException.MSG_ERROR_INVALID_INDEX;
 		Exception expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "del 0").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 0);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "del -1").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, -1);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 	}
@@ -389,8 +276,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		logic.executeCommand(ContentBox.PENDING, "del 2");
 		assertEquals(expected, logic.getAllTaskLists());
 		
@@ -400,26 +287,6 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "del -1");
 		assertEquals(expected, logic.getAllTaskLists());
 	}
-	
-	/*
-	@Ignore
-	public void testDeleteTaskByInvalidName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DELETE_BY_INVALID_NAME);
-		LogicFeedback actual = logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_NAME_NOT_FOUND, po.getTask().getTaskName());
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	// This test might fail once PowerSearch is implemented.
 	@Test
@@ -435,12 +302,12 @@ public class LogicTest {
 		expected.add(task2);
 		// Both task1 and task2 match
 		logic.executeCommand(ContentBox.PENDING, "search t");
-		assertEquals(expected, logic.getActionList());
+		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 		
 		// Only task2 matches
 		logic.executeCommand(ContentBox.PENDING, "search 2");
 		expected.remove(task1);
-		assertEquals(expected, logic.getActionList());
+		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 	}
 	
 	@Test
@@ -448,37 +315,8 @@ public class LogicTest {
 		String input = "add task1";
 		logic.executeCommand(ContentBox.PENDING, input);
 		Exception actual = logic.executeCommand(ContentBox.PENDING, "search t ask").getException();
-		assertEquals(LogicConstants.MSG_EXCEPTION_SEARCH_NOT_FOUND, actual.getMessage());
+		assertEquals(LogicException.MSG_ERROR_SEARCH_NOT_FOUND, actual.getMessage());
 	}
-	
-	/*
-	@Ignore
-	public void testSearchPhraseNotFound() {
-		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
-		logic.addFloating(originalCopy, modifiedCopy, po);
-
-		originalCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_SEARCH_NOT_FOUND);
-		LogicFeedback actual = logic.search(originalCopy, po);
-		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Ignore
-	public void testSearchPhraseEmpty() {
-		ProcessedObject po = parser.parseInput(STRING_ADD_FLOATING);
-		logic.addFloating(originalCopy, modifiedCopy, po);
-
-		originalCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_SEARCH_EMPTY);
-		LogicFeedback actual = logic.search(originalCopy, po);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_SEARCH_PHRASE_EMPTY;
-		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	// The completed task should be removed from all lists and then inserted into the COMPLETED list.
 	@Test
@@ -488,7 +326,7 @@ public class LogicTest {
 		Task task = parser.parseInput(input).getTask();
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.COMPLETED.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_COMPLETED).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -503,42 +341,24 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag3"));
-		assertEquals(expected, logic.getTagList());
+		assertEquals(expected, logic.getTagCategoryList());
 	}
-	
-	/*
-	@Ignore
-	public void testDoneTaskFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DONE_BY_INDEX);
-		LogicFeedback actual = logic.doneByIndex(ContentBox.EXPIRED, originalCopy, modifiedCopy, po);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_DONE_INVALID_TAB;
-		LogicFeedback expected = new LogicFeedback(modifiedCopy, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	@Test
 	public void doneTaskByInvalidIndexShouldThrowException() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception actual = logic.executeCommand(ContentBox.PENDING, "done 2").getException();
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 2);
+		String exceptionMsg = String.format(LogicException.MSG_ERROR_INVALID_INDEX, 2);
 		Exception expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "done 0").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 0);
+		exceptionMsg = String.format(LogicException.MSG_ERROR_INVALID_INDEX, 0);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "done -1").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, -1);
+		exceptionMsg = String.format(LogicException.MSG_ERROR_INVALID_INDEX, -1);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 	}
@@ -549,8 +369,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		logic.executeCommand(ContentBox.PENDING, "done 2");
 		assertEquals(expected, logic.getAllTaskLists());
 		
@@ -560,45 +380,6 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "done -1");
 		assertEquals(expected, logic.getAllTaskLists());
 	}
-	
-	/*
-	@Test
-	public void testDoneTaskByName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DONE_BY_NAME);
-		LogicFeedback actual = logic.doneByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = getEmptyLists();
-		temp.get(ListID.COMPLETED.getIndex()).add(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	public void testDoneTaskByInvalidName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_DONE_BY_INVALID_NAME);
-		LogicFeedback actual = logic.doneByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_NAME_NOT_FOUND;
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	// Every list that contains the updated task should also be updated.
 	@Test
@@ -611,47 +392,26 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "set 1 \"new name\"");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
 		task.setTaskName("new name");
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.DEADLINE.getIndex()).add(task);
-		expected.get(ListID.THIS_WEEK.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
-	/*
-	@Ignore
-	public void testUpdateTaskByIndexFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_INDEX_CHANGE_NAME);
-		LogicFeedback actual = logic.updateByIndexChangeName(ContentBox.EXPIRED, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID_TAB;
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
 	
 	@Test
 	public void updateTaskByInvalidIndexShouldThrowExceptionMessage() {
 		logic.executeCommand(ContentBox.PENDING, "add task");
 		Exception actual = logic.executeCommand(ContentBox.PENDING, "set 2 \"new name\"").getException();
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 2);
+		String exceptionMsg = LogicException.MSG_ERROR_INVALID_INDEX;
 		Exception expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "set 0 \"new name\"").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, 0);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 		
 		actual = logic.executeCommand(ContentBox.PENDING, "set -1 \"new name\"").getException();
-		exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_INVALID_INDEX, -1);
 		expected = new Exception(exceptionMsg);
 		assertEquals(expected.getMessage(), actual.getMessage());
 	}
@@ -662,8 +422,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		logic.executeCommand(ContentBox.PENDING, "set 2 \"new name\"");
 		assertEquals(expected, logic.getAllTaskLists());
 		
@@ -673,6 +433,7 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "set -1 \"new name\"");
 		assertEquals(expected, logic.getAllTaskLists());
 	}
+	
 	/*
 	@Ignore
 	public void testUpdateTaskByIndexChangeDateSameWeek() {
@@ -732,9 +493,9 @@ public class LogicTest {
 		Task newTask = parser.parseInput(input).getTask();
 		newTask.setTaskName(oldTaskName);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.DEADLINE.getIndex()).add(newTask);
-		expected.get(ListID.PENDING.getIndex()).add(newTask);
-		expected.get(ListID.THIS_WEEK.getIndex()).add(newTask);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(newTask);
+		expected.get(LogicMemory.INDEX_PENDING).add(newTask);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(newTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -750,8 +511,8 @@ public class LogicTest {
 		Task newTask = parser.parseInput(input).getTask();
 		newTask.setTaskName(oldTaskName);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.EVENT.getIndex()).add(newTask);
-		expected.get(ListID.PENDING.getIndex()).add(newTask);
+		expected.get(LogicMemory.INDEX_EVENT).add(newTask);
+		expected.get(LogicMemory.INDEX_PENDING).add(newTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -767,8 +528,8 @@ public class LogicTest {
 		Task newTask = parser.parseInput(input).getTask();
 		newTask.setTaskName(oldTaskName);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.GENERAL.getIndex()).add(newTask);
-		expected.get(ListID.PENDING.getIndex()).add(newTask);
+		expected.get(LogicMemory.INDEX_FLOATING).add(newTask);
+		expected.get(LogicMemory.INDEX_PENDING).add(newTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -781,7 +542,7 @@ public class LogicTest {
 		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		input = "set 1 [" + deadline + "]";
 		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
-		String expected = String.format(LogicConstants.MSG_EXCEPTION_DATE_EXPIRED, deadline);
+		String expected = LogicException.MSG_ERROR_DATE_EXPIRED;
 		assertEquals(expected, actual);
 	}
 	
@@ -795,70 +556,13 @@ public class LogicTest {
 		input = "set 1 [" + deadline + "]";
 		logic.executeCommand(ContentBox.PENDING, input);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.GENERAL.getIndex()).add(oldTask);
-		expected.get(ListID.PENDING.getIndex()).add(oldTask);
+		expected.get(LogicMemory.INDEX_FLOATING).add(oldTask);
+		expected.get(LogicMemory.INDEX_PENDING).add(oldTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
 	
-	/*
-	@Test
-	public void testUpdateTaskByNameChangeName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		task.setTaskName(po.getNewTaskName());
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	public void testUpdateTaskByNameFromWrongTab() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.EXPIRED, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = LogicConstants.MSG_EXCEPTION_UPDATE_INVALID_TAB;
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	public void testUpdateTaskByInvalidName() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		Task task = po.getTask();
-		logic.addDeadline(originalCopy, modifiedCopy, po);
-		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_INVALID_NAME);
-		LogicFeedback actual = logic.updateByNameChangeName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		String exceptionMsg = String.format(LogicConstants.MSG_EXCEPTION_NAME_NOT_FOUND, po.getTask().getTaskName());
-		LogicFeedback expected = new LogicFeedback(temp, po, new Exception(exceptionMsg));
-		
-		assertEquals(expected, actual);
-	}*/
-	
+
 	@Test
 	public void changingTaskNameAndDateShouldUpdateTaskLists() {
 		long currTime = timeConverter.getCurrTime();
@@ -870,32 +574,43 @@ public class LogicTest {
 		Task newTask = parser.parseInput(input).getTask();
 		newTask.setTaskName("new name");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.DEADLINE.getIndex()).add(newTask);
-		expected.get(ListID.PENDING.getIndex()).add(newTask);
-		expected.get(ListID.THIS_WEEK.getIndex()).add(newTask);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(newTask);
+		expected.get(LogicMemory.INDEX_PENDING).add(newTask);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(newTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
 	
-	/*
 	@Test
-	public void testUpdateTaskByNameChangeBoth() {
-		long currTime = timeConverter.getCurrTime();
-		String input = String.format(STRING_ADD_DEADLINE, timeConverter.getDate(currTime));
-		ProcessedObject po = parser.parseInput(input);
-		logic.addDeadline(originalCopy, modifiedCopy, po);
+	public void changingTaskNameShouldThrowExceptionMessageIfThereIsDuplicateTask() {
+		logic.executeCommand(ContentBox.PENDING, "add task");
+		logic.executeCommand(ContentBox.PENDING, "add task 2");
+		Exception actual = logic.executeCommand(ContentBox.PENDING, "set 2 \"task\"").getException();
+		String expected = LogicException.MSG_ERROR_DUPLICATE_TASKS;
+		assertEquals(expected, actual.getMessage());
+	}
+	
+	@Test
+	public void changingTaskNameShouldNotChangeTaskListsIfThereIsDuplicateTask() {
+		String input = "add task";
+		Task task1 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+
+		input = "add task 2";
+		Task task2 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, "add task 2");
+
+		input = "set 2 \"task\"";
+		logic.executeCommand(ContentBox.PENDING, input); // Should fail
 		
-		originalCopy = logic.getAllTaskLists();
-		modifiedCopy = logic.getAllTaskLists();
-		po = parser.parseInput(STRING_UPDATE_BY_NAME_CHANGE_BOTH);
-		LogicFeedback actual = logic.updateByNameChangeBoth(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		Task task = po.getTask();
-		task.setTaskName(po.getNewTaskName());
-		ArrayList<ArrayList<Task>> temp = addTaskToLists(task);
-		LogicFeedback expected = new LogicFeedback(temp, po, null);
-		
-		assertEquals(expected, actual);
-	}*/
+		ArrayList<ArrayList<Task>> expected = getEmptyLists();
+		expected.get(LogicMemory.INDEX_PENDING).add(task1);
+		expected.get(LogicMemory.INDEX_PENDING).add(task2);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task1);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task2);
+		assertEquals(expected, logic.getAllTaskLists());
+	}
+	
 	
 	@Test
 	public void undoAddShouldUpdateTaskLists() {
@@ -912,7 +627,7 @@ public class LogicTest {
 		String input = "add task #tag1 #tag2";
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "undo");
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
 	@Test
@@ -923,8 +638,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "del 1");
 		logic.executeCommand(ContentBox.PENDING, "undo");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -938,7 +653,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -950,8 +665,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "set 1 \"new name\" [30 dec 5pm, 31 dec 3pm]");
 		logic.executeCommand(ContentBox.PENDING, "undo");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -964,8 +679,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "undo");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -979,7 +694,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -989,7 +704,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -999,7 +714,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -1009,7 +724,7 @@ public class LogicTest {
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1"));
 		expected.add(new TagCategory("tag2"));
-		ArrayList<TagCategory> actual = logic.getTagList();
+		ArrayList<TagCategory> actual = logic.getTagCategoryList();
 		assertEquals(expected, actual);
 	}
 	
@@ -1017,29 +732,19 @@ public class LogicTest {
 	public void deletingTaggedTaskByIndexShouldUpdateTagDatabase() {
 		logic.executeCommand(ContentBox.PENDING, "add task #tag1 #tag2");
 		logic.executeCommand(ContentBox.PENDING,"del 1");
-		assertTrue(logic.getTagList().isEmpty());
+		assertTrue(logic.getTagCategoryList().isEmpty());
 	}
 	
-	/*
-	@Ignore
-	public void deletingTaggedTaskByNameShouldUpdateTagDatabase() {
-		ProcessedObject po = parser.parseInput("add task #tag1 #tag2");
-		logic.addFloating(originalCopy, modifiedCopy, po);
-		po = parser.parseInput("del task");
-		logic.deleteByName(ContentBox.PENDING, originalCopy, modifiedCopy, po);
-		assertTrue(logic.getTagList().isEmpty());
-	}*/
-	
 	@Test
-	public void deletingTagCategoryShouldOnlyRemoveAllTasksWithThatTag() {
+	public void deletingTagCategoryShouldUpdateTaskLists() {
 		logic.executeCommand(ContentBox.PENDING, "add task #tag1");
 		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "del #tag3");
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
 		Task task = parser.parseInput("add task #tag1").getTask();
-		expected.get(ListID.PENDING.getIndex()).add(task);
-		expected.get(ListID.GENERAL.getIndex()).add(task);
+		expected.get(LogicMemory.INDEX_PENDING).add(task);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -1052,7 +757,17 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "del #tag3");
 		ArrayList<TagCategory> expected = new ArrayList<TagCategory>();
 		expected.add(new TagCategory("tag1")); // #tag2 and #tag3 should not be in tag database
-		assertEquals(expected, logic.getTagList());
+		assertEquals(expected, logic.getTagCategoryList());
+	}
+	
+	@Test
+	public void deletingNonExistentTagCategoryShouldThrowException() {
+		logic.executeCommand(ContentBox.PENDING, "add task #tag1");
+		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
+		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
+		LogicException actual = logic.executeCommand(ContentBox.PENDING, "del #tag4").getException();
+		assertEquals(expected, actual);
 	}
 	
 	// The order of displayed tasks is not tested here.
@@ -1063,8 +778,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "add task2 on 31 dec 3pm #tag2 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task3 from 30 dec 1pm to 31 dec 2pm #tag1 #tag3");
 		logic.executeCommand(ContentBox.PENDING, "add task4 #tag2 #tag4");
-		LogicFeedback lf = logic.executeCommand(ContentBox.PENDING, "view #tag1 #tag3 #tag5");
-		ArrayList<Task> viewList = lf.getTaskLists().get(ListID.ACTION.getIndex());
+		logic.executeCommand(ContentBox.PENDING, "view #tag1 #tag3 #tag5");
+		ArrayList<Task> viewList = logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION);
 		Task task1 = parser.parseInput("add task1 #tag1").getTask();
 		assertTrue(viewList.contains(task1));
 		Task task2 = parser.parseInput("add task2 on 31 dec 3pm #tag2 #tag3").getTask();
@@ -1080,8 +795,9 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "view archive");
-		Exception actual = logic.executeCommand(ContentBox.ACTION, "set 1 \"new name\"").getException();
-		assertEquals(LogicConstants.MSG_EXCEPTION_UPDATE_INVALID, actual.getMessage());
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
+		LogicException actual = logic.executeCommand(ContentBox.ACTION, "set 1 \"new name\"").getException();
+		assertEquals(expected, actual);
 	}
 	
 	@Test
@@ -1090,7 +806,8 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, input);
 		logic.executeCommand(ContentBox.PENDING, "done 1");
 		logic.executeCommand(ContentBox.PENDING, "view archive");
-		Exception actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
-		assertEquals(LogicConstants.MSG_EXCEPTION_DONE_INVALID, actual.getMessage());
+		LogicException expected = new LogicException(LogicException.MSG_ERROR_DONE_INVALID);
+		LogicException actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
+		assertEquals(expected, actual);
 	}
 }

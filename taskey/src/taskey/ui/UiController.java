@@ -30,9 +30,9 @@ import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logic.Logic;
-import taskey.logic.LogicConstants.ListID;
 import taskey.parser.AutoComplete;
 import taskey.logic.LogicFeedback;
+import taskey.logic.LogicMemory;
 import taskey.logic.ProcessedObject;
 import taskey.logic.TagCategory;
 import taskey.logic.Task;
@@ -100,7 +100,7 @@ public class UiController {
 		myTabs.requestFocus(); // to display prompt at the start
 		
 		logic = new Logic();
-		updateAll(logic.getTagList(),logic.getAllTaskLists());
+		updateAll(logic.getTagCategoryList(),logic.getAllTaskLists());
 	}
 
 	/**
@@ -195,26 +195,26 @@ public class UiController {
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
 				displayTabContents(ContentBox.PENDING);
-				updateAll(logic.getTagList(),allLists);
+				updateAll(logic.getTagCategoryList(),allLists);
 				break;
 			case "VIEW_BASIC":
 			case "VIEW_TAGS":
 			case "SEARCH":
-				updateActionDisplay(allLists.get(ListID.ACTION.getIndex()), ActionMode.LIST);
+				updateActionDisplay(allLists.get(LogicMemory.INDEX_ACTION), ActionMode.LIST);
 				displayTabContents(ContentBox.ACTION);
 				break;	
 			default:
-				updateAll(logic.getTagList(),allLists);
+				updateAll(logic.getTagCategoryList(),allLists);
 				break;
 		}
 	}
 	
 	public void updateAll(ArrayList<TagCategory> tagList, ArrayList<ArrayList<Task>> allLists) {
 		ArrayList<Triplet<Color,String,Integer>> categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
-				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(ListID.GENERAL.getIndex()).size()),
-				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(ListID.DEADLINE.getIndex()).size()),
-				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(ListID.EVENT.getIndex()).size()),
-				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(ListID.COMPLETED.getIndex()).size())
+				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(LogicMemory.INDEX_FLOATING).size()),
+				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(LogicMemory.INDEX_DEADLINE).size()),
+				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(LogicMemory.INDEX_EVENT).size()),
+				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(LogicMemory.INDEX_COMPLETED).size())
 				));
 		// Add tags in addition to the default lists
 		for ( int i = 0 ; i < tagList.size(); i++ ) {
@@ -222,11 +222,11 @@ public class UiController {
 		}
 		updateCategoryDisplay(categoryList);
 		
-		updateDisplay(allLists.get(ListID.THIS_WEEK.getIndex()), UiConstants.ContentBox.THIS_WEEK);
-		updateDisplay(allLists.get(ListID.PENDING.getIndex()), UiConstants.ContentBox.PENDING);
-		updateDisplay(allLists.get(ListID.EXPIRED.getIndex()), UiConstants.ContentBox.EXPIRED);	
-		updateDisplay(allLists.get(ListID.ACTION.getIndex()), UiConstants.ContentBox.ACTION);	
-		expiredIcon.setText(String.valueOf(allLists.get(ListID.EXPIRED.getIndex()).size()));
+		updateDisplay(allLists.get(LogicMemory.INDEX_THIS_WEEK), UiConstants.ContentBox.THIS_WEEK);
+		updateDisplay(allLists.get(LogicMemory.INDEX_PENDING), UiConstants.ContentBox.PENDING);
+		updateDisplay(allLists.get(LogicMemory.INDEX_EXPIRED), UiConstants.ContentBox.EXPIRED);	
+		updateDisplay(allLists.get(LogicMemory.INDEX_ACTION), UiConstants.ContentBox.ACTION);	
+		expiredIcon.setText(String.valueOf(allLists.get(LogicMemory.INDEX_EXPIRED).size()));
 	}
 	
 	public void cleanUp() {

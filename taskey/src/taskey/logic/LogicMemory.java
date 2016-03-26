@@ -519,8 +519,8 @@ public class LogicMemory {
 		for (Iterator<Task> it = list.iterator(); it.hasNext();) { // Iterator is for save removal of elements while 
 			                                                       // iterating
 			Task task = it.next();
-			
-			if (task.getTaskTags().contains(tagName)) {
+			ArrayList<String> taskTags = task.getTaskTags();
+			if (taskTags != null && taskTags.contains(tagName)) {
 				it.remove();
 				removeFromAllLists(task); // This is safe because the task has already been removed from the current list.
 				removeTaskTags(task.getTaskTags());
@@ -545,7 +545,8 @@ public class LogicMemory {
 			Task task = it.next();
 			
 			for (String s : tagNames) {
-				if (task.getTaskTags().contains(s)) {
+				ArrayList<String> taskTags = task.getTaskTags();
+				if (taskTags != null && taskTags.contains(s)) {
 					taskLists.get(INDEX_ACTION).add(task);
 					taskFound = true;
 					break;

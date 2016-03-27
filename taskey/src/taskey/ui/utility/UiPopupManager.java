@@ -50,6 +50,7 @@ public class UiPopupManager {
 		}
 		promptMessage = createPopupLabelAtNode(text,node,offsetX,offsetY,true);
 	}
+	
 	/**
 	 * This method creates a label at the node position with offset
 	 *  Note that this offset is in screen space coordinates
@@ -115,7 +116,7 @@ public class UiPopupManager {
 	
 	/**
 	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems
-	 * To provide more customization
+	 * To provide more customization, this customization is provided by other classes, for example UiDropDown
 	 * @param numRows
 	 * @return Popup
 	 */

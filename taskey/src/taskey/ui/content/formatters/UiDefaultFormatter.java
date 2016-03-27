@@ -20,7 +20,7 @@ import taskey.ui.content.UiFormatter;
 public class UiDefaultFormatter extends UiFormatter {
 	private static final int entriesPerPage = 6;
 	private UiTaskView myTaskView;
-	private int lastNum = -1;
+	private int lastNumOfTasks = -1;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
@@ -62,10 +62,10 @@ public class UiDefaultFormatter extends UiFormatter {
 			myTaskView.getView().clear();
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
-			if ( lastNum != -1 && myTaskList.size() > lastNum ) { // addition of a task
+			if ( lastNumOfTasks != -1 && myTaskList.size() > lastNumOfTasks ) { // addition of a task
 				myTaskView.getView().selectInPage(totalPages-1, entriesPerPage); // select last
 			} 
-			lastNum = myTaskList.size();
+			lastNumOfTasks = myTaskList.size();
 		}
 	}
 	

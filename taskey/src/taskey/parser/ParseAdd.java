@@ -137,13 +137,15 @@ public class ParseAdd extends ParseCommand {
 				processed = handleDeadline(task, taskName, rawDate);
 			}
 		} else {
-			//set as floating task 
+			//set as floating task, remove priority first  
 			priority = getPriority(taskName); 
 			//invalid priority given
 			if (priority == -1) {
 				return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY);
 			}
-			taskName = taskName.split("!")[0].trim();
+			if (priority != 0) {
+				taskName = taskName.split("!")[0].trim();
+			}
 			processed = handleFloating(command, taskName);
 		}
 		//set the priority
@@ -428,12 +430,24 @@ public class ParseAdd extends ParseCommand {
 	 * @return priority for the task
 	 */
 	public int getPriority(String rawDate) {
+		//rawDate = rawDate.trim(); 
 		int count = 0; 
 		int dateLen = rawDate.length(); 
+		boolean canContinue = false; 
+		
 		for(int i = dateLen-1; i >= 0; i--) {
 			char k = rawDate.charAt(i); 
-			if (k == '!') {
-				count += 1; 
+			//check that the end of the string has !, 
+			//else there's no priority to check 
+			if (i == dateLen-1 && k == '!') {
+				canContinue = true; 
+				count += 1;
+			} else if (canContinue == true) {
+				if (k == '!') {
+					count += 1; 
+				}
+			} else {
+				return 0; //user did not indicate a priority 
 			}
 		}
 		

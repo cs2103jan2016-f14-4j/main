@@ -391,7 +391,7 @@ public class Task implements Comparable<Task> {
 			otherStartTime = anotherTask.getDeadlineEpoch(); 
 		}
 		//1. Sort by Priority
-		//2. Sort by type (Event and Deadline first, floating behind
+		//2. Sort by type (Event and Deadline first, floating behind)
 		//3. Sort by task name (alphabetical order) 
 		
 		if (this.priority > otherTaskPriority) {

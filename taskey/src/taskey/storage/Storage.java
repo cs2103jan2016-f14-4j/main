@@ -242,16 +242,18 @@ public class Storage {
 	 * This method is invoked by Logic, should the end user request to change it.
 	 * <p>Post-conditions:
 	 * <br>- Creates the directory if it does not exist yet.
-	 * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
 	 * <br>- Moves the .taskey storage files from the existing directory to the new one, 
 	 * 		 provided the new directory does not contain existing task savefiles.
-	 * @return - True if the new directory was successfully created and set;
-	 * 		   <br>- False if the path was invalid due to illegal characters (e.g. *), 
-	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters;
-	 * 		   <br>- False if move was unsuccessful
+	 * <br>- Saves the new directory setting to a persistent .taskeyconfig file in "user.dir".
+	 * <br>- The move and save will not happen if the given pathname string is equal to the current directory.
+	 * @return <br>- False if the path was invalid due to illegal characters (e.g. *), 
+	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
+	 * 		   <br>- False if at least one file was not moved unsuccessfully
+	 *         <br>- True if the new directory was successfully set and now exists
+	 *         		 and the move was successful (if it occurred)
 	 * @param pathname can be an absolute path, or relative to "user.dir"
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists;
-	 * 									  signal Logic to call loadAllTasklists
+	 * 		   							  this signals Logic to call loadAllTasklists()
 	 */
 	public boolean setDirectory(String pathname) throws FileAlreadyExistsException {
 		File dir = new File(pathname);

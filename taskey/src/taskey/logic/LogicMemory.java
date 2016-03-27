@@ -363,7 +363,8 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Updates the action list based on the view type.
+	 * Updates the action list based on the view type. When the user wants to view tasks by priority i.e. "high", "medium"
+	 * or "low", only expired and pending tasks will be displayed.
 	 * @param viewType
 	 * @throws LogicException 
 	 */
@@ -385,6 +386,14 @@ public class LogicMemory {
 				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_COMPLETED)));
 				break;
 				
+			case "high":
+			case "medium":
+			case "low":
+				clearActionList();
+				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
+				viewPriority(taskLists.get(INDEX_PENDING), viewType);
+				break;
+							
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
 				clearActionList();
 				break;
@@ -392,7 +401,7 @@ public class LogicMemory {
 			default: // Should not reach this point
 		}
 	}
-	
+
 	/**
 	 * Updates the action list with all the expired and pending tasks that contain at least one of the tag categories 
 	 * that the user wants to view.
@@ -606,6 +615,37 @@ public class LogicMemory {
 		}
 		
 		return taskFound;
+	}
+	
+	/** 
+	 * Views all tasks from the given list which are of the specified priority. 
+	 * 
+	 * @param list
+	 * @param priority
+	 * @return true if and only if at least one task was found with the specified priority
+	 */
+	private boolean viewPriority(ArrayList<Task> list, String priority) {
+		boolean priorityFound = false;
+		int priorityNumber;
+		
+		if (priority.equals("high")) {
+			priorityNumber = 3;
+		} else if (priority.equals("medium")) {
+			priorityNumber = 2;
+		} else { // "low"
+			priorityNumber = 1;
+		}
+		
+		for (Iterator<Task> it = list.iterator(); it.hasNext();) { 
+			Task task = it.next();
+			
+			if (task.getPriority() == priorityNumber) {
+				taskLists.get(INDEX_ACTION).add(task);
+				priorityFound = true;
+			}
+		}
+		
+		return priorityFound;
 	}
 	
 	/** 

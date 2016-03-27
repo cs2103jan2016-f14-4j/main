@@ -29,6 +29,7 @@ public class LogicException extends Exception {
 	public static final String MSG_ERROR_UNDO = "Nothing to undo!";
 	public static final String MSG_ERROR_TAG_NOT_FOUND = "The tag(s) you specified were not found.";
 	public static final String MSG_ERROR_SEARCH_NOT_FOUND = "No search results found.";
+	public static final String MSG_ERROR_PRIORITY_NOT_FOUND = "There are no pending/expired tasks with that priority level.";
 	public static final String MSG_ERROR_SAVE = "Error occurred during save.";
 	public static final String MSG_ERROR_CHANGE_DIR = "Error changing save directory!";
 	

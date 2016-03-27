@@ -248,7 +248,7 @@ public class Storage {
 	 * @return True if the new directory was successfully created and set;
 	 * 		   <br>False if the path was invalid due to illegal characters (e.g. *), 
 	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
-	 * @param pathname can be a relative or absolute path
+	 * @param pathname can be an absolute path, or relative to "user.dir"
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists;
 	 * 									  signal Logic to call loadAllTasklists
 	 */

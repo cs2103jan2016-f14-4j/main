@@ -105,7 +105,7 @@ public class Storage {
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
-	
+
 	/**
 	 * For testing
 	 */
@@ -133,7 +133,7 @@ public class Storage {
 	public Storage() {
 		storageReader = new StorageReader();
 		storageWriter = new StorageWriter();
-		
+
 		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory != null) {
 			if (createDirectory(loadedDirectory) == true) {
@@ -148,7 +148,7 @@ public class Storage {
 		}
 	}
 
-	
+
 	/*=====================*
 	 * Load/Save tasklists *
 	 *=====================*/
@@ -238,7 +238,7 @@ public class Storage {
 	public String getDirectory() {
 		return directory.getAbsolutePath();
 	}
-	
+
 	/**
 	 * Has the same effect as calling setDirectory(pathname, true)
 	 */
@@ -277,7 +277,7 @@ public class Storage {
 		if (createDirectory(dir) == false) {
 			return false;
 		}
-		
+
 		if (shouldMove) {
 			// Check for existing task savefiles in dir; perform the move only if it does not
 			if (!containsExistingTaskFilesIn(dir)) {
@@ -308,7 +308,7 @@ public class Storage {
 				return false;
 			}
 		}
-		
+
 		if (dir.isDirectory()) {
 			return true;
 		} else {
@@ -326,7 +326,7 @@ public class Storage {
 		if (dir.listFiles().length == 0) {
 			return false;
 		}
-		
+
 		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
 		for (File file : dir.listFiles()) {
 			String filename = file.getName();
@@ -354,7 +354,7 @@ public class Storage {
 		if (srcDir.getAbsolutePath().equalsIgnoreCase(destDir.getAbsolutePath())) {
 			return false;
 		}
-		
+
 		boolean wasMoved = false;
 		for (File srcFile : srcDir.listFiles()) {
 			if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
@@ -376,7 +376,7 @@ public class Storage {
 		}
 		return wasMoved;
 	}
-	
+
 	/**
 	 * Checks whether the abstract pathname given by dir should be saved to the directory config file.
 	 * @param dir the candidate directory
@@ -396,7 +396,7 @@ public class Storage {
 				return true; //since delete failed, return true to save it
 			}
 		}
-		
+
 		// Check that dir is different from the current directory
 		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
 			return true;

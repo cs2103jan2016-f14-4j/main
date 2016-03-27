@@ -574,6 +574,7 @@ public class Task implements Comparable<Task> {
 	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
 	 */
 	private int compareTaskNames(String otherTaskName) {
+		/*
 		//compare by name 
 		if (this.taskName.compareTo(otherTaskName) == 0) {
 			return 0; 
@@ -583,7 +584,8 @@ public class Task implements Comparable<Task> {
 			return -1; 
 		} else {
 			return 1; //less impt than the other task name
-		}
+		}*/
+		return taskName.compareTo(otherTaskName);
 	}
 	
 	// @@author A0134177E

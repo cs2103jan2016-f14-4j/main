@@ -6,6 +6,8 @@ import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 import java.util.ArrayList;
 
+import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
+
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;
@@ -49,17 +51,24 @@ public class Logic {
     //================================================================================
 	
 	/**
-	 * Returns a deep copy of all task lists.
+	 * Returns a (sorted) deep copy of all task lists.
 	 */
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
-		return ListCloner.cloneTaskLists(logicMemory.getTaskLists());
+		ArrayList<ArrayList<Task>> deepCopy = ListCloner.cloneTaskLists(logicMemory.getTaskLists());
+		for (ArrayList<Task> list : deepCopy) {
+			Collections.sort(list);
+		}
+		
+		return deepCopy;
 	}
 	
 	/**
-	 * Returns a deep copy of the current tag category list.
+	 * Returns a (sorted) deep copy of the current tag category list.
 	 */
 	public ArrayList<TagCategory> getTagCategoryList() {
-		return ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
+		ArrayList<TagCategory> deepCopy = ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
+		Collections.sort(deepCopy);
+		return deepCopy;
 	}
 	
     //================================================================================

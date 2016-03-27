@@ -9,8 +9,8 @@ import java.util.List;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task; 
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.Task; 
 
 /**
  * @@author A0107345L 
@@ -226,6 +226,8 @@ public class ParseEdit extends ParseCommand {
 	 */
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
+		long startTime = -1;
+		long endTime = -1; 
 		String[] dateList = newDateRaw.split(","); 
 		String startDate = dateList[0].trim().toLowerCase();
 		String endDate = dateList[1].trim().toLowerCase();
@@ -243,10 +245,12 @@ public class ParseEdit extends ParseCommand {
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(startDate);
 		if (epochTime != -1) {
+			startTime = epochTime; 
 			changedTask.setStartDate(epochTime); 
 		} else if (!specialDays.containsKey(startDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(startDate);
+				startTime = epochTime; 
 				changedTask.setStartDate(epochTime);
 			} catch (ParseException error) {
 				processed = super.processError(String.format(
@@ -256,15 +260,18 @@ public class ParseEdit extends ParseCommand {
 		} else {
 			//process the special day
 			epochTime = specialDays.get(startDate);
+			startTime = epochTime; 
 			changedTask.setStartDate(epochTime);
 		}
 		
 		epochTime = getPrettyTime(endDate);
 		if (epochTime != -1) {
+			endTime = epochTime; 
 			changedTask.setEndDate(epochTime); 
 		} else if (!specialDays.containsKey(endDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(endDate);
+				endTime = epochTime; 
 				changedTask.setEndDate(epochTime);
 			} catch (ParseException error) {
 				processed = super.processError(String.format(
@@ -274,13 +281,35 @@ public class ParseEdit extends ParseCommand {
 		} else {
 			//process the special day
 			epochTime = specialDays.get(endDate);
+			endTime = epochTime; 
 			changedTask.setEndDate(epochTime);
+		}
+		
+		//check to make sure valid event time 
+		if (!isValidEvent(startTime, endTime)) {
+			return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID);
 		}
 		
 		processed.setTask(changedTask);
 		return processed;
 	}
 	
+	/**
+	 * Checks if an event time is valid (ie, start time < end time) 
+	 * @param eventStartTime
+	 * @param eventEndTime
+	 * @return true if start time < end time 
+	 */
+	private boolean isValidEvent(long eventStartTime, long eventEndTime) {
+		if (eventStartTime == -1 || eventEndTime == -1) {
+			return false; 
+		}
+		
+		if (eventStartTime >= eventEndTime) {
+			return false; 
+		}
+		return true; 
+	}
 	
 	/**
 	 * Given a task we want to update the task type to deadline

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 
 /**
  * @@author A0121618M

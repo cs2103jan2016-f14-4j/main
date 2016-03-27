@@ -7,15 +7,14 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logic.Logic;
 import taskey.logic.LogicException;
 import taskey.logic.LogicMemory;
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.parser.Parser;
 import taskey.parser.TimeConverter;
 

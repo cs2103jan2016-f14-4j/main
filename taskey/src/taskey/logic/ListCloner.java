@@ -2,6 +2,9 @@ package taskey.logic;
 
 import java.util.ArrayList;
 
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
+
 /** 
  * @@author A0134177E
  * This class provides methods for creating deep copies of ArrayList<Task>, ArrayList<ArrayList<Task>>, and

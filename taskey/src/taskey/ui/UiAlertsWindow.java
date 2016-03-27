@@ -30,7 +30,7 @@ import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiAnimationManager;

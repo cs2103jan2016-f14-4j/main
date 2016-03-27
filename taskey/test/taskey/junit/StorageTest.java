@@ -15,8 +15,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageReader;

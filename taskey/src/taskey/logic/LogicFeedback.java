@@ -2,6 +2,9 @@ package taskey.logic;
 
 import java.util.ArrayList;
 
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.Task;
+
 /**
  * @@author A0134177E
  * This class is the default feedback mechanism from Logic to UI.

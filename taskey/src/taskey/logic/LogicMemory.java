@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.storage.Storage;
-import taskey.storage.StorageException;
 
 /**
  * @@author A0134177E

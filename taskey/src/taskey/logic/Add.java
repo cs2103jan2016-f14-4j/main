@@ -2,6 +2,8 @@ package taskey.logic;
 
 import java.util.ArrayList;
 
+import taskey.messenger.Task;
+
 /** 
  * @@author A0134177E
  * This class provides the basic resources necessary for subclasses to encapsulate the instructions that the receiver, 

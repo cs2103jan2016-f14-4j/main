@@ -28,7 +28,13 @@ public class ParserTest {
 		
 		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
-		
+	}
+	
+	@Test
+	/**
+	 * Test floating tasks that do not parse correctly 
+	 */
+	public void testFloatingError() {		
 		//disallow task names with only numbers 
 		assertEquals("Command: ERROR\nerror type: Error: Task name cannot consist "
 				+ "entirely of numbers\n",
@@ -51,7 +57,14 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
-		
+	}
+	
+	@Test
+	/**
+	 * Test that adding deadline tasks don't give strange results for 
+	 * error cases, so on... 
+	 */
+	public void testDeadlineError() {
 		//ensure that numbers in meeting name do not affect date output
 		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
 				+ "Feb 2016\n",
@@ -82,12 +95,34 @@ public class ParserTest {
 				+ "16:00 to 19 Feb 2016 17:00\n",
 				parser.parseInput("add project meeting from 4pm to "
 						+ "5pm on 19 feb").toString());
-		
+	}
+	
+	@Test 
+	/**
+	 * Test that events with numbers in their task names get parsed correctly 
+	 */
+	public void testEventsNumbers() {
 		//test events with numbers in task name 
 		assertEquals("Command: ADD_EVENT\nmtg2234, EVENT, from 19 Feb 2016 16:00"
 				+ " to 19 Feb 2016 17:00\n",
 				parser.parseInput("add mtg2234 from 19 feb 4pm to 5pm ").toString());
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
+	}
+	
+	@Test 
+	/**
+	 *  Test that for adding events: startTime >= endTime gives error 
+	 */
+	public void testEventsValidTime() {
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from 19 feb 5pm to 3pm").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from 21 feb to 20 feb").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from tmr to 18 feb 3pm").toString());
 	}
 	
 	@Test
@@ -114,17 +149,24 @@ public class ParserTest {
 		
 	}
 	
-	//TODO 
+	@Test
 	/**
 	 * Test the adding of tasks with priority 
 	 */
 	public void testAddPriority() {
 		//test setting of priority here 
-		System.out.println(parser.parseInput("add meeting !"));
-		System.out.println(parser.parseInput("add meeting on 18 feb !!!"));
-		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb !!"));
-		System.out.println(parser.parseInput("add meeting from 18 feb to 19 feb #boo !!"));
-		System.out.println(parser.parseInput("add meeting #sua !!"));
+		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \n",
+				parser.parseInput("add meeting !").toString());
+		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 18 Feb 2016\npriority: 3\n",
+				parser.parseInput("add meeting on 18 feb !!!").toString());
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
+				+ "priority: 2\n",
+				parser.parseInput("add meeting from 18 feb to 19 feb !!").toString());
+		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
+				+ "tags: boo, \npriority: 2\n",
+				parser.parseInput("add meeting from 18 feb to 19 feb #boo !!").toString());
+		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, \npriority: 2\n",
+				parser.parseInput("add meeting #sua !!").toString());
 	}
 	
 	@Test 
@@ -208,22 +250,49 @@ public class ParserTest {
 				parser.parseInput("set 1 [14 mar,15 mar] \"task 2\"").toString());
 	}
 	
-	//TODO
+	@Test
 	/**
 	 * Test the changing of task priorities 
 	 */
 	public void testChangesTaskPriority() {
 		//test boundary case 
-		System.out.println(parser.parseInput("set 1 !!!")); 
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_PRIORITY\nat index: 0\n"
+				+ "newPriority: 3\n",
+				parser.parseInput("set 1 !!!").toString()); 
 		//test out of bound case 
-		System.out.println(parser.parseInput("set 1 !!!!"));
-		System.out.println(parser.parseInput("set do homework !!"));
+		assertEquals("Command: ERROR\nerror type: Error: Invalid task priority entered\n",
+				parser.parseInput("set 1 !!!!").toString());
+		//test working case 
+		assertEquals("Command: UPDATE_BY_NAME_CHANGE_PRIORITY\ndo homework, \n"
+				+ "newPriority: 2\n",
+				parser.parseInput("set do homework !!").toString());
 		//test boundary case 
-		System.out.println(parser.parseInput("set 2 !")); 
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_PRIORITY\nat index: 1\n"
+				+ "newPriority: 1\n",
+				parser.parseInput("set 2 !").toString()); 
 		//test no task name given 
-		System.out.println(parser.parseInput("set !")); 
+		assertEquals("Command: ERROR\nerror type: Error: Task name/index is not given\n",
+				parser.parseInput("set !").toString()); 
 		//test no priority given
-		System.out.println(parser.parseInput("set 2")); 
+		assertEquals("Command: ERROR\nerror type: Error: Wrong format for new "
+				+ "task name/date\n",
+				parser.parseInput("set 2").toString()); 
+	}
+	
+	@Test
+	/**
+	 * Test: Changing an task to an invalid event date (ie. startTime >= endTime) 
+	 */
+	public void testChangesInvalidEvent() {
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [19 feb 5pm, 19 feb 3pm]").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [21 feb, 20 feb]").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [tmr, 19 feb 3pm]").toString());
 	}
 	
 	@Test
@@ -288,14 +357,26 @@ public class ParserTest {
 		
 	}
 	
-	//TODO 
+	@Test 
 	/**
 	 * Test the viewing of tasks by tag categories 
 	 */
 	public void testViewTags() {
-		parser.parseInput("view #work");
-		parser.parseInput("view #work #homework #yolo");
-		parser.parseInput("view lala #yolo");
+		assertEquals("Command: VIEW_TAGS\nview type: work, \n",
+				parser.parseInput("view #work").toString());
+		assertEquals("Command: VIEW_TAGS\nview type: work, homework, yolo, \n",
+				parser.parseInput("view #work #homework #yolo").toString());
+	}
+	
+	@Test
+	/**
+	 * Test the error parsing of viewing tasks by tag categories
+	 */
+	public void testViewTagsError() {
+		assertEquals("Command: ERROR\nerror type: Error: \"lala\" is not a valid tag\n",
+				parser.parseInput("view lala #yolo").toString());
+		assertEquals("Command: ERROR\nerror type: Error: \"lala\" is not a valid tag\n",
+				parser.parseInput("view #yolo lala #boo").toString());
 	}
 	
 	
@@ -320,10 +401,13 @@ public class ParserTest {
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
-	public void testDeadlineHuman() {
-		//tests the SpecialDateConverter, which is based on relative dates.
-		//thus, cannot to assert this 
+	/**
+	 * Test that words like lullaby/ bagon do not get their
+	 * "by" and "on" stripped as keywords + test relative dates
+	 */
+	public void testDeadlineHuman() { 
 		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
+		System.out.println(parser.parseInput("add buy baygon on 11 mar"));
 		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 

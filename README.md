@@ -117,3 +117,9 @@ Examples:
   <li><b>add</b> play pokemon #forfun
   <li><b>view</b> forfun 
 </ul> 
+
+###Saving
+You can save any changes to your task list by typing the command <b>save</b>
+
+###Clear all your tasks
+You can clear all your tasks by typing the command <b>clear</b>. To save this change, type <b>save</b>. 

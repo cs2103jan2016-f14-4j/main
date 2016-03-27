@@ -9,7 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 
 /**
  * @@author A0125419H

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import taskey.logic.Task;
+import taskey.messenger.Task;
 
 /**
  * @@author A0121618M

@@ -99,7 +99,7 @@ public class UiHelpView {
 			}
 			helpView.addGridToPagination(newGrid,menuElements);
 		}	
-		helpView.initialize(totalPages); // update UI and bind call back
+		helpView.initializeDisplay(totalPages); // update UI and bind call back
 	}
 	
 	private void addMenu(ArrayList<IMAGE_ID> images, ArrayList<String> info ) {
@@ -116,7 +116,7 @@ public class UiHelpView {
 			gridHelper.addTextFlowToCell(0, 1, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 			menu.addGridToPagination(newGrid,new ArrayList<StackPane>()); // no interactions	
 		}
-		menu.initialize(totalPages); // update UI and bind call back
+		menu.initializeDisplay(totalPages); // update UI and bind call back
 	}
 
 	private void setUpHelpView() {

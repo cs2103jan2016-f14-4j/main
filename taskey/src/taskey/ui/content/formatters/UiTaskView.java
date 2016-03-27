@@ -62,7 +62,7 @@ public class UiTaskView {
 			}
 			taskView.addGridToPagination(newGrid,pageEntries);
 		}
-		taskView.initialize(totalPages); // update UI and bind call back
+		taskView.initializeDisplay(totalPages); // update UI and bind call back
 	}
 
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {

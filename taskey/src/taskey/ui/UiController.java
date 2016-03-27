@@ -195,8 +195,8 @@ public class UiController {
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
 			 // just set pop up to appear below input
-			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 
-																0,input.getHeight()*1.25F,true);
+			UiPopupManager.getInstance().updatePromptMessage(statusCode.getMessage(), input, 
+																0,input.getHeight()*1.25F);
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	

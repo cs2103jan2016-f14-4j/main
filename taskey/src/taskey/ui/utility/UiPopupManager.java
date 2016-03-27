@@ -26,8 +26,9 @@ import taskey.constants.UiConstants;
 
 public class UiPopupManager {
 	private double X_Ratio = 1, Y_Ratio = 1; // window ratios
-	private static UiPopupManager instance = null;
 	private ArrayList<Popup> popupList = new ArrayList<Popup>();
+	private Popup promptMessage;
+	private static UiPopupManager instance = null;
 	private UiPopupManager() {
 	}
 	public static UiPopupManager getInstance() {
@@ -38,8 +39,20 @@ public class UiPopupManager {
 	}
 
 	/**
-	 * This method creates a label at the node position with offset Note that
-	 * this offset is in screen space coordinates
+	 * This method implements a single prompt message that will be replaced
+	 * whenever this method is called
+	 * This method uses createPopupLabelAtNode() to replace the prompt
+	 */
+	public void updatePromptMessage( String text, Node node, double offsetX, double offsetY ) { 
+		if ( promptMessage != null ) {
+			promptMessage.hide();
+			popupList.remove(promptMessage);
+		}
+		promptMessage = createPopupLabelAtNode(text,node,offsetX,offsetY,true);
+	}
+	/**
+	 * This method creates a label at the node position with offset
+	 *  Note that this offset is in screen space coordinates
 	 * 
 	 * @param text - what to display in the label
 	 * @param offsetX - from node X position
@@ -48,31 +61,30 @@ public class UiPopupManager {
 	 */
 	public Popup createPopupLabelAtNode(String text, Node node, double offsetX, double offsetY, boolean deleteAfter) {
 		assert(node != null);
-		Popup newPopup = new Popup();
+		Popup thePopup = new Popup();
 		Bounds bounds = node.getBoundsInLocal();
 		Bounds screenBounds = node.localToScreen(bounds);
 		Label content = new Label();
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
-		newPopup.getContent().add(content);
-		
-		newPopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
+		thePopup.getContent().add(content);
+		thePopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
 							screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
-		popupList.add(newPopup);
+		popupList.add(thePopup);
 		
 		if ( deleteAfter == true ) {
 			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(
-					newPopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+					thePopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
 			fade.play();
 			fade.setOnFinished(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					removePopup(newPopup);
+					removePopup(thePopup);
 				}
 			});
 		}
-		return newPopup;
+		return thePopup;
 	}
 
 	/**
@@ -105,10 +117,9 @@ public class UiPopupManager {
 	 * This method creates a pop up menu with a Popup container instead of a ContextMenu with MenuItems
 	 * To provide more customization
 	 * @param numRows
-	 * @return
+	 * @return Popup
 	 */
-	public Popup createPopupMenu(int numRows) {
-		assert(numRows >= 0);
+	public Popup createPopupMenu() {
 		Popup newPopup = new Popup();
 		VBox container = new VBox(); // VBox is used only for formatting purposes purposes
 		container.setFillWidth(true);

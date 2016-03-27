@@ -51,7 +51,7 @@ public class UiDropDown {
 		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Drop down Menu...", Level.ALL);
 		
 		myInput = input; // set up reference
-		myMenu = UiPopupManager.getInstance().createPopupMenu(MAX_ITEMS);
+		myMenu = UiPopupManager.getInstance().createPopupMenu();
 		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
 																	 5000, 1000, 1.0, 0.0);
 		// create custom handler

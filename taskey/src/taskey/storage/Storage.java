@@ -273,7 +273,7 @@ public class Storage {
 				}
 			} else {
 				// Else if there are existing savefiles, signal Logic to load them
-				System.out.println("{New directory contains existing tasklist files!}");
+				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
 				throw new FileAlreadyExistsException(null);
 			}
 		}
@@ -305,12 +305,17 @@ public class Storage {
 	/**
 	 * Checks whether dir is a new/different directory that should be saved.
 	 * This check is done to avoid unnecessary calls to the subsequent methods.
-	 * @param dir the new candidate directory
-	 * @return true if dir is a new directory; false otherwise
+	 * @param dir the candidate directory
+	 * @return true if dir is a new and different directory; false otherwise
 	 */
 	private boolean isDiffDirectory(File dir) {
 		assert (directory != null);
-		// If the new dir is different from the old directory
+		/* Check that dir is not the default directory
+		if (dir.getAbsolutePath().equalsIgnoreCase(DEFAULT_DIRECTORY.getAbsolutePath())) {
+			return false;
+		}*/ //TODO delete .taskeyconfig file if user sets the default directory.
+		
+		// Check that dir is different from the current directory
 		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
 			return true;
 		}

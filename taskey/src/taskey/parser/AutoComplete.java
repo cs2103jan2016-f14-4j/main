@@ -31,6 +31,8 @@ public class AutoComplete {
 		commands.add("done");
 		commands.add("undo");
 		commands.add("setdir");
+		commands.add("save");
+		commands.add("clear");
 		
 		commandList.put("add","add");
 		commandList.put("view","view");
@@ -40,6 +42,8 @@ public class AutoComplete {
 		commandList.put("done","done");
 		commandList.put("undo","undo");
 		commandList.put("setdir","setdir");
+		commandList.put("save","save");
+		commandList.put("clear","clear");
 		
 		viewList.add("all");
 		viewList.add("general");
@@ -47,6 +51,9 @@ public class AutoComplete {
 		viewList.add("events");
 		viewList.add("archive");
 		viewList.add("help");
+		viewList.add("high");
+		viewList.add("medium");
+		viewList.add("low");
 		
 		specialDays.add("sun");
 		specialDays.add("mon");

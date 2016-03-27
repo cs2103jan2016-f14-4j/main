@@ -8,7 +8,8 @@ import taskey.messenger.ProcessedObject;
  * @@author A0107345L
  * Logic can only call this class parse inputs from the user.
  * This Parser is a high level interface that acts as a facade
- * between the other parts of Parser. 
+ * between the other parts of Parser. Commands parsed here make
+ * use of the Command pattern as well. 
  * @author Xue Hui
  *
  */

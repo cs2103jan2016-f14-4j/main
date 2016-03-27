@@ -258,7 +258,7 @@ public class Storage {
 	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
 	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
 	 * 
-	 * @param pathname can be an absolute path, or relative to "user.dir"
+	 * @param pathname can be absolute, or relative to "user.dir"
 	 * @param shouldMove true if move operation should be performed; 
 	 * 					 false to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
@@ -266,8 +266,10 @@ public class Storage {
 	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
 	 *         <br>- True if the new directory was successfully set
 	 * 
-	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists.
+	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
+	 *			This will update Storage's directory and load from the new directory;
+	 *			files in the previous directory will remain.
 	 *
 	 * @throws IOException if an I/O error occurs when moving the files.
 	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 

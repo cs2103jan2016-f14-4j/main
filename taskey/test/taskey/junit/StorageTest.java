@@ -35,34 +35,34 @@ public class StorageTest {
 		if (originalDirConfigFile == null) {
 			System.out.println("[StorageTest] No existing directory config file");
 		}
-		storage.setDirectory(testfolder.getAbsolutePath());
+		storage.setDirectory(testfolder.getAbsolutePath(), false); //don't move savefiles to test folder
 	}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws IOException {		
+	public static void tearDownAfterClass() throws IOException {
 		// Delete savefiles
 		for (File file : testfolder.listFiles()) {
 			if (file.getName().endsWith(Storage.FILENAME_EXTENSION)) {
 				File testTasklist = new File(testfolder, file.getName());
 				Files.delete(testTasklist.toPath());
-				System.out.println("[StorageTest] " + file.getName() + " deleted");
 			}
 		}
-		
-		// Delete config file
-		if (originalDirConfigFile != null) {
-			System.out.println("[StorageTest] Setting back to original directory");
-			storage.setDirectory(originalDirConfigFile.getAbsolutePath());
-		} else {
-			// Else if there was no pre-existing config file, delete the one created in the test
-			File testDirConfigFile = new File(Storage.FILENAME_DIRCONFIG);
-			Files.delete(testDirConfigFile.toPath());
-			System.out.println("[StorageTest] Config file deleted");
-		}
+		System.out.println("[StorageTest] All " + Storage.FILENAME_EXTENSION + " test files deleted");
 		
 		// Delete folder
 		Files.delete(testfolder.toPath());
 		System.out.println("[StorageTest] Test folder deleted");
+		
+		// Revert back to previous config file
+		if (originalDirConfigFile != null) {
+			System.out.println("[StorageTest] Reverting back to original directory");
+			storage.setDirectory(originalDirConfigFile.getAbsolutePath(), false); //don't move test files to original folder
+		} else {
+			// Else if there was no pre-existing config file, delete the one created in the test
+			File testDirConfigFile = new File(Storage.FILENAME_DIRCONFIG);
+			Files.delete(testDirConfigFile.toPath());
+			System.out.println("[StorageTest] Test config file deleted");
+		}
 	}
 
 	@Before

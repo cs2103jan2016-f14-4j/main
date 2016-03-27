@@ -138,7 +138,7 @@ public class Storage {
 		if (loadedDirectory != null) {
 			if (createDirectory(loadedDirectory) == true) {
 				directory = loadedDirectory;
-				System.out.println("{Storage directory loaded} " + directory.getAbsolutePath());
+				System.out.println("{Storage directory loaded} " + directory.getPath());
 			} else { //loaded directory was invalid
 				directory = DEFAULT_DIRECTORY;
 			}
@@ -295,7 +295,7 @@ public class Storage {
 			storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
 		}
 		directory = dir;
-		System.out.println("{Storage directory set} " + directory.getAbsolutePath());
+		System.out.println("{Storage directory set} " + directory.getPath());
 		return true;
 	}
 

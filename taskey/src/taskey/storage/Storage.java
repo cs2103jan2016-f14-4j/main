@@ -259,8 +259,8 @@ public class Storage {
 	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
 	 * 
 	 * @param pathname can be absolute, or relative to "user.dir"
-	 * @param shouldMove true if move operation should be performed; 
-	 * 					 false to set Storage's directory without moving the files (see Throws section for use case).
+	 * @param shouldMove [true] if move operation should be performed; 
+	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
 	 * @return <br>- False if the pathname is invalid due to illegal characters (e.g. *), 
 	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
@@ -268,8 +268,8 @@ public class Storage {
 	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
-	 *			This will update Storage's directory and load from the new directory;
-	 *			files in the previous directory will remain.
+	 *			This will update Storage's directory and load from the new directory, 
+	 *			without moving files from the previous one.
 	 *
 	 * @throws IOException if an I/O error occurs when moving the files.
 	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 
@@ -282,27 +282,26 @@ public class Storage {
 		}
 
 		if (shouldMove) {
-			// Check for existing task savefiles in dir; perform the move only if it does not have
-			if (!containsExistingTaskFilesIn(dir)) {
+			try {
 				moveFiles(directory, dir);
-			} else {
-				// Else if there are existing savefiles, signal Logic to load them
+			} catch (FileAlreadyExistsException e) {
 				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
-				throw new FileAlreadyExistsException(null);
+				// Signal Logic to load the existing task savefiles
+				throw e;
 			}
 		}
 
-		directory = dir;
 		if (shouldSave(dir)) {
 			storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
 		}
+		directory = dir;
 		System.out.println("{Storage directory set} " + directory.getAbsolutePath());
 		return true;
 	}
 
 	/**
 	 * Creates the full directory path of the given abstract pathname.
-	 * @param dir
+	 * @param dir to be created
 	 * @return true if all the necessary folders were created or already exist and is valid; false otherwise
 	 */
 	private boolean createDirectory(File dir) {
@@ -320,47 +319,29 @@ public class Storage {
 	}
 
 	/**
-	 * Checks if the given directory contains the full set of tasklist savefiles.
-	 * @param dir directory to check for pre-existing tasklist files
-	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
-	 */
-	private boolean containsExistingTaskFilesIn(File dir) {
-		// dir is empty
-		if (dir.listFiles().length == 0) {
-			return false;
-		}
-
-		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
-		for (File file : dir.listFiles()) {
-			String filename = file.getName();
-			if (TasklistEnum.contains(filename)) {
-				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
-			}
-		}
-
-		if (Arrays.asList(tasklistFlags).contains(false)) {
-			return false; //at least one tasklist file is missing
-		} else {
-			return true; //all tasklist files are present in dir
-		}
-	}
-
-	/**
-	 * Moves the ".taskey" savefiles from the given source to destination directories.
+	 * Moves the ".taskey" savefiles from the given source to destination directory.
 	 * @param srcDir the source directory
 	 * @param destDir the destination diectory
-	 * @returns true if the files were moved successfully; false if no files were moved
+	 * @returns true if all the files were moved successfully; false if no files were moved
 	 * @throws IOException thrown by Files.move method
+	 * @throws FileAlreadyExistsException if savefiles exist in destDir
 	 */
-	private boolean moveFiles(File srcDir, File destDir) throws IOException {
-		// Skip the move if the source and destination files are the same
+	private boolean moveFiles(File srcDir, File destDir) throws IOException, FileAlreadyExistsException {
+		// Skip the move if srcDir and destDir are the same
 		if (srcDir.getAbsolutePath().equalsIgnoreCase(destDir.getAbsolutePath())) {
 			return false;
 		}
 
+		// If destDir contains a full set of pre-existing tasklist files
+		// we do not want to inadvertently overwrite them, so we skip the move
+		if (containsExistingTaskFilesIn(destDir)) {
+			throw new FileAlreadyExistsException(null);
+		}
+
 		boolean wasMoved = false;
+
 		for (File srcFile : srcDir.listFiles()) {
-			if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
+			if (srcFile.getName().endsWith(FILENAME_EXTENSION)) {
 				Path srcPath = srcFile.toPath();
 				Path destPath = destDir.toPath().resolve(srcFile.getName());
 
@@ -381,18 +362,40 @@ public class Storage {
 	}
 
 	/**
+	 * Checks if the given directory contains the full set of tasklist savefiles.
+	 * @param dir directory to check for pre-existing tasklist files
+	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
+	 */
+	private boolean containsExistingTaskFilesIn(File dir) {
+		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
+		for (File file : dir.listFiles()) {
+			String filename = file.getName();
+			//System.out.println(filename);
+			if (TasklistEnum.contains(filename)) {
+				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
+			}
+		}
+
+		if (Arrays.asList(tasklistFlags).contains(null) || Arrays.asList(tasklistFlags).contains(false)) {
+			return false; //at least one tasklist file is missing (note: should not contain false)
+		} else {
+			return true; //all tasklist files are present in dir
+		}
+	}
+
+	/**
 	 * Checks whether the abstract pathname given by dir should be saved to the directory config file.
 	 * @param dir the candidate directory
 	 * @return true if dir is different from the current directory;
-	 * 		   false if dir is the default directory or is the same as the current
+	 * 		   false if dir is the default directory or is the same as the current directory
 	 */
 	private boolean shouldSave(File dir) {
 		// If dir is equal to the default directory, we can delete the config file
-		// since Storage does not need it to remember it
+		// since Storage does not need it to remember it.
 		if (dir.getAbsolutePath().equalsIgnoreCase(DEFAULT_DIRECTORY.getAbsolutePath())) {
 			File configFile = new File(FILENAME_DIRCONFIG);
 			try {
-				Files.delete(configFile.toPath());
+				Files.deleteIfExists(configFile.toPath());
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -238,16 +238,17 @@ public class Storage {
 	}
 
 	/**
-	 * Sets the storage directory to the given pathname string after checking that the path is valid.
+	 * Changes the storage directory to the given pathname string after checking that the path is valid.
 	 * This method is invoked by Logic, should the end user request to change it.
 	 * <p>Post-conditions:
 	 * <br>- Creates the directory if it does not exist yet.
 	 * <br>- Saves the new directory setting to a .taskeyconfig file in "user.dir".
 	 * <br>- Moves the .taskey storage files from the existing directory to the new one, 
-	 * 		 provided the new directory does not contain existing tasklist files.
-	 * @return True if the new directory was successfully created and set;
-	 * 		   <br>False if the path was invalid due to illegal characters (e.g. *), 
-	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters.
+	 * 		 provided the new directory does not contain existing task savefiles.
+	 * @return - True if the new directory was successfully created and set;
+	 * 		   <br>- False if the path was invalid due to illegal characters (e.g. *), 
+	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters;
+	 * 		   <br>- False if move was unsuccessful
 	 * @param pathname can be an absolute path, or relative to "user.dir"
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists;
 	 * 									  signal Logic to call loadAllTasklists
@@ -258,13 +259,16 @@ public class Storage {
 			return false;
 		}
 
-		// Compare the new directory with the old to see if it should be moved and saved
-		if (isNewDirectory(dir)) {
-			// Check for existing files in the new dir
-			if (!haveExistingTaskFilesIn(dir)) {
-				// Perform move only if the new dir does not contain existing savefiles
-				moveFiles(directory, dir);
-				storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+		// Only move files in the current directory if the new dir is different from the current one
+		if (isDiffDirectory(dir)) {
+			// Check for existing task savefiles in dir; perform the move only if dir does not have them
+			if (!containsExistingTaskFilesIn(dir)) {
+				// Save the new directory only if the move was successful
+				if (moveFiles(directory, dir) == true) {
+					storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+				} else {
+					return false;
+				}
 			} else {
 				// Else if there are existing savefiles, signal Logic to load them
 				System.out.println("{New directory contains existing tasklist files!}");
@@ -280,7 +284,7 @@ public class Storage {
 	/**
 	 * Creates the full path of dir.
 	 * @param dir
-	 * @return true if successful; false otherwise
+	 * @return true if the full folder path was successfully created; false otherwise
 	 */
 	private boolean createDirectory(File dir) {
 		if (!dir.exists()) {
@@ -297,34 +301,32 @@ public class Storage {
 	}
 
 	/**
-	 * Private helper method. Checks whether dir is a new/different directory that should be saved.
-	 * This check is done to avoid unnecessary calls to saveDirectory().
+	 * Checks whether dir is a new/different directory that should be saved.
+	 * This check is done to avoid unnecessary calls to the subsequent methods.
 	 * @param dir the new candidate directory
 	 * @return true if dir is a new directory; false otherwise
 	 */
-	private boolean isNewDirectory(File dir) {
-		if (directory != null) {
-			// If the new dir is different from the old directory
-			if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
-				return true;
-			}
+	private boolean isDiffDirectory(File dir) {
+		assert (directory != null);
+		// If the new dir is different from the old directory
+		if (! dir.getAbsolutePath().equalsIgnoreCase(directory.getAbsolutePath()) ) {
+			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Checks if the given directory contains a full set of existing tasklists.
+	 * Checks if the given directory contains a full set of existing tasklist savefiles.
 	 * @param dir
-	 * @return true if dir contains the full set of tasklist files; false otherwise
+	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
 	 */
-	private boolean haveExistingTaskFilesIn(File dir) {
-		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
-
+	private boolean containsExistingTaskFilesIn(File dir) {
 		// dir is empty
 		if (dir.listFiles().length == 0) {
 			return false;
 		}
-
+		
+		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
 		for (File file : dir.listFiles()) {
 			String filename = file.getName();
 			//System.out.println(filename);
@@ -334,18 +336,18 @@ public class Storage {
 			}
 		}
 
-		if (!Arrays.asList(tasklistFlags).contains(false)) {
-			return true;
+		if (Arrays.asList(tasklistFlags).contains(false)) {
+			return false; //at least one tasklist file is missing
 		} else {
-			return false;
+			return true; //all tasklist files are present in dir
 		}
 	}
 
 	/**
-	 * Moves the .taskey savefiles in the existing directory to the new one.
+	 * Moves the ".taskey" savefiles from the given source to destination directories.
 	 * @param srcDir the source directory
 	 * @param destDir the destination diectory
-	 * @returns TODO: error handling?
+	 * @returns true if move was successful; false otherwise
 	 */
 	private boolean moveFiles(File srcDir, File destDir) {
 		boolean isSuccessful = true;
@@ -367,7 +369,7 @@ public class Storage {
 		if (isSuccessful) {
 			System.out.println("{Storage files moved}");
 		} else {
-			System.out.println("{IOException moving directory}");
+			System.out.println("{IOException when moving savefiles}");
 		}
 		return isSuccessful;
 	}

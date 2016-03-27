@@ -109,9 +109,20 @@ public class ParserTest {
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
-	//TODO: Test that starttime >= endTime gives error 
+	@Test 
+	/**
+	 *  Test that for adding events: startTime >= endTime gives error 
+	 */
 	public void testEventsValidTime() {
-		
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from 19 feb 5pm to 3pm").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from 21 feb to 20 feb").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from tmr to 18 feb 3pm").toString());
 	}
 	
 	@Test
@@ -268,9 +279,20 @@ public class ParserTest {
 				parser.parseInput("set 2").toString()); 
 	}
 	
-	//TODO: change to an invalid event date (ie. startTime >= endTime) 
+	@Test
+	/**
+	 * Test: Changing an task to an invalid event date (ie. startTime >= endTime) 
+	 */
 	public void testChangesInvalidEvent() {
-		
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [19 feb 5pm, 19 feb 3pm]").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [21 feb, 20 feb]").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("set 1 [tmr, 19 feb 3pm]").toString());
 	}
 	
 	@Test

@@ -452,8 +452,11 @@ public class Task implements Comparable<Task> {
 	 * 1) Based on Time
 	 * 2) Based on name, if time is the same 
 	 * @param startTime
+	 * @param endTime
 	 * @param otherTaskName
+	 * @param otherTaskType
 	 * @param otherStartTime
+	 * @param otherEndTime 
 	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
 	 */
 	private int compareNonFloating(long startTime, long endTime, String otherTaskName, String otherTaskType,
@@ -473,10 +476,10 @@ public class Task implements Comparable<Task> {
 	/**
 	 * This Task is a Deadline, and the other task is an Event.
 	 * Do a comparison based on start and end times. 
+	 * @param deadlineTime
+	 * @param otherTaskName
 	 * @param eventStartTime
 	 * @param eventEndTime
-	 * @param otherTaskName
-	 * @param deadlineTime
 	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
 	 */
 	private int compareDeadlineEvent(long deadlineTime, String otherTaskName, long eventStartTime, long eventEndTime) {

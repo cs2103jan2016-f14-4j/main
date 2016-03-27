@@ -3,6 +3,8 @@ package taskey.logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
+
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
@@ -58,6 +60,7 @@ public class LogicMemory {
 		assert(taskLists != null);
 		assert(!taskLists.contains(null));
 		assert(taskLists.size() == NUM_TASK_LISTS);
+		sortTaskLists();
 		return taskLists;
 	}
 
@@ -71,6 +74,7 @@ public class LogicMemory {
 	ArrayList<TagCategory> getTagCategoryList() {
 		assert(tagCategoryList != null);
 		assert(!tagCategoryList.contains(null));
+		sortTagCategoryList();
 		return tagCategoryList;
 	}
 
@@ -305,6 +309,28 @@ public class LogicMemory {
 		updateByIndexChangeBoth(contentBox, taskIndex, newName, toUpdateCopy);
 	}
 	
+	void updateByIndexChangePriority(ContentBox contentBox, int taskIndex, int newPriority) throws LogicException {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
+			throw new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
+		}
+		
+		removeFromAllLists(toUpdate);
+		toUpdate.setPriority(newPriority);
+		addTaskToLists(contentBox, toUpdate);
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			clearActionList();
+		}
+	}
+	
 	/**
 	 * Saves the current task lists and tag category list in memory to disk.
 	 * @throws LogicException if error occurred during save
@@ -438,6 +464,16 @@ public class LogicMemory {
 	
 	void clearTagCategoryList() {
 		tagCategoryList.clear();
+	}
+	
+	private void sortTaskLists() {
+		for (ArrayList<Task> list : taskLists) {
+			Collections.sort(list);
+		}
+	}
+	
+	private void sortTagCategoryList() {
+		Collections.sort(tagCategoryList);
 	}
 	
 	/** 

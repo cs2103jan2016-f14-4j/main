@@ -54,21 +54,14 @@ public class Logic {
 	 * Returns a (sorted) deep copy of all task lists.
 	 */
 	public ArrayList<ArrayList<Task>> getAllTaskLists() {
-		ArrayList<ArrayList<Task>> deepCopy = ListCloner.cloneTaskLists(logicMemory.getTaskLists());
-		for (ArrayList<Task> list : deepCopy) {
-			Collections.sort(list);
-		}
-		
-		return deepCopy;
+		return ListCloner.cloneTaskLists(logicMemory.getTaskLists());
 	}
 	
 	/**
 	 * Returns a (sorted) deep copy of the current tag category list.
 	 */
 	public ArrayList<TagCategory> getTagCategoryList() {
-		ArrayList<TagCategory> deepCopy = ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
-		Collections.sort(deepCopy);
-		return deepCopy;
+		return ListCloner.cloneTagCategoryList(logicMemory.getTagCategoryList());
 	}
 	
     //================================================================================
@@ -145,6 +138,10 @@ public class Logic {
 			case "UPDATE_BY_INDEX_CHANGE_NAME":
 				cmd = new UpdateByIndexChangeName(currentContent, po.getIndex(), po.getNewTaskName());
 				return executeUpdate(po, cmd);		
+				
+			case "UPDATE_BY_INDEX_CHANGE_PRIORITY":
+				cmd = new UpdateByIndexChangePriority(currentContent, po.getIndex(), po.getNewPriority());
+				return executeUpdate(po, cmd);
 
 			case "VIEW_BASIC":
 				cmd = new ViewBasic(po.getViewType().get(0));

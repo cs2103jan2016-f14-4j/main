@@ -146,10 +146,9 @@ public class Logic {
 				return executeView(po, cmd);
 
 			default:
-				break;
+				return new LogicFeedback(getAllTaskLists(), po, 
+						                 new LogicException(LogicException.MSG_ERROR_INVALID_COMMAND));
 		}
-
-		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_ERROR_COMMAND_EXECUTION));
 	}
 	
     //================================================================================

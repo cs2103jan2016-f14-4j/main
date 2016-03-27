@@ -1,9 +1,8 @@
 package taskey.logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-
-import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
 
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.TagCategory;
@@ -366,7 +365,6 @@ public class LogicMemory {
 	 * Updates the action list based on the view type. When the user wants to view tasks by priority i.e. "high", "medium"
 	 * or "low", only expired and pending tasks will be displayed.
 	 * @param viewType
-	 * @throws LogicException 
 	 */
 	void viewBasic(String viewType) {
 		switch (viewType) {

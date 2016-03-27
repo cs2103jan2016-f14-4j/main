@@ -6,8 +6,6 @@ import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 import java.util.ArrayList;
 
-import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
-
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;

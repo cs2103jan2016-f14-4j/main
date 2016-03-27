@@ -24,13 +24,13 @@ import taskey.parser.TimeConverter;
 public class LogicTest {
 	public static final int NUM_SECONDS_1_DAY = 86400;
 	public static final int NUM_SECONDS_1_WEEK = 604800;
-	public static final int NUM_SECONDS_BUFFER_TIME = 100; // Used for safety in dealing with boundary conditions
+	public static final int NUM_SECONDS_BUFFER_TIME = 10; // Used for safety in dealing with boundary conditions
 	
 	private Logic logic;
 	private Parser parser;
 	private TimeConverter timeConverter;
 	
-	public static ArrayList<ArrayList<Task>> getEmptyLists() {
+	private static ArrayList<ArrayList<Task>> getEmptyLists() {
 		ArrayList<ArrayList<Task>> lists = new ArrayList<ArrayList<Task>>();
 		
 		while (lists.size() < 8) {
@@ -61,8 +61,8 @@ public class LogicTest {
 	@Test
 	public void addingFloatingTaskShouldUpdateOnlyGeneralAndPendingLists() {
 		String input = "add task";
-		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
 		expected.get(LogicMemory.INDEX_FLOATING).add(task);
 		expected.get(LogicMemory.INDEX_PENDING).add(task);
@@ -73,10 +73,10 @@ public class LogicTest {
 	@Test
 	public void addingDeadlineTaskEndingThisWeekShouldUpdateOnlyPendingAndDeadlineAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
-		String deadline = timeConverter.getDate(currTime);
+		String deadline = timeConverter.getDate(currTime + NUM_SECONDS_BUFFER_TIME);
 		String input = "add task on " + deadline;
-		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
 		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
@@ -88,10 +88,10 @@ public class LogicTest {
 	@Test
 	public void addingDeadlineTaskNotEndingThisWeekShouldUpdateOnlyPendingAndDeadlineLists() {
 		long currTime = timeConverter.getCurrTime();
-		String deadline = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		String deadline = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_BUFFER_TIME);
 		String input = "add task on " + deadline;
-		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
 		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		expected.get(LogicMemory.INDEX_DEADLINE).add(task);
@@ -102,8 +102,8 @@ public class LogicTest {
 	@Test
 	public void addingEventTaskStartingThisWeekShouldUpdateOnlyPendingAndEventAndThisWeekLists() {
 		long currTime = timeConverter.getCurrTime();
-		String startDate = timeConverter.getDate(currTime);
-		String endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		String startDate = timeConverter.getDate(currTime + NUM_SECONDS_BUFFER_TIME);
+		String endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_BUFFER_TIME);
 		String input = "add task from " + startDate + " to " + endDate;
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task = parser.parseInput(input).getTask();

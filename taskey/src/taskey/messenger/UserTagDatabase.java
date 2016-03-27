@@ -116,7 +116,8 @@ public class UserTagDatabase {
 	 */
 	/*public boolean saveTagDatabase() {
 		try {
-			return db.saveTaglist(cloneTagList(userTags));
+			db.saveTaglist(cloneTagList(userTags));
+			return true;
 		} catch (IOException e) {
 			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 

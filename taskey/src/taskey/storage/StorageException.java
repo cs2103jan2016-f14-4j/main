@@ -7,10 +7,10 @@ import java.util.HashMap;
 import taskey.messenger.Task;
 
 /**
+ * @@author A0121618M
  * This exception class has fields that hold the last successfully saved tasklist/tagmap by Storage.
  * If Storage encounters an error during write, it will throw an instance of this class to Logic,
  * so that Logic can get the last modified tasklist/tagmap.
- * @author Dylan
  */
 @SuppressWarnings("serial")
 public class StorageException extends IOException {
@@ -25,6 +25,9 @@ public class StorageException extends IOException {
 	public StorageException(Throwable cause, HashMap<String, Integer> tagmap) {
 		super(cause.getMessage(), cause);
 		lastModifiedTagMap = tagmap;
+	}
+
+	public StorageException() {
 	}
 
 	/**

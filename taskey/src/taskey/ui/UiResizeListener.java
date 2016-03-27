@@ -27,7 +27,7 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 	public UiResizeListener(Scene theScene, Stage theStage) {
 		scene = theScene;
 		stage = theStage;
-		aspectRatio = UiConstants.MIN_SIZE.getWidth() / UiConstants.MIN_SIZE.getHeight();
+		aspectRatio = UiConstants.WINDOW_MIN_SIZE.getWidth() / UiConstants.WINDOW_MIN_SIZE.getHeight();
 	}
 	
 	@Override
@@ -47,24 +47,27 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 			dy = stage.getHeight() - t.getY();
 		} else if (MouseEvent.MOUSE_DRAGGED.equals(t.getEventType())) {
 			if (resizeH) {
-				if ( t.getX() + dx >= UiConstants.MIN_SIZE.getWidth() ) {
+				if ( t.getX() + dx >= UiConstants.WINDOW_MIN_SIZE.getWidth() ) {
 					stage.setWidth(t.getX() + dx);		
 				} else {
-					stage.setWidth(UiConstants.MIN_SIZE.getWidth());
+					stage.setWidth(UiConstants.WINDOW_MIN_SIZE.getWidth());
 				}
 			}
 			if (resizeV) {
-				if ( t.getY() + dy >= UiConstants.MIN_SIZE.getHeight() ) {
+				if ( t.getY() + dy >= UiConstants.WINDOW_MIN_SIZE.getHeight() ) {
 					stage.setHeight(t.getY() + dy);
 				} else {
-					stage.setHeight(UiConstants.MIN_SIZE.getHeight());
+					stage.setHeight(UiConstants.WINDOW_MIN_SIZE.getHeight());
 				}
 			}
 			checkAspectRatio();
-			UiPopupManager.getInstance().resizeAllPopups(stage);
+			UiPopupManager.getInstance().updateWindowRatios(stage);
 		}
 	}
 
+	/**
+	 * This method ensures that the window will always stay in proportions
+	 */
 	private void checkAspectRatio() {
 		double currentAspectRatio = stage.getWidth() / stage.getHeight();
 		if ( currentAspectRatio < aspectRatio ) { // width is smaller in aspect

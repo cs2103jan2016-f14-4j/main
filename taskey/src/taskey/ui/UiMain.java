@@ -1,7 +1,6 @@
 package taskey.ui;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javafx.application.Application;
@@ -14,15 +13,10 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ActionMode;
-import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.messenger.Task;
-import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
-import taskey.ui.utility.UiPopupManager;
 
 /**
  * @@author A0125419H
@@ -62,16 +56,21 @@ public class UiMain extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
+		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 1);
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up the program UI...", Level.ALL);
+		
 		UiImageManager.getInstance().loadImages();
 		myController = new UiController();
 		// set up main window
 		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 		// set up alert window
-		UiAlertController.getInstance().setUpStage(loadFXML(UiAlertController.getInstance(),UiConstants.FXML_ALERT_PATH));
+		UiAlertsWindow.getInstance().setUpStage(loadFXML(UiAlertsWindow.getInstance(),UiConstants.FXML_ALERT_PATH));
 		trayModule = new UiTrayModule();
-		trayModule.createTrayIcon(primaryStage);
-		trayModule.doLinkage(primaryStage, UiAlertController.getInstance().getStage()); 
+		trayModule.initTrayVariables(primaryStage);
+		trayModule.createLinkage(primaryStage, UiAlertsWindow.getInstance().getStage()); 
+		
+		TaskeyLog.getInstance().log(LogSystems.UI, "UI has been set up...", Level.ALL);
 	}
 	
 	/**
@@ -82,8 +81,8 @@ public class UiMain extends Application {
 	 */
 	private Region setUpResize(Stage primaryStage, Region contentRootRegion) {
 		 //Set a default "standard" or "100%" resolution
-	    double origW = UiConstants.MIN_SIZE.getWidth()*2;
-	    double origH = UiConstants.MIN_SIZE.getHeight()*2;
+	    double origW = UiConstants.WINDOW_MIN_SIZE.getWidth()*2;
+	    double origH = UiConstants.WINDOW_MIN_SIZE.getHeight()*2;
 		// If the Region containing the GUI does not already have a preferred
 		// width and height, set it.
 		// But, if it does, we can use that setting as the "standard"
@@ -129,18 +128,12 @@ public class UiMain extends Application {
 	private void setUpScene(Stage primaryStage, Parent root) {
 		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
-		
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
 
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
-		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on show()
-		
-		//testUI();
-		
-		TaskeyLog.getInstance().addHandler(LogSystems.UI, "UiLog.txt", 5);
-		TaskeyLog.getInstance().log(LogSystems.UI, "Done setting up the Scene...", Level.ALL);
+		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on primaryStage.show()	
 	}
 
 	/**
@@ -154,24 +147,5 @@ public class UiMain extends Application {
 	
 	public static void main(String[] args) {
 		launch(args); // calls the start() method
-	}
-
-	/**
-	 * ************************************ MY TESTING **********************************.
-	 */
-	private void testUI() {
-		ArrayList<Task> myTaskList = new ArrayList<Task>();
-		// Temporary;
-		for ( int i = 0; i < 8; i ++ ) {
-			Task temp = new Task("General Task " + i);
-			temp.setTaskType("FLOATING");
-			myTaskList.add(temp);
-		}
-		
-		myController.updateDisplay(myTaskList, ContentBox.PENDING);	
-		myController.updateDisplay(myTaskList, ContentBox.THIS_WEEK);
-		myController.updateActionDisplay(myTaskList, ActionMode.HELP);
-		myController.displayTabContents(ContentBox.ACTION);
-		
 	}
 }

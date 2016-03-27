@@ -31,14 +31,14 @@ import taskey.ui.utility.UiImageManager;
 
 /**
  * @@author A0125419H
- * This class is responsible for formatting the Default box
+ * This class is responsible for formatting the Default content box
  * The default box is used by this week, pending, expired
  * 
  * @author junwei
  */
 
 public class UiDefaultFormatter extends UiFormatter {
-	private int entriesPerPage = 6;
+	private static final int entriesPerPage = 6;
 	private UiTaskView myTaskView;
 	private int lastNum = -1;
 	
@@ -88,9 +88,10 @@ public class UiDefaultFormatter extends UiFormatter {
 			lastNum = myTaskList.size();
 		}
 	}
+	
 	private void createPromptNoTasks() {
 		// create prompt in absence of tasks
-		setGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_SINGLE));
+		setGrid(gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_SINGLE_CELL));
 		RowConstraints row = new RowConstraints();
 		row.setPercentHeight(100);
 		currentGrid.getRowConstraints().add(row);

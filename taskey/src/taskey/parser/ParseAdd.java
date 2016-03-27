@@ -9,8 +9,8 @@ import java.util.List;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task; 
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.Task; 
 
 /**
  * @@author A0107345L

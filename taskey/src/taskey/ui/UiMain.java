@@ -19,7 +19,7 @@ import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.parser.AutoComplete;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;

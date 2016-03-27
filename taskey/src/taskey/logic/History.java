@@ -2,7 +2,9 @@ package taskey.logic;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
+
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 
 /**
  * This class is to allow Storage to easily retrieve the last successfully saved tasklist/tagmap from memory

@@ -43,7 +43,7 @@ import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.constants.UiConstants.IMAGE_ID;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiAnimationManager;

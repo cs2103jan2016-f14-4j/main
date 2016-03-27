@@ -1,7 +1,7 @@
 package taskey.parser;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject; 
+import taskey.messenger.ProcessedObject; 
 
 
 /**
@@ -21,6 +21,8 @@ public class Parser {
 	private ParseDelete parseDelete = new ParseDelete();
 	private ParseDone parseDone = new ParseDone(); 
 	private ParseFileLocation parseDir = new ParseFileLocation(); 
+	private ParseSave parseSave = new ParseSave(); 
+	private ParseClear parseClear = new ParseClear(); 
 	
 	private ParseView parseView = new ParseView();
 	
@@ -47,8 +49,14 @@ public class Parser {
 			case "del":
 				processed = parseDelete.processDelete(command, stringInput); 
 				break;
-			case "file_loc":
+			case "setdir":
 				processed = parseDir.processLoc(command, stringInput);
+				break; 	
+			case "save":
+				processed = parseSave.processSave(command); 
+				break;
+			case "clear":
+				processed = parseClear.processClear(command);
 				break; 
 				
 			//need to check date: 

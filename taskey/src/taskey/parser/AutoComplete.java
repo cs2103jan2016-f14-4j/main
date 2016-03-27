@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedAC;
-import taskey.logic.TagCategory;
+import taskey.messenger.ProcessedAC;
+import taskey.messenger.TagCategory;
+import taskey.messenger.UserTagDatabase;
 
 /**
  * @@author A0107345L
@@ -29,7 +30,7 @@ public class AutoComplete {
 		commands.add("search");
 		commands.add("done");
 		commands.add("undo");
-		commands.add("file_loc");
+		commands.add("setdir");
 		
 		commandList.put("add","add");
 		commandList.put("view","view");
@@ -38,7 +39,7 @@ public class AutoComplete {
 		commandList.put("search","search");
 		commandList.put("done","done");
 		commandList.put("undo","undo");
-		commandList.put("file_loc","file_loc");
+		commandList.put("setdir","setdir");
 		
 		viewList.add("all");
 		viewList.add("general");

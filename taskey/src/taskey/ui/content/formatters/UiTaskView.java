@@ -10,7 +10,7 @@ import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.IMAGE_ID;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;

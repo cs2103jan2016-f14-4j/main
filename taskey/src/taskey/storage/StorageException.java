@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import taskey.logic.Task;
+import taskey.messenger.Task;
 
 /**
  * This exception class has fields that hold the last successfully saved tasklist/tagmap by Storage.

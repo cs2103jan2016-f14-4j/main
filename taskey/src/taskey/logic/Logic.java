@@ -1,17 +1,18 @@
 package taskey.logic;
 
-import taskey.parser.AutoComplete;
-import taskey.parser.Parser;
-import taskey.logic.Task;
+import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
+import static taskey.constants.ParserConstants.FINISHED_COMMAND;
+import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 import java.util.ArrayList;
 
 import taskey.constants.UiConstants.ContentBox;
-import taskey.logic.ProcessedObject;
-
-import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
-import static taskey.constants.ParserConstants.FINISHED_COMMAND;
-import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
+import taskey.messenger.ProcessedAC;
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
+import taskey.parser.AutoComplete;
+import taskey.parser.Parser;
 
 /**
  * @@author A0134177E

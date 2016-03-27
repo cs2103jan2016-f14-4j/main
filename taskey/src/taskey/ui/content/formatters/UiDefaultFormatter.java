@@ -23,7 +23,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.IMAGE_ID;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;

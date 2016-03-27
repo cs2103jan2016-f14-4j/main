@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.logic.LogicMemory;
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 
 /**
  * This class exposes public IO methods for saving tasklists and tags.

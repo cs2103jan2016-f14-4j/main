@@ -1,6 +1,8 @@
-package taskey.logic;
+package taskey.messenger;
 
 import java.util.ArrayList;
+
+import taskey.messenger.Task;
 
 /**
  * @@author A0107345L
@@ -31,6 +33,8 @@ import java.util.ArrayList;
  * 21. SEARCH
  * 22. UNDO 
  * 23. CHANGE_FILE_LOC
+ * 24. SAVE
+ * 25. CLEAR 
  * 
  * @author Xue Hui
  *
@@ -69,7 +73,8 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC/DELETE_BY_CATEGORY
+	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC/DELETE_BY_CATEGORY/
+	 * SAVE/CLEAR
 	 * @param command
 	 */
 	public ProcessedObject(String command) {

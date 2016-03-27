@@ -246,18 +246,21 @@ public class Storage {
 	 * <br>- Creates the directory if it does not exist yet.
 	 * <br>- Moves the .taskey storage files from the existing directory to the new one, 
 	 * 		 provided the new directory does not contain existing task savefiles.
-	 * <br>- Saves the new directory setting to a persistent .taskeyconfig file in "user.dir".
+	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
 	 * <br>- The move and save will not happen if the given pathname string is equal to the current directory.
+	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
 	 * @return <br>- False if the path was invalid due to illegal characters (e.g. *), 
 	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
-	 * 		   <br>- False if at least one file was not moved unsuccessfully
 	 *         <br>- True if the new directory was successfully set and now exists
 	 *         		 and the move was successful (if it occurred)
 	 * @param pathname can be an absolute path, or relative to "user.dir"
-	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists;
-	 * 		   							  this signals Logic to call loadAllTasklists()
+	 * @throws FileAlreadyExistsException if the new directory already contains a full set of existing tasklists.
+	 *			This is a signal for Logic to call loadAllTasklists().
+	 * @throws IOException if an I/O error occurs when moving the files.
+	 * 			This is not an atomic operation, so some files may have already been moved. 
+	 *			Logic should call the save methods to ensure that the current directory maintains the full set of tasklists.
 	 */
-	public boolean setDirectory(String pathname) throws FileAlreadyExistsException {
+	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException {
 		File dir = new File(pathname);
 		if (createDirectory(dir) == false) {
 			return false;
@@ -265,15 +268,10 @@ public class Storage {
 
 		// Only move files in the current directory if the new dir is different from the current one
 		if (isDiffDirectory(dir)) {
-			// Check for existing task savefiles in dir; perform the move only if dir does not have any
+			// Check for existing task savefiles in dir; perform the move only if it does not
 			if (!containsExistingTaskFilesIn(dir)) {
-				boolean moveSuccessful = moveFiles(directory, dir);
-				// Save the new directory only if the move was successful
-				if (moveSuccessful == true) {
-					storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
-				} else {
-					return false;
-				}
+				moveFiles(directory, dir);
+				storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
 			} else {
 				// Else if there are existing savefiles, signal Logic to load them
 				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
@@ -287,9 +285,10 @@ public class Storage {
 	}
 
 	/**
-	 * Creates the full path of dir.
+	 * Creates the full directory path of the given abstract pathname.
 	 * @param dir
-	 * @return true if the full folder path was successfully created; false otherwise
+	 * @return true if all the necessary folders were created and the resulting directory is valid; 
+	 * 		   false otherwise
 	 */
 	private boolean createDirectory(File dir) {
 		if (!dir.exists()) {
@@ -297,7 +296,7 @@ public class Storage {
 				return false;
 			}
 		}
-
+		
 		if (dir.isDirectory()) {
 			return true;
 		} else {
@@ -357,10 +356,11 @@ public class Storage {
 	 * Moves the ".taskey" savefiles from the given source to destination directories.
 	 * @param srcDir the source directory
 	 * @param destDir the destination diectory
-	 * @returns true if move was successful; false otherwise
+	 * @returns true if the files were moved successfully; false if no files were moved
+	 * @throws IOException thrown by Files.move method
 	 */
-	private boolean moveFiles(File srcDir, File destDir) {
-		boolean isSuccessful = true;
+	private boolean moveFiles(File srcDir, File destDir) throws IOException {
+		boolean wasMoved = false;
 
 		for (File srcFile : srcDir.listFiles()) {
 			if ( srcFile.getName().endsWith(FILENAME_EXTENSION) ) {
@@ -369,18 +369,19 @@ public class Storage {
 
 				try {
 					Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+					wasMoved = true;
 				} catch (IOException e) {
-					isSuccessful = false;
 					e.printStackTrace();
+					throw e;
 				}
 			}
 		}
 
-		if (isSuccessful) {
+		if (wasMoved) {
 			System.out.println("{Storage files moved}");
 		} else {
-			System.out.println("{IOException when moving savefiles}");
+			System.out.println("{No .taskey files to move}");
 		}
-		return isSuccessful;
+		return wasMoved;
 	}
 }

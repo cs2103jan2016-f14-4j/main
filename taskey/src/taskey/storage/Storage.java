@@ -25,16 +25,16 @@ public class Storage {
 	private File directory;
 
 	private static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
-	private static final String FILENAME_CONFIG = "last_used_directory.taskeyconfig";
+	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig"; //public for unit tests
+	public static final String FILENAME_EXTENSION = ".taskey";
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
-	private static final String FILENAME_EXTENSION = ".taskey";
 	private static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
 	public enum TasklistEnum {
-		// Index 0 (THIS_WEEK list) and 7 (ACTION list) is to  be ignored
+		// Index 0 (THIS_WEEK list) and 7 (ACTION list) from Logic is to be ignored
 		PENDING		("PENDING.taskey", 1),
 		EXPIRED		("EXPIRED.taskey", 2),
-		GENERAL		("GENERAL.taskey", 3),	//
+		GENERAL		("GENERAL.taskey", 3),	//TODO: consolidate files?
 		DEADLINE	("DEADLINE.taskey", 4),	//
 		EVENT		("EVENT.taskey", 5),	//
 		COMPLETED	("COMPLETED.taskey", 6);
@@ -63,7 +63,7 @@ public class Storage {
 		/**
 		 * Checks whether TasklistEnum contains the given filename string.
 		 * @param fileName
-		 * @return
+		 * @return true if the given filename matches any of the enum fields; false otherwise
 		 */
 		public static boolean contains(String fileName) {
 			for (TasklistEnum e : TasklistEnum.values()) {
@@ -77,7 +77,8 @@ public class Storage {
 		/**
 		 * Get the corresponding index of the given filename string.
 		 * @param fileName
-		 * @return
+		 * @return the index of the enum constant that has the given filename;
+		 * 		   -1 is returned if the given filename does not exist in the enum
 		 */
 		public static int indexOf(String fileName) {
 			for (TasklistEnum e : TasklistEnum.values()) {
@@ -133,7 +134,7 @@ public class Storage {
 		storageReader = new StorageReader();
 		storageWriter = new StorageWriter();
 
-		File loadedDirectory = storageReader.loadDirectory(FILENAME_CONFIG);
+		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory == null) {
 			createDirectory(DEFAULT_DIRECTORY);
 			directory = DEFAULT_DIRECTORY;
@@ -263,11 +264,12 @@ public class Storage {
 
 		// Only move files in the current directory if the new dir is different from the current one
 		if (isDiffDirectory(dir)) {
-			// Check for existing task savefiles in dir; perform the move only if dir does not have them
+			// Check for existing task savefiles in dir; perform the move only if dir does not have any
 			if (!containsExistingTaskFilesIn(dir)) {
+				boolean moveSuccessful = moveFiles(directory, dir);
 				// Save the new directory only if the move was successful
-				if (moveFiles(directory, dir) == true) {
-					storageWriter.saveDirectory(dir, FILENAME_CONFIG);
+				if (moveSuccessful == true) {
+					storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
 				} else {
 					return false;
 				}

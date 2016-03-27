@@ -3,6 +3,7 @@ package taskey.storage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -14,11 +15,7 @@ import taskey.logic.Task;
 /**
  * @@author A0121618M
  */
-class StorageReader {
-	@SuppressWarnings("serial")
-	public class InvalidTaskException extends Exception {
-	}
-
+public class StorageReader {
 	/**
 	 * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
 	 * @param src JSON file to be read
@@ -30,6 +27,11 @@ class StorageReader {
 		FileReader reader = new FileReader(src);
 		Gson gson = new Gson();
 		T object = gson.fromJson(reader, typeToken.getType()); //TODO Handle type safety
+		try {
+			reader.close(); //close stream to allow deletion of files by StorageTest
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return object;
 	}
 
@@ -41,12 +43,12 @@ class StorageReader {
 	 * @param filename name of the config file to be read
 	 * @return the File representing the last-saved directory, or null if it was not found
 	 */
-	File loadDirectory(String filename) {
+	public File loadDirectoryConfigFile(String filename) {
 		File src = new File(filename);
 		try {
 			//TODO: buggyPath will somehow always have user.dir prefixed in its absolute path
 			File buggyPath = readFromFile(src, new TypeToken<File>() {});
-			File fixedPath = new File(buggyPath.getPath()); //hackey solution
+			File fixedPath = new File(buggyPath.getPath()); //kludge solution
 			return fixedPath;
 		} catch (FileNotFoundException e) {
 			return null;
@@ -57,6 +59,10 @@ class StorageReader {
 	/*================*
 	 * Load task list *
 	 *================*/
+	@SuppressWarnings("serial")
+	public class InvalidTaskException extends Exception {
+	}
+
 	/**
 	 * Returns an ArrayList of Task objects read from the File src.
 	 * An empty ArrayList is returned if src was not found.

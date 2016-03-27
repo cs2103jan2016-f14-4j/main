@@ -35,11 +35,11 @@ class StorageWriter {
 	 * Save directory *
 	 *================*/
 	/**
-	 * Writes the given directory to a config file located in System.getProperty("user.dir").
+	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
 	 * @param dir the File representing the directory to be saved
 	 * @param filename name of the destination file
 	 */
-	void saveDirectory(File dir, String filename) {
+	void saveDirectoryConfigFile(File dir, String filename) {
 		File dest = new File(filename);
 		try {
 			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});

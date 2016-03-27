@@ -19,6 +19,7 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_UPDATE = "Successfully updated task.";
 	public static final String MSG_SUCCESS_CLEAR = "Successfully cleared memory.";
 	public static final String MSG_SUCCESS_SAVE = "Save successful.";
+	public static final String MSG_SUCCESS_CHANGE_DIR = "Successfully changed save directory.";
 	public static final String MSG_ERROR_COMMAND_EXECUTION = "Failed to execute command.";
 	public static final String MSG_ERROR_DUPLICATE_TASKS = "Duplicate tasks are not allowed.";	                                             
 	public static final String MSG_ERROR_DATE_EXPIRED = "The deadline/end date is already past!";
@@ -29,6 +30,7 @@ public class LogicException extends Exception {
 	public static final String MSG_ERROR_TAG_NOT_FOUND = "The tag(s) you specified were not found.";
 	public static final String MSG_ERROR_SEARCH_NOT_FOUND = "No search results found.";
 	public static final String MSG_ERROR_SAVE = "Error occurred during save.";
+	public static final String MSG_ERROR_CHANGE_DIR = "Error changing save directory!";
 	
     //================================================================================
     // Constructor

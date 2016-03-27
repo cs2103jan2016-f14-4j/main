@@ -26,6 +26,9 @@ public class Parser {
 	
 	private ParseView parseView = new ParseView();
 	
+	/**
+	 * Constructor 
+	 */
 	public Parser() {
 	
 	}
@@ -41,7 +44,7 @@ public class Parser {
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"
-		//view, delete by index, delete by name, 
+		//view, delete by index, delete by name, save, clear
 		switch(command) {
 			case "view":
 				processed = parseView.processView(command, stringInput); 
@@ -61,7 +64,7 @@ public class Parser {
 				
 			//need to check date: 
 			//add floating, add deadline, add event,
-			//update by index, update by name 
+			//update by index, update by name ,etc 
 			case "add":
 				processed = parseAdd.processAdd(command, stringInput); 
 				break;
@@ -101,7 +104,6 @@ public class Parser {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput

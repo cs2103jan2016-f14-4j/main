@@ -109,6 +109,11 @@ public class ParserTest {
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
 	}
 	
+	//TODO: Test that starttime >= endTime gives error 
+	public void testEventsValidTime() {
+		
+	}
+	
 	@Test
 	/**
 	 * Test that tagging gets parsed correctly 
@@ -261,6 +266,11 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Wrong format for new "
 				+ "task name/date\n",
 				parser.parseInput("set 2").toString()); 
+	}
+	
+	//TODO: change to an invalid event date (ie. startTime >= endTime) 
+	public void testChangesInvalidEvent() {
+		
 	}
 	
 	@Test

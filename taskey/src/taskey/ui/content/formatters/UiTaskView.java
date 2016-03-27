@@ -8,8 +8,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.IMAGE_ID;
-import taskey.logic.Task;
+import taskey.constants.UiConstants.ImageID;
+import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
@@ -124,16 +124,16 @@ public class UiTaskView {
 	
 	private void addImage(Task theTask, GridPane newGrid) { 
 		assert(theTask.getTaskType() != null);
-		IMAGE_ID imgID;
+		ImageID imgID;
 		switch ( theTask.getTaskType() ) {
 			case "EVENT":
-				imgID = IMAGE_ID.EVENT;
+				imgID = ImageID.EVENT;
 				break;
 			case "DEADLINE":
-				imgID = IMAGE_ID.DEADLINE;
+				imgID = ImageID.DEADLINE;
 				break;
 			default:
-				imgID = IMAGE_ID.FLOATING;
+				imgID = ImageID.FLOATING;
 				break;
 		}
 		gridHelper.createStyledCell(1, 0, "", newGrid);

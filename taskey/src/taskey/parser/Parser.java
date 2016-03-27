@@ -1,14 +1,15 @@
 package taskey.parser;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject; 
+import taskey.messenger.ProcessedObject; 
 
 
 /**
  * @@author A0107345L
  * Logic can only call this class parse inputs from the user.
  * This Parser is a high level interface that acts as a facade
- * between the other parts of Parser. 
+ * between the other parts of Parser. Commands parsed here make
+ * use of the Command pattern as well. 
  * @author Xue Hui
  *
  */
@@ -21,9 +22,14 @@ public class Parser {
 	private ParseDelete parseDelete = new ParseDelete();
 	private ParseDone parseDone = new ParseDone(); 
 	private ParseFileLocation parseDir = new ParseFileLocation(); 
+	private ParseSave parseSave = new ParseSave(); 
+	private ParseClear parseClear = new ParseClear(); 
 	
 	private ParseView parseView = new ParseView();
 	
+	/**
+	 * Constructor 
+	 */
 	public Parser() {
 	
 	}
@@ -39,7 +45,7 @@ public class Parser {
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"
-		//view, delete by index, delete by name, 
+		//view, delete by index, delete by name, save, clear
 		switch(command) {
 			case "view":
 				processed = parseView.processView(command, stringInput); 
@@ -47,13 +53,19 @@ public class Parser {
 			case "del":
 				processed = parseDelete.processDelete(command, stringInput); 
 				break;
-			case "file_loc":
+			case "setdir":
 				processed = parseDir.processLoc(command, stringInput);
+				break; 	
+			case "save":
+				processed = parseSave.processSave(command); 
+				break;
+			case "clear":
+				processed = parseClear.processClear(command);
 				break; 
 				
 			//need to check date: 
 			//add floating, add deadline, add event,
-			//update by index, update by name 
+			//update by index, update by name ,etc 
 			case "add":
 				processed = parseAdd.processAdd(command, stringInput); 
 				break;
@@ -93,7 +105,6 @@ public class Parser {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput

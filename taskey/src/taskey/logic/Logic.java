@@ -1,17 +1,18 @@
 package taskey.logic;
 
-import taskey.parser.AutoComplete;
-import taskey.parser.Parser;
-import taskey.logic.Task;
+import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
+import static taskey.constants.ParserConstants.FINISHED_COMMAND;
+import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 import java.util.ArrayList;
 
 import taskey.constants.UiConstants.ContentBox;
-import taskey.logic.ProcessedObject;
-
-import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
-import static taskey.constants.ParserConstants.FINISHED_COMMAND;
-import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
+import taskey.messenger.ProcessedAC;
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
+import taskey.parser.AutoComplete;
+import taskey.parser.Parser;
 
 /**
  * @@author A0134177E
@@ -139,6 +140,10 @@ public class Logic {
 			case "UNDO":
 				return executeUndo(po);
 				
+			case "CHANGE_FILE_LOC":
+				cmd = new ChangeSaveDirectory(po.getNewFileLoc());
+				return executeChangeSaveDirectory(po, cmd);
+				
 			case "ERROR":
 				return new LogicFeedback(getAllTaskLists(), po, new LogicException(po.getErrorType()));
 
@@ -248,6 +253,15 @@ public class Logic {
 				                 new LogicException(LogicException.MSG_SUCCESS_SAVE));
 	}
 	
+	private LogicFeedback executeChangeSaveDirectory(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
+		}
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));
+	}
+	
     //================================================================================
     // Miscellaneous
     //================================================================================
@@ -257,18 +271,6 @@ public class Logic {
 		history.addTaskLists(getAllTaskLists());
 		history.addTagCategoryList(getTagCategoryList());
 	}
-	
-	/*
-	// Save all task lists to Storage. If the save failed, the task lists will be reverted to the states
-	// they were in before they were modified.
-	private void saveAllTasks(ArrayList<ArrayList<Task>> taskLists) throws LogicException {
-		try {
-			storage.saveAllTasklists(taskLists);
-		} catch (StorageException se) {
-			throw new LogicException (se.getMessage());
-		}
-	}*/
-	
 	
 	public ArrayList<String> autoCompleteLine(String line, ContentBox currentContent) {
 		AutoComplete auto = new AutoComplete();

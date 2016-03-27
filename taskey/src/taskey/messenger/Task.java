@@ -1,4 +1,4 @@
-package taskey.logic;
+package taskey.messenger;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -369,14 +369,16 @@ public class Task implements Comparable<Task> {
 	
 	@Override
 	/**
-	 * tasks are comparable by their start time. 
-	 * used for sorting in ArrayList<Task>
+	 * Tasks are comparable by their start time. 
+	 * Used for sorting in ArrayList<Task>
 	 * So that one can easily just call Collections.sort(taskList) 
 	 */
 	public int compareTo(Task anotherTask) {
 		long startTime = -1; 
+		long endTime = -1; 
 		if (this.taskType.compareTo("EVENT") == 0) {
 			startTime = getStartDateEpoch(); 
+			endTime = getEndDateEpoch(); 
 		} else if (this.taskType.compareTo("DEADLINE") == 0) { 
 			startTime = getDeadlineEpoch(); 
 		}
@@ -385,19 +387,23 @@ public class Task implements Comparable<Task> {
 		String otherTaskName = anotherTask.getTaskName(); 
 		int otherTaskPriority = anotherTask.getPriority(); 
 		long otherStartTime = -1; 
+		long otherEndTime = -1; 
 		if (anotherTask.getTaskType().compareTo("EVENT") == 0) {
 			otherStartTime = anotherTask.getStartDateEpoch(); 
+			otherEndTime = anotherTask.getEndDateEpoch(); 
 		} else if (anotherTask.getTaskType().compareTo("DEADLINE") == 0) { 
 			otherStartTime = anotherTask.getDeadlineEpoch(); 
 		}
+		
 		//1. Sort by Priority
-		//2. Sort by type (Event and Deadline first, floating behind
+		//2. Sort by type (Event and Deadline first, floating behind)
 		//3. Sort by task name (alphabetical order) 
 		
 		if (this.priority > otherTaskPriority) {
 			return 1; 
 		} else if (this.priority == otherTaskPriority) {
-			return compareByTaskType(startTime, otherTaskType, otherTaskName, otherStartTime);
+			return compareByTaskType(startTime, endTime, otherTaskType, 
+					otherTaskName, otherStartTime, otherEndTime);
 		} else {
 			return -1; //this.priority < otherTaskPriority 
 		}
@@ -412,26 +418,31 @@ public class Task implements Comparable<Task> {
 	 * @return 1 if this task is "greater" than the other Task, 0 if they are the same,
 	 * and -1 if this task is "lesser" then the other Task 
 	 */
-	private int compareByTaskType(long startTime, String otherTaskType, String otherTaskName, long otherStartTime) {
+	private int compareByTaskType(long startTime, long endTime,
+			String otherTaskType, String otherTaskName, long otherStartTime, long otherEndTime) {
 		//FLOATING HAS THE LOWEST PRIORITY : compare by name 
-		if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("FLOATING") == 0) {
+		if (this.taskType.equals("FLOATING") && otherTaskType.equals("FLOATING")) {
 			return compareTaskNames(otherTaskName);
-		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+		} else if (this.taskType.equals("FLOATING") && otherTaskType.equals("EVENT")) {
 			return -1; 
 		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
 			return -1; 
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
 			return 1; 
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
-			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
+					otherStartTime, otherEndTime);
 		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
-			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
+					otherStartTime, otherEndTime);
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
 			return 1; 
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
-			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
+					otherStartTime, otherEndTime);
 		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
-			return compareNonFloating(startTime, otherTaskName, otherStartTime);
+			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
+					otherStartTime, otherEndTime);
 		} 
 		return 0; //shouldn't get here. 
 	}
@@ -441,33 +452,137 @@ public class Task implements Comparable<Task> {
 	 * 1) Based on Time
 	 * 2) Based on name, if time is the same 
 	 * @param startTime
+	 * @param endTime
 	 * @param otherTaskName
+	 * @param otherTaskType
 	 * @param otherStartTime
-	 * @return
+	 * @param otherEndTime 
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
 	 */
-	private int compareNonFloating(long startTime, String otherTaskName, long otherStartTime) {
-		if (startTime > otherStartTime) {
-			return 1;
-		} else if (startTime == otherStartTime) {
-			return compareTaskNames(otherTaskName);
+	private int compareNonFloating(long startTime, long endTime, String otherTaskName, String otherTaskType,
+			long otherStartTime, long otherEndTime) {
+		
+		if (this.taskType.equals("EVENT") && otherTaskType.equals("DEADLINE")) {
+			return compareEventDeadline(startTime, endTime, otherTaskName, otherStartTime); 
+		} else if (this.taskType.equals("EVENT") && otherTaskType.equals("EVENT")) {
+			return compareTwoEvents(startTime, endTime, otherTaskName, otherStartTime, otherEndTime);
+		} else if (this.taskType.equals("DEADLINE") && otherTaskType.equals("EVENT")) {
+			return compareDeadlineEvent(startTime, otherTaskName, otherStartTime, otherEndTime); 
+		} else { //this.taskType == Deadline && other.taskType == deadline 
+			return compareTwoDeadlines(startTime, otherTaskName, otherStartTime);
+		}
+	}
+	
+	/**
+	 * This Task is a Deadline, and the other task is an Event.
+	 * Do a comparison based on start and end times. 
+	 * @param deadlineTime
+	 * @param otherTaskName
+	 * @param eventStartTime
+	 * @param eventEndTime
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
+	 */
+	private int compareDeadlineEvent(long deadlineTime, String otherTaskName, long eventStartTime, long eventEndTime) {
+		if (deadlineTime < eventEndTime) {
+			return 1; //deadline ends earlier, so it gets a higher priority
+		} else if (deadlineTime == eventEndTime) {
+			if (deadlineTime < eventStartTime) {
+				return 1; //deadline ends before (other) eventStartTime, so deadline gets higher priority
+			} else if (eventStartTime == deadlineTime) {
+				return compareTaskNames(otherTaskName); 
+			} else {
+				return -1; 
+			}
 		} else {
 			return -1; 
 		}
 	}
 	
 	/**
-	 * Compare events, floatings or deadlines based on their task names
+	 * This Task is an Event, and the other task is a deadline.
+	 * Do a comparison based on start and end times. 
+	 * @param eventStartTime
+	 * @param eventEndTime
 	 * @param otherTaskName
-	 * @return
+	 * @param deadlineTime
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
+	 */
+	private int compareEventDeadline(long eventStartTime, long eventEndTime, String otherTaskName, long deadlineTime) {
+		if (eventEndTime > deadlineTime) {
+			return -1; //deadline ends earlier, so it gets a higher priority
+		} else if (eventEndTime == deadlineTime) {
+			if (eventStartTime > deadlineTime) {
+				return -1; //event starts after deadline, so deadline gets higher priority
+			} else if (eventStartTime == deadlineTime) {
+				return compareTaskNames(otherTaskName); 
+			} else {
+				return 1; 
+			}
+		} else {
+			return 1; 
+		}
+	}
+	
+	/**
+	 * Compare the time priority for 2 events. If they start at the same time,
+	 * the event which ends earlier gets higher priority. 
+	 * @param startTime
+	 * @param endTime
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @param otherEndTime
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
+	 */
+	private int compareTwoEvents(long startTime, long endTime, String otherTaskName, 
+			long otherStartTime, long otherEndTime) {
+		if (startTime > otherStartTime) {
+			return -1; //this task starts later, so it gets less priority
+		} else if (startTime == otherStartTime) {
+			if (endTime < otherEndTime) {
+				return 1; //this task ends earlier, so it gets more priority 
+			} else if (endTime == otherEndTime) {
+				return compareTaskNames(otherTaskName);
+			} else {
+				return -1; 
+			}
+		} else {
+			return 1; 
+		}
+	}
+
+	/**
+	 * Compare two start times for 2 deadline tasks 
+	 * @param startTime
+	 * @param otherTaskName
+	 * @param otherStartTime
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
+	 */
+	private int compareTwoDeadlines(long endTime, String otherTaskName, long otherEndTime) {
+		if (endTime > otherEndTime) {
+			return -1; //this task ends later, so it gets less priority 
+		} else if (endTime == otherEndTime) {
+			return compareTaskNames(otherTaskName);
+		} else {
+			return 1; 
+		}
+	}
+	
+	/**
+	 * Compare events, floating or deadlines based on their task names
+	 * ie. arrange in alphabetical order 
+	 * @param otherTaskName
+	 * @return 0 if equal, 1 if this task is greater, -1 if this task is lesser
 	 */
 	private int compareTaskNames(String otherTaskName) {
 		//compare by name 
 		if (this.taskName.compareTo(otherTaskName) == 0) {
 			return 0; 
 		} else if (this.taskName.compareTo(otherTaskName) > 0) {
-			return 1; //this task name is greater than the other task name 
+			//this task name is greater than the other task name and should be ordered behind
+			//eg. this is Zephyr, that is Wine, then that should come before this. 
+			return -1; 
 		} else {
-			return -1; //less impt than the other task name
+			return 1; //less impt than the other task name
 		}
 	}
 	

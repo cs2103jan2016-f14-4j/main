@@ -11,7 +11,7 @@ import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.formatters.UiActionFormatter;
 import taskey.ui.content.formatters.UiCategoryFormatter;
 import taskey.ui.content.formatters.UiDefaultFormatter;

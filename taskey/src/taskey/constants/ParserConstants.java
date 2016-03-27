@@ -34,6 +34,7 @@ public class ParserConstants {
 	public static final String ERROR_VIEW_EMPTY = "Error: No view type selected";
 	public static final String ERROR_COMMAND = "Error: \"%s\" is not a valid command"; 
 	public static final String ERROR_ADD_EMPTY = "Error: Cannot be an empty add";
+	public static final String ERROR_EVENT_TIME_INVALID = "Error: Event starting time cannot be later than the ending time"; 
 	public static final String ERROR_ONLY_NUMS = "Error: Task name cannot consist entirely of numbers";
 	public static final String ERROR_INPUT_EMPTY = "Error: Cannot be an empty change"; 
 	public static final String ERROR_NAME_EMPTY = "Error: Task name/index is not given";

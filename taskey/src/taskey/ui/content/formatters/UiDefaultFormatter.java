@@ -6,7 +6,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
 import taskey.constants.UiConstants;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
 
 /**

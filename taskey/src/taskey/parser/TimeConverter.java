@@ -6,7 +6,12 @@ import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
 
-/* @@author A0107345L */ 
+/**
+ * @@author A0107345L 
+ * The purpose of this class is to convert time anywhere in taskey. 
+ * @author Xue Hui
+ *
+ */
 public class TimeConverter {
 	
 	//store curr time in seconds 
@@ -21,9 +26,11 @@ public class TimeConverter {
 	}
 	
 	/**
-	 * @return the value of the variable, currTime 
+	 * @return the value of the variable, currTime. 
+	 * Update the currTime every time this is called.
 	 */
 	public long getCurrTime() {
+		currTime = System.currentTimeMillis()/1000;
 		return currTime; 
 	}	
 	

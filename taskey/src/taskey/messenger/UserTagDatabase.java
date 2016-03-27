@@ -1,10 +1,8 @@
-package taskey.parser;
+package taskey.messenger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import taskey.logic.TagCategory;
 import taskey.storage.Storage;
 
 /**
@@ -118,7 +116,8 @@ public class UserTagDatabase {
 	 */
 	/*public boolean saveTagDatabase() {
 		try {
-			return db.saveTaglist(cloneTagList(userTags));
+			db.saveTaglist(cloneTagList(userTags));
+			return true;
 		} catch (IOException e) {
 			userTags = cloneTagList(db.getHistory().peekTags()); //To revert changes to userTags
 			return false; 

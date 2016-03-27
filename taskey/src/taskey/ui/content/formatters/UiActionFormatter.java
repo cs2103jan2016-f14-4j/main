@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import taskey.constants.UiConstants.ActionMode;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
 

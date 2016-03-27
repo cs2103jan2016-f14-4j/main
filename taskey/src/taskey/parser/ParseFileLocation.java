@@ -1,6 +1,6 @@
 package taskey.parser;
 
-import taskey.logic.ProcessedObject;
+import taskey.messenger.ProcessedObject;
 import taskey.constants.ParserConstants; 
 
 /**

@@ -26,15 +26,15 @@ import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
-import taskey.constants.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
 import taskey.logic.LogicFeedback;
 import taskey.logic.LogicMemory;
-import taskey.logic.ProcessedObject;
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
@@ -128,8 +128,8 @@ public class UiController {
 	}
 	
 	private void setUpButtonStyles() {
-		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
-		minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+		crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT)); 
+		minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 	}
 	
 	/**
@@ -424,7 +424,7 @@ public class UiController {
 		} else if (event.getCode() == KeyCode.ESCAPE) {
 			System.exit(0);
 		} else if (event.isControlDown() && event.getCode() == KeyCode.W){
-			crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+			crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 			stage.close();
 		} else if (event.getCode() == KeyCode.F1) {
 			myContentManager.setActionMode(ActionMode.HELP);
@@ -458,7 +458,7 @@ public class UiController {
 		assert(minusButton != null);	
 		crossButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
-				crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_SELECT));
+				crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_SELECT));
 		  }
 		});
 		crossButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -467,22 +467,22 @@ public class UiController {
 				if ( mouseEvent.getPickResult().getIntersectedNode() == crossButton) {
 					System.exit(0);
 				} else {
-					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+					crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 				}
 			}
 		});
 		minusButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
-				minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_SELECT));
+				minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_SELECT));
 		  }
 		});
 		minusButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 				if ( mouseEvent.getPickResult().getIntersectedNode() == minusButton) {
-					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+					minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 					stage.close();
 				} else {
-					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+					minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 				}
 			}
 		});

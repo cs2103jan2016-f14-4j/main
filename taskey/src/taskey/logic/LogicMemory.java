@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.storage.Storage;
-import taskey.storage.StorageException;
 
 /**
  * @@author A0134177E
@@ -298,19 +299,19 @@ public class LogicMemory {
 	void viewBasic(String viewType) {
 		switch (viewType) {
 			case "general":
-				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_FLOATING));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
 				break;
 			
 			case "deadlines":
-				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_DEADLINE));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
 				break;
 				
 			case "events":
-				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_EVENT));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_EVENT)));
 				break;
 				
 			case "archive":
-				taskLists.set(INDEX_ACTION, taskLists.get(INDEX_COMPLETED));
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_COMPLETED)));
 				break;
 				
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
@@ -365,6 +366,20 @@ public class LogicMemory {
 			storage.saveTaglist(ListCloner.cloneTagCategoryList(tagCategoryList));
 		} catch (Exception e) {
 			throw new LogicException(LogicException.MSG_ERROR_SAVE);
+		}
+	}
+	
+	/**
+	 * Change the directory where task and tag category data are saved. If this method succeeds, all saved files are 
+	 * moved from the current save directory to the new directory.
+	 * @param pathName        the new directory pathname
+	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
+	 */
+	void changeSaveDirectory(String pathName) throws LogicException {
+		try {
+			storage.setDirectory(pathName);
+		} catch (Exception e) {
+			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		}
 	}
 	

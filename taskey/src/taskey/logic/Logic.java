@@ -77,17 +77,7 @@ public class Logic {
     	ProcessedObject po = parser.parseInput(input);
     	String command = po.getCommand();
     	Command cmd;
-    	
-    	if (input.equalsIgnoreCase("clear")) { // TODO: implement "clear" in Parser
-    		cmd = new Clear();
-			return executeClear(cmd);
-    	}
-    	
-    	if (input.equalsIgnoreCase("save")) { // TODO: implement "save" in Parser
-    		cmd = new Save();
-			return executeSave(cmd);
-    	}
-    	
+  
     	switch (command) {
 			case "ADD_FLOATING":
 				cmd = new AddFloating(po.getTask());
@@ -100,38 +90,33 @@ public class Logic {
 			case "ADD_EVENT":
 				cmd = new AddEvent(po.getTask());
 				return executeAdd(po, cmd);
+				
+			case "CHANGE_FILE_LOC":
+				cmd = new ChangeSaveDirectory(po.getNewFileLoc());
+				return executeChangeSaveDirectory(po, cmd);
+				
+			case "CLEAR":
+	    		cmd = new Clear();
+				return executeClear(cmd);
+				
+			case "DELETE_BY_CATEGORY":
+				cmd = new DeleteByTagName(po.getCategory());
+				return executeDelete(po, cmd);
 
 			case "DELETE_BY_INDEX":
 				cmd = new DeleteByIndex(currentContent, po.getIndex());
 				return executeDelete(po, cmd);
-						
-			case "DELETE_BY_CATEGORY":
-				cmd = new DeleteByTagName(po.getCategory());
-				return executeDelete(po, cmd);
 			
 			case "DONE_BY_INDEX":
 				cmd = new DoneByIndex(currentContent, po.getIndex());
-				return executeDone(po, cmd);			
+				return executeDone(po, cmd);	
 				
-			case "UPDATE_BY_INDEX_CHANGE_NAME":
-				cmd = new UpdateByIndexChangeName(currentContent, po.getIndex(), po.getNewTaskName());
-				return executeUpdate(po, cmd);
+			case "ERROR":
+				return new LogicFeedback(getAllTaskLists(), po, new LogicException(po.getErrorType()));
 				
-			case "UPDATE_BY_INDEX_CHANGE_DATE":
-				cmd = new UpdateByIndexChangeDate(currentContent, po.getIndex(), po.getTask());
-				return executeUpdate(po, cmd);
-			
-			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-				cmd = new UpdateByIndexChangeBoth(currentContent, po.getIndex(), po.getNewTaskName(), po.getTask());
-				return executeUpdate(po, cmd);
-			
-			case "VIEW_BASIC":
-				cmd = new ViewBasic(po.getViewType().get(0));
-				return executeView(po, cmd);
-			
-			case "VIEW_TAGS":
-				cmd = new ViewTags(po.getViewType());
-				return executeView(po, cmd);
+			case "SAVE":
+	    		cmd = new Save();
+				return executeSave(cmd);
 				
 			case "SEARCH":
 				cmd = new Search(po.getSearchPhrase());
@@ -140,12 +125,25 @@ public class Logic {
 			case "UNDO":
 				return executeUndo(po);
 				
-			case "CHANGE_FILE_LOC":
-				cmd = new ChangeSaveDirectory(po.getNewFileLoc());
-				return executeChangeSaveDirectory(po, cmd);
+			case "UPDATE_BY_INDEX_CHANGE_BOTH":
+				cmd = new UpdateByIndexChangeBoth(currentContent, po.getIndex(), po.getNewTaskName(), po.getTask());
+				return executeUpdate(po, cmd);
 				
-			case "ERROR":
-				return new LogicFeedback(getAllTaskLists(), po, new LogicException(po.getErrorType()));
+			case "UPDATE_BY_INDEX_CHANGE_DATE":
+				cmd = new UpdateByIndexChangeDate(currentContent, po.getIndex(), po.getTask());
+				return executeUpdate(po, cmd);
+				
+			case "UPDATE_BY_INDEX_CHANGE_NAME":
+				cmd = new UpdateByIndexChangeName(currentContent, po.getIndex(), po.getNewTaskName());
+				return executeUpdate(po, cmd);		
+
+			case "VIEW_BASIC":
+				cmd = new ViewBasic(po.getViewType().get(0));
+				return executeView(po, cmd);
+			
+			case "VIEW_TAGS":
+				cmd = new ViewTags(po.getViewType());
+				return executeView(po, cmd);
 
 			default:
 				break;
@@ -157,17 +155,6 @@ public class Logic {
     //================================================================================
     // Command Methods
     //================================================================================
-
-	private LogicFeedback executeClear(Command cmd) {
-		try {
-			cmdExecutor.execute(cmd, logicMemory);
-		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), le);
-		}
-		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
-				                 new LogicException(LogicException.MSG_SUCCESS_CLEAR));
-	}
 	
 	private LogicFeedback executeAdd(ProcessedObject po, Command cmd) {
 		try {
@@ -177,6 +164,26 @@ public class Logic {
 		}
 		updateHistory();
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_ADD));
+	}
+	
+	private LogicFeedback executeChangeSaveDirectory(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
+		}
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));
+	}
+	
+	private LogicFeedback executeClear(Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), le);
+		}
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
+				                 new LogicException(LogicException.MSG_SUCCESS_CLEAR));
 	}
 	
 	private LogicFeedback executeDelete(ProcessedObject po, Command cmd) {
@@ -199,23 +206,14 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_DONE));
 	}
 	
-	private LogicFeedback executeUpdate(ProcessedObject po, Command cmd) {
+	private LogicFeedback executeSave(Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), po, le);
+			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), le);
 		}
-		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_UPDATE));
-	}
-	
-	private LogicFeedback executeView(ProcessedObject po, Command cmd) {
-		try {
-			cmdExecutor.execute(cmd, logicMemory);
-		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), po, le);
-		}
-		return new LogicFeedback(getAllTaskLists(), po, null);
+		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), 
+				                 new LogicException(LogicException.MSG_SUCCESS_SAVE));
 	}
 	
 	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
@@ -243,23 +241,23 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), po, null);
 	}
 	
-	private LogicFeedback executeSave(Command cmd) {
-		try {
-			cmdExecutor.execute(cmd, logicMemory);
-		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), le);
-		}
-		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), 
-				                 new LogicException(LogicException.MSG_SUCCESS_SAVE));
-	}
-	
-	private LogicFeedback executeChangeSaveDirectory(ProcessedObject po, Command cmd) {
+	private LogicFeedback executeUpdate(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
-		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));
+		updateHistory();
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_UPDATE));
+	}
+	
+	private LogicFeedback executeView(ProcessedObject po, Command cmd) {
+		try {
+			cmdExecutor.execute(cmd, logicMemory);
+		} catch (LogicException le) {
+			return new LogicFeedback(getAllTaskLists(), po, le);
+		}
+		return new LogicFeedback(getAllTaskLists(), po, null);
 	}
 	
     //================================================================================

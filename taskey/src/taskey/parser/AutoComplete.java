@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedAC;
+import taskey.messenger.ProcessedAC;
+import taskey.messenger.TagCategory;
+import taskey.messenger.UserTagDatabase;
 
 /**
  * @@author A0107345L
@@ -16,6 +18,7 @@ import taskey.logic.ProcessedAC;
  */
 public class AutoComplete {
 	private HashMap<String,String> commandList = new HashMap<String,String>();
+	private ArrayList<String> specialDays = new ArrayList<String>(); 
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
 	
@@ -27,7 +30,9 @@ public class AutoComplete {
 		commands.add("search");
 		commands.add("done");
 		commands.add("undo");
-		commands.add("file_loc");
+		commands.add("setdir");
+		commands.add("save");
+		commands.add("clear");
 		
 		commandList.put("add","add");
 		commandList.put("view","view");
@@ -36,7 +41,9 @@ public class AutoComplete {
 		commandList.put("search","search");
 		commandList.put("done","done");
 		commandList.put("undo","undo");
-		commandList.put("file_loc","file_loc");
+		commandList.put("setdir","setdir");
+		commandList.put("save","save");
+		commandList.put("clear","clear");
 		
 		viewList.add("all");
 		viewList.add("general");
@@ -44,7 +51,50 @@ public class AutoComplete {
 		viewList.add("events");
 		viewList.add("archive");
 		viewList.add("help");
+		viewList.add("high");
+		viewList.add("medium");
+		viewList.add("low");
 		
+		specialDays.add("sun");
+		specialDays.add("mon");
+		specialDays.add("tue");
+		specialDays.add("wed");
+		specialDays.add("thu");
+		specialDays.add("fri");
+		specialDays.add("sat");
+		
+	}
+	
+	public ProcessedAC getSuggestions(String rawPhrase, UserTagDatabase utd) {
+		ProcessedAC suggestions = null;
+		String phrase = rawPhrase.toLowerCase().trim();
+		String[] split = phrase.split(" ");
+		
+		if (split.length == 1) {
+			//likely only command 
+			suggestions = completeCommand(phrase); 
+			return suggestions; 
+		}
+		
+		//look for the correct word to auto-suggest and return 
+		switch (split[0].trim()) {
+			case "view": 
+				suggestions = completeView(phrase, utd); 
+				break;
+			
+			case "add": 
+				completeAdd(phrase);
+				break;
+				
+			case "set":
+				completeEdit(phrase);
+				break;
+				
+			default:
+				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+				break; 
+		}
+		return suggestions; 
 	}
 	
 	/**
@@ -93,34 +143,56 @@ public class AutoComplete {
 	}
 	
 	/**
-	 * Given a partial input that contains "view xxxx",
-	 * return a list of available view types that the user can access.
+	 * Given a partial input that contains "view xxxx xxx",
+	 * return a list of available view types that the user can access in his 
+	 * latest word 
 	 * @param phrase
 	 * @return If no such list of views is available, return null 
 	 */
-	public ArrayList<String> completeView(String phrase, 
-			ArrayList<String> tagDB) {
+	public ProcessedAC completeView(String phrase, UserTagDatabase utd) {
+		ArrayList<TagCategory> tagDB = utd.getTagList(); 
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("view", ""); 
+		String[] parts = phrase.split(" ");
+		//only want to auto-complete the latest word
+		String word = parts[parts.length-1].trim(); 
 		
+		//check if basic view exists 
 		for(int i = 0; i < viewList.size(); i++) {
-			if (viewList.get(i).contains(phrase)) {
+			if (viewList.get(i).contains(word)) {
 				availViews.add(viewList.get(i)); 
 			}
 		}
 		
+		//check if tag view exists 
 		for(int i = 0; i < tagDB.size(); i++) {
-			if (tagDB.get(i).contains(phrase)) {
-				availViews.add(tagDB.get(i)); 
+			String tag = tagDB.get(i).getTagName(); 
+			if (tag.contains(phrase)) {
+				availViews.add(tag); 
 			}
 		}
 		
 		if (!availViews.isEmpty()) {
-			return availViews; 
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availViews); 
 		}
-		return null; 
+		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
+	
+	//TODO
+	public void completeAdd(String phrase) {
+		//help user to fill in date if any 
+	}
+	
+	//TODO
+	public void completeEdit(String phrase) {
+		//help user to fill in !!! or date 
+	}
+	
+	/* @@author A0107345L-unused
+	 * Decided not to use the code below as we decided to change 
+	 * what the AutoComplete should display 
+	 */
 	
 	/**
 	 * Given a partial input that contains "del xxxx",

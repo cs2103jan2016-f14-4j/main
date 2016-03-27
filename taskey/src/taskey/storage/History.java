@@ -4,8 +4,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 
 /**
  * @@author A0121618M

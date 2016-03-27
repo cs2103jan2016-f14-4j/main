@@ -10,9 +10,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.storage.StorageReader.InvalidTaskException;
+
 
 /**
  * @@author A0121618M

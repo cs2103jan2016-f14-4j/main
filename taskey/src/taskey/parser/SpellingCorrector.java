@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+/**
+ * Code credits to: http://raelcunha.com/spell-correct/ 
+ *
+ */
 class SpellingCorrector {
 
 	private final HashMap<String, Integer> nWords = new HashMap<String, Integer>();

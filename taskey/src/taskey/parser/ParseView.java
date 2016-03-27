@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject; 
+import taskey.messenger.ProcessedObject; 
 
 /**
  * @@author A0107345L

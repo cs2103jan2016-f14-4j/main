@@ -1,6 +1,7 @@
 package taskey.logic;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.messenger.Task;
 
 /** 
  * @@author A0134177E

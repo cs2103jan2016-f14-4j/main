@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
-import taskey.logic.Task;
+import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiTextBuilder;
 

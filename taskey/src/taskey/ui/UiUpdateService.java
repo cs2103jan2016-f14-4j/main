@@ -37,7 +37,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 				Platform.runLater(new Runnable() { // let main thread handle the update
 					@Override
 					public void run() {		
-						taskey.logic.Task t = new taskey.logic.Task(); // to do, prompt for expiring tasks
+						taskey.messenger.Task t = new taskey.messenger.Task(); // to do, prompt for expiring tasks
 						UiAlertsWindow.getInstance().addEntry(t);
 						dateLabelRef.setText(UiConstants.CLOCK_DATE_FORMAT.format(cal.getTime()));
 					}

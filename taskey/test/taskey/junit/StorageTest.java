@@ -1,6 +1,7 @@
 package taskey.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import taskey.logic.TagCategory;
-import taskey.logic.Task;
+import taskey.messenger.TagCategory;
+import taskey.messenger.Task;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
 

@@ -1,6 +1,8 @@
-package taskey.logic;
+package taskey.messenger;
 
 import java.util.ArrayList;
+
+import taskey.messenger.Task;
 
 /**
  * @@author A0107345L
@@ -11,7 +13,7 @@ import java.util.ArrayList;
  * 1. ADD_FLOATING
  * 2. ADD_DEADLINE
  * 3. ADD_EVENT
- * 4. ADD_RECURRING
+ * 4. ADD_RECURRING //not implementing 
  * 5. DELETE_BY_INDEX
  * 6. DELETE_BY_NAME 
  * 7. DELETE_BY_CATEGORY
@@ -31,6 +33,8 @@ import java.util.ArrayList;
  * 21. SEARCH
  * 22. UNDO 
  * 23. CHANGE_FILE_LOC
+ * 24. SAVE
+ * 25. CLEAR 
  * 
  * @author Xue Hui
  *
@@ -69,7 +73,8 @@ public class ProcessedObject {
 	}
 	
 	/**
-	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC/DELETE_BY_CATEGORY
+	 * Constructor for ERROR/UNDO/SEARCH/CHANGE_FILE_LOC/DELETE_BY_CATEGORY/
+	 * SAVE/CLEAR
 	 * @param command
 	 */
 	public ProcessedObject(String command) {
@@ -282,8 +287,9 @@ public class ProcessedObject {
 		}
 		
 		if (viewType != null) {
+			stringRep += "view type: "; 
 			for(int i = 0; i < viewType.size(); i++) {
-				stringRep += "view type: " + viewType.get(i) + ", "; 
+				stringRep += viewType.get(i) + ", "; 
 			}
 			stringRep += "\n"; 
 		}
@@ -303,6 +309,11 @@ public class ProcessedObject {
 		if (category != null) {
 			stringRep += "category: " + category + "\n";
 		}
+		
+		if (newPriority != -1) {
+			stringRep += "newPriority: " + newPriority + "\n"; 
+		}
+		
 		return stringRep; 
 	}
 }

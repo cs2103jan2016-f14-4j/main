@@ -9,8 +9,8 @@ import java.util.List;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import taskey.constants.ParserConstants;
-import taskey.logic.ProcessedObject;
-import taskey.logic.Task; 
+import taskey.messenger.ProcessedObject;
+import taskey.messenger.Task; 
 
 /**
  * @@author A0107345L
@@ -137,13 +137,15 @@ public class ParseAdd extends ParseCommand {
 				processed = handleDeadline(task, taskName, rawDate);
 			}
 		} else {
-			//set as floating task 
+			//set as floating task, remove priority first  
 			priority = getPriority(taskName); 
 			//invalid priority given
 			if (priority == -1) {
 				return super.processError(ParserConstants.ERROR_SET_NEW_PRIORITY);
 			}
-			taskName = taskName.split("!")[0].trim();
+			if (priority != 0) {
+				taskName = taskName.split("!")[0].trim();
+			}
 			processed = handleFloating(command, taskName);
 		}
 		//set the priority
@@ -199,25 +201,37 @@ public class ParseAdd extends ParseCommand {
 		
 		String rawStartDate = dateList[0].trim().toLowerCase();
 		String rawEndDate = dateList[1].trim().toLowerCase(); 
+		long epochTimeStart = -1;
+		long epochTimeEnd = -1; 
 		
 		//if date contains am or pm or morning or night, 
 		//call pretty parser to process the time and return. 
 		try {
 			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
-			task.setStartDate(epochTimeEvent[0]);
-			task.setEndDate(epochTimeEvent[1]);
+			epochTimeStart = epochTimeEvent[0]; 
+			epochTimeEnd = epochTimeEvent[1]; 
+			task.setStartDate(epochTimeStart);
+			task.setEndDate(epochTimeEnd);
 			task.setTaskName(taskName);
 			task.setTaskType("EVENT");
 			processed = new ProcessedObject("ADD_EVENT",task);
+			
+			//make sure start time < end Time 
+			if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
+				return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
+			}
+			
 			return processed;
 		} catch (Error e) {
 			//do nothing, continue to code below
 			//ie. date format wrong or has no time in the date
 		}
 		
+		//process start date/time
 		if (!specialDays.containsKey(rawStartDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
+				epochTimeStart = epochTime; 
 				task.setStartDate(epochTime);
 			} catch (ParseException error) {
 				processed = super.processError(String.format(
@@ -227,13 +241,15 @@ public class ParseAdd extends ParseCommand {
 		} else {
 			//process the special day
 			epochTime = specialDays.get(rawStartDate);
+			epochTimeStart = epochTime; 
 			task.setStartDate(epochTime);
 		}
 		
-		
+		//process end date/time 
 		if (!specialDays.containsKey(rawEndDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
+				epochTimeEnd = epochTime; 
 				task.setEndDate(epochTime); 	
 			} catch (ParseException error) {
 				processed = super.processError(String.format(
@@ -243,13 +259,37 @@ public class ParseAdd extends ParseCommand {
 		} else {
 			//process the special day
 			epochTime = specialDays.get(rawEndDate);
+			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
 		}
 		
 		task.setTaskName(taskName);
 		task.setTaskType("EVENT");
 		processed = new ProcessedObject("ADD_EVENT",task);
+		
+		//check to make sure startDate < end date 
+		if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
+			return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
+		}
+		
 		return processed;
+	}
+	
+	/**
+	 * Checks if an event time is valid (ie, start time < end time) 
+	 * @param eventStartTime
+	 * @param eventEndTime
+	 * @return true if start time < end time 
+	 */
+	private boolean isValidEvent(long eventStartTime, long eventEndTime) {
+		if (eventStartTime == -1 || eventEndTime == -1) {
+			return false; 
+		}
+		
+		if (eventStartTime >= eventEndTime) {
+			return false; 
+		}
+		return true; 
 	}
 	
 	/**
@@ -390,12 +430,24 @@ public class ParseAdd extends ParseCommand {
 	 * @return priority for the task
 	 */
 	public int getPriority(String rawDate) {
+		//rawDate = rawDate.trim(); 
 		int count = 0; 
 		int dateLen = rawDate.length(); 
+		boolean canContinue = false; 
+		
 		for(int i = dateLen-1; i >= 0; i--) {
 			char k = rawDate.charAt(i); 
-			if (k == '!') {
-				count += 1; 
+			//check that the end of the string has !, 
+			//else there's no priority to check 
+			if (i == dateLen-1 && k == '!') {
+				canContinue = true; 
+				count += 1;
+			} else if (canContinue == true) {
+				if (k == '!') {
+					count += 1; 
+				}
+			} else {
+				return 0; //user did not indicate a priority 
 			}
 		}
 		

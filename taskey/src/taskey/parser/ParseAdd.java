@@ -80,10 +80,36 @@ public class ParseAdd extends ParseCommand {
 		//process tags now: if there are tags, add it in.
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
+			if (!isValidTagList(tags)) {
+				return super.processError("invalid tag list"); 
+			}
 			processed.getTask().setTaskTags(tags);
 		}
 		return processed; 
 	}
+	
+	/**
+	 * TODO: complete this 
+	 * @param tagList
+	 * @return true if none of the tags in tagList repeats. 
+	 */
+	private boolean isValidTagList(ArrayList<String> tagList) {
+		String pattern = "(deadlines|events|general|all)";
+		for(int i = 0; i < tagList.size(); i++) {
+			String tag = tagList.get(i); 
+			if (tag.matches(pattern)) {
+				return false; 
+			}
+			for (int j = i+1; j < tagList.size(); j++) {
+				String otherTag = tagList.get(j); 
+				if (tag.equals(otherTag)) {
+					return false; 
+				}
+			}
+		}
+		return true; 
+	}
+	
 	
 	/**
 	 * Processes the string normally as either a 

@@ -1,6 +1,7 @@
 package taskey.logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import taskey.constants.UiConstants.ContentBox;
@@ -58,6 +59,7 @@ public class LogicMemory {
 		assert(taskLists != null);
 		assert(!taskLists.contains(null));
 		assert(taskLists.size() == NUM_TASK_LISTS);
+		sortTaskLists();
 		return taskLists;
 	}
 
@@ -71,6 +73,7 @@ public class LogicMemory {
 	ArrayList<TagCategory> getTagCategoryList() {
 		assert(tagCategoryList != null);
 		assert(!tagCategoryList.contains(null));
+		sortTagCategoryList();
 		return tagCategoryList;
 	}
 
@@ -142,6 +145,20 @@ public class LogicMemory {
 		
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
+		}
+	}
+	
+	/**
+	 * Change the directory where task and tag category data are saved. If this method succeeds, all saved files are 
+	 * moved from the current save directory to the new directory.
+	 * @param pathName        the new directory pathname
+	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
+	 */
+	void changeSaveDirectory(String pathName) throws LogicException {
+		try {
+			storage.setDirectory(pathName);
+		} catch (Exception e) {
+			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		}
 	}
 	
@@ -220,43 +237,6 @@ public class LogicMemory {
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be updated
 	 * @param newName    the new name to update the task to
-	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
-	 */
-	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws LogicException {
-		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
-		
-		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
-		}
-		
-		Task toUpdate = targetList.get(taskIndex);
-		Task toUpdateCopy = new Task(toUpdate);
-		updateByIndexChangeBoth(contentBox, taskIndex, newName, toUpdateCopy);
-	}
-	
-	/**
-	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
-	 * @param contentBox specifies the current tab that user is in
-	 * @param taskIndex  the index of task to be updated
-	 * @param newTask    the task with the new date
-	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
-	 */
-	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws LogicException {
-		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
-		
-		if (taskIndex >= targetList.size() || taskIndex < 0) {
-			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
-		}
-		
-		Task toUpdate = targetList.get(taskIndex);
-		updateByIndexChangeBoth(contentBox, taskIndex, toUpdate.getTaskName(), newTask);
-	}
-	
-	/**
-	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
-	 * @param contentBox specifies the current tab that user is in
-	 * @param taskIndex  the index of task to be updated
-	 * @param newName    the new name to update the task to
 	 * @param newTask    the task with the new date
 	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
 	 */
@@ -292,52 +272,77 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Updates the action list based on the view type.
-	 * @param viewType
-	 * @throws LogicException 
+	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be updated
+	 * @param newTask    the task with the new date
+	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
 	 */
-	void viewBasic(String viewType) {
-		switch (viewType) {
-			case "general":
-				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
-				break;
-			
-			case "deadlines":
-				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
-				break;
-				
-			case "events":
-				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_EVENT)));
-				break;
-				
-			case "archive":
-				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_COMPLETED)));
-				break;
-				
-			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
-				clearActionList();
-				break;
-			
-			default: // Should not reach this point
+	void updateByIndexChangeDate(ContentBox contentBox, int taskIndex, Task newTask) throws LogicException {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		updateByIndexChangeBoth(contentBox, taskIndex, toUpdate.getTaskName(), newTask);
+	}
+	
+	/**
+	 * Updates an indexed task from the specified task list, and also updates all lists that contained the updated task.
+	 * @param contentBox specifies the current tab that user is in
+	 * @param taskIndex  the index of task to be updated
+	 * @param newName    the new name to update the task to
+	 * @throws LogicException if the index is invalid, or the updated task is a duplicate or expired
+	 */
+	void updateByIndexChangeName(ContentBox contentBox, int taskIndex, String newName) throws LogicException {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		Task toUpdateCopy = new Task(toUpdate);
+		updateByIndexChangeBoth(contentBox, taskIndex, newName, toUpdateCopy);
+	}
+	
+	void updateByIndexChangePriority(ContentBox contentBox, int taskIndex, int newPriority) throws LogicException {
+		ArrayList<Task> targetList = taskLists.get(getListIndex(contentBox));
+		
+		if (taskIndex >= targetList.size() || taskIndex < 0) {
+			throw new LogicException(LogicException.MSG_ERROR_INVALID_INDEX);
+		}
+		
+		Task toUpdate = targetList.get(taskIndex);
+		
+		if (taskLists.get(INDEX_COMPLETED).contains(toUpdate)) {
+			throw new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
+		}
+		
+		removeFromAllLists(toUpdate);
+		toUpdate.setPriority(newPriority);
+		addTaskToLists(contentBox, toUpdate);
+		
+		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
+			clearActionList();
 		}
 	}
 	
 	/**
-	 * Updates the action list with all the expired and pending tasks that contain at least one of the tag categories 
-	 * that the user wants to view.
-	 * @param tagNames
-	 * @throws LogicException if the tag categories do not exist
+	 * Saves the current task lists and tag category list in memory to disk.
+	 * @throws LogicException if error occurred during save
 	 */
-	void viewTags(ArrayList<String> tagNames) throws LogicException {
-		clearActionList();
-		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
-		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
-		
-		if (!tagFound) {
-			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
+	void save() throws LogicException {
+		try {
+			storage.saveAllTasklists(ListCloner.cloneTaskLists(taskLists));
+			storage.saveTaglist(ListCloner.cloneTagCategoryList(tagCategoryList));
+		} catch (Exception e) {
+			throw new LogicException(LogicException.MSG_ERROR_SAVE);
 		}
 	}
-
+	
 	/**
 	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 
 	 * is not case sensitive.
@@ -357,29 +362,57 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Saves the current task lists and tag category list in memory to disk.
-	 * @throws LogicException if error occurred during save
+	 * Updates the action list based on the view type. When the user wants to view tasks by priority i.e. "high", "medium"
+	 * or "low", only expired and pending tasks will be displayed.
+	 * @param viewType
 	 */
-	void save() throws LogicException {
-		try {
-			storage.saveAllTasklists(ListCloner.cloneTaskLists(taskLists));
-			storage.saveTaglist(ListCloner.cloneTagCategoryList(tagCategoryList));
-		} catch (Exception e) {
-			throw new LogicException(LogicException.MSG_ERROR_SAVE);
+	void viewBasic(String viewType) {
+		switch (viewType) {
+			case "general":
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
+				break;
+			
+			case "deadlines":
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
+				break;
+				
+			case "events":
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_EVENT)));
+				break;
+				
+			case "archive":
+				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_COMPLETED)));
+				break;
+				
+			case "high":
+			case "medium":
+			case "low":
+				clearActionList();
+				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
+				viewPriority(taskLists.get(INDEX_PENDING), viewType);
+				break;
+							
+			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
+				clearActionList();
+				break;
+			
+			default: // Should not reach this point
 		}
 	}
-	
+
 	/**
-	 * Change the directory where task and tag category data are saved. If this method succeeds, all saved files are 
-	 * moved from the current save directory to the new directory.
-	 * @param pathName        the new directory pathname
-	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
+	 * Updates the action list with all the expired and pending tasks that contain at least one of the tag categories 
+	 * that the user wants to view.
+	 * @param tagNames
+	 * @throws LogicException if the tag categories do not exist
 	 */
-	void changeSaveDirectory(String pathName) throws LogicException {
-		try {
-			storage.setDirectory(pathName);
-		} catch (Exception e) {
-			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+	void viewTags(ArrayList<String> tagNames) throws LogicException {
+		clearActionList();
+		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
+		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
+		
+		if (!tagFound) {
+			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
 		}
 	}
 	
@@ -438,6 +471,16 @@ public class LogicMemory {
 	
 	void clearTagCategoryList() {
 		tagCategoryList.clear();
+	}
+	
+	private void sortTaskLists() {
+		for (ArrayList<Task> list : taskLists) {
+			Collections.sort(list);
+		}
+	}
+	
+	private void sortTagCategoryList() {
+		Collections.sort(tagCategoryList);
 	}
 	
 	/** 
@@ -570,6 +613,37 @@ public class LogicMemory {
 		}
 		
 		return taskFound;
+	}
+	
+	/** 
+	 * Views all tasks from the given list which are of the specified priority. 
+	 * 
+	 * @param list
+	 * @param priority
+	 * @return true if and only if at least one task was found with the specified priority
+	 */
+	private boolean viewPriority(ArrayList<Task> list, String priority) {
+		boolean priorityFound = false;
+		int priorityNumber;
+		
+		if (priority.equals("high")) {
+			priorityNumber = 3;
+		} else if (priority.equals("medium")) {
+			priorityNumber = 2;
+		} else { // "low"
+			priorityNumber = 1;
+		}
+		
+		for (Iterator<Task> it = list.iterator(); it.hasNext();) { 
+			Task task = it.next();
+			
+			if (task.getPriority() == priorityNumber) {
+				taskLists.get(INDEX_ACTION).add(task);
+				priorityFound = true;
+			}
+		}
+		
+		return priorityFound;
 	}
 	
 	/** 

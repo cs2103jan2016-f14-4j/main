@@ -8,9 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants.ImageID;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiPagination;
 import taskey.ui.content.UiTextBuilder;
@@ -82,7 +81,8 @@ public class UiHelpView {
 				if ( entryNo >= numCommmands ) {
 					break;
 				}
-				Label current = gridHelper.createLabelInCell( 0, j, headers.get(entryNo), UiConstants.STYLE_PROMPT_SELECTED, newGrid);
+				Label current = gridHelper.createLabelInCell(0, j, headers.get(entryNo), 
+															 UiConstants.STYLE_PROMPT_SELECTED, newGrid);
 				GridPane.setFillWidth(current.getParent(), false);
 				GridPane.setFillHeight(current.getParent(), false);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
@@ -99,10 +99,10 @@ public class UiHelpView {
 			}
 			helpView.addGridToPagination(newGrid,menuElements);
 		}	
-		helpView.initialize(totalPages); // update UI and bind call back
+		helpView.initializeDisplay(totalPages); // update UI and bind call back
 	}
 	
-	private void addMenu(ArrayList<IMAGE_ID> images, ArrayList<String> info ) {
+	private void addMenu(ArrayList<ImageID> images, ArrayList<String> info ) {
 		UiPagination menu = new UiPagination("");
 		commandViews.add(menu);
 		int totalPages = images.size(); 
@@ -116,13 +116,13 @@ public class UiHelpView {
 			gridHelper.addTextFlowToCell(0, 1, myBuilder.build(line),TextAlignment.CENTER, newGrid);
 			menu.addGridToPagination(newGrid,new ArrayList<StackPane>()); // no interactions	
 		}
-		menu.initialize(totalPages); // update UI and bind call back
+		menu.initializeDisplay(totalPages); // update UI and bind call back
 	}
 
 	private void setUpHelpView() {
 		addMainMenu();
-		ArrayList<IMAGE_ID> images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.ADD_FLOAT,IMAGE_ID.ADD_DEADLINE,
-				IMAGE_ID.ADD_DEADLINE_DATE,IMAGE_ID.ADD_EVENT,IMAGE_ID.ADD_LAST));
+		ArrayList<ImageID> images = new ArrayList<ImageID>(Arrays.asList(ImageID.ADD_FLOAT,ImageID.ADD_DEADLINE,
+				ImageID.ADD_DEADLINE_DATE,ImageID.ADD_EVENT,ImageID.ADD_LAST));
 		ArrayList<String> info = new ArrayList<String>(Arrays.asList(
 				"type: add <task name> to add a general task",
 				"type: add <task name> on/by <date> to add a deadline task.",
@@ -131,44 +131,44 @@ public class UiHelpView {
 				"That's it! Press Enter to return"
 				));
 		addMenu(images, info);
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.DELETE_ID,IMAGE_ID.DELETE_NAME,
-				IMAGE_ID.DELETE_LAST));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.DELETE_ID,ImageID.DELETE_NAME,
+				ImageID.DELETE_LAST));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: del <ID> to delete a task, ID is shown on the left.",
 				"type: del <task name>, to do the same operation.",
 				"That's it! Press Enter to return"
 				));
 		addMenu(images, info);	
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.SET_ID_DATE,IMAGE_ID.SET_ID_EVENT,
-				IMAGE_ID.SET_LAST));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.SET_ID_DATE,ImageID.SET_ID_EVENT,
+				ImageID.SET_LAST));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: set <ID> [date] to change the deadline of a task",
 				"use [date,date] to specify an event.",
 				"That's it! Press Enter to return"
 				));
 		addMenu(images, info);	
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.DONE_ID,IMAGE_ID.DONE_NAME,
-				IMAGE_ID.DONE_LAST));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.DONE_ID,ImageID.DONE_NAME,
+				ImageID.DONE_LAST));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: done <ID> to move a task to the archive",
 				"<task name> can also be used",
 				"That's it! Press Enter to return"
 				));
 		addMenu(images, info);	
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.SEARCH_NAME,IMAGE_ID.SEARCH_LAST));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.SEARCH_NAME,ImageID.SEARCH_LAST));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: search <phrase> to search for a task",
 				"A list of tasks will be shown in Action"
 				));
 		addMenu(images, info);	
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.UNDO,IMAGE_ID.UNDO_LAST));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.UNDO,ImageID.UNDO_LAST));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: undo, to revert an action ",
 				"That's it! Press Enter to return"
 				));
 		addMenu(images, info);	
-		images = new ArrayList<IMAGE_ID>(Arrays.asList(IMAGE_ID.VIEW_GENERAL,IMAGE_ID.VIEW_DEADLINE,
-				IMAGE_ID.VIEW_EVENT));
+		images = new ArrayList<ImageID>(Arrays.asList(ImageID.VIEW_GENERAL,ImageID.VIEW_DEADLINE,
+				ImageID.VIEW_EVENT));
 		info = new ArrayList<String>(Arrays.asList(
 				"type: view general, to view all general tasks ",
 				"type: view deadline, to view all tasks with deadlines ",

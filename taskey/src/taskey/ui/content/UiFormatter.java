@@ -25,7 +25,7 @@ public abstract class UiFormatter {
 	protected ScrollPane mainPane;
 	protected GridPane currentGrid;
 	protected UiGridHelper gridHelper;
-	protected ArrayList<Triplet<Color,String,Integer>> categoryList;
+
 	// Abstract methods that are handled by extended classes
 	public abstract void format(ArrayList<Task> myTaskList);
 	public abstract void processArrowKey(KeyEvent event);
@@ -39,9 +39,7 @@ public abstract class UiFormatter {
 		mainPane.setFitToWidth(true);
 		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 	}
-	public void setCategories(ArrayList<Triplet<Color,String,Integer>> _categoryList) {
-		categoryList = _categoryList;
-	}
+
 	/**
 	 * Sets the current grid variable only, note needs mainPane.setContent() for effect
 	 *

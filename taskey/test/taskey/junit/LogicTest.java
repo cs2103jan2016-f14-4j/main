@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,12 +34,21 @@ public class LogicTest {
 	private static ArrayList<ArrayList<Task>> getEmptyLists() {
 		ArrayList<ArrayList<Task>> lists = new ArrayList<ArrayList<Task>>();
 		
-		while (lists.size() < 8) {
+		while (lists.size() < LogicMemory.NUM_TASK_LISTS) {
 			lists.add(new ArrayList<Task>());
 		}
 		
 		return lists;
 	}
+	
+	private static ArrayList<ArrayList<Task>> sortLists(ArrayList<ArrayList<Task>> lists) {
+		for (ArrayList<Task> list : lists) {
+			Collections.sort(list);
+		}
+		
+		return lists;
+	}
+	
 	
 	// Make sure "clear" command works because it is used in setUp().
 	// "clear" command is supposed to clear all task and tag data in memory.
@@ -202,6 +212,7 @@ public class LogicTest {
 		expected.get(LogicMemory.INDEX_EVENT).add(task);
 		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		
+		sortLists(expected);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -808,5 +819,27 @@ public class LogicTest {
 		LogicException expected = new LogicException(LogicException.MSG_ERROR_DONE_INVALID);
 		LogicException actual = logic.executeCommand(ContentBox.ACTION, "done 1").getException();
 		assertEquals(expected, actual);
+	}
+	
+	// This test is currently dependent on the order of the lists, which in turn depends on the compareTo() method
+	// in Task.java. Until the sorting method is finalized, this test may occasionally fail.
+	@Test
+	public void updatingTaskPriorityByIndexShouldNotAffectAnyOtherTasks() {
+		String input = "add task1";
+		Task task1 = parser.parseInput(input).getTask(); // Should go into PENDING and FLOATING lists
+		logic.executeCommand(ContentBox.PENDING, input);
+
+		input = "add task2";
+		Task task2 = parser.parseInput(input).getTask(); // Should go into PENDING and FLOATING lists
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		logic.executeCommand(ContentBox.PENDING, "set 2 !!"); // Should only modify task2
+		
+		ArrayList<Task> pendingList = logic.getAllTaskLists().get(LogicMemory.INDEX_PENDING);
+		ArrayList<Task> floatingList = logic.getAllTaskLists().get(LogicMemory.INDEX_FLOATING);
+		assertTrue(pendingList.get(0).getPriority() == 1);
+		assertTrue(pendingList.get(1).getPriority() == 2);
+		assertTrue(floatingList.get(0).getPriority() == 1);
+		assertTrue(floatingList.get(1).getPriority() == 2);
 	}
 }

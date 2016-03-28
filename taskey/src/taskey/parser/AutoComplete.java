@@ -149,7 +149,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of views is available, return null 
 	 */
-	public ProcessedAC completeView(String phrase, UserTagDatabase utd) {
+	private ProcessedAC completeView(String phrase, UserTagDatabase utd) {
 		ArrayList<TagCategory> tagDB = utd.getTagList(); 
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
@@ -180,12 +180,12 @@ public class AutoComplete {
 	}
 	
 	//TODO
-	public void completeAdd(String phrase) {
+	private void completeAdd(String phrase) {
 		//help user to fill in date if any 
 	}
 	
 	//TODO
-	public void completeEdit(String phrase) {
+	private void completeEdit(String phrase) {
 		//help user to fill in !!! or date 
 	}
 	

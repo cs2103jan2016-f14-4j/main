@@ -578,7 +578,8 @@ public class Task implements Comparable<Task> {
 		if (this.taskName.compareTo(otherTaskName) == 0) {
 			return 0; 
 		} else if (this.taskName.compareTo(otherTaskName) > 0) {
-			//this task name is greater than the other task name and should be ordered behind
+			//this task name is greater than the other task name and should be ordered in front,
+			//so that sortReverse() will return it in alphabetical order. 
 			//eg. this is Zephyr, that is Wine, then that should come before this. 
 			return -1; 
 		} else {

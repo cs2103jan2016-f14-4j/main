@@ -26,7 +26,7 @@ The following characters are reserved for special usage and should not be used i
 <ul>
   <li>! : Used for specifying task priorities (low:!, medium: !!, high: !!!)
   <li># : Used for specifying hashtags for a task 
-  <li>^ : For our AutoComplete feature to suggest a list of dates for you
+  <li>^ : Get suggestions a list of dates you can use
 </ul>
 
 ###Accepted date/time formats
@@ -57,27 +57,25 @@ Examples:
 </ul> 
 
 ###Deleting a task
-A task can be deleted by its index number as shown in the UI, or by its name.
+A task can be deleted by its index number as shown in the UI.
 
-Format: del \<taskname/id\>
+Format: del \<id\>
 
 Examples: 
 <ul> 
-  <li><b>del</b> learn cooking
   <li><b>del</b> 1
 </ul> 
 
 ###Editing a task
 A task's name, priority or its date details can be changed when required.
 
-Format: set \<old taskname/id\> "new taskname"/[new date] 
-<br> set \<old taskname/id\> \<new priority\>
+Format: set \<old id\> "new taskname"/[new date] 
+<br> set \<old id\> \<new priority\>
 
 Examples:
 <ul> 
-  <li><b>set</b> learn cooking "learn golf"
   <li><b>set</b> 1 [none] 
-  <li><b>set</b> learn cooking [19 feb] 
+  <li><b>set</b> 1 [19 feb] 
   <li><b>set</b> 1 [19 feb 3pm, 19 feb 4pm] 
   <li><b>set</b> 1 "learn golf" [19 feb 5pm,19 feb 6pm]
   <li><b>set</b> 1 !!!
@@ -86,12 +84,11 @@ Examples:
 ###Archive a task
 When you are done with a task, you can archive it. 
 
-Format: done \<taskname/id\>
+Format: done \<id\>
 
 Examples:
 <ul> 
   <li><b>done</b> 1
-  <li><b>done</b> learn golf 
 </ul> 
 
 ###Search for a task

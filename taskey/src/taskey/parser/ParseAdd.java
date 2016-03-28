@@ -81,7 +81,7 @@ public class ParseAdd extends ParseCommand {
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
 			if (!isValidTagList(tags)) {
-				return super.processError("invalid tag list"); 
+				return super.processError(ParserConstants.ERROR_ADD_INVALID_TAG); 
 			}
 			processed.getTask().setTaskTags(tags);
 		}
@@ -89,17 +89,19 @@ public class ParseAdd extends ParseCommand {
 	}
 	
 	/**
-	 * TODO: complete this 
+	 * Check that the taglist does not contain default category words (eg. event)
+	 * or that the categories repeat multiple times 
 	 * @param tagList
 	 * @return true if none of the tags in tagList repeats. 
 	 */
 	private boolean isValidTagList(ArrayList<String> tagList) {
-		String pattern = "(deadlines|events|general|all)";
+		String pattern = "(deadline|deadlines|event|events|general|all)";
 		for(int i = 0; i < tagList.size(); i++) {
 			String tag = tagList.get(i); 
 			if (tag.matches(pattern)) {
 				return false; 
 			}
+			//compare with every other tag in the list to ensure no repeats
 			for (int j = i+1; j < tagList.size(); j++) {
 				String otherTag = tagList.get(j); 
 				if (tag.equals(otherTag)) {

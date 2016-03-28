@@ -151,6 +151,19 @@ public class ParserTest {
 	
 	@Test
 	/**
+	 * Test invalid tags for adding 
+	 */
+	public void testTagInvalid() {
+		//adding the same tag multiple times
+		assertEquals("Command: ERROR\nerror type: Error: Invalid tags added to the task\n",
+				parser.parseInput("add meeting #work #work #work").toString());
+		//adding deadlines/general/all/events: invalid categories cos these are default categories
+		assertEquals("Command: ERROR\nerror type: Error: Invalid tags added to the task\n",
+				parser.parseInput("add meeting #work #general #deadline").toString());
+	}
+	
+	@Test
+	/**
 	 * Test the adding of tasks with priority 
 	 */
 	public void testAddPriority() {

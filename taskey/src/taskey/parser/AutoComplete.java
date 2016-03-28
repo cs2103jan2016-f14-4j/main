@@ -207,6 +207,7 @@ public class AutoComplete {
 	 * @return ProcessedAutoComplete Object 
 	 */
 	private ProcessedAC completeAdd(String phrase, UserTagDatabase utd) {
+		ArrayList<TagCategory> tagDB = utd.getTagList(); 
 		String keyWords = "(at|on|by|from)";
 		ArrayList<String> availSuggestions = new ArrayList<String>(); 
 		phrase = phrase.toLowerCase();
@@ -215,8 +216,28 @@ public class AutoComplete {
 		String latestWord = splitString[splitString.length - 1]; 
 		
 		if (latestWord.contains("#")) {
-			//TODO:
+			latestWord = latestWord.replace("#", "").trim(); 
 			//suggest categories to the user 
+			//if empty tag, suggest anything
+			if (latestWord.equals("")) {
+				//if tagDB is empty, nth to suggest 
+				if (tagDB.size() == 0) {
+					return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+				}
+				for(int i = 0; i < tagDB.size(); i++) {
+					if (i < 3) {
+						availSuggestions.add(tagDB.get(i).getTagName());
+					}
+				}
+				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+			}
+			//if typed halfway, can suggest 
+			for(int i = 0; i < tagDB.size(); i++) {
+				String tag = tagDB.get(i).getTagName(); 
+				if (tag.contains(latestWord)) {
+					availSuggestions.add(tag); 
+				}
+			}
 		} else if (latestWord.contains("!")) {
 			//suggest priorities to the user 
 			if (phrase.contains("!")) {
@@ -231,8 +252,10 @@ public class AutoComplete {
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 			}
 		} else if (latestWord.matches(keyWords)) {
-			//TODO: 
-			//suggest some dates to the user 
+			//suggest some dates to the user, since keywords spotted 
+			availSuggestions.add("tmr");
+			availSuggestions.add("8pm");
+			availSuggestions.add("next mon");
 		} else {
 			availSuggestions = suggestDates(latestWord); 
 			if (availSuggestions == null) {

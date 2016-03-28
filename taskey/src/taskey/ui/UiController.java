@@ -26,7 +26,7 @@ import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
-import taskey.constants.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
@@ -128,8 +128,8 @@ public class UiController {
 	}
 	
 	private void setUpButtonStyles() {
-		crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT)); 
-		minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+		crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT)); 
+		minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 	}
 	
 	/**
@@ -182,7 +182,8 @@ public class UiController {
 		myStyleSheets.clear();
 		try {
 			for (int i = 0; i < styleSheets.size(); i++) { // load all style sheets into list
-				myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET + styleSheets.get(i)).toExternalForm());
+				myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET 
+														 + styleSheets.get(i)).toExternalForm());
 			}
 		} catch (Exception excep) {
 			System.out.println(excep + UiConstants.STYLE_SHEETS_LOAD_FAIL);
@@ -193,7 +194,9 @@ public class UiController {
 		assert(feedback != null);
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
-			UiPopupManager.getInstance().createPopupLabelAtNode(statusCode.getMessage(), input, 0,input.getHeight()*1.25F,true); // just set pop up to appear below input
+			 // just set pop up to appear below input
+			UiPopupManager.getInstance().updatePromptMessage(statusCode.getMessage(), input, 
+																0,input.getHeight()*1.25F);
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	
@@ -219,19 +222,44 @@ public class UiController {
 			default:
 				break;
 		}
-		updateAllContents(logic.getTagCategoryList(),allLists); // just update all displays, rather than splitting it into each switch case
+		// just update all displays, rather than splitting it into each switch case
+		updateAllContents(logic.getTagCategoryList(),allLists); 
 	}
 	
-	public void updateAllContents(ArrayList<TagCategory> tagList, ArrayList<ArrayList<Task>> allLists) {
-		ArrayList<Triplet<Color,String,Integer>> categoryList = new ArrayList<Triplet<Color,String,Integer>>(Arrays.asList(
-				new Triplet<Color,String,Integer>(Color.BLUE,"General",allLists.get(LogicMemory.INDEX_FLOATING).size()),
-				new Triplet<Color,String,Integer>(Color.RED,"Deadlines",allLists.get(LogicMemory.INDEX_DEADLINE).size()),
-				new Triplet<Color,String,Integer>(Color.GREEN,"Events",allLists.get(LogicMemory.INDEX_EVENT).size()),
-				new Triplet<Color,String,Integer>(Color.YELLOW,"Archive",allLists.get(LogicMemory.INDEX_COMPLETED).size())
-				));
-		// Add tags in addition to the default lists
+	/**
+	 * Create a header of fixed categories for the category list
+	 * @param allLists - all the task lists
+	 * @return categoryListHeader
+	 */
+	private ArrayList<Triplet<Color, String, Integer>> createCategoriesHeader(ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryListHeader = new ArrayList<Triplet<Color,String,Integer>>();
+		ArrayList<Task> pendingList = allLists.get(LogicMemory.INDEX_PENDING);
+		int priorityNums[] = new int[3];
+		for ( int i = 0; i < pendingList.size(); i++ ) {
+			priorityNums[pendingList.get(i).getPriority()-1]++; // increase numbers for each priority
+		}
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.RED,"HIGH", priorityNums[2]));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.ORANGE,"MED", priorityNums[1]));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.GREEN,"LOW", priorityNums[0]));
+		
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.CADETBLUE,"General",
+																 allLists.get(LogicMemory.INDEX_FLOATING).size()));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.CADETBLUE,"Deadlines",
+																 allLists.get(LogicMemory.INDEX_DEADLINE).size()));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.CADETBLUE,"Events",
+																 allLists.get(LogicMemory.INDEX_EVENT).size()));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.CADETBLUE,"Archive",
+																 allLists.get(LogicMemory.INDEX_COMPLETED).size()));
+		
+		return categoryListHeader;
+	}
+	
+	private void updateAllContents(ArrayList<TagCategory> tagList, ArrayList<ArrayList<Task>> allLists) {
+		ArrayList<Triplet<Color,String,Integer>> categoryList = createCategoriesHeader(allLists);
+		// Add tags in addition to the default categories
 		for ( int i = 0 ; i < tagList.size(); i++ ) {
-			categoryList.add(new Triplet<Color,String,Integer>(Color.DARKGRAY,tagList.get(i).getTagName(), tagList.get(i).getNumTags()));
+			categoryList.add(new Triplet<Color,String,Integer>(Color.DIMGRAY,tagList.get(i).getTagName(), 
+															   tagList.get(i).getNumTags()));
 		}
 		myContentManager.updateCategoryContentBox(categoryList);
 		
@@ -255,7 +283,8 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {			
-				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() || event.getCode() == KeyCode.BACK_SPACE) {
+				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
+					 || event.getCode() == KeyCode.BACK_SPACE) {
 					processAutoComplete();
 				}
 				if (event.getCode() == KeyCode.ENTER) {	
@@ -268,7 +297,8 @@ public class UiController {
 		input.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode().isArrowKey()) {
-					if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) { // get previous / next input history
+					if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) { 
+						// get previous / next input history
 						setInputFromHistory(event.getCode());
 						event.consume();
 					}
@@ -394,7 +424,7 @@ public class UiController {
 		} else if (event.getCode() == KeyCode.ESCAPE) {
 			System.exit(0);
 		} else if (event.isControlDown() && event.getCode() == KeyCode.W){
-			crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+			crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 			stage.close();
 		} else if (event.getCode() == KeyCode.F1) {
 			myContentManager.setActionMode(ActionMode.HELP);
@@ -419,7 +449,6 @@ public class UiController {
 			  @Override public void handle(MouseEvent mouseEvent) {
 			  	stage.setX(mouseEvent.getScreenX() + mouseX);
 			    stage.setY(mouseEvent.getScreenY() + mouseY);
-			    myDropDown.closeMenu();
 			  }
 		});
 	}
@@ -429,7 +458,7 @@ public class UiController {
 		assert(minusButton != null);	
 		crossButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
-				crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_SELECT));
+				crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_SELECT));
 		  }
 		});
 		crossButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -438,22 +467,22 @@ public class UiController {
 				if ( mouseEvent.getPickResult().getIntersectedNode() == crossButton) {
 					System.exit(0);
 				} else {
-					crossButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.CROSS_DEFAULT));  
+					crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 				}
 			}
 		});
 		minusButton.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
-				minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_SELECT));
+				minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_SELECT));
 		  }
 		});
 		minusButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
 				if ( mouseEvent.getPickResult().getIntersectedNode() == minusButton) {
-					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+					minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 					stage.close();
 				} else {
-					minusButton.setImage(UiImageManager.getInstance().getImage(IMAGE_ID.MINUS_DEFAULT)); 
+					minusButton.setImage(UiImageManager.getInstance().getImage(ImageID.MINUS_DEFAULT)); 
 				}
 			}
 		});

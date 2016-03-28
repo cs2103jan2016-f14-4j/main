@@ -475,12 +475,13 @@ public class LogicMemory {
 	
 	private void sortTaskLists() {
 		for (ArrayList<Task> list : taskLists) {
-			Collections.sort(list);
+			Collections.sort(list, Collections.reverseOrder()); // Sort in reverse order because compareTo logic in
+			                                                    // Task.java is reversed
 		}
 	}
 	
 	private void sortTagCategoryList() {
-		Collections.sort(tagCategoryList);
+		Collections.sort(tagCategoryList); 
 	}
 	
 	/** 

@@ -41,12 +41,20 @@ public class LogicTest {
 		return lists;
 	}
 	
-	private static ArrayList<ArrayList<Task>> sortLists(ArrayList<ArrayList<Task>> lists) {
+	private static void sortLists(ArrayList<ArrayList<Task>> lists) {
 		for (ArrayList<Task> list : lists) {
 			Collections.sort(list);
 		}
-		
-		return lists;
+	}
+	
+	private static void sortListsReversed(ArrayList<ArrayList<Task>> lists) {
+		for (ArrayList<Task> list : lists) {
+			Collections.sort(list, Collections.reverseOrder());
+		}
+	}
+	
+	private static void sortListReversed(ArrayList<Task> list) {
+		Collections.sort(list, Collections.reverseOrder());
 	}
 	
 	
@@ -212,7 +220,7 @@ public class LogicTest {
 		expected.get(LogicMemory.INDEX_EVENT).add(task);
 		expected.get(LogicMemory.INDEX_PENDING).add(task);
 		
-		sortLists(expected);
+		sortListsReversed(expected);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
@@ -304,14 +312,17 @@ public class LogicTest {
 		String input = "add task1";
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task1 = parser.parseInput(input).getTask();
-		ArrayList<Task> expected = new ArrayList<Task>();
-		expected.add(task1);
+
 		input = "add task2 on 31 dec";
 		logic.executeCommand(ContentBox.PENDING, input);
 		Task task2 = parser.parseInput(input).getTask();
-		expected.add(task2);
+
 		// Both task1 and task2 match
 		logic.executeCommand(ContentBox.PENDING, "search t");
+		ArrayList<Task> expected = new ArrayList<Task>();
+		expected.add(task1);
+		expected.add(task2);
+		sortListReversed(expected);
 		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 		
 		// Only task2 matches
@@ -837,9 +848,9 @@ public class LogicTest {
 		
 		ArrayList<Task> pendingList = logic.getAllTaskLists().get(LogicMemory.INDEX_PENDING);
 		ArrayList<Task> floatingList = logic.getAllTaskLists().get(LogicMemory.INDEX_FLOATING);
-		assertTrue(pendingList.get(0).getPriority() == 1);
-		assertTrue(pendingList.get(1).getPriority() == 2);
-		assertTrue(floatingList.get(0).getPriority() == 1);
-		assertTrue(floatingList.get(1).getPriority() == 2);
+		assertTrue(pendingList.get(0).getPriority() == 2);
+		assertTrue(pendingList.get(1).getPriority() == 1);
+		assertTrue(floatingList.get(0).getPriority() == 2);
+		assertTrue(floatingList.get(1).getPriority() == 1);
 	}
 }

@@ -13,7 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.IMAGE_ID;
+import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.ui.utility.UiImageManager;
@@ -128,7 +128,7 @@ public class UiMain extends Application {
 	private void setUpScene(Stage primaryStage, Parent root) {
 		primaryStage.setTitle(UiConstants.PROGRAM_NAME);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
-		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(IMAGE_ID.WINDOW_ICON));
+		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(ImageID.WINDOW_ICON));
 
 		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);

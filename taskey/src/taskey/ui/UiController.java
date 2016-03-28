@@ -234,10 +234,15 @@ public class UiController {
 	private ArrayList<Triplet<Color, String, Integer>> createCategoriesHeader(ArrayList<ArrayList<Task>> allLists) {
 		ArrayList<Triplet<Color,String,Integer>> categoryListHeader = new ArrayList<Triplet<Color,String,Integer>>();
 		ArrayList<Task> pendingList = allLists.get(LogicMemory.INDEX_PENDING);
+		ArrayList<Task> expiredList = allLists.get(LogicMemory.INDEX_EXPIRED);
 		int priorityNums[] = new int[3];
 		for ( int i = 0; i < pendingList.size(); i++ ) {
 			priorityNums[pendingList.get(i).getPriority()-1]++; // increase numbers for each priority
 		}
+		for ( int i = 0; i < expiredList.size(); i ++ ) {
+			priorityNums[expiredList.get(i).getPriority()-1]++; // do the same for expired
+		}
+		
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.RED,"HIGH", priorityNums[2]));
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.ORANGE,"MED", priorityNums[1]));
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.GREEN,"LOW", priorityNums[0]));
@@ -433,7 +438,9 @@ public class UiController {
 			setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		} else if (event.getCode() == KeyCode.F3) {
 			setStyleSheets(UiConstants.STYLE_UI_LIGHT);
-		} 
+		} else if ( event.getCode() == KeyCode.Z && event.isControlDown()) {
+			handleFeedback(logic.executeCommand(getCurrentContent(), "undo"));
+		}
 	}
 	
 	private void registerDragHandler() {

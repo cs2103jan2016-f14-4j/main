@@ -104,11 +104,11 @@ public class AutoComplete {
 				break;
 			
 			case "add": 
-				completeAdd(phrase);
+				suggestions = completeAdd(phrase, utd);
 				break;
 				
 			case "set":
-				completeEdit(phrase);
+				suggestions = completeEdit(phrase);
 				break;
 				
 			default:
@@ -203,9 +203,10 @@ public class AutoComplete {
 	/**
 	 * Help a user suggest dates/categories/priority if any 
 	 * @param phrase
+	 * @param utd 
 	 * @return ProcessedAutoComplete Object 
 	 */
-	private ProcessedAC completeAdd(String phrase) {
+	private ProcessedAC completeAdd(String phrase, UserTagDatabase utd) {
 		String keyWords = "(at|on|by|from)";
 		ArrayList<String> availSuggestions = new ArrayList<String>(); 
 		phrase = phrase.toLowerCase();
@@ -214,6 +215,7 @@ public class AutoComplete {
 		String latestWord = splitString[splitString.length - 1]; 
 		
 		if (latestWord.contains("#")) {
+			//TODO:
 			//suggest categories to the user 
 		} else if (latestWord.contains("!")) {
 			//suggest priorities to the user 
@@ -229,6 +231,7 @@ public class AutoComplete {
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 			}
 		} else if (latestWord.matches(keyWords)) {
+			//TODO: 
 			//suggest some dates to the user 
 		} else {
 			availSuggestions = suggestDates(latestWord); 

@@ -35,9 +35,11 @@ public class UiTaskView {
 		entriesPerPage = _entriesPerPage;
 		taskView = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 	}
+	
 	public UiPagination getView() {
 		return taskView;
 	}
+	
 	public void createPaginationGrids(ArrayList<Task> myTaskList, int totalPages) {
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i ++ ) {

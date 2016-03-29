@@ -16,8 +16,8 @@ public class ParseFileLocation extends ParseCommand {
 		super(); 
 	}
 	
-	public ProcessedObject processLoc(String command, String rawInput) {
-		String pathname = getFileName(command, rawInput); 
+	public ProcessedObject processLoc(String rawInput) {
+		String pathname = getFileName(rawInput); 
 		ProcessedObject po = new ProcessedObject(ParserConstants.NEW_FILE_LOC);
 		po.setNewFileLoc(pathname); 
 		
@@ -30,7 +30,8 @@ public class ParseFileLocation extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getFileName(String command, String stringInput) {
+	public String getFileName(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

@@ -56,7 +56,7 @@ public class ParseAdd extends ParseCommand {
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = stringNoCommand(command, stringInput);
+		String simpString = stringNoCommand(stringInput);
 		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		String simpString2 = simpString.split("#")[0].trim(); 
 		simpString2 = simpString.split("!")[0].trim(); 
@@ -382,13 +382,13 @@ public class ParseAdd extends ParseCommand {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String stringNoCommand(String command, String stringInput) {
+	public String stringNoCommand(String stringInput) {
+		String command = stringInput.split(" ")[0]; //so we don't need to worry about case
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

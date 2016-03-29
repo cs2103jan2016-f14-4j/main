@@ -25,9 +25,9 @@ public class ParseDone extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processDone(String command, String stringInput) {
+	public ProcessedObject processDone(String stringInput) {
 		ProcessedObject processed; 
-		String taskName = getTaskName(command, stringInput);
+		String taskName = getTaskName(stringInput);
 		
 		if (taskName.compareTo("") == 0) {
 			return super.processError(ParserConstants.ERROR_DONE_EMPTY);
@@ -51,7 +51,8 @@ public class ParseDone extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String command, String stringInput) {
+	public String getTaskName(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

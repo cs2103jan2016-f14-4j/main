@@ -26,7 +26,7 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		
-		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
+		assertEquals("Command: ADD_FLOATING\nMEETING2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
 	}
 	
@@ -137,10 +137,10 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016\n"
 				+ "tags: sua, serious, \n",
 				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr\" is not an "
+		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr\" is not an "
 				+ "accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr 2016\" is not "
+		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr 2016\" is not "
 				+ "an accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 "
@@ -253,10 +253,10 @@ public class ParserTest {
 	public void testChangesBothNameDate() { 
 		//test combination
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
-				+ "Feb 2016\nat index: 1\nnew TaskName: newname\n",
+				+ "Feb 2016\nat index: 1\nnew TaskName: newName\n",
 				parser.parseInput("set 2 [16 Feb] \"newName\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_BOTH\nmeeting, DEADLINE, "
-				+ "due on 19 Feb 2016\nnew TaskName: newname\n",
+				+ "due on 19 Feb 2016\nnew TaskName: newName\n",
 				parser.parseInput("set meeting \"newName\" [19 feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nEVENT, from 14 Mar "
 				+ "2016 to 15 Mar 2016\nat index: 0\nnew TaskName: task 2\n",
@@ -392,19 +392,40 @@ public class ParserTest {
 				parser.parseInput("view #yolo lala #boo").toString());
 	}
 	
-	//TODO: 
+	@Test
+	/**
+	 * Test the parsing of the change Directory Command
+	 * TODO  
+	 */
 	public void testChangeDir() {
-		
+		System.out.println(parser.parseInput("setdir C:/Desktop"));
 	}
 	
-	//TODO:
+	@Test
+	/**
+	 * Test the parsing of the clear command
+	 */
 	public void testClear() {
-		
+		assertEquals("Command: CLEAR\n",
+				parser.parseInput("clear").toString());
 	}
 	
-	//TODO: 
+	@Test
+	/**
+	 * Test the parsing of the save command 
+	 */
 	public void testSave() {
-		
+		assertEquals("Command: SAVE\n",
+				parser.parseInput("save").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of invalid command
+	 */
+	public void testNoSuchCommand() {
+		assertEquals("Command: ERROR\nerror type: Error: \"write\" is not a valid command\n",
+				parser.parseInput("write oo").toString());
 	}
 	
 	/*

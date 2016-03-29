@@ -314,6 +314,10 @@ public class ProcessedObject {
 			stringRep += "newPriority: " + newPriority + "\n"; 
 		}
 		
+		if (newFileLoc != null) {
+			stringRep += "newLocation: " + newFileLoc + "\n"; 
+		}
+		
 		return stringRep; 
 	}
 }

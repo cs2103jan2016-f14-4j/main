@@ -44,8 +44,8 @@ public class ParseView extends ParseCommand {
 	 * @param stringInput
 	 * @return processedStuff
 	 */
-	public ProcessedObject processView(String command, String stringInput) {
-		String stringWithoutCommand = getStringWithoutCommand(command, stringInput);
+	public ProcessedObject processView(String stringInput) {
+		String stringWithoutCommand = getStringWithoutCommand(stringInput);
 		
 		//empty view
 		if (stringWithoutCommand.compareTo("") == 0) {
@@ -61,7 +61,8 @@ public class ParseView extends ParseCommand {
 	 * @param stringInput
 	 * @return string without the "view" command attached to it. 
 	 */
-	public String getStringWithoutCommand(String command, String stringInput) {
+	public String getStringWithoutCommand(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		return stringInput.replace(command, "").trim().toLowerCase();
 	}
 	

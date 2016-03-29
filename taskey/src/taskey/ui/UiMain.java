@@ -63,11 +63,13 @@ public class UiMain extends Application {
 		UiImageManager.getInstance().loadImages();
 		myController = new UiController();
 		alertController = new UiAlertsController();
+		
 		// set up main window
 		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 		// set up alert window
 		alertController.setUpStage(loadFXML(alertController,UiConstants.FXML_ALERT_PATH));
+		
 		trayModule = new UiTrayModule();
 		trayModule.initTrayVariables(primaryStage);
 		trayModule.createLinkage(myController, alertController); 

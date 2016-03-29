@@ -11,7 +11,6 @@
     -fx-prompt-text-fill: #2d3956;
 }
 .text-field:focused {
-    -fx-prompt-text-fill: transparent ;
 }
 
 /* Bound to fx:id */

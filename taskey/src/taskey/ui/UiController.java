@@ -100,7 +100,7 @@ public class UiController {
 		registerEventHandlersToNodes(root);	
 		setUpLogic();	
 		
-		myTabs.requestFocus(); // to display prompt at the start
+		//myTabs.requestFocus(); // to display prompt at the start
 		TaskeyLog.getInstance().log(LogSystems.UI, "Main Controller has been set up...", Level.ALL);
 	}
 	
@@ -405,6 +405,7 @@ public class UiController {
 	
 	private void handleKeyPressInRoot(KeyEvent event) {
 		input.requestFocus(); // give focus to textfield
+		UiPopupManager.getInstance().removePrompt();
 		if (myDropDown.isMenuShowing()) {
 			if (event.getCode().isArrowKey()) {
 				myDropDown.processArrowKey(event);

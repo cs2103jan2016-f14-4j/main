@@ -38,16 +38,20 @@ public class UiPopupManager {
 		return instance;
 	}
 
+	public void removePrompt() {
+		if ( promptMessage != null ) {
+			promptMessage.hide();
+			popupList.remove(promptMessage);
+		}
+	}
+	
 	/**
 	 * This method implements a single prompt message that will be replaced
 	 * whenever this method is called
 	 * This method uses createPopupLabelAtNode() to replace the prompt
 	 */
 	public void updatePromptMessage( String text, Node node, double offsetX, double offsetY ) { 
-		if ( promptMessage != null ) {
-			promptMessage.hide();
-			popupList.remove(promptMessage);
-		}
+		removePrompt();
 		promptMessage = createPopupLabelAtNode(text,node,offsetX,offsetY,true);
 	}
 	

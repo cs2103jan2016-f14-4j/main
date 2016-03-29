@@ -231,9 +231,9 @@ public class Storage {
 	}
 
 
-	/*=====================*
-	 * Set/get directories *
-	 *=====================*/
+	/*======================*
+	 * Directory management * TODO extract into a directory manager class?
+	 *======================*/
 	/**
 	 * Returns the current storage directory.
 	 * When the user asks to change directory, Logic can return it as feedback.
@@ -281,28 +281,28 @@ public class Storage {
 	 *			Logic should save everything after this to ensure that the current directory still has all the savefiles.
 	 */
 	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException {
-		File dir = new File(pathname);
-		boolean isValidDir = createDirectory(dir);
+		File newDir = new File(pathname);
+		boolean isValidDir = createDirectory(newDir);
 		if (!isValidDir) {
 			return false;
 		}
 
 		if (shouldMove) {
 			try {
-				moveFiles(directory, dir);
+				moveFiles(directory, newDir);
 			} catch (FileAlreadyExistsException e) {
-				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
+				System.out.println("{New directory contains existing tasklist files!} " + newDir.getAbsolutePath());
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
 
 		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
-		
-		if (shouldSaveNewDir(dir)) {
-			storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
+
+		if (shouldSaveNewDir(newDir)) {
+			storageWriter.saveDirectoryConfigFile(newDir, FILENAME_DIRCONFIG);
 		}
-		
-		directory = dir;
+
+		directory = newDir;
 		System.out.println("{Storage directory set} " + directory.getPath());
 		return true;
 	}
@@ -389,9 +389,10 @@ public class Storage {
 			return true; //all tasklist files are present in dir
 		}
 	}
-	
+
 	/**
 	 * Deletes the current Storage directory if it was created during runtime and is currently empty.
+	 * This method is meant to be used only in the setDirectory method.
 	 */
 	private void deleteCurrDir() {
 		if (directoriesCreated.contains(directory) && (directory.list().length == 0)) {

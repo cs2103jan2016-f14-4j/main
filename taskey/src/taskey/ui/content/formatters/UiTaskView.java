@@ -100,7 +100,7 @@ public class UiTaskView {
 				line += timings[0] + " to " + timings[1];
 				break;
 	 		case "DEADLINE":
-				line += "Due by: ";	
+				line += "By: ";	
 				line += "" + theTask.getDeadline();
 				break;
 			default:

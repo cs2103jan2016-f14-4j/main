@@ -25,7 +25,7 @@ import taskey.ui.utility.UiImageManager;
 
 public class UiTaskView {
 
-	private int stackPanePadding = 2;
+	private int stackPanePadding = 4;
 	private UiPagination taskView;
 	private int entriesPerPage;
 	private UiGridHelper gridHelper;
@@ -98,27 +98,25 @@ public class UiTaskView {
 		switch ( theTask.getTaskType() ) {
 			case "EVENT": 
 				String [] timings = theTask.getEventTime();
-				line += "Event from: ";
+				line += "from ";
 				line += timings[0] + " to " + timings[1];
 				break;
 	 		case "DEADLINE":
-				line += "By: ";	
+				line += "by ";	
 				line += "" + theTask.getDeadline();
 				break;
 			default:
 				break;
 		}
 		line += "\n";
-		line += "Tags: ";
 		if ( theTask.getTaskTags() != null ) {
+			line += "Tags: ";
 			ArrayList<String> tags = theTask.getTaskTags();
 			for ( int i = 0; i < tags.size()-1 ; i++ ) {
-				line += tags.get(i) + ", ";
+				line += "#" + tags.get(i) + ", ";
 			}
-			line += tags.get(tags.size()-1);
-		} else {
-			line += "None";
-		}
+			line += "#" + tags.get(tags.size()-1);
+		} 
 		StackPane pane = gridHelper.createStyledCell(0, 0, "", newGrid);
 		pane.setPadding(new Insets(stackPanePadding));
 		gridHelper.addTextFlowToCell(0, 0, myBuilder.build(line),TextAlignment.LEFT, newGrid);

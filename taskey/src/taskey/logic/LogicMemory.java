@@ -177,8 +177,12 @@ public class LogicMemory {
 		}
 		
 		Task toDelete = targetList.get(taskIndex);
+
+		if (!taskLists.get(INDEX_COMPLETED).contains(toDelete)) { // Completed tasks already have their tags removed.
+			removeTaskTags(toDelete.getTaskTags());
+		}
+		
 		removeFromAllLists(toDelete);
-		removeTaskTags(toDelete.getTaskTags());
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
 			clearActionList();

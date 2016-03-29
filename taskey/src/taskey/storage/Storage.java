@@ -406,7 +406,7 @@ public class Storage {
 				directoriesCreated.remove(directory);
 				System.out.println("{Storage} Old directory deleted | " + directory.getPath());
 			} catch (Exception e) {
-				System.out.println("{Storage} Could not delete old directory | " + directory.getPath());
+				System.err.println("{Storage} Could not delete old directory | " + directory.getPath());
 			}
 		}
 	}

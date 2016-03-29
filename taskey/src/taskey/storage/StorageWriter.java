@@ -47,7 +47,7 @@ class StorageWriter {
 			//System.out.println("{New storage directory saved}");
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("{Storage} Error saving new directory");
+			System.err.println("{Storage} Error saving new directory");
 		}
 	}
 

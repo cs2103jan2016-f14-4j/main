@@ -76,7 +76,11 @@ public class UiController {
 	private ContentBox currentContent;
 	private ArrayList<String> inputHistory;
 	private int historyIterator;
-	
+
+	public Stage getStage() {
+		return stage;
+	}
+		
 	/**
 	 * Sets up the nodes.
 	 *
@@ -95,7 +99,6 @@ public class UiController {
 		setUpInput();
 		registerEventHandlersToNodes(root);	
 		setUpLogic();	
-		setUpUpdateService();
 		
 		myTabs.requestFocus(); // to display prompt at the start
 		TaskeyLog.getInstance().log(LogSystems.UI, "Main Controller has been set up...", Level.ALL);
@@ -154,9 +157,13 @@ public class UiController {
 		updateAllContents(logic.getTagCategoryList(),logic.getAllTaskLists());
 	}
 
-	private void setUpUpdateService() {
-		updateService = new UiUpdateService(dateLabel,logic);
+	public void setUpUpdateService(UiAlertsController alertController) {
+		updateService = new UiUpdateService(dateLabel,logic,alertController);
 		updateService.start();
+	}
+	
+	public void updateAlerts() {
+		updateService.pollFromLogic();
 	}
 	
 	public void displayTabContents(ContentBox toContent) {
@@ -427,7 +434,7 @@ public class UiController {
 			displayTabContents(ContentBox.fromInteger(currentTab));
 			event.consume();
 		} else if (event.getCode() == KeyCode.ESCAPE) {
-			System.exit(0);
+			doSaveOnExit();
 		} else if (event.isControlDown() && event.getCode() == KeyCode.W){ // minimize
 			crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 			stage.close();
@@ -472,7 +479,7 @@ public class UiController {
 			@Override public void handle(MouseEvent mouseEvent) {
 				// 1st level intersect
 				if ( mouseEvent.getPickResult().getIntersectedNode() == crossButton) {
-					System.exit(0);
+					doSaveOnExit();
 				} else {
 					crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 				}
@@ -493,5 +500,10 @@ public class UiController {
 				}
 			}
 		});
+	}
+	
+	public void doSaveOnExit() {
+		handleFeedback(logic.executeCommand(getCurrentContent(), "save"));
+		System.exit(0);
 	}
 }

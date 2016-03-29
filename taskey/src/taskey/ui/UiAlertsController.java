@@ -44,7 +44,7 @@ import taskey.ui.utility.UiImageManager;
  * @author Junwei
  *
  */
-public class UiAlertsWindow {
+public class UiAlertsController {
 
 	@FXML
 	private ScrollPane scrollPane;
@@ -54,14 +54,9 @@ public class UiAlertsWindow {
 	private UiGridHelper gridHelper = new UiGridHelper("");
 	private ArrayList<Task> currentAlerts = new ArrayList<Task>(); // used as array
 	private ArrayList<Task> alertHistory = new ArrayList<Task>(); // dismissed tasks are not re-added
-	private static UiAlertsWindow instance = null;
-	private UiAlertsWindow(){
-	}
-	public static UiAlertsWindow getInstance() {
-		if ( instance == null ) {
-			instance = new UiAlertsWindow();
-		}
-		return instance;
+
+	public Stage getStage() {
+		return stage;
 	}
 		
 	public void setUpStage(Region contentRootRegion) {
@@ -110,10 +105,6 @@ public class UiAlertsWindow {
 			}
 		});
 	}	
-	
-	public Stage getStage() {
-		return stage;
-	}
 	
 	public void hide() {
 		stage.hide();

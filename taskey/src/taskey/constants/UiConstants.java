@@ -132,7 +132,7 @@ public class UiConstants {
 	
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
-	public static final int UPDATE_SERVICE_INTERVAL = 10000; // in milliseconds
+	public static final int UPDATE_SERVICE_INTERVAL = 300000; // in milliseconds (5 minutes)
 	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
 	public static final int DEFAULT_FADE_START_DELAY = 2000; 
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller

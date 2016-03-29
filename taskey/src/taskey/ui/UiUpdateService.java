@@ -22,14 +22,16 @@ import taskey.logic.LogicMemory;
 
 public class UiUpdateService extends ScheduledService<Void> {
 
+	private UiAlertsController alertController;
 	private Label dateLabelRef;
 	private Logic logicRef; // logic reference
 	
-	public UiUpdateService(Label dateLabel, Logic logic) {
+	public UiUpdateService(Label dateLabel, Logic logic, UiAlertsController _alertController) {
 		assert(dateLabel != null);
 		assert(logic != null);
 		dateLabelRef = dateLabel;
 		logicRef = logic;
+		alertController = _alertController;
 		this.setDelay(new Duration(0));
 		this.setPeriod(new Duration(UiConstants.UPDATE_SERVICE_INTERVAL));
 	}
@@ -56,10 +58,10 @@ public class UiUpdateService extends ScheduledService<Void> {
 	/**
 	 * This method polls task lists from logic and updates the Alert Window
 	 */
-	private void pollFromLogic() {
+	public void pollFromLogic() {
 		ArrayList<ArrayList<taskey.messenger.Task>> allLists = logicRef.getAllTaskLists();
 		ArrayList<taskey.messenger.Task> expiredList = allLists.get(LogicMemory.INDEX_EXPIRED);
 
-		UiAlertsWindow.getInstance().setAll(expiredList);
+		alertController.setAll(expiredList);
 	}
 }

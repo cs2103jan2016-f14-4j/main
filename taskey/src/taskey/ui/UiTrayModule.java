@@ -26,36 +26,58 @@ import taskey.logger.TaskeyLog.LogSystems;
 * @@author A0125419H
 * This class implements a tray module for the program, adapted from 
 * http://stackoverflow.com/questions/14626550/to-hide-javafx-fxml-or-javafx-swing-application-to-system-tray
+* It also acts as the main interface between uiController and alertsController
+* and performs all window close/open call backs
 * @author alvaro, junwei
 * 
 */
 
 public class UiTrayModule {
 	private TrayIcon trayIcon;
+	private UiController mainController;
+	private UiAlertsController alertsController;
 	
 	public UiTrayModule ( ) {
 		Platform.setImplicitExit(false);
 	}
 	
 	/**
-	 * This method creates the window dependency link between the alerts Window and the main Window
-	 * @param main - main Stage
-	 * @param alerts - alerts Stage
+	 * This method creates the dependency link between the alertsController and the uiController
+	 * @param myController - main Stage
+	 * @param alertController - alerts Stage
 	 */
-	public void createLinkage(Stage main, Stage alerts) {
-		main.setOnHidden(new EventHandler<WindowEvent>() {
+	public void createLinkage(UiController _mainController, UiAlertsController _alertsController) {
+		assert(_mainController != null);
+		assert(_alertsController != null);
+		
+		mainController = _mainController;
+		alertsController = _alertsController;
+		
+		Stage mainStage =  mainController.getStage();
+		Stage alertsStage = alertsController.getStage();
+		
+		mainController.setUpUpdateService(alertsController); // starts update service with alertController
+		
+		mainStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
-				hide(main);
-				UiAlertsWindow.getInstance().show();
+				hide(mainStage);
+				alertsController.show();
 			}
 		});
 		
-		alerts.setOnHidden(new EventHandler<WindowEvent>() {
+		alertsStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
-				UiAlertsWindow.getInstance().hide();
-				main.show();
+				alertsController.hide();
+				mainStage.show();
+			}
+		});
+		
+		alertsStage.setOnShown(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent t) {
+				mainController.updateAlerts();
 			}
 		});
 	}
@@ -71,7 +93,7 @@ public class UiTrayModule {
 			ActionListener closeListener = new ActionListener() {
 				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					System.exit(0);
+					mainController.doSaveOnExit();
 				}
 			};
 
@@ -81,7 +103,7 @@ public class UiTrayModule {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
-							UiAlertsWindow.getInstance().hide();
+							alertsController.hide();
 							stage.show();
 						}
 					});

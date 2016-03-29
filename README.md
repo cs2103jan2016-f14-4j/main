@@ -81,7 +81,7 @@ Examples:
   <li><b>set</b> 1 !!!
 </ul> 
 
-###Archive a task
+###Archiving a task
 When you are done with a task, you can archive it. 
 
 Format: done \<id\>
@@ -91,7 +91,7 @@ Examples:
   <li><b>done</b> 1
 </ul> 
 
-###Search for a task
+###Searching for a task
 If you have many tasks, you can search for your tasks by typing the command "<b>search</b>". 
 
 Format: search \<phrase\>
@@ -101,10 +101,10 @@ Example:
   <li><b>search</b> meetings
 </ul> 
 
-###Undo
+###Undoing an Action
 You can undo the last action by typing "<b>undo</b>". 
 
-###Tagging
+###Tagging your Tasks
 You can add tags to your tasks, so that you can view them by tags.
 Typing the command <b>view</b>, followed by the tag-name allows you to view all tasks with that tag in one window. 
 
@@ -129,5 +129,5 @@ Examples:
 ###Saving
 You can save any changes to your task list by typing the command <b>save</b>
 
-###Clear all your tasks
+###Clearing all tasks
 You can clear all your tasks by typing the command <b>clear</b>. To save this change, type <b>save</b>. 

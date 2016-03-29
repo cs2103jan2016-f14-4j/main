@@ -141,9 +141,9 @@ public class Storage {
 		if (loadedDirectory != null) {
 			if (createDirectory(loadedDirectory) == true) {
 				directory = loadedDirectory;
-				System.out.println("{Storage directory loaded} " + directory.getPath());
+				System.out.println("{Storage: directory loaded} " + directory.getAbsolutePath());
 			} else { //loaded directory was invalid or could not be created
-				//TODO
+				createDirectory(DEFAULT_DIRECTORY);
 				directory = DEFAULT_DIRECTORY;
 			}
 		} else { //directory config file not found
@@ -259,6 +259,7 @@ public class Storage {
 	 * <br>- Creates the directory if it does not exist yet.
 	 * <br>- If requested, moves the .taskey storage files from the existing directory to the new one, 
 	 * 		 provided the new directory does not contain a full set of pre-existing tasklist files.
+	 * <br>- The old folder will be deleted if it was created during runtime and is currently empty.
 	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
 	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
 	 * 
@@ -291,12 +292,11 @@ public class Storage {
 				moveFiles(directory, dir);
 			} catch (FileAlreadyExistsException e) {
 				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
-				// Signal Logic to load the existing task savefiles
-				throw e;
+				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
 
-		deleteOldDirectory();
+		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
 		
 		if (shouldSaveNewDir(dir)) {
 			storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
@@ -369,21 +369,6 @@ public class Storage {
 		}
 		return wasMoved;
 	}
-	
-	/**
-	 * Deletes the old directory after a move, only if it was created by Taskey and is currently empty.
-	 * @param directory the folder to be deleted
-	 */
-	private void deleteOldDirectory() {
-		if (directoriesCreated.contains(directory) && (directory.list().length == 0)) {
-			try {
-				Files.delete(directory.toPath());
-				System.out.println("{Storage} Old directory deleted");
-			} catch (Exception e) {
-				System.out.println("{Storage} Could not delete old directory");
-			}
-		}
-	}
 
 	/**
 	 * Checks if the given directory contains the full set of tasklist savefiles.
@@ -392,9 +377,7 @@ public class Storage {
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
 		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
-		for (File file : dir.listFiles()) {
-			String filename = file.getName();
-			//System.out.println(filename);
+		for (String filename : dir.list()) {
 			if (TasklistEnum.contains(filename)) {
 				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
 			}
@@ -404,6 +387,21 @@ public class Storage {
 			return false; //at least one tasklist file is missing (note: should not contain false)
 		} else {
 			return true; //all tasklist files are present in dir
+		}
+	}
+	
+	/**
+	 * Deletes the current Storage directory if it was created during runtime and is currently empty.
+	 */
+	private void deleteCurrDir() {
+		if (directoriesCreated.contains(directory) && (directory.list().length == 0)) {
+			try {
+				Files.delete(directory.toPath());
+				directoriesCreated.remove(directory);
+				System.out.println("{Storage} Old directory deleted");
+			} catch (Exception e) {
+				System.out.println("{Storage} Could not delete old directory");
+			}
 		}
 	}
 

@@ -117,7 +117,8 @@ Examples:
 
 ###Viewing selected tasks
 You can choose to view only certain types of task with the "view" command
-Format: view \<category\> or view #tag1 #tag2 #tag3 ... 
+
+Format: view \<category\> or view #tag1 #tag2 #tag3 ... <br>
 [You can only view one basic category at a time, but you can view multiple user-defined categories at one go]
 
 Examples:

@@ -173,7 +173,7 @@ public class StorageReader {
 	}
 
 	/**
-	 * Attempts to converts the given human time to its epoch equivalent.
+	 * Attempts to convert the given human time to its epoch equivalent.
 	 * If failed, the given epochTime will be returned instead.
 	 * @param humanTime user-editable human time in HH:mm (or HH:mm:ss)
 	 * @param epochTime this will always have a precision in seconds 

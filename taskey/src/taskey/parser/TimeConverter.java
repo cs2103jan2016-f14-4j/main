@@ -2,6 +2,7 @@ package taskey.parser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import taskey.constants.ParserConstants;
@@ -153,7 +154,7 @@ public class TimeConverter {
 	
 	/**
 	 * @param epochTime
-	 * @return Month as an integer (0-12) 
+	 * @return Month as an integer (1-12) 
 	 */
 	public int getMonth(long epochTime) {
 		String month = new java.text.SimpleDateFormat("MM").format(
@@ -171,6 +172,77 @@ public class TimeConverter {
 				new java.util.Date(epochTime*1000));
 		
 		return Integer.parseInt(day); 
+	}
+	
+	/**
+	 * @return an ArrayList of 3 months starting from the current time
+	 */
+	public ArrayList<String> get3MonthsFromNow() {
+		ArrayList<String> months = new ArrayList<String>();
+		
+		int currMonth = getMonth(getCurrTime()); 
+		
+		switch (currMonth) {
+			case 1:
+				months.add("jan");
+				months.add("feb");
+				months.add("mar"); 
+				break; 
+			case 2:
+				months.add("feb");
+				months.add("mar");
+				months.add("apr"); 
+				break; 
+			case 3:
+				months.add("mar");
+				months.add("apr");
+				months.add("may"); 
+				break; 
+			case 4:
+				months.add("apr");
+				months.add("may");
+				months.add("jun"); 
+				break; 
+			case 5:
+				months.add("may");
+				months.add("jun");
+				months.add("jul"); 
+				break; 
+			case 6:
+				months.add("jun");
+				months.add("jul");
+				months.add("aug"); 
+				break; 
+			case 7:
+				months.add("jul");
+				months.add("aug");
+				months.add("sep"); 
+				break; 
+			case 8:
+				months.add("aug");
+				months.add("sep");
+				months.add("oct"); 
+				break; 
+			case 9:
+				months.add("sep");
+				months.add("oct");
+				months.add("nov"); 
+				break; 
+			case 10:
+				months.add("oct");
+				months.add("nov");
+				months.add("dec"); 
+				break; 
+			case 11:
+				months.add("nov");
+				months.add("dec");
+				break; 
+			case 12:
+				months.add("dec"); 
+				break; 
+		}
+		
+		return months; 
 	}
 	
 	/**
@@ -242,6 +314,8 @@ public class TimeConverter {
 			long epochTime2 = tc.toEpochTime("21 Mar"); 
 			System.out.println(tc.toHumanTime(epochTime1));
 			System.out.println(tc.isSameWeek(epochTime1, epochTime2));
+			
+			tc.get3MonthsFromNow();
 		} catch (Exception e) {
 			System.out.println(e);
 		}

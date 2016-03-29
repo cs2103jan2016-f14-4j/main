@@ -113,3 +113,21 @@ add do homework on 30 feb (invalid date range, to be caught by TC)
 
 add do homework by 17 foo rd on sun <- will not be caught by ErrorDetector
 add watch the movie named 'day after tomorrow' <- should not be interpreted as date 
+--------
+COMMANDS TO DEMO:
+BASIC REQUIREMENTS: 
+1) add floating: add ride bike
+2) add deadline: add do MA3233 tutorial 9 by tomorrow
+3) add event: add lecture from 5 Apr 4pm to 5pm
+4) undo
+5) Edit task: set 3 "paint cupboard"
+6) search: search ma3233
+7) tracking done: done 1, view archive 
+8) save
+9) change storage: setdir C:\Desktop 
+
+EXTRA FEATURES:
+GOOD GUI
+1) autocomplete? 
+2) Adding tasks with tags? add ride bike #leisure 
+3) Priority tasks? add project meeting !!!

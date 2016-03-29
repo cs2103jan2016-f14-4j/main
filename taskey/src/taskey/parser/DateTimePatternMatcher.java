@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  *
  */
 public class DateTimePatternMatcher {
+	/* Blacklist for Adding task with date/time */
 	private String pattern1 = "by \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) on"; 
 	private String pattern2 = "on \\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) "
 			+ "from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to";
@@ -26,14 +27,50 @@ public class DateTimePatternMatcher {
 	private String pattern5 = "on (tmr|tomorrow|today) from \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) to"; 
 	private String pattern6 = "at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by"; 
 	
+	/* White-list for AutoComplete to suggest date/time */
+	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2}"; //for time
+	private String pattern8 = "\\d{1,2} ?"; //for date
+	
+	
 	public DateTimePatternMatcher() {
 		
 	}
 	
 	/**
+	 * For AutoComplete class:
+	 * Checks if the input contains something that looks like a time format
+	 * @param input
+	 * @return true if there seems to be some kind of time format
+	 */
+	public boolean hasTimeAC(String input) {
+		Pattern p = Pattern.compile(pattern7);
+		Matcher m = p.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		return false; 
+	}
+	
+	/**
+	 * For AutoComplete class:
+	 * Checks if the input contains something that looks like a date format
+	 * @param input
+	 * @return
+	 */
+	public boolean hasDateAC(String input) {
+		if (input.matches(pattern8)) {
+			return true;
+		}
+		return false; 
+	}
+	
+	
+	/**
 	 * Check if the input falls into any of the patterns specified in this class
 	 * @param input
-	 * @return true if it contains the pattern, false if it doesnt 
+	 * @return true if it contains the pattern, false if it doesn't 
 	 */
 	public boolean hasPattern(String input) {
 		Pattern p = Pattern.compile(pattern1);
@@ -55,32 +92,32 @@ public class DateTimePatternMatcher {
 		Matcher m6 = p6.matcher(input);
 		
 		while (m.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}
 		
 		while (m2.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}
 		
 		while (m3.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}
 		
 		while (m4.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}
 		
 		while (m5.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}
 		
 		while (m6.find()) {
-			System.out.println("Found a match.");
+			//System.out.println("Found a match.");
 			return true;
 		}	
 		return false; 

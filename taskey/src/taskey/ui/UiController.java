@@ -155,7 +155,7 @@ public class UiController {
 	}
 
 	private void setUpUpdateService() {
-		updateService = new UiUpdateService(dateLabel);
+		updateService = new UiUpdateService(dateLabel,logic);
 		updateService.start();
 	}
 	
@@ -288,6 +288,7 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {			
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
 				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
 					 || event.getCode() == KeyCode.BACK_SPACE) {
 					processAutoComplete();
@@ -314,8 +315,7 @@ public class UiController {
 		});
 	}
 
-	private void processAutoComplete() {
-		input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);	
+	private void processAutoComplete() {	
 		ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 		if ( suggestions == null ) {
 			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
@@ -403,7 +403,7 @@ public class UiController {
 				myDropDown.processArrowKey(event);
 				event.consume();
 			}
-		} else if (input.getText().isEmpty()) {
+		} else if (input.getText().isEmpty()) { // user not typing in command
 			if (event.getCode() == KeyCode.DELETE) {
 				int id = myContentManager.processDelete(getCurrentContent());
 				if (id != 0) {
@@ -428,7 +428,7 @@ public class UiController {
 			event.consume();
 		} else if (event.getCode() == KeyCode.ESCAPE) {
 			System.exit(0);
-		} else if (event.isControlDown() && event.getCode() == KeyCode.W){
+		} else if (event.isControlDown() && event.getCode() == KeyCode.W){ // minimize
 			crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 			stage.close();
 		} else if (event.getCode() == KeyCode.F1) {
@@ -438,7 +438,7 @@ public class UiController {
 			setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		} else if (event.getCode() == KeyCode.F3) {
 			setStyleSheets(UiConstants.STYLE_UI_LIGHT);
-		} else if ( event.getCode() == KeyCode.Z && event.isControlDown()) {
+		} else if ( event.getCode() == KeyCode.Z && event.isControlDown()) { // undo
 			handleFeedback(logic.executeCommand(getCurrentContent(), "undo"));
 		}
 	}

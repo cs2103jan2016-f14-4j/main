@@ -82,7 +82,7 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 15, 100);
-	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 80,10);
+	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 75,15);
 	
 	// Resources 
 	// Note that getResourceByStream uses relative Package directory. 
@@ -103,10 +103,11 @@ public class UiConstants {
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
 	public static final String STYLE_HELP_MENU_SELECTOR = "helpSelector";
-	public static final String STYLE_PROMPT = "prompt";
-	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
+	public static final String STYLE_DROPDOWN_DEFAULT = "dropDown";
+	public static final String STYLE_DROPDOWN_SELECTED = "dropDownSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
 	public static final String STYLE_INPUT_ERROR = "inputError";
+	public static final String STYLE_ALERT_BOX = "alertBox";
 	
 	public static final ArrayList<String> STYLE_UI_DEFAULT = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "defaultStyle.css", "defaultTab.css" ));
@@ -131,7 +132,8 @@ public class UiConstants {
 	
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
-	public static final int ClOCK_UPDATE_INTERVAL = 1000; // in milliseconds
+	public static final int UPDATE_SERVICE_INTERVAL = 10000; // in milliseconds
 	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
+	public static final int DEFAULT_FADE_START_DELAY = 2000; 
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
 }

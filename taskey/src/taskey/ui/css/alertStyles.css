@@ -11,14 +11,7 @@
  	 -fx-background-color: transparent;
 }
 
-#main {
-	 -fx-background-color: red;
-}
-.highlightBox {
-	-fx-background-color: #234187;
-}
-
-.numberIcon {
+.alertBox {
 	-fx-background-color: 
         radial-gradient(center 50% -50%, radius 200%, #FFFFFF 50%, #EEEEEE 50%);
     -fx-padding: 3px;

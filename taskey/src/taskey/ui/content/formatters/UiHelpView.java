@@ -82,7 +82,7 @@ public class UiHelpView {
 					break;
 				}
 				Label current = gridHelper.createLabelInCell(0, j, headers.get(entryNo), 
-															 UiConstants.STYLE_PROMPT_SELECTED, newGrid);
+															 UiConstants.STYLE_DROPDOWN_SELECTED, newGrid);
 				GridPane.setFillWidth(current.getParent(), false);
 				GridPane.setFillHeight(current.getParent(), false);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
@@ -90,7 +90,7 @@ public class UiHelpView {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
 				UiTextBuilder myBuilder = new UiTextBuilder();
-				myBuilder.addMarker(0, UiConstants.STYLE_PROMPT_SELECTED);
+				myBuilder.addMarker(0, UiConstants.STYLE_DROPDOWN_SELECTED);
 				String line = info.get(entryNo);
 				gridHelper.createStyledCell(1, j, "", newGrid);
 				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.LEFT, newGrid);

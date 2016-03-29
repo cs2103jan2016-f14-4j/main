@@ -11,7 +11,6 @@
     -fx-prompt-text-fill: #206ba4;
 }
 .text-field:focused {
-    -fx-prompt-text-fill: transparent ;
 }
 
 /* Bound to fx:id */
@@ -59,7 +58,7 @@
   -fx-background-radius: 2px, 0px;
 }
 
-.prompt {
+.dropDown {
 	-fx-padding: 2px;
 	-fx-background-color: #ebf4fb;
     -fx-background-radius: 5px;
@@ -67,7 +66,7 @@
     -fx-text-fill: #206ba4;
 }
 
-.promptSelect {
+.dropDownSelect {
 	-fx-padding: 2px;
 	-fx-background-color:#206ba4;
     -fx-background-radius: 5px;

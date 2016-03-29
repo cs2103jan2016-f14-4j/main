@@ -53,14 +53,13 @@ public class ParseAdd extends ParseCommand {
 	 * @return appropriate ProcessedObject 
 	 */
 	public ProcessedObject processAdd(String command, String stringInput) {
+		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
 		String simpString = stringNoCommand(stringInput);
 		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		String simpString2 = simpString.split("#")[0].trim(); 
-		simpString2 = simpString.split("!")[0].trim(); 
-		//TODO: find a way to handle add !!
 		
 		if (isEmptyAdd(simpString2)) {
 			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
@@ -71,6 +70,11 @@ public class ParseAdd extends ParseCommand {
 			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 
+		
+		if (simpString2.matches(onlyPriorityPattern)) {
+			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
+			return processed;
+		}
 		
 		//process as floating, event, deadline, or error 
 		processed = processNormally(command, processed, task, simpString);

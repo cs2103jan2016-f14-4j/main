@@ -39,6 +39,8 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Task name cannot consist "
 				+ "entirely of numbers\n",
 				parser.parseInput("add 2345").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
+				parser.parseInput("add !!").toString());
 	}
 	
 	@Test

@@ -58,13 +58,16 @@ public class ParseAdd extends ParseCommand {
 		//simpString: basically string without the command
 		String simpString = stringNoCommand(command, stringInput);
 		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
+		String simpString2 = simpString.split("#")[0].trim(); 
+		simpString2 = simpString.split("!")[0].trim(); 
+		//TODO: find a way to handle add !!
 		
-		if (isEmptyAdd(simpString)) {
+		if (isEmptyAdd(simpString2)) {
 			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
 			return processed;
 		}
 		
-		if(isOnlyNumbers(simpString)) {
+		if(isOnlyNumbers(simpString2)) {
 			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 

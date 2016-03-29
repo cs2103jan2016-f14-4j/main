@@ -392,6 +392,20 @@ public class ParserTest {
 				parser.parseInput("view #yolo lala #boo").toString());
 	}
 	
+	//TODO: 
+	public void testChangeDir() {
+		
+	}
+	
+	//TODO:
+	public void testClear() {
+		
+	}
+	
+	//TODO: 
+	public void testSave() {
+		
+	}
 	
 	/*
 	 * All the methods below will be manually tested because 

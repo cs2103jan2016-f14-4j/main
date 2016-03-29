@@ -120,7 +120,7 @@ BASIC REQUIREMENTS:
 2) add deadline: add do MA3233 tutorial 9 by tomorrow
 3) add event: add lecture from 5 Apr 4pm to 5pm
 4) undo
-5) set 3 "paint cupboard"
+5) Edit task: set 3 "paint cupboard"
 6) search: search ma3233
 7) tracking done: done 1, view archive 
 8) save

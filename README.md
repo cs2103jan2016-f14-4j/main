@@ -115,6 +115,17 @@ Examples:
   <li><b>view</b> forfun 
 </ul> 
 
+###Viewing selected tasks
+You can choose to view only certain types of task with the "view" command
+Format: view \<category\> or view #tag1 #tag2 #tag3 ... 
+[You can only view one basic category at a time, but you can view multiple user-defined categories at one go]
+
+Examples:
+<ul> 
+  <li><b>view</b> deadlines 
+  <li><b>view</b> #work #leisure 
+</ul> 
+
 ###Saving
 You can save any changes to your task list by typing the command <b>save</b>
 

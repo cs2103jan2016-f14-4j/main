@@ -475,16 +475,18 @@ public class ParserTest {
 	 * change every time the the unit test is run 
 	 */
 	
+	@Test
 	/**
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
 	public void testEventsHuman() {
-		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from today to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr"));
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
+	@Test
 	/**
 	 * Test human date edits
 	 */
@@ -493,6 +495,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
+	@Test 
 	/**
 	 * Test human deadlines
 	 */

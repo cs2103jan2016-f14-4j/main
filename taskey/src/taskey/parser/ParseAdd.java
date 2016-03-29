@@ -263,7 +263,7 @@ public class ParseAdd extends ParseCommand {
 		}
 		
 		//process start date/time
-		if (!specialDays.containsKey(rawStartDate)) {
+		if (!specialDays.containsKey(rawStartDate.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				epochTimeStart = epochTime; 
@@ -275,13 +275,13 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawStartDate);
+			epochTime = specialDays.get(rawStartDate.toLowerCase());
 			epochTimeStart = epochTime; 
 			task.setStartDate(epochTime);
 		}
 		
 		//process end date/time 
-		if (!specialDays.containsKey(rawEndDate)) {
+		if (!specialDays.containsKey(rawEndDate.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				epochTimeEnd = epochTime; 
@@ -293,7 +293,7 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawEndDate);
+			epochTime = specialDays.get(rawEndDate.toLowerCase());
 			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
 		}
@@ -346,7 +346,7 @@ public class ParseAdd extends ParseCommand {
 		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
-		} else if (!specialDays.containsKey(rawDate)) {
+		} else if (!specialDays.containsKey(rawDate.toLowerCase())) {
 			//process standard calendar dates (eg. 17 Feb) 
 			try {
 				epochTime = timeConverter.toEpochTime(rawDate); 
@@ -358,7 +358,7 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawDate);
+			epochTime = specialDays.get(rawDate.toLowerCase());
 			task.setDeadline(epochTime);
 		}
 		

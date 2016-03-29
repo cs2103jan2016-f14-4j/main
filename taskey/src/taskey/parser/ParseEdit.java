@@ -55,8 +55,8 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject
 	 */
-	public ProcessedObject processSet(String command, String stringInput) {
-		String strNoCommand = removeCommand(command, stringInput).trim();
+	public ProcessedObject processSet(String stringInput) {
+		String strNoCommand = removeCommand(stringInput);
 		
 		if (stringInput.split(" ").length > 1) {
 			String rawIndex = getTaskName(strNoCommand);
@@ -378,7 +378,8 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String removeCommand(String command, String stringInput) {
+	public String removeCommand(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

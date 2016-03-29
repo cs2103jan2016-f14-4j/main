@@ -23,7 +23,7 @@ public class ParseSearch extends ParseCommand {
 	 */
 	public ProcessedObject processSearch(String command, String stringInput) {
 		ProcessedObject processed = new ProcessedObject(command.toUpperCase()); 
-		String searchPhrase = getTaskName(command, stringInput);
+		String searchPhrase = getTaskName(stringInput);
 		
 		if (searchPhrase.compareTo("") != 0) { 
 			processed.setSearchPhrase(searchPhrase);
@@ -34,13 +34,13 @@ public class ParseSearch extends ParseCommand {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String command, String stringInput) {
+	public String getTaskName(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

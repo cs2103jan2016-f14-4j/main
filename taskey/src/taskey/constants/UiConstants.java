@@ -103,8 +103,8 @@ public class UiConstants {
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
 	public static final String STYLE_HELP_MENU_SELECTOR = "helpSelector";
-	public static final String STYLE_DROPDOWN_DEFAULT = "dropDown";
-	public static final String STYLE_DROPDOWN_SELECTED = "dropDownSelect";
+	public static final String STYLE_PROMPT_DEFAULT = "prompt";
+	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
 	public static final String STYLE_INPUT_ERROR = "inputError";
 	public static final String STYLE_ALERT_BOX = "alertBox";

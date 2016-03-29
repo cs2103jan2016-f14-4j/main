@@ -59,7 +59,7 @@
   -fx-background-radius: 2px, 0px;
 }
 
-.dropDown {
+.prompt {
 	-fx-padding: 2px;
 	-fx-background-color: #e7e7e7;
     -fx-background-radius: 5px;
@@ -67,7 +67,7 @@
     -fx-text-fill: #2d3956;
 }
 
-.dropDownSelect {
+.promptSelect {
 	-fx-padding: 2px;
 	-fx-background-color:#2d3956;
     -fx-background-radius: 5px;

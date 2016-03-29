@@ -2,21 +2,12 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
-import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
 import taskey.ui.content.UiPagination;
-import taskey.ui.content.UiTextBuilder;
 
 /**
  * @@author A0125419H
@@ -94,7 +85,7 @@ public class UiActionFormatter extends UiFormatter {
 		assert(myTaskList != null);	
 		taskView.getView().clear();
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
-		taskView.createPaginationGrids(myTaskList,categoryList,totalPages);
+		taskView.createPaginationGrids(myTaskList,totalPages);
 	}
 
 	@Override

@@ -53,21 +53,28 @@ public class ParseAdd extends ParseCommand {
 	 * @return appropriate ProcessedObject 
 	 */
 	public ProcessedObject processAdd(String command, String stringInput) {
+		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
-		String simpString = stringNoCommand(command, stringInput);
+		String simpString = stringNoCommand(stringInput);
 		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
+		String simpString2 = simpString.split("#")[0].trim(); 
 		
-		if (isEmptyAdd(simpString)) {
+		if (isEmptyAdd(simpString2)) {
 			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
 			return processed;
 		}
 		
-		if(isOnlyNumbers(simpString)) {
+		if(isOnlyNumbers(simpString2)) {
 			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
 			return processed; 
 		} 
+		
+		if (simpString2.matches(onlyPriorityPattern)) {
+			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
+			return processed;
+		}
 		
 		//process as floating, event, deadline, or error 
 		processed = processNormally(command, processed, task, simpString);
@@ -80,10 +87,38 @@ public class ParseAdd extends ParseCommand {
 		//process tags now: if there are tags, add it in.
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
+			if (!isValidTagList(tags)) {
+				return super.processError(ParserConstants.ERROR_ADD_INVALID_TAG); 
+			}
 			processed.getTask().setTaskTags(tags);
 		}
 		return processed; 
 	}
+	
+	/**
+	 * Check that the taglist does not contain default category words (eg. event)
+	 * or that the categories repeat multiple times 
+	 * @param tagList
+	 * @return true if none of the tags in tagList repeats. 
+	 */
+	private boolean isValidTagList(ArrayList<String> tagList) {
+		String pattern = "(deadline|deadlines|event|events|general|all)";
+		for(int i = 0; i < tagList.size(); i++) {
+			String tag = tagList.get(i); 
+			if (tag.matches(pattern)) {
+				return false; 
+			}
+			//compare with every other tag in the list to ensure no repeats
+			for (int j = i+1; j < tagList.size(); j++) {
+				String otherTag = tagList.get(j); 
+				if (tag.equals(otherTag)) {
+					return false; 
+				}
+			}
+		}
+		return true; 
+	}
+	
 	
 	/**
 	 * Processes the string normally as either a 
@@ -228,7 +263,7 @@ public class ParseAdd extends ParseCommand {
 		}
 		
 		//process start date/time
-		if (!specialDays.containsKey(rawStartDate)) {
+		if (!specialDays.containsKey(rawStartDate.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				epochTimeStart = epochTime; 
@@ -240,13 +275,13 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawStartDate);
+			epochTime = specialDays.get(rawStartDate.toLowerCase());
 			epochTimeStart = epochTime; 
 			task.setStartDate(epochTime);
 		}
 		
 		//process end date/time 
-		if (!specialDays.containsKey(rawEndDate)) {
+		if (!specialDays.containsKey(rawEndDate.toLowerCase())) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				epochTimeEnd = epochTime; 
@@ -258,7 +293,7 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawEndDate);
+			epochTime = specialDays.get(rawEndDate.toLowerCase());
 			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
 		}
@@ -311,7 +346,7 @@ public class ParseAdd extends ParseCommand {
 		epochTime = getPrettyTime(dateForPrettyParser);
 		if (epochTime != -1) {
 			task.setDeadline(epochTime); 
-		} else if (!specialDays.containsKey(rawDate)) {
+		} else if (!specialDays.containsKey(rawDate.toLowerCase())) {
 			//process standard calendar dates (eg. 17 Feb) 
 			try {
 				epochTime = timeConverter.toEpochTime(rawDate); 
@@ -323,7 +358,7 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawDate);
+			epochTime = specialDays.get(rawDate.toLowerCase());
 			task.setDeadline(epochTime);
 		}
 		
@@ -351,13 +386,13 @@ public class ParseAdd extends ParseCommand {
 	}
 	
 	/**
-	 * FOR FLOATING TASK: 
 	 * Given a stringInput, remove the command from the string
 	 * @param command
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String stringNoCommand(String command, String stringInput) {
+	public String stringNoCommand(String stringInput) {
+		String command = stringInput.split(" ")[0]; //so we don't need to worry about case
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

@@ -43,7 +43,8 @@ public class UiAnimationManager {
 	 * @param toAlpha - end opacity
 	 * @return - FadeTransition object for custom handling
 	 */
-	public FadeTransition createFadeTransition(Node theNode, int startDelay, int animDuration, double fromAlpha, double toAlpha) {
+	public FadeTransition createFadeTransition(Node theNode, int startDelay, int animDuration, 
+											   double fromAlpha, double toAlpha) {
 		assert(theNode != null);
 		FadeTransition ft = new FadeTransition(Duration.millis(animDuration), theNode);
 		ft.setDelay(Duration.millis(startDelay));
@@ -62,8 +63,8 @@ public class UiAnimationManager {
 	 * @param animDuration - the anim duration
 	 * @return - the translate transition
 	 */
-	public TranslateTransition createTranslateTransition(Node theNode, Pair<Double,Double> source, Pair<Double,Double> dest,
-														 int animDuration) {
+	public TranslateTransition createTranslateTransition(Node theNode, Pair<Double,Double> source, 
+														 Pair<Double,Double> dest, int animDuration) {
 		assert(theNode != null);
 		TranslateTransition shift = new TranslateTransition();
 		shift.setFromX(source.getKey());

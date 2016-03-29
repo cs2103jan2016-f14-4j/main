@@ -2,6 +2,7 @@ package taskey.ui.content;
 
 import java.util.ArrayList;
 
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Pagination;
 import javafx.scene.input.KeyCode;
@@ -27,6 +28,7 @@ public class UiPagination {
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	private String selectionStyle;
 	private StackPane selectedPane = null;
+	private boolean isSettingUp;
 	
 	public Pagination getPagination() {
 		return myPages;
@@ -40,14 +42,26 @@ public class UiPagination {
 		myPages.setVisible(false);
 		currentSelection = 0;
 		selectionInPage = 0;
+		isSettingUp = true;
+		
+		disableKeyInputs();
 	}
 	
+	private void disableKeyInputs() {
+		// so that the default pagination arrows wont affect the manual key input calls
+		myPages.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				event.consume();
+			}
+		});
+	}
+
 	/**
-	 * Initialize, sets the display for Pagination with totalPages.
+	 * Initialize and sets up the display for Pagination with totalPages.
 	 * Then binds the method for create pages
 	 * @param totalPages - the total pages
 	 */
-	public void initialize( int totalPages ) {	
+	public void initializeDisplay( int totalPages ) {	
 		if ( totalPages == 0 ) {// for formatting
 			myPages.setPageCount(1);
 			myPages.setMaxPageIndicatorCount(1);
@@ -63,6 +77,7 @@ public class UiPagination {
             }
         });
 		myPages.setVisible(true);
+		isSettingUp = false;
 	}
 	
 	public int getSelection() { 
@@ -151,12 +166,18 @@ public class UiPagination {
 		if ( pageIndex >= myGrids.size() ) {
 			return null; // grid has not been initialized
 		} 
+		if ( isSettingUp == true ) { // workaround for pagination index resetting to 0 on setPageFactory
+			// leave current Page active
+		} else {
+			currentPage = pageIndex;
+		}
 		currentPage = Math.min(currentPage, myGrids.size()-1);
 		selectInPage(currentPage,selectionInPage);
 		return myGrids.get(currentPage);
     }	
 	
 	public void clear() {
+		isSettingUp = true;
 		myGrids.clear();
 		totalEntries.clear();
 		selectedPane = null;

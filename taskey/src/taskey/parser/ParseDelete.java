@@ -26,9 +26,9 @@ public class ParseDelete extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processDelete(String command, String stringInput) {
+	public ProcessedObject processDelete(String stringInput) {
 		ProcessedObject processed; 
-		String taskName = getTaskName(command, stringInput);
+		String taskName = getTaskName(stringInput);
 		
 		if (taskName.compareTo("") == 0) {
 			return super.processError(ParserConstants.ERROR_DEL_EMPTY); 
@@ -66,7 +66,8 @@ public class ParseDelete extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String command, String stringInput) {
+	public String getTaskName(String stringInput) {
+		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
 		return task.trim(); 

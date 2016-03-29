@@ -41,20 +41,20 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		ProcessedObject processed = null;  
-		stringInput = stringInput.toLowerCase(); 
+		//stringInput = stringInput.toLowerCase(); 
 		String command = getCommand(stringInput); 
 		
 		//don't need to check date, just get "task"
 		//view, delete by index, delete by name, save, clear
 		switch(command) {
 			case "view":
-				processed = parseView.processView(command, stringInput); 
+				processed = parseView.processView(stringInput); 
 				break; 
 			case "del":
-				processed = parseDelete.processDelete(command, stringInput); 
+				processed = parseDelete.processDelete(stringInput); 
 				break;
 			case "setdir":
-				processed = parseDir.processLoc(command, stringInput);
+				processed = parseDir.processLoc(stringInput);
 				break; 	
 			case "save":
 				processed = parseSave.processSave(command); 
@@ -70,7 +70,7 @@ public class Parser {
 				processed = parseAdd.processAdd(command, stringInput); 
 				break;
 			case "set":
-				processed = parseEdit.processSet(command, stringInput); 
+				processed = parseEdit.processSet(stringInput); 
 				break;
 			case "search":
 				processed = parseSearch.processSearch(command, stringInput); 
@@ -79,7 +79,7 @@ public class Parser {
 				processed = parseUndo.processUndo(command); 
 				break; 
 			case "done":
-				processed = parseDone.processDone(command, stringInput);
+				processed = parseDone.processDone(stringInput);
 				break; 
 			default:
 				//error goes here

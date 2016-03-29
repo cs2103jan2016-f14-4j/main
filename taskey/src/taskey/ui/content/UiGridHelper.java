@@ -30,7 +30,7 @@ import taskey.constants.UiConstants;
 
 public class UiGridHelper {
 	
-	private String defaultWrapperStyle; // used to style the initial StackPane in a cell on creation if it does not exist
+	private String defaultWrapperStyle; // used to style the initial StackPane in a cell on creation 
 	
 	public UiGridHelper(String wrapperStyle) {
 		defaultWrapperStyle = wrapperStyle;
@@ -133,8 +133,8 @@ public class UiGridHelper {
 	}		
 	
 	/**
-	 * Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually for different
-	 * formatters, methods for the single wrapper can still be used, but switch the parents
+	 * Stacks a pane onto the cell, note that to place elements in this new pane, it has to be done manually 
+	 * for different formatters, methods for the single wrapper can still be used, but switch the parents
 	 * @param col - the col
 	 * @param row - the row
 	 * @param paneStyle - the pane style
@@ -157,7 +157,9 @@ public class UiGridHelper {
 		scaledRect.setFill(Paint.valueOf(theColor.toString()));
 		cellWrapper.getChildren().add(scaledRect);
 		StackPane.setAlignment(scaledRect, Pos.CENTER_LEFT);
-		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1.5f)); // problem with precision which shifts the whole row
+		
+		// problem with precision which shifts the whole row, thus we subtract a fixed amount
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1.5f)); 
 		scaledRect.setTranslateX(0.75f); // this mitigates the issue
 		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
 		return scaledRect;

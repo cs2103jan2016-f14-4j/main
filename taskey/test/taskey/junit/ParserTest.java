@@ -26,7 +26,7 @@ public class ParserTest {
 		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		
-		assertEquals("Command: ADD_FLOATING\nmeeting2, FLOATING, \n",
+		assertEquals("Command: ADD_FLOATING\nMEETING2, FLOATING, \n",
 				parser.parseInput("ADD MEETING2").toString());
 	}
 	
@@ -39,6 +39,18 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Task name cannot consist "
 				+ "entirely of numbers\n",
 				parser.parseInput("add 2345").toString());
+		//disallow empty adds 
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
+				parser.parseInput("add ").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
+				parser.parseInput("add !!").toString());
+		//invalid priority 
+		assertEquals("Command: ERROR\nerror type: Error: Invalid task priority entered\n",
+				parser.parseInput("add mtg !!!!!").toString());
+		//test that adding a place to the task doesn't get detected as time
+		//because of the keywords "by" and "on" 
+		assertEquals("Command: ADD_FLOATING\ndo work by the park, FLOATING, \n",
+				parser.parseInput("add do work by the park").toString());
 	}
 	
 	@Test
@@ -57,6 +69,9 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+		
+		assertEquals("Command: ADD_DEADLINE\ndo work, DEADLINE, due on 17 Feb 2016 15:00\n",
+				parser.parseInput("add do work at 17 feb 3pm").toString());
 	}
 	
 	@Test
@@ -65,10 +80,27 @@ public class ParserTest {
 	 * error cases, so on... 
 	 */
 	public void testDeadlineError() {
+		//ensure that words with "by" and "on" in it split correctly
+		//ie. make sure that the correct keywords are detected. 
+		assertEquals("Command: ADD_DEADLINE\nsing lullaby, DEADLINE, due on 11 Mar 2016\n",
+				parser.parseInput("add sing lullaby on 11 mar").toString());
+		assertEquals("Command: ADD_DEADLINE\nbuy baygon, DEADLINE, due on 11 Mar 2016\n",
+				parser.parseInput("add buy baygon on 11 mar").toString());
 		//ensure that numbers in meeting name do not affect date output
 		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
 				+ "Feb 2016\n",
 				parser.parseInput("add meeting 222 on 17 Feb").toString());
+	}
+	
+	@Test
+	/**
+	 * Check that grammatically incorrect dates get caught before 
+	 * PrettyTime returns the wrong date 
+	 */
+	public void testDeadlineGrammar() {
+		assertEquals("Command: ERROR\nerror type: Error: \"by 3pm on 17 Feb 2016\" is "
+				+ "a grammatically incorrect date\n",
+				parser.parseInput("add project meeting by 3pm on 17 Feb 2016").toString());
 	}
 	
 	@Test
@@ -137,16 +169,29 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016\n"
 				+ "tags: sua, serious, \n",
 				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr\" is not an "
+		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr\" is not an "
 				+ "accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr #sua #serious").toString());
-		assertEquals("Command: ERROR\nerror type: Error: \"17 fbr 2016\" is not "
+		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr 2016\" is not "
 				+ "an accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
 		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 "
 				+ "to 18 Feb 2016\ntags: sua, serious, \n",
 				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
 		
+	}
+	
+	@Test
+	/**
+	 * Test invalid tags for adding 
+	 */
+	public void testTagInvalid() {
+		//adding the same tag multiple times
+		assertEquals("Command: ERROR\nerror type: Error: Invalid tags added to the task\n",
+				parser.parseInput("add meeting #work #work #work").toString());
+		//adding deadlines/general/all/events: invalid categories cos these are default categories
+		assertEquals("Command: ERROR\nerror type: Error: Invalid tags added to the task\n",
+				parser.parseInput("add meeting #work #general #deadline").toString());
 	}
 	
 	@Test
@@ -240,10 +285,10 @@ public class ParserTest {
 	public void testChangesBothNameDate() { 
 		//test combination
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
-				+ "Feb 2016\nat index: 1\nnew TaskName: newname\n",
+				+ "Feb 2016\nat index: 1\nnew TaskName: newName\n",
 				parser.parseInput("set 2 [16 Feb] \"newName\"").toString());
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_BOTH\nmeeting, DEADLINE, "
-				+ "due on 19 Feb 2016\nnew TaskName: newname\n",
+				+ "due on 19 Feb 2016\nnew TaskName: newName\n",
 				parser.parseInput("set meeting \"newName\" [19 feb]").toString());
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nEVENT, from 14 Mar "
 				+ "2016 to 15 Mar 2016\nat index: 0\nnew TaskName: task 2\n",
@@ -293,6 +338,15 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
 				+ " later than the ending time\n",
 				parser.parseInput("set 1 [tmr, 19 feb 3pm]").toString());
+	}
+	
+	@Test 
+	/**
+	 * Test that trying to do empty changes returns error 
+	 */
+	public void testChangesEmptyError() {
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty change\n",
+				parser.parseInput("set ").toString());
 	}
 	
 	@Test
@@ -379,6 +433,41 @@ public class ParserTest {
 				parser.parseInput("view #yolo lala #boo").toString());
 	}
 	
+	@Test
+	/**
+	 * Test the parsing of the change Directory Command
+	 */
+	public void testChangeDir() {
+		assertEquals("Command: CHANGE_FILE_LOC\nnewLocation: C:/Desktop\n",
+				parser.parseInput("setdir C:/Desktop").toString());
+	}
+	
+	@Test
+	/**
+	 * Test the parsing of the clear command
+	 */
+	public void testClear() {
+		assertEquals("Command: CLEAR\n",
+				parser.parseInput("clear").toString());
+	}
+	
+	@Test
+	/**
+	 * Test the parsing of the save command 
+	 */
+	public void testSave() {
+		assertEquals("Command: SAVE\n",
+				parser.parseInput("save").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of invalid command
+	 */
+	public void testNoSuchCommand() {
+		assertEquals("Command: ERROR\nerror type: Error: \"write\" is not a valid command\n",
+				parser.parseInput("write oo").toString());
+	}
 	
 	/*
 	 * All the methods below will be manually tested because 
@@ -386,28 +475,31 @@ public class ParserTest {
 	 * change every time the the unit test is run 
 	 */
 	
+	@Test
 	/**
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
 	public void testEventsHuman() {
-		System.out.println(parser.parseInput("add meeting from today to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Mar"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Mar"));
+		System.out.println(parser.parseInput("add meeting from today to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr"));
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
+	@Test
+	/**
+	 * Test human date edits
+	 */
 	public void testChangesHuman() {
 		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
+	@Test 
 	/**
-	 * Test that words like lullaby/ bagon do not get their
-	 * "by" and "on" stripped as keywords + test relative dates
+	 * Test human deadlines
 	 */
 	public void testDeadlineHuman() { 
-		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
-		System.out.println(parser.parseInput("add buy baygon on 11 mar"));
 		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 

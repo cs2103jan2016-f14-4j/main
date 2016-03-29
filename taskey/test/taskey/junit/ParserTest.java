@@ -39,8 +39,18 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Task name cannot consist "
 				+ "entirely of numbers\n",
 				parser.parseInput("add 2345").toString());
+		//disallow empty adds 
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
+				parser.parseInput("add ").toString());
 		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
 				parser.parseInput("add !!").toString());
+		//invalid priority 
+		assertEquals("Command: ERROR\nerror type: Error: Invalid task priority entered\n",
+				parser.parseInput("add mtg !!!!!").toString());
+		//test that adding a place to the task doesn't get detected as time
+		//because of the keywords "by" and "on" 
+		assertEquals("Command: ADD_FLOATING\ndo work by the park, FLOATING, \n",
+				parser.parseInput("add do work by the park").toString());
 	}
 	
 	@Test
@@ -59,6 +69,9 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
+		
+		assertEquals("Command: ADD_DEADLINE\ndo work, DEADLINE, due on 17 Feb 2016 15:00\n",
+				parser.parseInput("add do work at 17 feb 3pm").toString());
 	}
 	
 	@Test
@@ -77,6 +90,17 @@ public class ParserTest {
 		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
 				+ "Feb 2016\n",
 				parser.parseInput("add meeting 222 on 17 Feb").toString());
+	}
+	
+	@Test
+	/**
+	 * Check that grammatically incorrect dates get caught before 
+	 * PrettyTime returns the wrong date 
+	 */
+	public void testDeadlineGrammar() {
+		assertEquals("Command: ERROR\nerror type: Error: \"by 3pm on 17 Feb 2016\" is "
+				+ "a grammatically incorrect date\n",
+				parser.parseInput("add project meeting by 3pm on 17 Feb 2016").toString());
 	}
 	
 	@Test
@@ -314,6 +338,15 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
 				+ " later than the ending time\n",
 				parser.parseInput("set 1 [tmr, 19 feb 3pm]").toString());
+	}
+	
+	@Test 
+	/**
+	 * Test that trying to do empty changes returns error 
+	 */
+	public void testChangesEmptyError() {
+		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty change\n",
+				parser.parseInput("set ").toString());
 	}
 	
 	@Test

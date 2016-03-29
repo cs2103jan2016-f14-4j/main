@@ -141,7 +141,7 @@ public class Storage {
 		if (loadedDirectory != null) {
 			if (createDirectory(loadedDirectory) == true) {
 				directory = loadedDirectory;
-				System.out.println("{Storage: directory loaded} " + directory.getAbsolutePath());
+				System.out.println("{Storage} Directory loaded | " + directory.getAbsolutePath());
 			} else { //loaded directory was invalid or could not be created
 				createDirectory(DEFAULT_DIRECTORY);
 				directory = DEFAULT_DIRECTORY;
@@ -296,7 +296,7 @@ public class Storage {
 			try {
 				moveFiles(directory, newDir);
 			} catch (FileAlreadyExistsException e) {
-				System.out.println("{New directory contains existing tasklist files!} " + newDir.getAbsolutePath());
+				System.out.println("{Storage} Directory contains existing tasklist files! | " + newDir.getPath());
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
@@ -308,7 +308,7 @@ public class Storage {
 		}
 
 		directory = newDir;
-		System.out.println("{Storage directory set} " + directory.getPath());
+		System.out.println("{Storage} Directory set | " + directory.getPath());
 		return true;
 	}
 
@@ -370,7 +370,7 @@ public class Storage {
 		}
 
 		if (wasMoved) {
-			System.out.println("{Storage files moved}");
+			System.out.println("{Storage} Files moved");
 		}
 		return wasMoved;
 	}
@@ -404,9 +404,9 @@ public class Storage {
 			try {
 				Files.delete(directory.toPath());
 				directoriesCreated.remove(directory);
-				System.out.println("{Storage} Old directory deleted");
+				System.out.println("{Storage} Old directory deleted | " + directory.getPath());
 			} catch (Exception e) {
-				System.out.println("{Storage} Could not delete old directory");
+				System.out.println("{Storage} Could not delete old directory | " + directory.getPath());
 			}
 		}
 	}

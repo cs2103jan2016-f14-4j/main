@@ -79,7 +79,7 @@ public class StorageReader {
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (InvalidTaskException e) {
-			System.out.println("{Tasklist invalid} " + src.getName());
+			System.out.println("{Storage} Invalid tasklist | " + src.getName());
 			throw e;
 		}
 		return tasklist;

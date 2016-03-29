@@ -113,7 +113,7 @@ public class UiTaskView {
 			line += "Tags: ";
 			ArrayList<String> tags = theTask.getTaskTags();
 			for ( int i = 0; i < tags.size()-1 ; i++ ) {
-				line += "#" + tags.get(i) + ", ";
+				line += "#" + tags.get(i) + " ";
 			}
 			line += "#" + tags.get(tags.size()-1);
 		} 

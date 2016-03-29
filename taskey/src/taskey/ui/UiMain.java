@@ -28,6 +28,7 @@ import taskey.ui.utility.UiImageManager;
 
 public class UiMain extends Application {
 
+	private UiAlertsController alertController;
 	private UiController myController;
 	private UiTrayModule trayModule;
 	
@@ -61,14 +62,15 @@ public class UiMain extends Application {
 		
 		UiImageManager.getInstance().loadImages();
 		myController = new UiController();
+		alertController = new UiAlertsController();
 		// set up main window
 		Parent root = setUpResize(primaryStage, loadFXML(myController,UiConstants.FXML_PATH));
 		setUpScene(primaryStage, root); // set up main scene
 		// set up alert window
-		UiAlertsWindow.getInstance().setUpStage(loadFXML(UiAlertsWindow.getInstance(),UiConstants.FXML_ALERT_PATH));
+		alertController.setUpStage(loadFXML(alertController,UiConstants.FXML_ALERT_PATH));
 		trayModule = new UiTrayModule();
 		trayModule.initTrayVariables(primaryStage);
-		trayModule.createLinkage(primaryStage, UiAlertsWindow.getInstance().getStage()); 
+		trayModule.createLinkage(myController, alertController); 
 		
 		TaskeyLog.getInstance().log(LogSystems.UI, "UI has been set up...", Level.ALL);
 	}

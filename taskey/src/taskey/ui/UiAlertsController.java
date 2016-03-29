@@ -28,21 +28,23 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
+import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
 import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiAnimationManager;
+import taskey.ui.utility.UiImageManager;
 
 /**
  * @@author A0125419H
  * 
- * This class implements another Stage / window for displaying alerts
+ * This class implements another Stage / window for displaying tasks as alerts
  * @author Junwei
  *
  */
-public class UiAlertsWindow {
+public class UiAlertsController {
 
 	@FXML
 	private ScrollPane scrollPane;
@@ -50,16 +52,11 @@ public class UiAlertsWindow {
 	private AnchorPane root;
 	private Stage stage;
 	private UiGridHelper gridHelper = new UiGridHelper("");
-	private ArrayList<Boolean> isSlotFree = new ArrayList<Boolean>();
-	
-	private static UiAlertsWindow instance = null;
-	private UiAlertsWindow(){
-	}
-	public static UiAlertsWindow getInstance() {
-		if ( instance == null ) {
-			instance = new UiAlertsWindow();
-		}
-		return instance;
+	private ArrayList<Task> currentAlerts = new ArrayList<Task>(); // used as array
+	private ArrayList<Task> alertHistory = new ArrayList<Task>(); // dismissed tasks are not re-added
+
+	public Stage getStage() {
+		return stage;
 	}
 		
 	public void setUpStage(Region contentRootRegion) {
@@ -76,7 +73,7 @@ public class UiAlertsWindow {
         setUpScene();
         addRootEventHandlers();
         for ( int i = 0; i < UiConstants.MAX_ALERTS; i++ ) {
-        	isSlotFree.add(new Boolean(true));
+        	currentAlerts.add(null); // set as null array
         }
         
         TaskeyLog.getInstance().log(LogSystems.UI, "Alert Window has been set up...", Level.ALL);
@@ -98,10 +95,9 @@ public class UiAlertsWindow {
 	private void addRootEventHandlers() {
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F5) {
+				if (event.getCode() == KeyCode.F5) { // for testing purposes
 					Task temp = new Task();
-					temp.setPriority(1);
-					temp.setTaskName(String.valueOf(Math.random()));
+					temp.setTaskName(String.valueOf(Math.random()).substring(0, 10));
 					addEntry(temp);
 				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
 					hide();
@@ -109,10 +105,6 @@ public class UiAlertsWindow {
 			}
 		});
 	}	
-	
-	public Stage getStage() {
-		return stage;
-	}
 	
 	public void hide() {
 		stage.hide();
@@ -133,15 +125,13 @@ public class UiAlertsWindow {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(thePane, 0,
-						UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+						UiConstants.DEFAULT_FADE_TIME/2, 1.0, 0.0);
 				fade.play();
 				fade.setOnFinished(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
 						StackPane wrapper = (StackPane) fade.getNode().getParent();
 						int index = GridPane.getRowIndex(wrapper);
-						theGrid.getChildren().remove(wrapper); // free the slot
-
 						removeEntry(index);
 					}
 				});
@@ -167,13 +157,18 @@ public class UiAlertsWindow {
 	}
 	
 	public void addEntry(Task newEntry) {
+		if ( checkTaskExisted(newEntry) == true ) {
+			return;
+		}
 		int gridIndex = findFirstFreeSlot();
 		if ( gridIndex == -1 ) {
 			return;
 		} else {
 			UiTextBuilder myBuilder = new UiTextBuilder();
 			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
-			String line = "" + newEntry;
+			String line = "" + newEntry.getTaskName();
+			myBuilder.addMarker(line.length(), UiConstants.STYLE_TEXT_RED);
+			line += "\n " + newEntry.getDeadline();
 			Color theColor = null;
 			switch ( newEntry.getPriority()) {
 				case 2: theColor = Color.RED;
@@ -183,21 +178,32 @@ public class UiAlertsWindow {
 				default:
 						theColor = Color.GREEN;
 			}
-			StackPane thePane = gridHelper.createStackPaneInCell(0, gridIndex, "numberIcon", theGrid);
+			StackPane thePane = gridHelper.createStackPaneInCell(0, gridIndex, UiConstants.STYLE_ALERT_BOX, theGrid);
 			GridPane entryGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT_ENTRY_PANE);
 			gridHelper.createScaledRectInCell(0, 0, theColor, entryGrid);
 			gridHelper.addTextFlowToCell(1, 0, myBuilder.build(line),TextAlignment.LEFT, entryGrid);	
+			gridHelper.createImageInCell(2, 0, UiImageManager.getInstance().getImage(ImageID.URGENT_MARK), 
+										 15, 15, entryGrid);
 			thePane.getChildren().add(entryGrid);
 			
 			addStartAnimation(thePane);
 			addClickHandler(thePane);					
-			isSlotFree.set(gridIndex, false);			
+			currentAlerts.set(gridIndex, newEntry);	
 		}
+	}
+	
+	private boolean checkTaskExisted(Task newEntry) {
+		if ( currentAlerts.contains(newEntry)) {
+			return true;
+		} else if ( alertHistory.contains(newEntry)) {
+			return true;
+		}
+		return false;
 	}
 	
 	private int findFirstFreeSlot() {
 		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
-			if ( isSlotFree.get(i) == true ) {
+			if ( currentAlerts.get(i) == null ) {
 				return i;
 			}
 		}
@@ -205,25 +211,46 @@ public class UiAlertsWindow {
 	}
 	
 	private void removeEntry( int gridIndex ) {
-		isSlotFree.set(gridIndex, true);
+		StackPane wrapper = gridHelper.getWrapperAtCell(0, gridIndex, theGrid);
+		theGrid.getChildren().remove(wrapper); // free the slot	
+		alertHistory.add(currentAlerts.get(gridIndex));
+		currentAlerts.set(gridIndex, null);
+		
 		 // shift all entries down
 		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
-			if ( isSlotFree.get(i) == true ) {
+			if ( currentAlerts.get(i) == null ) {
 				int swapIndex = -1;
+				Task swapTask = null;
 				for ( int j = i-1; j >= 0; j -- ) {
-					if ( isSlotFree.get(j) == false ) { // non empty
+					if ( currentAlerts.get(j) != null ) { // non empty
 						StackPane temp = gridHelper.getWrapperAtCell(0, j, theGrid);
 						theGrid.getChildren().remove(temp);
 						theGrid.add(temp, 0, i); // move to empty slot
 						swapIndex = j;
+						swapTask = currentAlerts.get(j);
 						break;
 					}	
 				}
 				if ( swapIndex != -1 ) {
-					isSlotFree.set(swapIndex, true);
-					isSlotFree.set(i, false);
+					currentAlerts.set(swapIndex, null); // free slot of task to be shifted down
+					currentAlerts.set(i, swapTask);
 				}
 			}	
+		}
+	}
+	
+	/**
+	 * Convenience method for setting all alerts
+	 * @param taskList
+	 */
+	public void setAll(ArrayList<Task> taskList) { // set all task lists
+		for ( int i = 0; i < UiConstants.MAX_ALERTS; i ++ ) {
+			if ( taskList.contains(currentAlerts.get(i)) == false ) { // remove old alerts
+				removeEntry(i);
+			}
+		}
+		for ( int i = 0; i < taskList.size() ; i ++) {
+			addEntry(taskList.get(i));
 		}
 	}
 }

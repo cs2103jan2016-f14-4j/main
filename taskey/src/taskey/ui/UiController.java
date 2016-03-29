@@ -76,7 +76,11 @@ public class UiController {
 	private ContentBox currentContent;
 	private ArrayList<String> inputHistory;
 	private int historyIterator;
-	
+
+	public Stage getStage() {
+		return stage;
+	}
+		
 	/**
 	 * Sets up the nodes.
 	 *
@@ -95,7 +99,6 @@ public class UiController {
 		setUpInput();
 		registerEventHandlersToNodes(root);	
 		setUpLogic();	
-		setUpUpdateService();
 		
 		myTabs.requestFocus(); // to display prompt at the start
 		TaskeyLog.getInstance().log(LogSystems.UI, "Main Controller has been set up...", Level.ALL);
@@ -154,9 +157,13 @@ public class UiController {
 		updateAllContents(logic.getTagCategoryList(),logic.getAllTaskLists());
 	}
 
-	private void setUpUpdateService() {
-		updateService = new UiUpdateService(dateLabel);
+	public void setUpUpdateService(UiAlertsController alertController) {
+		updateService = new UiUpdateService(dateLabel,logic,alertController);
 		updateService.start();
+	}
+	
+	public void updateAlerts() {
+		updateService.pollFromLogic();
 	}
 	
 	public void displayTabContents(ContentBox toContent) {
@@ -234,10 +241,15 @@ public class UiController {
 	private ArrayList<Triplet<Color, String, Integer>> createCategoriesHeader(ArrayList<ArrayList<Task>> allLists) {
 		ArrayList<Triplet<Color,String,Integer>> categoryListHeader = new ArrayList<Triplet<Color,String,Integer>>();
 		ArrayList<Task> pendingList = allLists.get(LogicMemory.INDEX_PENDING);
+		ArrayList<Task> expiredList = allLists.get(LogicMemory.INDEX_EXPIRED);
 		int priorityNums[] = new int[3];
 		for ( int i = 0; i < pendingList.size(); i++ ) {
 			priorityNums[pendingList.get(i).getPriority()-1]++; // increase numbers for each priority
 		}
+		for ( int i = 0; i < expiredList.size(); i ++ ) {
+			priorityNums[expiredList.get(i).getPriority()-1]++; // do the same for expired
+		}
+		
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.RED,"HIGH", priorityNums[2]));
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.ORANGE,"MED", priorityNums[1]));
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.GREEN,"LOW", priorityNums[0]));
@@ -283,6 +295,7 @@ public class UiController {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {			
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
 				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
 					 || event.getCode() == KeyCode.BACK_SPACE) {
 					processAutoComplete();
@@ -309,8 +322,7 @@ public class UiController {
 		});
 	}
 
-	private void processAutoComplete() {
-		input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR);	
+	private void processAutoComplete() {	
 		ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 		if ( suggestions == null ) {
 			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
@@ -398,7 +410,7 @@ public class UiController {
 				myDropDown.processArrowKey(event);
 				event.consume();
 			}
-		} else if (input.getText().isEmpty()) {
+		} else if (input.getText().isEmpty()) { // user not typing in command
 			if (event.getCode() == KeyCode.DELETE) {
 				int id = myContentManager.processDelete(getCurrentContent());
 				if (id != 0) {
@@ -422,8 +434,8 @@ public class UiController {
 			displayTabContents(ContentBox.fromInteger(currentTab));
 			event.consume();
 		} else if (event.getCode() == KeyCode.ESCAPE) {
-			System.exit(0);
-		} else if (event.isControlDown() && event.getCode() == KeyCode.W){
+			doSaveOnExit();
+		} else if (event.isControlDown() && event.getCode() == KeyCode.W){ // minimize
 			crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 			stage.close();
 		} else if (event.getCode() == KeyCode.F1) {
@@ -433,7 +445,9 @@ public class UiController {
 			setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		} else if (event.getCode() == KeyCode.F3) {
 			setStyleSheets(UiConstants.STYLE_UI_LIGHT);
-		} 
+		} else if ( event.getCode() == KeyCode.Z && event.isControlDown()) { // undo
+			handleFeedback(logic.executeCommand(getCurrentContent(), "undo"));
+		}
 	}
 	
 	private void registerDragHandler() {
@@ -465,7 +479,7 @@ public class UiController {
 			@Override public void handle(MouseEvent mouseEvent) {
 				// 1st level intersect
 				if ( mouseEvent.getPickResult().getIntersectedNode() == crossButton) {
-					System.exit(0);
+					doSaveOnExit();
 				} else {
 					crossButton.setImage(UiImageManager.getInstance().getImage(ImageID.CROSS_DEFAULT));  
 				}
@@ -486,5 +500,10 @@ public class UiController {
 				}
 			}
 		});
+	}
+	
+	public void doSaveOnExit() {
+		handleFeedback(logic.executeCommand(getCurrentContent(), "save"));
+		System.exit(0);
 	}
 }

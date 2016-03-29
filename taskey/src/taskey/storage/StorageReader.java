@@ -77,7 +77,6 @@ public class StorageReader {
 			tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
 			verifyTasklist(tasklist);
 		} catch (FileNotFoundException e) {
-			System.out.println("{At least one tasklist file was not found} " + src.getName());
 			throw e;
 		} catch (InvalidTaskException e) {
 			System.out.println("{Tasklist invalid} " + src.getName());

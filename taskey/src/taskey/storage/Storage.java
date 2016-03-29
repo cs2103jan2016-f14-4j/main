@@ -169,8 +169,8 @@ public class Storage {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
+			File src = new File(directory, tasklist.filename());
 			try {
-				File src = new File(directory, tasklist.filename());
 				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) {
@@ -178,7 +178,7 @@ public class Storage {
 				while (superlist.size() < TasklistEnum.size()) {
 					superlist.add(new ArrayList<Task>());
 				}
-				return superlist;
+				return superlist; //return an empty superlist if any tasklist was not found or is invalid
 			}
 		}
 		return superlist;
@@ -199,9 +199,14 @@ public class Storage {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			ArrayList<Task> listToSave = superlist.get(tasklist.index());
 			File dest = new File(directory, tasklist.filename());
-			storageWriter.saveTasklist(listToSave, dest);
+			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+			try {
+				storageWriter.saveTasklist(listToSave, dest);
+			} catch (FileNotFoundException e) {
+				createDirectory(directory); //in case user deletes their storage directory
+				storageWriter.saveTasklist(listToSave, dest); //try again
+			}
 		}
 	}
 

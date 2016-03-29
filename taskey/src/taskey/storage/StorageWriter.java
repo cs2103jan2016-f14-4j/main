@@ -1,6 +1,7 @@
 package taskey.storage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ class StorageWriter {
 	 * @param dest the JSON file to be written
 	 * @param object of type T to be serialized
 	 * @param typeToken represents the generic type T of the given object; this is obtained from the Gson TypeToken class
-	 * @throws IOException
+	 * @throws IOException thrown by FileWriter
 	 */
 	private <T> void writeToFile(File dest, T object, TypeToken<T> typeToken) throws IOException {
 		FileWriter writer = new FileWriter(dest);
@@ -64,7 +65,9 @@ class StorageWriter {
 		try {
 			writeToFile(dest, tasks, new TypeToken<ArrayList<Task>>() {});
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (!(e instanceof FileNotFoundException)) {
+				e.printStackTrace();
+			}
 			throw e;
 		}
 	}

@@ -177,8 +177,12 @@ public class LogicMemory {
 		}
 		
 		Task toDelete = targetList.get(taskIndex);
+
+		if (!taskLists.get(INDEX_COMPLETED).contains(toDelete)) { // Completed tasks already have their tags removed.
+			removeTaskTags(toDelete.getTaskTags());
+		}
+		
 		removeFromAllLists(toDelete);
-		removeTaskTags(toDelete.getTaskTags());
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
 			clearActionList();
@@ -475,12 +479,13 @@ public class LogicMemory {
 	
 	private void sortTaskLists() {
 		for (ArrayList<Task> list : taskLists) {
-			Collections.sort(list);
+			Collections.sort(list, Collections.reverseOrder()); // Sort in reverse order because compareTo logic in
+			                                                    // Task.java is reversed
 		}
 	}
 	
 	private void sortTagCategoryList() {
-		Collections.sort(tagCategoryList);
+		Collections.sort(tagCategoryList); 
 	}
 	
 	/** 

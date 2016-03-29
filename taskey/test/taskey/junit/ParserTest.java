@@ -65,6 +65,12 @@ public class ParserTest {
 	 * error cases, so on... 
 	 */
 	public void testDeadlineError() {
+		//ensure that words with "by" and "on" in it split correctly
+		//ie. make sure that the correct keywords are detected. 
+		assertEquals("Command: ADD_DEADLINE\nsing lullaby, DEADLINE, due on 11 Mar 2016\n",
+				parser.parseInput("add sing lullaby on 11 mar").toString());
+		assertEquals("Command: ADD_DEADLINE\nbuy baygon, DEADLINE, due on 11 Mar 2016\n",
+				parser.parseInput("add buy baygon on 11 mar").toString());
 		//ensure that numbers in meeting name do not affect date output
 		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
 				+ "Feb 2016\n",
@@ -395,10 +401,10 @@ public class ParserTest {
 	@Test
 	/**
 	 * Test the parsing of the change Directory Command
-	 * TODO  
 	 */
 	public void testChangeDir() {
-		System.out.println(parser.parseInput("setdir C:/Desktop"));
+		assertEquals("Command: CHANGE_FILE_LOC\nnewLocation: C:/Desktop\n",
+				parser.parseInput("setdir C:/Desktop").toString());
 	}
 	
 	@Test
@@ -444,18 +450,18 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
+	/**
+	 * Test human date edits
+	 */
 	public void testChangesHuman() {
 		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
 	/**
-	 * Test that words like lullaby/ bagon do not get their
-	 * "by" and "on" stripped as keywords + test relative dates
+	 * Test human deadlines
 	 */
 	public void testDeadlineHuman() { 
-		System.out.println(parser.parseInput("add sing lullaby on 11 mar"));
-		System.out.println(parser.parseInput("add buy baygon on 11 mar"));
 		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 

@@ -38,16 +38,20 @@ public class UiPopupManager {
 		return instance;
 	}
 
+	public void removePrompt() {
+		if ( promptMessage != null ) {
+			promptMessage.hide();
+			popupList.remove(promptMessage);
+		}
+	}
+	
 	/**
 	 * This method implements a single prompt message that will be replaced
 	 * whenever this method is called
 	 * This method uses createPopupLabelAtNode() to replace the prompt
 	 */
 	public void updatePromptMessage( String text, Node node, double offsetX, double offsetY ) { 
-		if ( promptMessage != null ) {
-			promptMessage.hide();
-			popupList.remove(promptMessage);
-		}
+		removePrompt();
 		promptMessage = createPopupLabelAtNode(text,node,offsetX,offsetY,true);
 	}
 	
@@ -68,7 +72,7 @@ public class UiPopupManager {
 		Label content = new Label();
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
+		content.getStyleClass().add(UiConstants.STYLE_DROPDOWN_SELECTED);
 		thePopup.getContent().add(content);
 		thePopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
 							screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
@@ -76,7 +80,8 @@ public class UiPopupManager {
 		
 		if ( deleteAfter == true ) {
 			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(
-					thePopup.getContent().get(0), 2000, UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+					thePopup.getContent().get(0), UiConstants.DEFAULT_FADE_START_DELAY, 
+					UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
 			fade.play();
 			fade.setOnFinished(new EventHandler<ActionEvent>() {
 				@Override

@@ -132,8 +132,9 @@ public class ParseAdd extends ParseCommand {
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {
-		String taskName = removeTimeFromName(simpString); 
-		String rawDate = simpString.replace(taskName, "").trim();
+		String taskNameRaw = removeTimeFromName(simpString); 
+		String taskName = taskNameRaw.substring(0, 1).toUpperCase() + taskNameRaw.substring(1);
+		String rawDate = simpString.replace(taskNameRaw, "").trim();
 		int priority = getPriority(rawDate); 
 		
 		//invalid priority given

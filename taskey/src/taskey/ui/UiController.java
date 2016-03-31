@@ -251,7 +251,7 @@ public class UiController {
 		}
 		
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.RED,"HIGH", priorityNums[2]));
-		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.ORANGE,"MED", priorityNums[1]));
+		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.web("#e87301",1.0),"MED", priorityNums[1]));
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.GREEN,"LOW", priorityNums[0]));
 		
 		categoryListHeader.add(new Triplet<Color,String,Integer>(Color.CADETBLUE,"General",

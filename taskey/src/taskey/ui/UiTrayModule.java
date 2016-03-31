@@ -90,20 +90,6 @@ public class UiTrayModule {
 			
 			// create a action listeners to listen for default action executed on
 			// the tray icon
-			ActionListener closeListener = new ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					mainController.doSaveOnExit();
-				}
-			};
-			
-			ActionListener closeNoSaveListener = new ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					System.exit(0);
-				}
-			};
-
 			ActionListener showListener = new ActionListener() {
 				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -116,7 +102,22 @@ public class UiTrayModule {
 					});
 				}
 			};
-			createTrayIcon(tray,showListener,closeNoSaveListener, closeListener);
+			
+			ActionListener closeNoSaveListener = new ActionListener() {
+				@Override
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					System.exit(0);
+				}
+			};
+			
+			ActionListener closeListener = new ActionListener() {
+				@Override
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					mainController.doSaveOnExit();
+				}
+			};
+			
+			createTrayIcon(tray,showListener,closeNoSaveListener,closeListener);
 		}
 		TaskeyLog.getInstance().log(LogSystems.UI, "Tray has been set up...", Level.ALL);
 	}

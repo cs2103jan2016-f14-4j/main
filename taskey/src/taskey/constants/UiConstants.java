@@ -103,8 +103,8 @@ public class UiConstants {
 	public static final String STYLE_DEFAULT_BOX = "defaultBox";
 	public static final String STYLE_HIGHLIGHT_BOX = "highlightBox";
 	public static final String STYLE_HELP_MENU_SELECTOR = "helpSelector";
-	public static final String STYLE_DROPDOWN_DEFAULT = "dropDown";
-	public static final String STYLE_DROPDOWN_SELECTED = "dropDownSelect";
+	public static final String STYLE_PROMPT_DEFAULT = "prompt";
+	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
 	public static final String STYLE_INPUT_ERROR = "inputError";
 	public static final String STYLE_ALERT_BOX = "alertBox";
@@ -121,6 +121,7 @@ public class UiConstants {
 	// Tray
 	public static String TRAY_SHOW_OPTION = "Show Taskey";
 	public static String TRAY_CLOSE_OPTION = "Close Program";
+	public static String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
 	public static String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
 	public static String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
 	public static String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";

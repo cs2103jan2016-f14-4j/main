@@ -23,7 +23,7 @@ public class ParserTest {
 	 * Test that adding floating tasks get parsed correctly 
 	 */
 	public void testFloating() {		
-		assertEquals("Command: ADD_FLOATING\ndo homework, FLOATING, \n",
+		assertEquals("Command: ADD_FLOATING\nDo homework, FLOATING, \n",
 				parser.parseInput("add do homework").toString());
 		
 		assertEquals("Command: ADD_FLOATING\nMEETING2, FLOATING, \n",
@@ -49,7 +49,7 @@ public class ParserTest {
 				parser.parseInput("add mtg !!!!!").toString());
 		//test that adding a place to the task doesn't get detected as time
 		//because of the keywords "by" and "on" 
-		assertEquals("Command: ADD_FLOATING\ndo work by the park, FLOATING, \n",
+		assertEquals("Command: ADD_FLOATING\nDo work by the park, FLOATING, \n",
 				parser.parseInput("add do work by the park").toString());
 	}
 	
@@ -58,19 +58,19 @@ public class ParserTest {
 	 * Test that adding deadline tasks gets parsed correctly 
 	 */
 	public void testDeadline() {
-		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
+		assertEquals("Command: ADD_DEADLINE\nProject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb 2016").toString());
 			 
-		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
+		assertEquals("Command: ADD_DEADLINE\nProject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting by 17 feb 2016 3pm").toString());
 		 
-		assertEquals("Command: ADD_DEADLINE\nproject meeting, DEADLINE, "
+		assertEquals("Command: ADD_DEADLINE\nProject meeting, DEADLINE, "
 				+ "due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add project meeting at 3pm on 17 Feb").toString());
 		
-		assertEquals("Command: ADD_DEADLINE\ndo work, DEADLINE, due on 17 Feb 2016 15:00\n",
+		assertEquals("Command: ADD_DEADLINE\nDo work, DEADLINE, due on 17 Feb 2016 15:00\n",
 				parser.parseInput("add do work at 17 feb 3pm").toString());
 	}
 	
@@ -82,12 +82,12 @@ public class ParserTest {
 	public void testDeadlineError() {
 		//ensure that words with "by" and "on" in it split correctly
 		//ie. make sure that the correct keywords are detected. 
-		assertEquals("Command: ADD_DEADLINE\nsing lullaby, DEADLINE, due on 11 Mar 2016\n",
+		assertEquals("Command: ADD_DEADLINE\nSing lullaby, DEADLINE, due on 11 Mar 2016\n",
 				parser.parseInput("add sing lullaby on 11 mar").toString());
-		assertEquals("Command: ADD_DEADLINE\nbuy baygon, DEADLINE, due on 11 Mar 2016\n",
+		assertEquals("Command: ADD_DEADLINE\nBuy baygon, DEADLINE, due on 11 Mar 2016\n",
 				parser.parseInput("add buy baygon on 11 mar").toString());
 		//ensure that numbers in meeting name do not affect date output
-		assertEquals("Command: ADD_DEADLINE\nmeeting 222, DEADLINE, due on 17 "
+		assertEquals("Command: ADD_DEADLINE\nMeeting 222, DEADLINE, due on 17 "
 				+ "Feb 2016\n",
 				parser.parseInput("add meeting 222 on 17 Feb").toString());
 	}
@@ -108,22 +108,22 @@ public class ParserTest {
 	 * Test that adding events get parsed correctly. 
 	 */
 	public void testEvents() {
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 "
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 19 Feb 2016 "
 				+ "to 20 Feb 2016\n",
 				parser.parseInput("add meeting from 19 Feb 2016 to 20 Feb 2016").toString());
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 "
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 19 Feb 2016 "
 				+ "to 20 Feb 2016\n",
 				parser.parseInput("add meeting from 19 Feb to 20 Feb").toString());	
 		
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00 "
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 19 Feb 2016 15:00 "
 				+ "to 19 Feb 2016 16:00\n",
 				parser.parseInput("add meeting from 19 feb 3pm to 19 feb 4pm").toString());
 		
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 19 Feb 2016 15:00 "
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 19 Feb 2016 15:00 "
 				+ "to 19 Feb 2016 16:00\n",
 				parser.parseInput("add meeting from 19 feb 3pm to 4pm").toString());
 		
-		assertEquals("Command: ADD_EVENT\nproject meeting, EVENT, from 19 Feb 2016 "
+		assertEquals("Command: ADD_EVENT\nProject meeting, EVENT, from 19 Feb 2016 "
 				+ "16:00 to 19 Feb 2016 17:00\n",
 				parser.parseInput("add project meeting from 4pm to "
 						+ "5pm on 19 feb").toString());
@@ -135,7 +135,7 @@ public class ParserTest {
 	 */
 	public void testEventsNumbers() {
 		//test events with numbers in task name 
-		assertEquals("Command: ADD_EVENT\nmtg2234, EVENT, from 19 Feb 2016 16:00"
+		assertEquals("Command: ADD_EVENT\nMtg2234, EVENT, from 19 Feb 2016 16:00"
 				+ " to 19 Feb 2016 17:00\n",
 				parser.parseInput("add mtg2234 from 19 feb 4pm to 5pm ").toString());
 		//System.out.println(p.parse(" from 4pm to 5pm on 19 feb"));
@@ -162,11 +162,11 @@ public class ParserTest {
 	 * Test that tagging gets parsed correctly 
 	 */
 	public void testTag() {
-		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, serious, \n",
+		assertEquals("Command: ADD_FLOATING\nMeeting, FLOATING, \ntags: sua, serious, \n",
 				parser.parseInput("add meeting #sua #serious").toString());
 		assertEquals("Command: ERROR\nerror type: Error: Cannot be an empty add\n",
 				parser.parseInput("add  ").toString());
-		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 17 Feb 2016\n"
+		assertEquals("Command: ADD_DEADLINE\nMeeting, DEADLINE, due on 17 Feb 2016\n"
 				+ "tags: sua, serious, \n",
 				parser.parseInput("add meeting on 17 Feb #sua #serious").toString());
 		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr\" is not an "
@@ -175,7 +175,7 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: \"17 Fbr 2016\" is not "
 				+ "an accepted date format\n",
 				parser.parseInput("add meeting on 17 Fbr 2016 #sua #serious").toString());
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 17 Feb 2016 "
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 17 Feb 2016 "
 				+ "to 18 Feb 2016\ntags: sua, serious, \n",
 				parser.parseInput("add meeting from 17 Feb to 18 Feb #sua #serious").toString());
 		
@@ -200,17 +200,17 @@ public class ParserTest {
 	 */
 	public void testAddPriority() {
 		//test setting of priority here 
-		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \n",
+		assertEquals("Command: ADD_FLOATING\nMeeting, FLOATING, \n",
 				parser.parseInput("add meeting !").toString());
-		assertEquals("Command: ADD_DEADLINE\nmeeting, DEADLINE, due on 18 Feb 2016\npriority: 3\n",
+		assertEquals("Command: ADD_DEADLINE\nMeeting, DEADLINE, due on 18 Feb 2016\npriority: 3\n",
 				parser.parseInput("add meeting on 18 feb !!!").toString());
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
 				+ "priority: 2\n",
 				parser.parseInput("add meeting from 18 feb to 19 feb !!").toString());
-		assertEquals("Command: ADD_EVENT\nmeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
+		assertEquals("Command: ADD_EVENT\nMeeting, EVENT, from 18 Feb 2016 to 19 Feb 2016\n"
 				+ "tags: boo, \npriority: 2\n",
 				parser.parseInput("add meeting from 18 feb to 19 feb #boo !!").toString());
-		assertEquals("Command: ADD_FLOATING\nmeeting, FLOATING, \ntags: sua, \npriority: 2\n",
+		assertEquals("Command: ADD_FLOATING\nMeeting, FLOATING, \ntags: sua, \npriority: 2\n",
 				parser.parseInput("add meeting #sua !!").toString());
 	}
 	

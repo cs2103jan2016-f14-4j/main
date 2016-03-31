@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * 1. DISPLAY_COMMAND : user is halfway through his command, show the list still
  * 2. FINISHED_COMMAND : user has completed typing his command, 
  * 						no need to display anything
- * 3. NO_SUCH_COMMAND : user keyed in a command that doesn't exist 
+ * 3. NO_SUCH_COMMAND : user keyed in a command that doesn't exist, show the red box 
  * 3. to be added when we add more auto complete features 
  * @author Xue Hui
  */

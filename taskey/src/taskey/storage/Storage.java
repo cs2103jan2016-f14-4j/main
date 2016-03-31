@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
@@ -24,6 +25,7 @@ public class Storage {
 	private StorageReader storageReader;
 	private StorageWriter storageWriter;
 	private File directory;
+	private HashSet<File> directoriesCreated;
 
 	private static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
@@ -133,13 +135,15 @@ public class Storage {
 	public Storage() {
 		storageReader = new StorageReader();
 		storageWriter = new StorageWriter();
+		directoriesCreated = new HashSet<File>();
 
 		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory != null) {
 			if (createDirectory(loadedDirectory) == true) {
 				directory = loadedDirectory;
-				System.out.println("{Storage directory loaded} " + directory.getPath());
-			} else { //loaded directory was invalid
+				System.out.println("{Storage} Directory loaded | " + directory.getAbsolutePath());
+			} else { //loaded directory was invalid or could not be created
+				createDirectory(DEFAULT_DIRECTORY);
 				directory = DEFAULT_DIRECTORY;
 			}
 		} else { //directory config file not found
@@ -165,8 +169,8 @@ public class Storage {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
+			File src = new File(directory, tasklist.filename());
 			try {
-				File src = new File(directory, tasklist.filename());
 				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) {
@@ -174,7 +178,7 @@ public class Storage {
 				while (superlist.size() < TasklistEnum.size()) {
 					superlist.add(new ArrayList<Task>());
 				}
-				return superlist;
+				return superlist; //return an empty superlist if any tasklist was not found or is invalid
 			}
 		}
 		return superlist;
@@ -195,9 +199,14 @@ public class Storage {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			ArrayList<Task> listToSave = superlist.get(tasklist.index());
 			File dest = new File(directory, tasklist.filename());
-			storageWriter.saveTasklist(listToSave, dest);
+			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+			try {
+				storageWriter.saveTasklist(listToSave, dest);
+			} catch (FileNotFoundException e) {
+				createDirectory(directory); //in case user deletes their storage directory
+				storageWriter.saveTasklist(listToSave, dest); //try again
+			}
 		}
 	}
 
@@ -227,9 +236,9 @@ public class Storage {
 	}
 
 
-	/*=====================*
-	 * Set/get directories *
-	 *=====================*/
+	/*======================*
+	 * Directory management * TODO extract into a directory manager class?
+	 *======================*/
 	/**
 	 * Returns the current storage directory.
 	 * When the user asks to change directory, Logic can return it as feedback.
@@ -255,6 +264,7 @@ public class Storage {
 	 * <br>- Creates the directory if it does not exist yet.
 	 * <br>- If requested, moves the .taskey storage files from the existing directory to the new one, 
 	 * 		 provided the new directory does not contain a full set of pre-existing tasklist files.
+	 * <br>- The old folder will be deleted if it was created during runtime and is currently empty.
 	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
 	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
 	 * 
@@ -276,44 +286,49 @@ public class Storage {
 	 *			Logic should save everything after this to ensure that the current directory still has all the savefiles.
 	 */
 	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException {
-		File dir = new File(pathname);
-		if (createDirectory(dir) == false) {
+		File newDir = new File(pathname);
+		boolean isValidDir = createDirectory(newDir);
+		if (!isValidDir) {
 			return false;
 		}
 
 		if (shouldMove) {
 			try {
-				moveFiles(directory, dir);
+				moveFiles(directory, newDir);
 			} catch (FileAlreadyExistsException e) {
-				System.out.println("{New directory contains existing tasklist files!} " + dir.getAbsolutePath());
-				// Signal Logic to load the existing task savefiles
-				throw e;
+				System.out.println("{Storage} Directory contains existing tasklist files! | " + newDir.getPath());
+				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
 
-		if (shouldSave(dir)) {
-			storageWriter.saveDirectoryConfigFile(dir, FILENAME_DIRCONFIG);
+		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
+
+		if (shouldSaveNewDir(newDir)) {
+			storageWriter.saveDirectoryConfigFile(newDir, FILENAME_DIRCONFIG);
 		}
-		directory = dir;
-		System.out.println("{Storage directory set} " + directory.getPath());
+
+		directory = newDir;
+		System.out.println("{Storage} Directory set | " + directory.getPath());
 		return true;
 	}
 
 	/**
-	 * Creates the full directory path of the given abstract pathname.
-	 * @param dir to be created
-	 * @return true if all the necessary folders were created or already exist and is valid; false otherwise
+	 * Creates the full directory path of the given abstract pathname and also checks that it is valid.
+	 * @param dir directory to be created
+	 * @return true if the directory was successfully created or already exists;
+	 * 		   false if dir is not a valid directory
 	 */
 	private boolean createDirectory(File dir) {
 		if (!dir.exists()) {
-			if (dir.mkdirs() == false) { //mkdirs() failed
+			if (dir.mkdirs() == true) {
+				directoriesCreated.add(dir);
+				return true;
+			} else { //mkdirs() failed
 				return false;
 			}
-		}
-
-		if (dir.isDirectory()) {
+		} else if (dir.isDirectory()) { //dir already exists && is a directory
 			return true;
-		} else {
+		} else { //dir exists but is not a directory
 			return false;
 		}
 	}
@@ -339,7 +354,6 @@ public class Storage {
 		}
 
 		boolean wasMoved = false;
-
 		for (File srcFile : srcDir.listFiles()) {
 			if (srcFile.getName().endsWith(FILENAME_EXTENSION)) {
 				Path srcPath = srcFile.toPath();
@@ -356,7 +370,7 @@ public class Storage {
 		}
 
 		if (wasMoved) {
-			System.out.println("{Storage files moved}");
+			System.out.println("{Storage} Files moved");
 		}
 		return wasMoved;
 	}
@@ -368,9 +382,7 @@ public class Storage {
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
 		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
-		for (File file : dir.listFiles()) {
-			String filename = file.getName();
-			//System.out.println(filename);
+		for (String filename : dir.list()) {
 			if (TasklistEnum.contains(filename)) {
 				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
 			}
@@ -384,12 +396,28 @@ public class Storage {
 	}
 
 	/**
+	 * Deletes the current Storage directory if it was created during runtime and is currently empty.
+	 * This method is meant to be used only in the setDirectory method.
+	 */
+	private void deleteCurrDir() {
+		if (directoriesCreated.contains(directory) && (directory.list().length == 0)) {
+			try {
+				Files.delete(directory.toPath());
+				directoriesCreated.remove(directory);
+				System.out.println("{Storage} Old directory deleted | " + directory.getPath());
+			} catch (Exception e) {
+				System.err.println("{Storage} Could not delete old directory | " + directory.getPath());
+			}
+		}
+	}
+
+	/**
 	 * Checks whether the abstract pathname given by dir should be saved to the directory config file.
 	 * @param dir the candidate directory
 	 * @return true if dir is different from the current directory;
 	 * 		   false if dir is the default directory or is the same as the current directory
 	 */
-	private boolean shouldSave(File dir) {
+	private boolean shouldSaveNewDir(File dir) {
 		// If dir is equal to the default directory, we can delete the config file
 		// since Storage does not need it to remember it.
 		if (dir.getAbsolutePath().equalsIgnoreCase(DEFAULT_DIRECTORY.getAbsolutePath())) {

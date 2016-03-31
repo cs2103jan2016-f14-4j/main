@@ -128,12 +128,13 @@ public class ParseAdd extends ParseCommand {
 	 * @param processed
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject 
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {
-		String taskName = removeTimeFromName(simpString); 
-		String rawDate = simpString.replace(taskName, "").trim();
+		String taskNameRaw = removeTimeFromName(simpString); 
+		String taskName = taskNameRaw.substring(0, 1).toUpperCase() + taskNameRaw.substring(1);
+		String rawDate = simpString.replace(taskNameRaw, "").trim();
 		int priority = getPriority(rawDate); 
 		
 		//invalid priority given
@@ -337,9 +338,13 @@ public class ParseAdd extends ParseCommand {
 		long epochTime;
 		ProcessedObject processed;
 		String dateForPrettyParser = rawDate;
-		rawDate = rawDate.replaceFirst("by", "").trim(); 
-		rawDate = rawDate.replaceFirst("on", "").trim(); 
-		rawDate = rawDate.replaceFirst("at", "").trim(); 
+		String[] splitDate = rawDate.split(" ");
+		rawDate = ""; 
+		for(int i=1; i < splitDate.length; i++) { 
+			rawDate += splitDate[i] + " "; 
+		}
+		rawDate = rawDate.trim(); 
+		
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.

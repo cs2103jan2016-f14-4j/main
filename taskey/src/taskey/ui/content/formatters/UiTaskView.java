@@ -76,7 +76,7 @@ public class UiTaskView {
 		switch ( theTask.getPriority()) {
 			case 3: theColor = Color.RED;
 					break;
-			case 2: theColor = Color.ORANGE;
+			case 2: theColor = Color.web("#e87301",1.0);
 					break;
 			default:
 					theColor = Color.GREEN;

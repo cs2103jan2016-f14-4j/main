@@ -121,6 +121,7 @@ public class UiConstants {
 	// Tray
 	public static String TRAY_SHOW_OPTION = "Show Taskey";
 	public static String TRAY_CLOSE_OPTION = "Close Program";
+	public static String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
 	public static String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
 	public static String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
 	public static String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";

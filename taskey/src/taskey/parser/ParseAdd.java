@@ -338,9 +338,13 @@ public class ParseAdd extends ParseCommand {
 		long epochTime;
 		ProcessedObject processed;
 		String dateForPrettyParser = rawDate;
-		rawDate = rawDate.replaceFirst("by", "").trim(); 
-		rawDate = rawDate.replaceFirst("on", "").trim(); 
-		rawDate = rawDate.replaceFirst("at", "").trim(); 
+		String[] splitDate = rawDate.split(" ");
+		rawDate = ""; 
+		for(int i=1; i < splitDate.length; i++) { 
+			rawDate += splitDate[i] + " "; 
+		}
+		rawDate = rawDate.trim(); 
+		
 		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.

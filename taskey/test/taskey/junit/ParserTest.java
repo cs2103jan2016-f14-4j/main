@@ -505,5 +505,8 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
 		System.out.println(parser.parseInput("add complete essay by this Wed"));
 		System.out.println(parser.parseInput("add complete essay by next Wed"));
+		System.out.println(parser.parseInput("add sdasda by mon")); 
+		System.out.println(parser.parseInput("add asdsad on sat")); 
+		System.out.println(parser.parseInput("add sdasad by sat")); 
 	}
 }

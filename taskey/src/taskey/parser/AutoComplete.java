@@ -315,6 +315,8 @@ public class AutoComplete {
 			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 		} else if (phrase.contains("[")) {
 			//TODO: this set of code assumes no space between event dates
+			//consider cases "set 1 [17 feb, 19 feb]
+			//or set 1 [ 17 feb , 19 feb ] 
 			String phrase2 = phrase.replace("]", ""); 
 			//suggest a date to the user 
 			String dates = phrase2.split("\\[")[1].trim();

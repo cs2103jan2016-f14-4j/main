@@ -111,10 +111,21 @@ public class AutoComplete {
 				suggestions = completeEdit(phrase);
 				break;
 				
+			case "del":
+			case "search":
+			case "done":
+			case "undo":
+			case "setdir":
+			case "save":
+			case "clear": 
+				suggestions = new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+				break; 
+				
 			default:
 				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 				break; 
-		}
+		}		
+		
 		return suggestions; 
 	}
 	
@@ -128,7 +139,7 @@ public class AutoComplete {
 		phrase = phrase.toLowerCase().trim(); 
 		
 		//if the command is completed, don't need to process
-		if (commandList.containsKey("phrase")) {
+		if (commandList.containsKey(phrase)) {
 			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 		}
 		
@@ -149,7 +160,7 @@ public class AutoComplete {
 			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 		}
 		
-		//find list normally 
+		//find list normally (for > 1 letter) 
 		for(int i = 0; i < commands.size(); i++) {
 			if (commands.get(i).contains(phrase)) {
 				availCommands.add(commands.get(i)); 
@@ -174,7 +185,7 @@ public class AutoComplete {
 		ArrayList<TagCategory> tagDB = utd.getTagList(); 
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
-		phrase = phrase.replaceFirst("view", ""); 
+		phrase = phrase.replaceFirst("view", "").trim(); 
 		String[] parts = phrase.split(" ");
 		//only want to auto-complete the latest word
 		String word = parts[parts.length-1].trim(); 
@@ -190,6 +201,8 @@ public class AutoComplete {
 		for(int i = 0; i < tagDB.size(); i++) {
 			String tag = tagDB.get(i).getTagName(); 
 			if (tag.contains(phrase)) {
+				//if user types without #, 
+				//then he should select the dropdown suggestion
 				availViews.add(tag); 
 			}
 		}
@@ -224,6 +237,7 @@ public class AutoComplete {
 				if (tagDB.size() == 0) {
 					return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 				}
+				//else suggest something 
 				for(int i = 0; i < tagDB.size(); i++) {
 					if (i < 3) {
 						availSuggestions.add(tagDB.get(i).getTagName());
@@ -238,6 +252,8 @@ public class AutoComplete {
 					availSuggestions.add(tag); 
 				}
 			}
+			//if tag doesnt exist, maybe it's a new tag. don't highlight error
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 		} else if (latestWord.contains("!")) {
 			//suggest priorities to the user 
 			if (phrase.contains("!")) {
@@ -250,6 +266,9 @@ public class AutoComplete {
 			} else if (phrase.contains("!!!")) {
 				//no need to suggest anything else 
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+			} else if (phrase.contains("!!!!")) {
+				//anything more than 3 !s is an error
+				return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 			}
 		} else if (latestWord.matches(keyWords)) {
 			//suggest some dates to the user, since keywords spotted 
@@ -259,6 +278,7 @@ public class AutoComplete {
 		} else {
 			availSuggestions = suggestDates(latestWord); 
 			if (availSuggestions == null) {
+				//might be task name, don't indicate error 
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 			}
 		}
@@ -290,7 +310,11 @@ public class AutoComplete {
 		} else if (phrase.contains("!!!")) {
 			//no need to suggest anything else 
 			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+		} else if (phrase.contains("!!!!")) {
+			//anything more than 3 !s is an error
+			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 		} else if (phrase.contains("[")) {
+			//TODO: this set of code assumes no space between event dates
 			String phrase2 = phrase.replace("]", ""); 
 			//suggest a date to the user 
 			String dates = phrase2.split("\\[")[1].trim();
@@ -308,7 +332,7 @@ public class AutoComplete {
 		if (!availSuggestions.isEmpty()) {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions); 
 		}
-		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+		return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 	}
 	
 	/**
@@ -322,7 +346,7 @@ public class AutoComplete {
 		if ("this".contains(date.trim())) { //eg. this ... 
 			availDates = specialDaysThis; 
 			return availDates; 
-		} else if ("next".contains(date.trim())) { //eg. this ...
+		} else if ("next".contains(date.trim())) { //eg. that ...
 			availDates = specialDaysNext; 
 			return availDates; 
 		}
@@ -334,7 +358,7 @@ public class AutoComplete {
 			}
 		}
 		
-		//check for time 
+		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
 			availDates.add(date.trim()+"am");
 			availDates.add(date.trim()+"pm"); 

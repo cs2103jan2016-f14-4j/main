@@ -133,6 +133,8 @@ GOOD GUI
 3) Priority tasks? add project meeting !!!
 ------------------
 TO WORK ON: 
-add meet friend to do pde at 12pm tomorrow 
-add meet friend to do pde tomorrow 
-add go home on this friday night 
+add meet friend to do pde tomorrow <- handling tomorrow using database?
+
+AutoComplete:
+set 1 [17 feb, 29 feb] 
+set 1 [ 17 feb, 29 feb ]

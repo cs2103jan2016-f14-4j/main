@@ -171,7 +171,7 @@ public class Storage {
 		for (TasklistEnum tasklist : TasklistEnum.values()) {
 			File src = new File(directory, tasklist.filename());
 			try {
-				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
+				ArrayList<Task> loadedList = storageReader.loadTasklist(src, tasklist);
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) {
 				superlist.clear();

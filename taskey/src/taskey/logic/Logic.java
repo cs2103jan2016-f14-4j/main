@@ -282,7 +282,7 @@ public class Logic {
 			ArrayList<String> suggestions = pac.getAvailCommands(); 
 			return suggestions;
 		} else if (pacCommand.compareTo(FINISHED_COMMAND) == 0) {
-			return null;
+			return new ArrayList<String>();
 		} else if (pacCommand.compareTo(NO_SUCH_COMMAND) == 0) {
 			return null;  
 		} else { // valid command

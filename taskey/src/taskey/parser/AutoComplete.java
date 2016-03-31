@@ -314,9 +314,6 @@ public class AutoComplete {
 			//anything more than 3 !s is an error
 			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 		} else if (phrase.contains("[")) {
-			//TODO: this set of code assumes no space between event dates
-			//consider cases "set 1 [17 feb, 19 feb]
-			//or set 1 [ 17 feb , 19 feb ] 
 			String phrase2 = phrase.replace("]", ""); 
 			//suggest a date to the user 
 			String dates = phrase2.split("\\[")[1].trim();
@@ -325,10 +322,15 @@ public class AutoComplete {
 				//only auto complete the 2nd date 
 				date = dates.split(",")[1].trim(); 
 			} else {
-				//only 1 date, try to autocomplete that 
+				//only 1 date, try to auto complete that 
 				date = dates; 
 			}
-			availSuggestions = suggestDates(date); 	
+			ArrayList<String> suggestedDates = suggestDates(date); 
+			if (suggestedDates != null) {
+				availSuggestions = suggestDates(date); 	
+			} else {
+				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+			}
 		}
 		
 		if (!availSuggestions.isEmpty()) {

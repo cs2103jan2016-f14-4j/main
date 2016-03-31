@@ -88,15 +88,8 @@ public class UiTrayModule {
 			// get the SystemTray instance
 			SystemTray tray = SystemTray.getSystemTray();
 			
-			// create a action listener to listen for default action executed on
+			// create a action listeners to listen for default action executed on
 			// the tray icon
-			ActionListener closeListener = new ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					mainController.doSaveOnExit();
-				}
-			};
-
 			ActionListener showListener = new ActionListener() {
 				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -109,22 +102,44 @@ public class UiTrayModule {
 					});
 				}
 			};
-			createTrayIcon(tray,closeListener,showListener);
+			
+			ActionListener closeNoSaveListener = new ActionListener() {
+				@Override
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					System.exit(0);
+				}
+			};
+			
+			ActionListener closeListener = new ActionListener() {
+				@Override
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					mainController.doSaveOnExit();
+				}
+			};
+			
+			createTrayIcon(tray,showListener,closeNoSaveListener,closeListener);
 		}
 		TaskeyLog.getInstance().log(LogSystems.UI, "Tray has been set up...", Level.ALL);
 	}
 	
-	private void createTrayIcon(SystemTray tray, ActionListener closeListener, ActionListener showListener) {
+	private void createTrayIcon(SystemTray tray, 
+								ActionListener showListener,
+								ActionListener closeNoSaveListener,
+								ActionListener closeListener) {
 		// create a popup menu
 		PopupMenu popup = new PopupMenu();
 		MenuItem showItem = new MenuItem(UiConstants.TRAY_SHOW_OPTION);
 		showItem.addActionListener(showListener);
 		popup.add(showItem);
 
+		MenuItem closeNoSaveItem = new MenuItem(UiConstants.TRAY_CLOSE_NO_SAVE_OPTION);
+		closeNoSaveItem.addActionListener(closeNoSaveListener);
+		popup.add(closeNoSaveItem);
+		
 		MenuItem closeItem = new MenuItem(UiConstants.TRAY_CLOSE_OPTION);
 		closeItem.addActionListener(closeListener);
 		popup.add(closeItem);
-
+		
 		// construct a TrayIcon
 		BufferedImage trayIconImage = null;
 		try {

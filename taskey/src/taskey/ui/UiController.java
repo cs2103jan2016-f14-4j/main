@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -504,7 +505,7 @@ public class UiController {
 	}
 	
 	public void doSaveOnExit() {
-		handleFeedback(logic.executeCommand(getCurrentContent(), "save"));
+		logic.executeCommand(getCurrentContent(), "save");
 		System.exit(0);
 	}
 }

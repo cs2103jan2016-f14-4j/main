@@ -128,7 +128,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param processed
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject 
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {

@@ -114,6 +114,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat",
 				currTime + ParserConstants.ONE_DAY);
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("monday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("tuesday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("wednesday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("thursday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("friday", 
+				currTime);
+		specialDays.put("saturday",
+				currTime + ParserConstants.ONE_DAY);
+		
+		specialDays.put("tues", 
+				currTime + ParserConstants.FOUR_DAYS);
+		specialDays.put("thurs", 
+				currTime + ParserConstants.SIX_DAYS);
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.TWO_DAYS); 
 		specialDays.put("this mon", 
@@ -129,6 +149,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat",
 				currTime + ParserConstants.ONE_DAY);
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this monday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this tuesday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this wednesday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("this thursday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this friday", 
+				currTime);
+		specialDays.put("this saturday",
+				currTime + ParserConstants.ONE_DAY);
+		
+		specialDays.put("this thurs", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this tues", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
 		specialDays.put("next mon", 
@@ -143,6 +183,26 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
 	}
 	
 	/**
@@ -167,6 +227,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat",
 				currTime + ParserConstants.TWO_DAYS);
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("monday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("tuesday", 
+				currTime +  ParserConstants.FIVE_DAYS); 
+		specialDays.put("wednesday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("thursday", 
+				currTime); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("saturday",
+				currTime + ParserConstants.TWO_DAYS);
+		
+		specialDays.put("tues", 
+				currTime +  ParserConstants.FIVE_DAYS); 
+		specialDays.put("thurs", 
+				currTime); 
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.THREE_DAYS); 
 		specialDays.put("this mon", 
@@ -182,6 +262,27 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat",
 				currTime + ParserConstants.TWO_DAYS);
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this monday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this tuesday", 
+				currTime +  ParserConstants.FIVE_DAYS); 
+		specialDays.put("this wednesday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this thursday", 
+				currTime); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this saturday",
+				currTime + ParserConstants.TWO_DAYS);
+		
+		specialDays.put("this tues", 
+				currTime +  ParserConstants.FIVE_DAYS);  
+		specialDays.put("this thurs", 
+				currTime); 
+		
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
 		specialDays.put("next mon", 
@@ -196,6 +297,26 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK); 
 	}
 	
 	/**
@@ -220,6 +341,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat",
 				currTime + ParserConstants.THREE_DAYS);
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("monday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("tuesday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("wednesday", 
+				currTime); 
+		specialDays.put("thursday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("saturday",
+				currTime + ParserConstants.THREE_DAYS);
+		
+		specialDays.put("tues", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("thurs", 
+				currTime + ParserConstants.ONE_DAY); 
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FOUR_DAYS); 
 		specialDays.put("this mon", 
@@ -235,6 +376,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat",
 				currTime + ParserConstants.THREE_DAYS);
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this monday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("this tuesday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this wednesday", 
+				currTime); 
+		specialDays.put("this thursday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this saturday",
+				currTime + ParserConstants.THREE_DAYS);
+		
+		specialDays.put("this tues", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this thurs", 
+				currTime + ParserConstants.ONE_DAY); 
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
 		specialDays.put("next mon", 
@@ -249,6 +410,26 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next tueday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
 	}
 
 	/**
@@ -273,6 +454,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat",
 				currTime + ParserConstants.FOUR_DAYS);
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("monday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("tuesday", 
+				currTime); 
+		specialDays.put("wednesday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("thursday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("saturday",
+				currTime + ParserConstants.FOUR_DAYS);
+		
+		specialDays.put("tues", 
+				currTime); 
+		specialDays.put("thurs", 
+				currTime + ParserConstants.TWO_DAYS); 
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.FIVE_DAYS); 
 		specialDays.put("this mon", 
@@ -288,6 +489,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat",
 				currTime + ParserConstants.FOUR_DAYS);
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("this monday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this tuesday", 
+				currTime); 
+		specialDays.put("this wednesday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this thursday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this saturday",
+				currTime + ParserConstants.FOUR_DAYS);
+		
+		specialDays.put("this tues", 
+				currTime); 
+		specialDays.put("this thurs", 
+				currTime + ParserConstants.TWO_DAYS); 
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
 		specialDays.put("next mon", 
@@ -302,6 +523,26 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
 	}
 
 	/**
@@ -326,6 +567,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat",
 				currTime + ParserConstants.FIVE_DAYS); 
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("monday", 
+				currTime);
+		specialDays.put("tuesday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("wednesday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("thursday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("saturday",
+				currTime + ParserConstants.FIVE_DAYS);
+		
+		specialDays.put("tues", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("thurs", 
+				currTime + ParserConstants.THREE_DAYS);
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.SIX_DAYS); 
 		specialDays.put("this mon", 
@@ -341,6 +602,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat",
 				currTime + ParserConstants.FIVE_DAYS); 
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this monday", 
+				currTime);
+		specialDays.put("this tuesday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this wednesday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this thursday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this saturday",
+				currTime + ParserConstants.FIVE_DAYS); 
+		
+		specialDays.put("this tues", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this thurs", 
+				currTime + ParserConstants.THREE_DAYS); 
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
 		specialDays.put("next mon", 
@@ -355,6 +636,26 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
 	}
 	
 	/**
@@ -379,6 +680,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sun",
 				currTime);
 		
+		specialDays.put("monday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("tuesday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("wednesday", 
+				currTime  + ParserConstants.THREE_DAYS); 
+		specialDays.put("thursday", 
+				currTime  + ParserConstants.FOUR_DAYS); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("saturday",
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("sunday",
+				currTime);
+		
+		specialDays.put("tues", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("thurs", 
+				currTime  + ParserConstants.FOUR_DAYS);
+		
 		specialDays.put("this mon", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this tue", 
@@ -394,6 +715,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sun",
 				currTime);
 		
+		specialDays.put("this monday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this tuesday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this wednesday", 
+				currTime  + ParserConstants.THREE_DAYS); 
+		specialDays.put("this thursday", 
+				currTime  + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("this saturday",
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this sunday",
+				currTime);
+		
+		specialDays.put("this tues", 
+				currTime + ParserConstants.TWO_DAYS);  
+		specialDays.put("this thurs", 
+				currTime  + ParserConstants.FOUR_DAYS); 
+		
 		specialDays.put("next sun", currTime + ParserConstants.ONE_WEEK); 
 		specialDays.put("next mon", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY ); 
@@ -407,6 +748,25 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS);
+		
+		specialDays.put("next sunday", currTime + ParserConstants.ONE_WEEK); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY ); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS);  
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
 	}
 
 	/**
@@ -431,6 +791,26 @@ public class SpecialDaysConverter {
 		specialDays.put("sat", 
 				currTime);
 		
+		specialDays.put("sunday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("monday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("tuesday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("wednesday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("thursday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("friday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("saturday", 
+				currTime);
+		
+		specialDays.put("tues", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("thurs", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		
 		specialDays.put("this sun", 
 				currTime + ParserConstants.ONE_DAY); 
 		specialDays.put("this mon", 
@@ -446,6 +826,26 @@ public class SpecialDaysConverter {
 		specialDays.put("this sat", 
 				currTime);
 		
+		specialDays.put("this sunday", 
+				currTime + ParserConstants.ONE_DAY); 
+		specialDays.put("this monday", 
+				currTime + ParserConstants.TWO_DAYS); 
+		specialDays.put("this tuesday", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this wednesday", 
+				currTime + ParserConstants.FOUR_DAYS); 
+		specialDays.put("this thursday", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		specialDays.put("this friday", 
+				currTime + ParserConstants.SIX_DAYS); 
+		specialDays.put("this saturday", 
+				currTime);
+		
+		specialDays.put("this tues", 
+				currTime + ParserConstants.THREE_DAYS); 
+		specialDays.put("this thurs", 
+				currTime + ParserConstants.FIVE_DAYS); 
+		
 		specialDays.put("next sun", 
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
 		specialDays.put("next mon", 
@@ -460,5 +860,25 @@ public class SpecialDaysConverter {
 				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
 		specialDays.put("next sat",
 				currTime + ParserConstants.ONE_WEEK);
+		
+		specialDays.put("next sunday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.ONE_DAY); 
+		specialDays.put("next monday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.TWO_DAYS); 
+		specialDays.put("next tuesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next wednesday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FOUR_DAYS); 
+		specialDays.put("next thursday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
+		specialDays.put("next friday", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.SIX_DAYS); 
+		specialDays.put("next saturday",
+				currTime + ParserConstants.ONE_WEEK);
+		
+		specialDays.put("next tues", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.THREE_DAYS); 
+		specialDays.put("next thurs", 
+				currTime + ParserConstants.ONE_WEEK + ParserConstants.FIVE_DAYS); 
 	}
 }

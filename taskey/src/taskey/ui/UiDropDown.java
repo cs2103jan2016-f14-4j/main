@@ -79,7 +79,7 @@ public class UiDropDown {
 			StackPane myPane = new StackPane();
 			Label text = new Label(items.get(i));
 			text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-			text.getStyleClass().add(UiConstants.STYLE_DROPDOWN_DEFAULT);
+			text.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
 			myPane.setAlignment(Pos.CENTER_LEFT);
 			myPane.getChildren().clear();
 			myPane.getChildren().add(text);
@@ -178,8 +178,8 @@ public class UiDropDown {
 	private void deSelect() {
 		if ( selectedPane != null ) {
 			Label toStyle = (Label) selectedPane.getChildren().get(0);
-			toStyle.getStyleClass().remove(UiConstants.STYLE_DROPDOWN_SELECTED);
-			toStyle.getStyleClass().add(UiConstants.STYLE_DROPDOWN_DEFAULT);
+			toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
+			toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
 			selectedPane = null;
 			currentSelection = -1;
 		}	
@@ -196,8 +196,8 @@ public class UiDropDown {
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		selectedPane = (StackPane) menuItems.get(currentSelection);
 		Label toStyle = (Label) selectedPane.getChildren().get(0);
-		toStyle.getStyleClass().remove(UiConstants.STYLE_DROPDOWN_SELECTED);
-		toStyle.getStyleClass().add(UiConstants.STYLE_DROPDOWN_SELECTED);
+		toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
+		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		restartFade();
 	}
 	

@@ -214,6 +214,15 @@ public class ParserTest {
 				parser.parseInput("add meeting #sua !!").toString());
 	}
 	
+	@Test
+	/**
+	 * Test adding of tasks with wrong priority 
+	 */
+	public void testAddWrongPriority() {
+		assertEquals("Command: ERROR\nerror type: Error: Invalid task priority entered\n",
+				parser.parseInput("add test !!!!!").toString());
+	}
+	
 	@Test 
 	/**
 	 * Test setting of changes via using task index
@@ -287,6 +296,11 @@ public class ParserTest {
 		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nDEADLINE, due on 16 "
 				+ "Feb 2016\nat index: 1\nnew TaskName: newName\n",
 				parser.parseInput("set 2 [16 Feb] \"newName\"").toString());
+		
+		assertEquals("Command: UPDATE_BY_INDEX_CHANGE_BOTH\nFLOATING, \nat index: 0\n"
+				+ "new TaskName: newName\n",
+				parser.parseInput("set 1 \"newName\" [none]").toString());
+		
 		assertEquals("Command: UPDATE_BY_NAME_CHANGE_BOTH\nmeeting, DEADLINE, "
 				+ "due on 19 Feb 2016\nnew TaskName: newName\n",
 				parser.parseInput("set meeting \"newName\" [19 feb]").toString());
@@ -475,7 +489,7 @@ public class ParserTest {
 	 * change every time the the unit test is run 
 	 */
 	
-	@Test
+	
 	/**
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
@@ -486,7 +500,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
-	@Test
+
 	/**
 	 * Test human date edits
 	 */
@@ -495,7 +509,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
-	@Test 
+	
 	/**
 	 * Test human deadlines
 	 */

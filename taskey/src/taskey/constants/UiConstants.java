@@ -77,7 +77,7 @@ public class UiConstants {
 
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
 	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 5, 20, 80);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 5, 30, 80);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
@@ -137,4 +137,6 @@ public class UiConstants {
 	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
 	public static final int DEFAULT_FADE_START_DELAY = 2000; 
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
+	public static final int ENTRIES_PER_PAGE_DEFAULT = 5;
+	public static final int ENTRIES_PER_PAGE_HELP_MENU = 6;
 }

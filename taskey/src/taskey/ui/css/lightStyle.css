@@ -34,12 +34,8 @@
 	-fx-background-color: #206ba4;
 }
 
-#expiredIcon {
-	-fx-text-fill: white;
-	-fx-background-color: red;
-	-fx-background-radius: 15px;
-	-fx-padding: 2px;
-	-fx-font-family: 'Montserrat';
+#notification {
+	-fx-text-fill: #206ba4;
 }
 
 /* Switchable styles */

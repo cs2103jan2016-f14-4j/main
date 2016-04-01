@@ -66,6 +66,8 @@ public class UiController {
 	private ImageView minusButton;
 	@FXML
 	private Label expiredIcon;
+	@FXML
+	private Label notification;
 	
 	private int mouseX, mouseY;
 	private Stage stage;
@@ -203,8 +205,10 @@ public class UiController {
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
 			 // just set pop up to appear below input
-			UiPopupManager.getInstance().updatePromptMessage(statusCode.getMessage(), input, 
-																0,input.getHeight()*1.25F);
+			//UiPopupManager.getInstance().updatePromptMessage(statusCode.getMessage(), input, 
+			//													0,input.getHeight()*1.25F);
+			
+			notification.setText(statusCode.getMessage());
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	
@@ -380,7 +384,9 @@ public class UiController {
 				line = inputHistory.get(historyIterator);
 			}
 			input.setText(line);
-		} 
+		} else { // wipe
+			input.setText("");
+		}
 		input.selectEnd();
 		input.deselect();
 	}
@@ -406,7 +412,6 @@ public class UiController {
 	
 	private void handleKeyPressInRoot(KeyEvent event) {
 		input.requestFocus(); // give focus to textfield
-		UiPopupManager.getInstance().removePrompt();
 		if (myDropDown.isMenuShowing()) {
 			if (event.getCode().isArrowKey()) {
 				myDropDown.processArrowKey(event);

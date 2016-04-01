@@ -110,6 +110,9 @@ public class UiDropDown {
 		double width = getWidthOfTextFieldInput(myInput);
 		Bounds bounds = myInput.getBoundsInLocal();
 		Bounds screenBounds = myInput.localToScreen(bounds);
+		
+		UiPopupManager.getInstance().resize(myMenu);
+
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth() * UiPopupManager.getInstance().getXRatio(), 
 								   screenBounds.getMinX() + width * UiPopupManager.getInstance().getXRatio()));
 		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight() * UiPopupManager.getInstance().getYRatio());

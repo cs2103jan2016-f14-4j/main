@@ -18,13 +18,12 @@ import taskey.ui.content.UiFormatter;
  */
 
 public class UiDefaultFormatter extends UiFormatter {
-	private static final int entriesPerPage = 6;
 	private UiTaskView myTaskView;
 	private ArrayList<Task> prevList = null;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
-		myTaskView = new UiTaskView(entriesPerPage);
+		myTaskView = new UiTaskView(UiConstants.ENTRIES_PER_PAGE_DEFAULT);
 		
 		mainPane.setContent(myTaskView.getView().getPagination());
 		mainPane.setFitToHeight(true);
@@ -60,12 +59,14 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
 			myTaskView.getView().clear();
-			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
+			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
+											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
 			
 			if ( prevList != null && myTaskList.size() > prevList.size() ) { // addition of a task
 				int index = findIndexOfAddedTask(prevList,myTaskList);	
-				myTaskView.getView().selectInPage(index/entriesPerPage, index%entriesPerPage); // select last
+				myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
+												  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); // select last
 			} 
 			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
 		}

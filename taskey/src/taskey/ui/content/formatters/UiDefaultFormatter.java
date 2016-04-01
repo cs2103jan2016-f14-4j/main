@@ -63,8 +63,13 @@ public class UiDefaultFormatter extends UiFormatter {
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
 			
-			if ( prevList != null && myTaskList.size() > prevList.size() ) { // addition of a task
-				int index = findIndexOfAddedTask(prevList,myTaskList);	
+			if ( prevList != null ) { // addition of a task
+				int index = 0;
+				if ( myTaskList.size() < prevList.size()) {
+					index = myTaskList.size();
+				} else {
+					index = findIndexOfAddedTask(prevList,myTaskList);	
+				}
 				myTaskView.getView().selectInPage(index/entriesPerPage, index%entriesPerPage); // select last
 			} 
 			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same

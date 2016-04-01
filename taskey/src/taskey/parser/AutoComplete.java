@@ -333,6 +333,12 @@ public class AutoComplete {
 			} else {
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 			}
+		} else if (phrase.contains("\"")) {
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+		} else {
+			//user has not typed any changes, so suggest format 
+			availSuggestions.add("\"New Task Name\"");
+			availSuggestions.add("[New Date]");
 		}
 		
 		if (!availSuggestions.isEmpty()) {

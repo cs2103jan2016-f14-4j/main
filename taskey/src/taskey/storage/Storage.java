@@ -169,10 +169,10 @@ public class Storage {
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			File src = new File(directory, tasklist.filename());
+		for (TasklistEnum listEnum : TasklistEnum.values()) {
+			File src = new File(directory, listEnum.filename());
 			try {
-				ArrayList<Task> loadedList = storageReader.loadTasklist(src, tasklist);
+				ArrayList<Task> loadedList = storageReader.loadTasklist(src, listEnum);
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) {
 				superlist.clear();
@@ -199,13 +199,13 @@ public class Storage {
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
-		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			File dest = new File(directory, tasklist.filename());
-			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+		for (TasklistEnum listEnum : TasklistEnum.values()) {
+			File dest = new File(directory, listEnum.filename());
+			ArrayList<Task> listToSave = superlist.get(listEnum.index());
 			try {
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (FileNotFoundException e) {
-				createDirectory(directory); //in case user deletes their storage directory
+				createDirectory(directory); //in case user deletes their storage directory during runtime
 				storageWriter.saveTasklist(listToSave, dest); //try again
 			}
 		}

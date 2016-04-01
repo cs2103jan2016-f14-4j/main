@@ -191,7 +191,7 @@ public class StorageReader {
 		String json1 = gson.toJson(derivedTasklist, new TypeToken<ArrayList<Task>>(){}.getType());
 		String json2 = gson.toJson(tasklistFromFile, new TypeToken<ArrayList<Task>>(){}.getType());
 		System.out.println(json1.equals(json2)); //in case assertions aren't enabled
-		//assert (json1.equals(json2));
+		//assert (json1.equals(json2)); TODO disabled cuz manually editing savefiles will cause assertion to trigger
 	}
 
 	/**

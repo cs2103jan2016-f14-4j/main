@@ -134,8 +134,10 @@ public class UiConstants {
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	public static final int UPDATE_SERVICE_INTERVAL = 300000; // in milliseconds (5 minutes)
-	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
+	public static final int DEFAULT_ANIM_DURATION = 1000; // How long to play an animation
 	public static final int DEFAULT_FADE_START_DELAY = 2000; 
+	public static final int DEFAULT_SHAKE_DISTANCE = 10;
+	public static final int DEFAULT_SHAKE_INTERVAL = 100;
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
 	public static final int ENTRIES_PER_PAGE_DEFAULT = 5;
 	public static final int ENTRIES_PER_PAGE_HELP_MENU = 6;

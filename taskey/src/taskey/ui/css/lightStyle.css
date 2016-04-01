@@ -36,6 +36,7 @@
 
 #notification {
 	-fx-text-fill: #206ba4;
+	-fx-font-weight: bold;
 }
 
 /* Switchable styles */
@@ -55,18 +56,16 @@
 }
 
 .prompt {
-	-fx-padding: 2px;
-	-fx-background-color: #ebf4fb;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 1px;
+	-fx-padding: 6px;
+	-fx-background-color: #206ba4, #ebf4fb;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #206ba4;
 }
 
 .promptSelect {
-	-fx-padding: 2px;
-	-fx-background-color:#206ba4;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 3px;
+	-fx-padding: 6px;
+	-fx-background-color: #206ba4, #206ba4;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #ebf4fb;
 }
 

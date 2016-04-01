@@ -54,7 +54,7 @@ public class UiDropDown {
 		myMenu = UiPopupManager.getInstance().createPopupMenu();
 		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
 																	 UiConstants.DEFAULT_FADE_START_DELAY*5, 
-																	 UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+																	 UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
 		// create custom handler
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
@@ -110,9 +110,9 @@ public class UiDropDown {
 		double width = getWidthOfTextFieldInput(myInput);
 		Bounds bounds = myInput.getBoundsInLocal();
 		Bounds screenBounds = myInput.localToScreen(bounds);
-		
 		UiPopupManager.getInstance().resize(myMenu);
 
+		// restrict menu from stretching beyond the TextField
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth() * UiPopupManager.getInstance().getXRatio(), 
 								   screenBounds.getMinX() + width * UiPopupManager.getInstance().getXRatio()));
 		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight() * UiPopupManager.getInstance().getYRatio());

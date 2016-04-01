@@ -62,11 +62,14 @@ public class UiDefaultFormatter extends UiFormatter {
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
-			
-			if ( prevList != null && myTaskList.size() > prevList.size() ) { // addition of a task
-				int index = findIndexOfAddedTask(prevList,myTaskList);	
-				myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
-												  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); // select last
+
+			if ( prevList != null ) { 
+				int index = 0;
+				if ( myTaskList.size() >= prevList.size()) {
+					index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
+					myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
+							  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
+				}
 			} 
 			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
 		}
@@ -80,10 +83,10 @@ public class UiDefaultFormatter extends UiFormatter {
 		return cloneList;
 	}
 	
-	private int findIndexOfAddedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
+	private int findIndexOfModifiedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
 		for ( int i = 0; i < prevList.size(); i++) {
 			if ( prevList.get(i).equals(currentList.get(i)) == false ) {
-				return i; // insertion point
+				return i; // index of first mismatch
 			}
 		}
 		return currentList.size();

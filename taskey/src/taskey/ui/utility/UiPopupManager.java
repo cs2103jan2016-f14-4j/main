@@ -63,8 +63,8 @@ public class UiPopupManager {
 		
 		if ( deleteAfter == true ) {
 			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(
-					thePopup.getContent().get(0), UiConstants.DEFAULT_FADE_START_DELAY*10000, 
-					UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+					thePopup.getContent().get(0), UiConstants.DEFAULT_FADE_START_DELAY, 
+					UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
 			fade.play();
 			fade.setOnFinished(new EventHandler<ActionEvent>() {
 				@Override

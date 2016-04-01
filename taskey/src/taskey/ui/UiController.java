@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -37,6 +38,7 @@ import taskey.messenger.ProcessedObject;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.ui.content.UiContentManager;
+import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
 import taskey.ui.utility.UiPopupManager;
 
@@ -79,7 +81,8 @@ public class UiController {
 	private ContentBox currentContent;
 	private ArrayList<String> inputHistory;
 	private int historyIterator;
-
+	private Timeline shake; // for notifications
+	
 	public Stage getStage() {
 		return stage;
 	}
@@ -139,13 +142,17 @@ public class UiController {
 	}
 	
 	/**
-	 * Sets up variables related to input
+	 * Sets up variables related to input, including feedbacks
 	 */
 	private void setUpInput() {
 		input.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		input.getStyleClass().add(UiConstants.STYLE_INPUT_NORMAL);		
 		inputHistory = new ArrayList<String>();
 		historyIterator = 0;
+		shake = UiAnimationManager.getInstance().createShakeTransition(notification, 
+																	   UiConstants.DEFAULT_SHAKE_DISTANCE, 
+																	   UiConstants.DEFAULT_SHAKE_INTERVAL, 
+																	   UiConstants.DEFAULT_ANIM_DURATION);
 	}
 	
 	private void registerEventHandlersToNodes(Parent root) {
@@ -204,11 +211,8 @@ public class UiController {
 		assert(feedback != null);
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
-			 // just set pop up to appear below input
-			//UiPopupManager.getInstance().updatePromptMessage(statusCode.getMessage(), input, 
-			//													0,input.getHeight()*1.25F);
-			
-			notification.setText(statusCode.getMessage());
+			notification.setText(statusCode.getMessage());	
+			shake.playFromStart();
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	
@@ -231,6 +235,8 @@ public class UiController {
 				displayTabContents(ContentBox.ACTION);
 				myContentManager.setActionMode(UiConstants.ActionMode.LIST);
 				break;	
+			case "ERROR":
+				return;
 			default:
 				break;
 		}

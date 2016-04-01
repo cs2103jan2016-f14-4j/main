@@ -36,6 +36,7 @@
 
 #notification {
 	-fx-text-fill: #e7e7e7;
+	-fx-font-weight: bold;
 }
 
 /* Switchable styles */
@@ -56,18 +57,16 @@
 }
 
 .prompt {
-	-fx-padding: 2px;
-	-fx-background-color: #e7e7e7;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 1px;
+	-fx-padding: 6px;
+	-fx-background-color: #2d3956, #e7e7e7;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #2d3956;
 }
 
 .promptSelect {
-	-fx-padding: 2px;
-	-fx-background-color:#2d3956;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 3px;
+	-fx-padding: 6px;
+	-fx-background-color: #2d3956, #2d3956;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #e7e7e7;
 }
 

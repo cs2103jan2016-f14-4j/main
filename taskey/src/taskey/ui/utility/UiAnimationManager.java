@@ -1,11 +1,13 @@
 package taskey.ui.utility;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.beans.property.DoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -86,6 +88,26 @@ public class UiAnimationManager {
 		scale.setAutoReverse(autoReverse);
 		return scale;
 	}
+	
+	
+	public Timeline createShakeTransition(Node theNode, int xShift, int interval, int animDuration) {
+		Interpolator WEB_EASE = Interpolator.SPLINE(0.25, 0.1, 0.25, 1);
+		int numShifts = animDuration / interval; // milliseconds
+		Timeline animation = new Timeline();
+		// first frame
+		animation.getKeyFrames().add(new KeyFrame(Duration.millis(0), 
+									 new KeyValue(theNode.translateXProperty(), 0, WEB_EASE)));
+		for (int i = 1; i < numShifts - 1; i++) {
+			animation.getKeyFrames().add(new KeyFrame(Duration.millis(i * interval),
+					new KeyValue(theNode.translateXProperty(), xShift, WEB_EASE)));
+			xShift *= -1;
+		}
+		//last frame
+		animation.getKeyFrames().add(new KeyFrame(Duration.millis(animDuration), 
+									 new KeyValue(theNode.translateXProperty(), 0, WEB_EASE)));
+		return animation;
+	}
+	
 	/**
 	 * Creates the timeline animation for shifting text around based on frames
 	 * This is a little choppy at the moment, a better alternative is based on translation
@@ -97,7 +119,7 @@ public class UiAnimationManager {
 	 * @param filler -the filler
 	 * @return - the timeline
 	 */
-	public Timeline createTimelineAnimation(Label theLabel, int interval, int charsToSkip, String filler) {
+	public Timeline createTextWrapAnimation(Label theLabel, int interval, int charsToSkip, String filler) {
 
 		Timeline timeline = new Timeline();
 		timeline.setCycleCount(Timeline.INDEFINITE);

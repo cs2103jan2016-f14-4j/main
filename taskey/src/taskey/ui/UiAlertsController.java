@@ -54,7 +54,7 @@ public class UiAlertsController {
 	private UiGridHelper gridHelper = new UiGridHelper("");
 	private ArrayList<Task> currentAlerts = new ArrayList<Task>(); // used as array
 	private ArrayList<Task> alertHistory = new ArrayList<Task>(); // dismissed tasks are not re-added
-
+	private int taskTestingID = 1; // forever increasing id for stimulation purposes
 	public Stage getStage() {
 		return stage;
 	}
@@ -97,7 +97,7 @@ public class UiAlertsController {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) { // for testing purposes
 					Task temp = new Task();
-					temp.setTaskName(String.valueOf(Math.random()).substring(0, 10));
+					temp.setTaskName(String.valueOf(taskTestingID++));
 					addEntry(temp);
 				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
 					hide();
@@ -125,7 +125,7 @@ public class UiAlertsController {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(thePane, 0,
-						UiConstants.DEFAULT_FADE_TIME/2, 1.0, 0.0);
+						UiConstants.DEFAULT_ANIM_DURATION/2, 1.0, 0.0);
 				fade.play();
 				fade.setOnFinished(new EventHandler<ActionEvent>() {
 					@Override

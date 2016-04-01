@@ -348,9 +348,7 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Search for all expired and pending tasks that contain the given search phrase in their name. The search phrase 
-	 * is not case sensitive.
-	 * TODO: improved search
+	 * Search for all expired and pending tasks via the given search phrase (not case sensitive).
 	 * @param searchPhrase
 	 * @throws LogicException if no matches were found
 	 */
@@ -721,20 +719,59 @@ public class LogicMemory {
 	}
 	
 	/**
-	 * Get all tasks from the given list that contain searchPhrase in their name. searchPhrase is not case sensitive.
+	 * Performs a search on the given list using the given search phrase, and returns a list of search results.
+	 * A task is added to the list of search results if and only if every token in the search phrase is "found" in that 
+	 * task's name. A search token that is <= 2 characters is considered to be "found" if the task name tokens contain the 
+	 * exact same token. A search token that is >= 3 characters is considered to be "found" if there exists a task name 
+	 * token that contains the search token as a substring.
 	 * @param list
 	 * @param searchPhrase
 	 * @return
 	 */
 	private ArrayList<Task> getSearchResults(ArrayList<Task> list, String searchPhrase) {
 		ArrayList<Task> searchResults = new ArrayList<Task>();
+		String[] searchTokens = searchPhrase.toLowerCase().split(" ");
 		
-		for (Task t : list) {
-			if (t.getTaskName().toLowerCase().contains(searchPhrase.toLowerCase())) {
-				searchResults.add(t);
+		for (Task task : list) {
+			boolean allTokensFound = true;
+			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
+			
+			for (String searchToken : searchTokens) {
+				if (!foundToken(searchToken, taskNameTokens)) {
+					allTokensFound = false;
+					break;
+				}
+			}
+			
+			if (allTokensFound) {
+				searchResults.add(task);
 			}
 		}
 		
 		return searchResults;
+	}
+	
+	/**
+	 * Returns true if and only if a given search token is "found" within an an array of task name tokens.
+	 * @param searchToken
+	 * @param taskNameTokens
+	 * @return
+	 */
+	private boolean foundToken(String searchToken, String[] taskNameTokens) {
+		if (searchToken.length() <= 2) {
+			for (String s : taskNameTokens) {
+				if (searchToken.equals(s)) {
+					return true;
+				}
+			}
+		} else {
+			for (String s : taskNameTokens) {
+				if (s.contains(searchToken)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

@@ -75,7 +75,7 @@ public class UiConstants {
 		LIST, HELP;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 3, 5, 98);
 	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 20, 10, 25, 75);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);

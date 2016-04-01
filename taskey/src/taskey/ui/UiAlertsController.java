@@ -144,13 +144,14 @@ public class UiAlertsController {
 		// animate within the grid, hence coordinates are 0
 		TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
 				new Pair<Double,Double>(stage.getWidth(), 0.0), 
-				new Pair<Double,Double>(0.0, 0.0), 500);
+				new Pair<Double,Double>(0.0, 0.0), UiConstants.DEFAULT_ANIM_DURATION/2);
 		shift.play();
 		shift.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				ScaleTransition scale = UiAnimationManager.getInstance().
-						createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 200);
+						createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 
+											  UiConstants.DEFAULT_ANIM_DURATION/5);
 				scale.play();
 			}
 		});
@@ -168,9 +169,13 @@ public class UiAlertsController {
 			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
 			String line = "" + newEntry.getTaskName();
 			myBuilder.addMarker(line.length(), UiConstants.STYLE_TEXT_RED);
-			line += "\n " + newEntry.getDeadline();
+			if ( newEntry.getTaskType().equals("DEADLINE")) {
+				line += "\n " + newEntry.getDeadline();
+			} else if ( newEntry.getTaskType().equals("EVENT")){
+				line += "\n" + newEntry.getStartDate() + " to " + newEntry.getEndDate();
+			}
 			Color theColor = null;
-			switch ( newEntry.getPriority()) {
+			switch ( newEntry.getPriority()) { 
 				case 2: theColor = Color.RED;
 						break;
 				case 1: theColor = Color.ORANGE;

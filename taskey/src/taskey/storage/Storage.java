@@ -296,7 +296,7 @@ public class Storage {
 		File newDir = new File(pathname);
 		Boolean isValidDir = createDirectory(newDir);
 		if (isValidDir == null) {
-			throw new NotDirectoryException(null); //the abstract path newDir is a normal file and not a directory/folder
+			throw new NotDirectoryException(pathname); //the abstract path newDir is a normal file and not a directory/folder
 		} else if (isValidDir == false) {
 			newDir.toPath(); //this line throws InvalidPathException if newDir is invalid
 			return false; 	 //otherwise return false for whatever other reason

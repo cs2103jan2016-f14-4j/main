@@ -180,7 +180,11 @@ public class UiPagination {
 		} else {
 			currentPage = pageIndex;
 		}
-		currentPage = Math.min(currentPage, myGrids.size()-1);
+		if ( currentPage > myGrids.size()-1) { // on deletion of task
+			int lastPage = myGrids.size()-1;
+			currentPage = lastPage;
+			selectionInPage = totalEntries.get(lastPage).size()-1;
+		}
 		selectInPage(currentPage,selectionInPage);
 		return myGrids.get(currentPage);
     }	

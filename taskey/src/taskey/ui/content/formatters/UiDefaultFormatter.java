@@ -67,8 +67,12 @@ public class UiDefaultFormatter extends UiFormatter {
 				int index = 0;
 				if ( myTaskList.size() >= prevList.size()) {
 					index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
-					myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
-							  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
+					if ( index == -1) {
+						// no op as lists are the same
+					} else {
+						myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
+								  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
+					}
 				}
 			} 
 			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
@@ -89,7 +93,11 @@ public class UiDefaultFormatter extends UiFormatter {
 				return i; // index of first mismatch
 			}
 		}
-		return currentList.size();
+		if ( prevList.size() == currentList.size()) { // all tasks match
+			return -1;
+		} else {
+			return currentList.size(); // return newly added task
+		}	
 	}
 	
 	private void createPromptNoTasks() {

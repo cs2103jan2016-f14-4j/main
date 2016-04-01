@@ -58,7 +58,7 @@ public class UiDefaultFormatter extends UiFormatter {
 			mainPane.setContent(currentGrid);	
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
-			myTaskView.getView().clear();
+			myTaskView.clear();
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);

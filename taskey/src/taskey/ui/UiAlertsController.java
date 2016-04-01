@@ -96,9 +96,10 @@ public class UiAlertsController {
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) { // for testing purposes
-					Task temp = new Task();
-					temp.setTaskName(String.valueOf(taskTestingID++));
-					addEntry(temp);
+					Task testTask = new Task();
+					testTask.setTaskName(String.valueOf(taskTestingID++));
+					testTask.setTaskType("FLOATING");
+					addEntry(testTask);
 				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
 					hide();
 				}
@@ -167,12 +168,12 @@ public class UiAlertsController {
 		} else {
 			UiTextBuilder myBuilder = new UiTextBuilder();
 			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
-			String line = "" + newEntry.getTaskName();
+			String line = "" + newEntry.getTaskName() + "\n";
 			myBuilder.addMarker(line.length(), UiConstants.STYLE_TEXT_RED);
 			if ( newEntry.getTaskType().equals("DEADLINE")) {
-				line += "\n " + newEntry.getDeadline();
+				line += newEntry.getDeadline();
 			} else if ( newEntry.getTaskType().equals("EVENT")){
-				line += "\n" + newEntry.getStartDate() + " to " + newEntry.getEndDate();
+				line += newEntry.getStartDate() + " to " + newEntry.getEndDate();
 			}
 			Color theColor = null;
 			switch ( newEntry.getPriority()) { 

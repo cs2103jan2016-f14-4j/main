@@ -79,6 +79,7 @@ public class StorageReader {
 		return object;
 	}
 
+	
 	/*================*
 	 * Load directory *
 	 *================*/
@@ -110,7 +111,7 @@ public class StorageReader {
 	/**
 	 * Returns the ArrayList of Task objects read from the File src.
 	 * The GENERAL/DEADLINE/EVENT lists are not read from file; instead, they are derived from the PENDING list.
-	 * Pre-condition: the PENDING list must occur before the derived lists.
+	 * Pre-condition: the PENDING list must be read before the derived lists.
 	 * @param src the source file to be read from
 	 * @param tasklistType
 	 * @return the tasklist read from file
@@ -127,11 +128,11 @@ public class StorageReader {
 				try {
 					tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
 					verifyTasks(tasklist);
+					checkTaskDates(tasklist);
 				} catch (InvalidTaskException e) {
 					System.err.println("{Storage} Invalid tasklist | " + src.getName());
 					throw e;
 				}
-				checkTaskDates(tasklist);
 	
 				if (tasklistType == PENDING) {
 					DerivedList.clearAllLists();

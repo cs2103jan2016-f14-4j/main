@@ -135,7 +135,6 @@ public class StorageReader {
 				}
 	
 				if (tasklistType == PENDING) {
-					DerivedList.clearAllLists();
 					getDerivedLists(tasklist); //generate the derived lists from the PENDING list
 				}
 				break;
@@ -158,6 +157,7 @@ public class StorageReader {
 	 * @param pendingList
 	 */
 	private void getDerivedLists(ArrayList<Task> pendingList) {
+		DerivedList.clearAllLists(); //erase the previous data
 		for (Task task : pendingList) {
 			switch (task.getTaskType().toUpperCase()) {
 				case "FLOATING":
@@ -191,7 +191,7 @@ public class StorageReader {
 		String json1 = gson.toJson(derivedTasklist, new TypeToken<ArrayList<Task>>(){}.getType());
 		String json2 = gson.toJson(tasklistFromFile, new TypeToken<ArrayList<Task>>(){}.getType());
 		System.out.println(json1.equals(json2)); //in case assertions aren't enabled
-		assert (json1.equals(json2));
+		//assert (json1.equals(json2));
 	}
 
 	/**

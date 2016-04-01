@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -139,7 +141,7 @@ public class Storage {
 
 		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory != null) {
-			if (createDirectory(loadedDirectory) == true) {
+			if (Boolean.TRUE.equals(createDirectory(loadedDirectory))) { //createDirectory could possibly return null
 				directory = loadedDirectory;
 				System.out.println("{Storage} Directory loaded | " + directory.getAbsolutePath());
 			} else { //loaded directory was invalid or could not be created
@@ -272,9 +274,8 @@ public class Storage {
 	 * @param shouldMove [true] if move operation should be performed; 
 	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
-	 * @return <br>- False if the pathname is invalid due to illegal characters (e.g. *), 
-	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
-	 *         <br>- True if the new directory was successfully set
+	 * @return <br>- True if the new directory was successfully set; otherwise,
+	 * 		   <br>- False for any other reason not covered under InvalidPathException or NotDirectoryException
 	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
@@ -284,12 +285,22 @@ public class Storage {
 	 * @throws IOException if an I/O error occurs when moving the files.
 	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 
 	 *			Logic should save everything after this to ensure that the current directory still has all the savefiles.
+	 *
+	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters, 
+	 *							or is invalid for other file system specific reasons. On Windows, this could be due to: 
+	 *							illegal characters (e.g. *), reserved words (e.g. CON), or nonexistent root drive letters.
+	 *
+	 * @throws NotDirectoryException when the path points to a normal file and not a directory
 	 */
-	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException {
+	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException, 
+																			InvalidPathException, NotDirectoryException {
 		File newDir = new File(pathname);
-		boolean isValidDir = createDirectory(newDir);
-		if (!isValidDir) {
-			return false;
+		Boolean isValidDir = createDirectory(newDir);
+		if (isValidDir == null) {
+			throw new NotDirectoryException(null);
+		} else if (isValidDir.equals(false)) {
+			newDir.toPath(); // This line throws InvalidPathException if path is invalid
+			return false; 	 // otherwise return false for whatever other reason
 		}
 
 		if (shouldMove) {
@@ -300,7 +311,6 @@ public class Storage {
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
-
 		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
 
 		if (shouldSaveNewDir(newDir)) {
@@ -316,9 +326,10 @@ public class Storage {
 	 * Creates the full directory path of the given abstract pathname and also checks that it is valid.
 	 * @param dir directory to be created
 	 * @return true if the directory was successfully created or already exists;
-	 * 		   false if dir is not a valid directory
+	 * 		   false if dir is not a valid abstract path;
+	 * 		   null if dir exists but is not a directory
 	 */
-	private boolean createDirectory(File dir) {
+	private Boolean createDirectory(File dir) {
 		if (!dir.exists()) {
 			if (dir.mkdirs() == true) {
 				directoriesCreated.add(dir);
@@ -329,7 +340,7 @@ public class Storage {
 		} else if (dir.isDirectory()) { //dir already exists && is a directory
 			return true;
 		} else { //dir exists but is not a directory
-			return false;
+			return null;
 		}
 	}
 

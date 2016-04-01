@@ -97,15 +97,14 @@ public class Storage {
 
 	/**
 	 * For testing
+	 * @throws IOException 
+	 * @throws NotDirectoryException 
+	 * @throws InvalidPathException 
+	 * @throws FileAlreadyExistsException 
 	 */
-	public static void main(String args[]) {
-		// The default or last-used directory is automatically set in the constructor method.
+	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-
-		// Can optionally set the directory again, if requested by user.
-		//System.out.println(storage.setDirectory("c:\\taskey"));
-
-		// Initialize tasklists
+		System.out.println(storage.setDirectory("***")); //throws invalid path exception
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -253,7 +252,8 @@ public class Storage {
 	/**
 	 * Has the same effect as calling setDirectory(pathname, true)
 	 */
-	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException {
+	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException, 
+														InvalidPathException, NotDirectoryException {
 		return setDirectory(pathname, true);
 	}
 
@@ -279,16 +279,15 @@ public class Storage {
 	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
-	 *			This will update Storage's directory and load from the new directory, 
-	 *			without moving files from the previous one.
+	 *			This will update Storage's directory and load from the new directory, without moving files from the previous one.
 	 *
 	 * @throws IOException if an I/O error occurs when moving the files.
 	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 
-	 *			Logic should save everything after this to ensure that the current directory still has all the savefiles.
+	 *			Logic should save everything after this to ensure that the current directory has all the savefiles.
 	 *
 	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters, 
-	 *							or is invalid for other file system specific reasons. On Windows, this could be due to: 
-	 *							illegal characters (e.g. *), reserved words (e.g. CON), or nonexistent root drive letters.
+	 *			or is invalid for other file system specific reasons. On Windows, this could be due to: 
+	 *			illegal characters (e.g. *), reserved words (e.g. CON), or nonexistent root drive letters.
 	 *
 	 * @throws NotDirectoryException when the path points to a normal file and not a directory
 	 */
@@ -297,10 +296,10 @@ public class Storage {
 		File newDir = new File(pathname);
 		Boolean isValidDir = createDirectory(newDir);
 		if (isValidDir == null) {
-			throw new NotDirectoryException(null);
-		} else if (isValidDir.equals(false)) {
-			newDir.toPath(); // This line throws InvalidPathException if path is invalid
-			return false; 	 // otherwise return false for whatever other reason
+			throw new NotDirectoryException(null); //the abstract path newDir is a normal file and not a directory/folder
+		} else if (isValidDir == false) {
+			newDir.toPath(); //this line throws InvalidPathException if newDir is invalid
+			return false; 	 //otherwise return false for whatever other reason
 		}
 
 		if (shouldMove) {
@@ -311,7 +310,7 @@ public class Storage {
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
-		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
+		deleteCurrDir(); //delete the old folder if it's currently empty and was created by Taskey during runtime
 
 		if (shouldSaveNewDir(newDir)) {
 			storageWriter.saveDirectoryConfigFile(newDir, FILENAME_DIRCONFIG);

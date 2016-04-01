@@ -77,7 +77,7 @@ public class UiConstants {
 
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
 	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 5, 30, 80);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 20, 10, 25, 75);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
@@ -107,6 +107,7 @@ public class UiConstants {
 	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
 	public static final String STYLE_INPUT_ERROR = "inputError";
+	public static final String STYLE_INPUT_CORRECT = "inputCorrect";
 	public static final String STYLE_ALERT_BOX = "alertBox";
 	
 	public static final ArrayList<String> STYLE_UI_DEFAULT = new ArrayList<String>(

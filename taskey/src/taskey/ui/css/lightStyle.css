@@ -44,15 +44,22 @@
 	-fx-background-color: #ebf4fb;
 	-fx-text-fill: #206ba4;
 }
-
 .inputError {
   -fx-outer-border: red;
   -fx-body-color: #ebf4fb;
   -fx-background-color: 
        -fx-outer-border, 
        -fx-body-color;
-  -fx-background-insets: 0, 2;
-  -fx-background-radius: 2px, 0px;
+  -fx-background-insets: 0, 2px;
+}
+
+.inputCorrect {
+  -fx-outer-border: #00ff00;
+  -fx-body-color: #ebf4fb;
+  -fx-background-color: 
+       -fx-outer-border, 
+       -fx-body-color;
+  -fx-background-insets: 0, 2px;
 }
 
 .prompt {

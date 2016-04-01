@@ -1,11 +1,9 @@
 package taskey.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -307,6 +305,7 @@ public class UiController {
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {			
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
+				input.getStyleClass().remove(UiConstants.STYLE_INPUT_CORRECT); // remove any correct styles
 				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
 					 || event.getCode() == KeyCode.BACK_SPACE) {
 					processAutoComplete();
@@ -334,11 +333,16 @@ public class UiController {
 	}
 
 	private void processAutoComplete() {	
+		if ( input.getText().isEmpty()) {
+			myDropDown.closeMenu();
+			return;
+		}
 		ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 		if ( suggestions == null ) {
 			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
 			myDropDown.closeMenu();
 		} else {
+			input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
 			myDropDown.updateMenuItems(suggestions);
 			myDropDown.updateMenu();
 		}
@@ -423,7 +427,7 @@ public class UiController {
 				myDropDown.processArrowKey(event);
 				event.consume();
 			}
-		} else if (input.getText().isEmpty()) { // user not typing in command
+		} else if (input.getText().isEmpty()) { // user not typing in command, do pagination
 			if (event.getCode() == KeyCode.DELETE) {
 				int id = myContentManager.processDelete(getCurrentContent());
 				if (id != 0) {

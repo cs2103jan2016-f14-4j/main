@@ -23,7 +23,7 @@ public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;
 	private int currentPage;
-	private int currentSelection;
+	private int currentSelection; // against total number of entries
 	private int selectionInPage;
 	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
 	private String selectionStyle;
@@ -134,9 +134,18 @@ public class UiPagination {
 			return;
 		}
 		if ( event.getCode() == KeyCode.PAGE_DOWN) {
-			selectInPage(currentPage,selectionInPage+1);
+			if ( selectionInPage + 1 > totalEntries.get(currentPage).size()-1) { // do page switch
+				selectInPage(currentPage+1,0);
+			} else {
+				selectInPage(currentPage,selectionInPage+1);
+			}
 		} else if ( event.getCode() == KeyCode.PAGE_UP) {
-			selectInPage(currentPage,selectionInPage-1);
+			if ( selectionInPage - 1 < 0 && currentPage >= 1 ) { // there exists a previous page
+				int prevPageSize = totalEntries.get(currentPage-1).size();
+				selectInPage(currentPage-1, prevPageSize-1);
+			} else {
+				selectInPage(currentPage,selectionInPage-1);
+			}
 		} else if ( event.getCode() == KeyCode.RIGHT) {
 			selectInPage(currentPage+1,selectionInPage);
 		} else if ( event.getCode() == KeyCode.LEFT) {

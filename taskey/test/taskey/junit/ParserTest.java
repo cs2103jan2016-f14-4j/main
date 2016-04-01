@@ -483,6 +483,15 @@ public class ParserTest {
 				parser.parseInput("write oo").toString());
 	}
 	
+	@Test
+	public void testDate() {
+		PrettyTimeParser p  = new PrettyTimeParser(); 
+		System.out.println(p.parse("today 3pm"));
+		System.out.println(p.parse("tomorrow 3pm"));
+		System.out.println(parser.parseInput("set 1 [today 3pm, tmr 3pm]"));
+	}
+	
+	
 	/*
 	 * All the methods below will be manually tested because 
 	 * dates like "tomorrow" and "today" are relative, and the time/date will

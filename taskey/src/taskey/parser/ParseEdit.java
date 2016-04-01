@@ -111,6 +111,7 @@ public class ParseEdit extends ParseCommand {
 			return updateChangeName(processed, newTaskName); 
 		} else if (newDateRaw != null && newTaskName == null) {
 			//changing date only 
+			newDateRaw = newDateRaw.replace("tmr", "tomorrow"); //prettytime cannot accept tmr
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_DATE, index);
 			 		
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
@@ -125,6 +126,7 @@ public class ParseEdit extends ParseCommand {
 			}
 		} else if (newDateRaw != null && newTaskName != null) {
 			//change both name and date 
+			newDateRaw = newDateRaw.replace("tmr", "tomorrow"); 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH, index);
 			processed = updateChangeName(processed, newTaskName); 
 			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
@@ -284,7 +286,6 @@ public class ParseEdit extends ParseCommand {
 			endTime = epochTime; 
 			changedTask.setEndDate(epochTime);
 		}
-		
 		//check to make sure valid event time 
 		if (!isValidEvent(startTime, endTime)) {
 			return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID);

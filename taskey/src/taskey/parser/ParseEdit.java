@@ -379,7 +379,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String removeCommand(String stringInput) {
+	private String removeCommand(String stringInput) {
 		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		
@@ -392,7 +392,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return
 	 */
-	public String getTaskName(String stringInput) {
+	private String getTaskName(String stringInput) {
 		int strLen = stringInput.length(); 
 		boolean canAdd = true;
 		String taskName = ""; 
@@ -423,7 +423,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return priority level 1,2,3 or -1 if error
 	 */
-	public int getNewPriority(String stringInput) {
+	private int getNewPriority(String stringInput) {
 		int strLen = stringInput.length();
 		int count = 0; 
 		
@@ -446,7 +446,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return newDate if there is any, else return null 
 	 */
-	public String getNewDate(String stringInput) {
+	private String getNewDate(String stringInput) {
 		int strLen = stringInput.length(); 
 		boolean canAdd = false; 
 		String date = ""; 
@@ -475,7 +475,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param stringInput
 	 * @return new task name if there is, else return null. 
 	 */
-	public String getNewName(String stringInput) {
+	private String getNewName(String stringInput) {
 		String newName = null;
 		String[] splitString = stringInput.split("\""); 
 		
@@ -496,7 +496,7 @@ public class ParseEdit extends ParseCommand {
 	 * @param rawDate
 	 * @return epochTime (long) of rawDate
 	 */
-	public long getPrettyTime(String rawDate) {
+	private long getPrettyTime(String rawDate) {
 		for(int i = 0; i < timeWords.size(); i++) {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser

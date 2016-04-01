@@ -51,6 +51,8 @@ public class AutoComplete {
 		commandList.put("clear","clear");
 		
 		viewList.add("all");
+		viewList.add("today");
+		viewList.add("tomorrow");
 		viewList.add("general");
 		viewList.add("deadlines");
 		viewList.add("events");

@@ -357,10 +357,8 @@ public class LogicMemory {
 		clearActionList();
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
-		
-		if (actionList.isEmpty()) {
-			throw new LogicException(LogicException.MSG_ERROR_SEARCH_NOT_FOUND);
-		}
+		String exceptionMsg = String.format(LogicException.MSG_SUCCESS_SEARCH, searchPhrase);
+		throw new LogicException(exceptionMsg);
 	}
 	
 	/**

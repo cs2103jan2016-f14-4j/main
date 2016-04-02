@@ -332,7 +332,7 @@ public class LogicTest {
 		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
 	}
 	
-	@Test
+	@Ignore
 	public void testSearch() {
 		String input = "add I will initialize it before the eve of xmas";
 		logic.executeCommand(ContentBox.PENDING, input);
@@ -368,14 +368,6 @@ public class LogicTest {
 		logic.executeCommand(ContentBox.PENDING, "search i");
 		expected.add(task1);
 		assertEquals(expected, logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION));
-	}
-	
-	@Test
-	public void searchShouldThrowExceptionMessageIfSearchPhraseNotFound() {
-		String input = "add task1";
-		logic.executeCommand(ContentBox.PENDING, input);
-		Exception actual = logic.executeCommand(ContentBox.PENDING, "search t ask").getException();
-		assertEquals(LogicException.MSG_ERROR_SEARCH_NOT_FOUND, actual.getMessage());
 	}
 	
 	// The completed task should be removed from all lists and then inserted into the COMPLETED list.

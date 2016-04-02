@@ -738,9 +738,11 @@ public class LogicMemory {
 			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
 			
 			if (searchTokens.length == 1) { // Search phrase is only one word
-				if (searchPhrase.length() <= 2 && searchWholeWord(searchPhrase, taskNameTokens)) {
-					searchResults.add(task);
-					foundMatch = true;
+				if (searchPhrase.length() <= 2) {
+					if (searchWholeWord(searchPhrase, taskNameTokens)) {
+						searchResults.add(task);
+					}
+					continue;
 				} else if (searchPhrase.length() >= 3 && searchSubstring(searchPhrase, taskNameTokens)) {
 					searchResults.add(task);
 					foundMatch = true;
@@ -755,7 +757,7 @@ public class LogicMemory {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.6) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.5) {
 				searchResults.add(task);
 			}
 		}

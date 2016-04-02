@@ -97,22 +97,10 @@ public class Parser {
 	 * @param stringInput
 	 * @return command
 	 */
-	public String getCommand(String stringInput) {
+	private String getCommand(String stringInput) {
 		String[] splitString = stringInput.split(" ");
 		String command = splitString[0].toLowerCase();
 		
 		return command;
-	}
-	
-	/**
-	 * Given a stringInput, remove the command from the string
-	 * @param command
-	 * @param stringInput
-	 * @return taskName without command
-	 */
-	public String getTaskName(String command, String stringInput) {
-		String task = stringInput.replaceFirst(command, "");
-		
-		return task.trim(); 
 	}
 }

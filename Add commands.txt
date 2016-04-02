@@ -116,9 +116,20 @@ add watch the movie named 'day after tomorrow' <- should not be interpreted as d
 --------
 COMMANDS TO DEMO:
 BASIC REQUIREMENTS: 
-1) add floating: add ride bike
-2) add deadline: add do MA3233 tutorial 9 by tomorrow
+1) add floating: add ride bike #leisure
+				 add do homework by the lake !!
+				 add fool friends on 1 apr !!! #hahaha
+				 add learn piano
+				 add don't die for security lab
+2) add deadline: add do MA3233 tutorial 10 by tomorrow
+				 add finish crypto for qy by this sun 
+				 add email jacob on lanyards by next fri 5pm
+				 add see friend's fyp presentation at 5pm #impt !!!
+				 add yolo on sat !!
 3) add event: add lecture from 5 Apr 4pm to 5pm
+			  add grp meeting from tmr 5pm to 6pm 
+			  add get the dlink router from this sat 4pm to 5pm
+			  add study RSA from next wed to next thu
 4) undo
 5) Edit task: set 3 "paint cupboard"
 6) search: search ma3233

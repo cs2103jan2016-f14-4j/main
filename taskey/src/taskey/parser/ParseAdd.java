@@ -396,7 +396,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String stringNoCommand(String stringInput) {
+	private String stringNoCommand(String stringInput) {
 		String command = stringInput.split(" ")[0]; //so we don't need to worry about case
 		String task = stringInput.replaceFirst(command, "");
 		
@@ -409,7 +409,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param rawDate
 	 * @return epochTime (long) of rawDate
 	 */
-	public long getPrettyTime(String rawDate) {
+	private long getPrettyTime(String rawDate) {
 		for(int i = 0; i < timeWords.size(); i++) {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser
@@ -430,7 +430,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param rawDate
 	 * @return epochTime (long array) of rawDate (FOR EVENTS) 
 	 */
-	public long[] getPrettyTimeEvent(String rawDate) throws Error {
+	private long[] getPrettyTimeEvent(String rawDate) throws Error {
 		for(int i = 0; i < timeWords.size(); i++) {
 			if (rawDate.contains(timeWords.get(i))) {
 				//if the date contains any of the time words, call prettyParser
@@ -454,7 +454,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param rawInput
 	 * @return
 	 */
-	public ArrayList<String> getTagList(String rawInput) {
+	private ArrayList<String> getTagList(String rawInput) {
 		ArrayList<String> tagList = new ArrayList<String>();
 		String[] splitString = rawInput.split("#");
 		for(int i = 1; i < splitString.length; i++) {
@@ -469,7 +469,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param rawDate: date with priority still stuck there... 
 	 * @return priority for the task
 	 */
-	public int getPriority(String rawDate) {
+	private int getPriority(String rawDate) {
 		//rawDate = rawDate.trim(); 
 		int count = 0; 
 		int dateLen = rawDate.length(); 
@@ -504,7 +504,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param taskName
 	 * @return
 	 */
-	public String removeTimeFromName(String taskName) {
+	private String removeTimeFromName(String taskName) {
 		String keyword = "(at|from|on|by)";
 		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm)";
 		String timeSpecifier = "(am|pm)";

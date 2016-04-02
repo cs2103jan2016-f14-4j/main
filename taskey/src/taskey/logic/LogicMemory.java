@@ -404,6 +404,8 @@ public class LogicMemory {
 				break;
 			
 			default: // Should not reach this point
+				exceptionMsg = String.format(LogicException.MSG_ERROR_VIEWTYPE, viewType);
+				throw new LogicException(exceptionMsg);
 		}
 		
 		exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + ".";
@@ -421,9 +423,7 @@ public class LogicMemory {
 		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
 		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
 		
-		if (!tagFound) {
-			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
-		}
+		throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TAGS);
 	}
 	
     //================================================================================

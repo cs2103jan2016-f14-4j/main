@@ -770,7 +770,7 @@ public class LogicMemory {
 	 * @param taskNameTokens
 	 * @return
 	 */
-	private boolean searchWholeWord(String searchPhrase, String[] taskNameTokens) {
+	private static boolean searchWholeWord(String searchPhrase, String[] taskNameTokens) {
 		for (String s : taskNameTokens) {
 			if (searchPhrase.equals(s)) {
 				return true;
@@ -786,7 +786,7 @@ public class LogicMemory {
 	 * @param taskNameTokens
 	 * @return
 	 */
-	private boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
+	private static boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
 		for (String s : taskNameTokens) {
 			if (s.contains(searchPhrase)) {
 				return true;
@@ -807,7 +807,7 @@ public class LogicMemory {
 	 * @param taskNameTokens
 	 * @return
 	 */
-	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
+	private static double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
 		double maxRatio = 0;
 		
 		for (String s : taskNameTokens) {
@@ -869,6 +869,7 @@ public class LogicMemory {
 		return d[source.length()][target.length()];
 	}
 	
+	// For testing
 	public static void main(String[] args) {
 		assert(getLevenshteinDist("kitten", "sitting") == 3);
 		assert(getLevenshteinDist("sitting", "kitten") == 3);

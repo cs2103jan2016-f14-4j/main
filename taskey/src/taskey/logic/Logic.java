@@ -11,7 +11,6 @@ import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
 
 /**
@@ -31,6 +30,7 @@ public class Logic {
 	private History history;
 	private CommandExecutor cmdExecutor;
 	private LogicMemory logicMemory;
+	private AutoComplete autoComplete;
 	
     //================================================================================
     // Constructors
@@ -41,6 +41,7 @@ public class Logic {
 		history = new History();
 		cmdExecutor = new CommandExecutor();
 		logicMemory = new LogicMemory();
+		autoComplete = new AutoComplete(logicMemory);
 		updateHistory();
 	}
 	
@@ -274,7 +275,7 @@ public class Logic {
 	}
 	
 	public ArrayList<String> autoCompleteLine(String line, ContentBox currentContent) {
-		AutoComplete auto = new AutoComplete();
+		/*AutoComplete auto = new AutoComplete();
 		ProcessedAC pac = auto.completeCommand(line); 
 		String pacCommand = pac.getCommand(); 
 		
@@ -313,6 +314,17 @@ public class Logic {
 			default:
 				return null;
 			}
+		}*/
+		ProcessedAC pac = autoComplete.getSuggestions(line);
+		String pacCommand = pac.getCommand();
+		
+		if (pacCommand.equals(DISPLAY_COMMAND)) { // to complete a command
+			ArrayList<String> suggestions = pac.getAvailCommands(); 
+			return suggestions;
+		} else if (pacCommand.equals(FINISHED_COMMAND)) {
+			return new ArrayList<String>();
+		} else { // Command not recognized
+			return null;  
 		}
 	}
 }

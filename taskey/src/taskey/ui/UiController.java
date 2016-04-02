@@ -348,29 +348,37 @@ public class UiController {
 		}
 	}
 	
-	private void processEnter() {
-		String selection = myDropDown.getSelectedItem();
-		if ( selection.isEmpty() == false ) { // add selected item as input text
-			String currentLine = input.getText().trim();
-			if ( selection.contains(currentLine)) {
-				input.setText(selection + " ");
-			} else {	
-				String [] tokens = selection.split(" ");
-				String [] lineTokens = currentLine.split(" ");
-				
-				for ( int i = 0; i < tokens.length; i ++ ) {
-					if ( currentLine.contains(tokens[i])) {
-						currentLine = currentLine.replace(tokens[i], ""); // remove
-					}
+	private void addSelectionToInput(String selection) {
+		String currentLine = input.getText().trim();
+		if ( selection.contains(currentLine)) {
+			input.setText(selection + " ");
+		} else {	
+			String [] tokens = selection.split(" ");
+			String [] lineTokens = currentLine.split(" ");		
+			for ( int i = 0; i < tokens.length; i ++ ) {
+				if ( currentLine.contains(tokens[i])) {
+					currentLine = currentLine.replace(tokens[i], ""); // remove
+				}
+				if ( lineTokens.length >= tokens.length) {
 					if ( selection.contains(lineTokens[lineTokens.length-1-i])) {
 						currentLine = currentLine.replace(lineTokens[lineTokens.length-1-i], "");
 					}
+				} else {
+					currentLine = lineTokens[0];
 				}
-				currentLine = currentLine.trim();
-				input.setText(currentLine + " " + selection + " ");
 			}
-			input.selectEnd();
-			input.deselect();
+			currentLine = currentLine.trim();
+			input.setText(currentLine + " " + selection + " ");
+		}
+		input.selectEnd();
+		input.deselect();
+		
+	}
+	
+	private void processEnter() {
+		String selection = myDropDown.getSelectedItem();
+		if ( selection.isEmpty() == false ) { // add selected item as input text
+			addSelectionToInput(selection);
 			myDropDown.closeMenu();
 		} else  {
 			String line = input.getText();
@@ -497,7 +505,8 @@ public class UiController {
 			  @Override public void handle(MouseEvent mouseEvent) {
 			  	stage.setX(mouseEvent.getScreenX() + mouseX);
 			    stage.setY(mouseEvent.getScreenY() + mouseY);
-			  }
+			    myDropDown.closeMenu();
+			  } 
 		});
 	}
 	

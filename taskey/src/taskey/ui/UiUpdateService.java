@@ -93,7 +93,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 			int secondsBefore = secondsInOneHour * hoursBefore;
 			if ( currentTask.getTaskType().equals("DEADLINE")) {
 				if ( currentTask.getDeadlineEpoch() - currTimeInSeconds < secondsBefore) {
-					alertList.add(createAlert(currentTask, getHourString(hoursBefore) + " Left!"));
+					alertList.add(createAlert(currentTask, "Within " + getHourString(hoursBefore) + " Left!"));
 					break;
 				}
 			} else if ( currentTask.getTaskType().equals("EVENT")) {
@@ -102,13 +102,13 @@ public class UiUpdateService extends ScheduledService<Void> {
 					currentTask.getEndDateEpoch() > currTimeInSeconds && 
 					currentTask.getEndDateEpoch() - currTimeInSeconds < secondsBefore) {
 					alertList.add(createAlert(currentTask,
-							"Event Ending In " + getHourString(hoursBefore) + "!"));
+							"Event Ending within " + getHourString(hoursBefore) + "!"));
 					break;
 				// event has not started
 				} else if ( currentTask.getStartDateEpoch() > currTimeInSeconds && 
 							currentTask.getStartDateEpoch() - currTimeInSeconds  < secondsBefore) {
 					alertList.add(createAlert(currentTask,
-							"Event Starting In " + getHourString(hoursBefore) + "!"));
+							"Event Starting within " + getHourString(hoursBefore) + "!"));
 					break;
 				} 
 			}
@@ -116,12 +116,14 @@ public class UiUpdateService extends ScheduledService<Void> {
 	}
 
 	private String getHourString( int hours ) {
+		// with or without the 's' at the end
 		if ( hours <= 1 ) {
 			return hours + " Hour";
 		} else {
 			return hours + " Hours";
 		}
 	}
+	
 	private UiAlert createAlert(taskey.messenger.Task fromTask, String msg) {
 		UiAlert myAlert = new UiAlert(fromTask);
 		myAlert.setMessage(msg);

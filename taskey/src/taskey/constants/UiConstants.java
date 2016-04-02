@@ -75,13 +75,13 @@ public class UiConstants {
 		LIST, HELP;
 	}
 
-	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 1, 2, 98);
+	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 3, 5, 98);
 	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
-	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 24, 5, 20, 80);
+	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 20, 10, 25, 75);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 15, 100);
+	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 75,15);
 	
 	// Resources 
@@ -107,6 +107,7 @@ public class UiConstants {
 	public static final String STYLE_PROMPT_SELECTED = "promptSelect";
 	public static final String STYLE_INPUT_NORMAL = "inputNormal";
 	public static final String STYLE_INPUT_ERROR = "inputError";
+	public static final String STYLE_INPUT_CORRECT = "inputCorrect";
 	public static final String STYLE_ALERT_BOX = "alertBox";
 	
 	public static final ArrayList<String> STYLE_UI_DEFAULT = new ArrayList<String>(
@@ -116,25 +117,29 @@ public class UiConstants {
 	public static final ArrayList<String> STYLE_UI_ALERT_WINDOW = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "alertStyles.css"));
 	
-	public static String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
+	public static final String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
 	
 	// Tray
-	public static String TRAY_SHOW_OPTION = "Show Taskey";
-	public static String TRAY_CLOSE_OPTION = "Close Program";
-	public static String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
-	public static String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
-	public static String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
-	public static String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";
-	public static String MINIMIZE_MESSAGE_BODY = "Taskey will continue running in the background, click to resume planning your tasks.";
+	public static final String TRAY_SHOW_OPTION = "Show Taskey";
+	public static final String TRAY_CLOSE_OPTION = "Close Program";
+	public static final String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
+	public static final String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
+	public static final String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
+	public static final String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";
+	public static final String MINIMIZE_MESSAGE_BODY = "Taskey will continue running in the background, click to resume planning your tasks.";
 	
 	// Alert Window
 	public static final int MAX_ALERTS = 10; 
 	public static final float ALERTS_OPACITY = 0.8f;
-	
+	public static final int[] HOUR_MARKS = { 1, 3, 5, 12 };
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	public static final int UPDATE_SERVICE_INTERVAL = 300000; // in milliseconds (5 minutes)
-	public static final int DEFAULT_FADE_TIME = 1000; // How long to play the animation for Fade only
+	public static final int DEFAULT_ANIM_DURATION = 1000; // How long to play an animation
 	public static final int DEFAULT_FADE_START_DELAY = 2000; 
+	public static final int DEFAULT_SHAKE_DISTANCE = 10;
+	public static final int DEFAULT_SHAKE_INTERVAL = 100;
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
+	public static final int ENTRIES_PER_PAGE_DEFAULT = 5;
+	public static final int ENTRIES_PER_PAGE_HELP_MENU = 6;
 }

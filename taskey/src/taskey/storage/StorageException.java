@@ -58,6 +58,6 @@ public class StorageException extends IOException {
 class History {
 }*/
 
-class StorageException {
+public class StorageException {
 	// Blank class to allow compilation of JAR file
 }

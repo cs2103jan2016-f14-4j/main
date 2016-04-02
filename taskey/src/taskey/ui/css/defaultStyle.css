@@ -34,12 +34,9 @@
 	-fx-background-color: #2d3956;
 }
 
-#expiredIcon {
-	-fx-text-fill: white;
-	-fx-background-color: red;
-	-fx-background-radius: 15px;
-	-fx-padding: 2px;
-	-fx-font-family: 'Montserrat';
+#notification {
+	-fx-text-fill: #e7e7e7;
+	-fx-font-weight: bold;
 }
 
 /* Switchable styles */
@@ -50,28 +47,27 @@
 }
 
 .inputError {
-  -fx-outer-border: red;
-  -fx-body-color: #e7e7e7;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2;
-  -fx-background-radius: 2px, 0px;
+    -fx-background-color: red, #e7e7e7;
+    -fx-background-insets: 0, 2px;
 }
 
+.inputCorrect {
+    -fx-background-color: #0000ff, #e7e7e7;
+    -fx-background-insets: 0, 2px;
+}
+
+
 .prompt {
-	-fx-padding: 2px;
-	-fx-background-color: #e7e7e7;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 1px;
+	-fx-padding: 6px;
+	-fx-background-color: #2d3956, #e7e7e7;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #2d3956;
 }
 
 .promptSelect {
-	-fx-padding: 2px;
-	-fx-background-color:#2d3956;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 3px;
+	-fx-padding: 6px;
+	-fx-background-color: #2d3956, #2d3956;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #e7e7e7;
 }
 

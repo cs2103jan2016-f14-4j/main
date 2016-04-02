@@ -156,12 +156,11 @@ public class UiGridHelper {
 		Rectangle scaledRect = new Rectangle(0,0,0,0);
 		scaledRect.setFill(Paint.valueOf(theColor.toString()));
 		cellWrapper.getChildren().add(scaledRect);
-		StackPane.setAlignment(scaledRect, Pos.CENTER_LEFT);
-		
+
+		double offset = 1.5f;
 		// problem with precision which shifts the whole row, thus we subtract a fixed amount
-		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(1.5f)); 
-		scaledRect.setTranslateX(0.75f); // this mitigates the issue
-		scaledRect.heightProperty().bind(cellWrapper.heightProperty());
+		scaledRect.widthProperty().bind(cellWrapper.widthProperty().subtract(offset)); 
+		scaledRect.heightProperty().bind(cellWrapper.heightProperty().subtract(offset));
 		return scaledRect;
 	}
 }

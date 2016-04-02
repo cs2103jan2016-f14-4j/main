@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
+import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
@@ -20,11 +21,10 @@ public class UiActionFormatter extends UiFormatter {
 	private UiTaskView taskView;
 	private UiHelpView helpView;
 	private UiPagination currentView;
-	private static final int entriesPerPage = 6;
-	
+
 	public UiActionFormatter(ScrollPane thePane) {
 		super(thePane);	
-		taskView = new UiTaskView(entriesPerPage);
+		taskView = new UiTaskView(UiConstants.ENTRIES_PER_PAGE_DEFAULT);
 		helpView = new UiHelpView();
 		mainPane.setFitToHeight(true);
 	}
@@ -84,7 +84,8 @@ public class UiActionFormatter extends UiFormatter {
 	public void format(ArrayList<Task> myTaskList) {
 		assert(myTaskList != null);	
 		taskView.getView().clear();
-		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
+		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
+										 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 		taskView.createPaginationGrids(myTaskList,totalPages);
 	}
 

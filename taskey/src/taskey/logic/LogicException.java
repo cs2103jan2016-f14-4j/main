@@ -20,8 +20,8 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_CLEAR = "Successfully cleared memory.";
 	public static final String MSG_SUCCESS_SAVE = "Save successful.";
 	public static final String MSG_SUCCESS_CHANGE_DIR = "Successfully changed save directory.";
-	public static final String MSG_SUCCESS_VIEW = "Viewing \"%$1s\"";
-	public static final String MSG_SUCCESS_VIEW_PRIORITY = "Viewing tasks with \"%$1s\" priority.";
+	public static final String MSG_SUCCESS_VIEW = "Viewing \"%1$s\"";
+	public static final String MSG_SUCCESS_VIEW_PRIORITY = "Viewing tasks with \"%1$s\" priority.";
 	public static final String MSG_ERROR_INVALID_COMMAND = "Invalid command!";
 	public static final String MSG_ERROR_DUPLICATE_TASKS = "Duplicate tasks are not allowed.";	                                             
 	public static final String MSG_ERROR_DATE_EXPIRED = "The deadline/end date is already past!";

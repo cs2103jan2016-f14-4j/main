@@ -733,17 +733,14 @@ public class LogicMemory {
 		String[] searchTokens = searchPhrase.toLowerCase().split(" ");
 		
 		for (Task task : list) {
-			boolean allTokensFound = true;
+			double sumOfLevenshteinRatios = 0;
 			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
 			
 			for (String searchToken : searchTokens) {
-				if (!foundToken(searchToken, taskNameTokens)) {
-					allTokensFound = false;
-					break;
-				}
+				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if (allTokensFound) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.5) {
 				searchResults.add(task);
 			}
 		}
@@ -751,6 +748,17 @@ public class LogicMemory {
 		return searchResults;
 	}
 	
+	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
+		double ratio = 0;
+		
+		for (String s : taskNameTokens) {
+			int currDist = getLevenshteinDist(searchToken, s);
+			ratio = Math.max(ratio, 1 - ((double) currDist / Math.max(searchToken.length(), s.length())));
+		}
+		
+		return ratio;
+	}
+
 	/**
 	 * Returns true if and only if a given search token is "found" within an an array of task name tokens.
 	 * @param searchToken
@@ -773,5 +781,49 @@ public class LogicMemory {
 		}
 		
 		return false;
+	}
+	
+	private static int getLevenshteinDist(String source, String target) {
+		// For all i and j, d[i][j] will hold the Levenshtein distance between the first i characters of source and 
+		// the first j characters of target
+		int[][] d = new int[source.length() + 1][target.length() + 1];
+		
+		// If target is an empty string, then the first i characters of source can be converted to target by deleting
+		// each of these i characters, yielding a Levenshtein distance of i.
+		for (int i = 1; i <= source.length(); i++) {
+		      d[i][0] = i;
+		}
+		
+		// If source is an empty string, then the first j characters of target can be converted to source by deleting
+		// each of these j characters, yielding a Levenshtein distance of j.
+		for (int j = 1; j <= target.length(); j++) {
+		      d[0][j] = j;
+		}
+		
+		for (int j = 1; j <= target.length(); j++) {
+			for (int i = 1; i <= source.length(); i++) {
+				int substitutionCost = 0;
+				
+				if (source.charAt(i - 1) != target.charAt(j - 1)) { // i-th character from source and j-th character
+		        	                                                // from target do not match (1-based indices)
+					substitutionCost = 1;
+				}
+				
+				d[i][j] = Math.min(d[i-1][j] + 1, // Deleting i-th character from source yields a cost of 1
+		                      	   Math.min(d[i][j-1] + 1, // Deleting j-th character from target yields a cost of 1
+		                                    d[i-1][j-1] + substitutionCost)); // Substituting the i-th character from 
+				                                                              // source to match the j-th character 
+			}
+	
+		}
+		
+		return d[source.length()][target.length()];
+	}
+	
+	public static void main(String[] args) {
+		assert(getLevenshteinDist("kitten", "sitting") == 3);
+		assert(getLevenshteinDist("sitting", "kitten") == 3);
+		assert(getLevenshteinDist("", "abcd") == 4);
+		assert(getLevenshteinDist("abcd", "abcd") == 0);
 	}
 }

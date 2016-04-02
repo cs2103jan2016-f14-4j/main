@@ -33,7 +33,7 @@ public class Storage {
 	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
 	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig"; //name of the directory config file
 	public static final String FILENAME_EXTENSION = ".taskey";						    //public for unit tests
-	private static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
+	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
 	public enum TasklistEnum {
 		// Index 0 (THIS_WEEK list) and 7 (ACTION list) from Logic is to be ignored

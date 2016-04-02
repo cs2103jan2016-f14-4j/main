@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.junit.After;
@@ -17,9 +18,11 @@ import org.junit.Test;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
+import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageReader;
+import static taskey.junit.StorageTest.TaskList.*;
 
 /**
  * @@author A0121618M
@@ -73,6 +76,129 @@ public class StorageTest {
 	public void tearDown() throws Exception {
 	}
 
+	/*================*
+	 * Test tasklists *
+	 *================*/
+	/**
+	 * Enum of all task lists from Logic.
+	 */
+	enum TaskList {
+		THIS_WEEK (new ArrayList<Task>()), //ignored by Storage
+		PENDING (new ArrayList<Task>()),   //saved to disk
+		EXPIRED (new ArrayList<Task>()),   //saved to disk
+		FLOATING (new ArrayList<Task>()),  //derived from pending list
+		DEADLINE (new ArrayList<Task>()),  //derived from pending list
+		EVENT (new ArrayList<Task>()),     //derived from pending list
+		COMPLETED (new ArrayList<Task>()), //saved to disk
+		ACTION(new ArrayList<Task>());	   //ignored by Storage
+		
+		static EnumSet<TaskList> derivedLists = EnumSet.of(EVENT, DEADLINE, FLOATING);
+		static EnumSet<TaskList> taskListsFromStorage = EnumSet.range(PENDING, COMPLETED);
+		static TimeConverter tc = new TimeConverter();
+		
+		ArrayList<Task> tasklist;
+		TaskList(ArrayList<Task> list) {
+			tasklist = list;
+		}
+
+		void add(Task t) {
+			tasklist.add(t);
+		}
+
+		ArrayList<Task> get() {
+			return tasklist;
+		}
+
+		static void clearAllLists() {
+			for (TaskList list : TaskList.values()) {
+				list.get().clear();
+			}
+		}
+		
+		static void populateLists() {
+			for (TaskList list : TaskList.values()) {
+				Task task = new Task();
+				
+				switch (list) {
+					case PENDING:
+						task.setTaskName("General");
+						task.setTaskType("FLOATING");
+						FLOATING.add(task);
+						PENDING.add(task);
+						
+						task = new Task();
+						task.setTaskName("Deadline");
+						task.setTaskType("DEADLINE");
+						task.setDeadline(tc.getCurrTime());
+						DEADLINE.add(task);
+						PENDING.add(task);
+						
+						task = new Task();
+						task.setTaskName("Event");
+						task.setTaskType("EVENT");
+						task.setStartDate(tc.getCurrTime());
+						task.setEndDate(tc.getCurrTime());
+						EVENT.add(task);
+						PENDING.add(task);
+						break;
+
+					case EXPIRED:
+						task.setTaskName("Expired task");
+						task.setTaskType("FLOATING");
+						EXPIRED.add(task);
+						break;
+						
+					case COMPLETED:
+						task.setTaskName("Completed task");
+						task.setTaskType("FLOATING");
+						COMPLETED.add(task);
+						break;
+						
+					case THIS_WEEK:
+						THIS_WEEK.add(task);
+						break;
+						
+					case ACTION:
+						ACTION.add(task);
+						break;
+						
+					case DEADLINE:
+					case EVENT:
+					case FLOATING:
+						break;
+				}
+			}
+		}
+		
+		static ArrayList<ArrayList<Task>> getSuperlist() {
+			ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
+			for (TaskList tasklist : TaskList.values()) {
+				superlist.add(tasklist.get());
+			}
+			return superlist;
+		}
+	}
+	
+	@Test
+	public void saveAndLoadTasklists() throws IOException {
+		TaskList.clearAllLists();
+		TaskList.populateLists();
+		
+		ArrayList<ArrayList<Task>> expectedList = new ArrayList<ArrayList<Task>>();	 
+		for (TaskList list : taskListsFromStorage) {
+			expectedList.add(list.get());
+		}
+
+		storage.saveAllTasklists(TaskList.getSuperlist());
+		ArrayList<ArrayList<Task>> loadedList = storage.loadAllTasklists();
+		assertEquals(TasklistEnum.size(), loadedList.size()); //loaded list must be size 6
+		assertEquals(toString(expectedList), toString(loadedList));
+		
+		System.out.println("\n" + toString(expectedList));
+		System.out.println(toString(loadedList));
+	}
+
+	
 	/*===========*
 	 * Test tags *
 	 *===========*/
@@ -98,41 +224,7 @@ public class StorageTest {
 		return tags;
 	}
 
-	/*================*
-	 * Test tasklists *
-	 *================*/
-	@Test
-	public void saveAndLoadTasklists() throws IOException {
-		ArrayList<ArrayList<Task>> savedList = createSuperlist();
-		storage.saveAllTasklists(savedList); //TODO use temp folder
-		List<ArrayList<Task>> sublist = savedList.subList(1, 7); //storage only saves from index 1 to 6 (both inclusive)
-
-		ArrayList<ArrayList<Task>> loadedList = storage.loadAllTasklists();
-		assertEquals(TasklistEnum.size(), loadedList.size()); //loaded list must be size 6
-
-		//System.out.println(toString( sublist ));
-		//System.out.println(toString(loadedList));
-
-		assertEquals(toString(sublist), toString(loadedList));
-	}
-
-	private ArrayList<ArrayList<Task>> createSuperlist() {
-		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
-
-		for (int i=0; i < 8; i++) {
-			ArrayList<Task> list = new ArrayList<Task>();
-			for (int j=1; j<=3; j++) {
-				Task t = new Task("Tasklist" + i +" Task" + j);
-				t.setTaskType("floating");
-				list.add(t);
-			}
-			superlist.add(list);
-		}
-
-		return superlist;
-	}
-
-
+	
 	/*================*
 	 * Helper methods *
 	 *================*/
@@ -154,6 +246,7 @@ public class StorageTest {
 		return str;
 	}
 
+	@SuppressWarnings("unused")
 	private static <E> void print(ArrayList<ArrayList<E>> lists) {
 		int i = 0;
 		for (ArrayList<E> list : lists) {

@@ -164,9 +164,9 @@ public class AutoComplete {
 				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
 			}
 			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
-		}*/
+		} */
 		
-		//find list normally (for > 1 letter) 
+		//find list normally  
 		for(int i = 0; i < commands.size(); i++) {
 			if (commands.get(i).indexOf(phrase) == 0) {
 				availCommands.add(commands.get(i)); 
@@ -209,7 +209,7 @@ public class AutoComplete {
 			if (tag.contains(phrase)) {
 				//if user types without #, 
 				//then he should select the dropdown suggestion
-				availViews.add(tag); 
+				availViews.add("#"+ tag); 
 			}
 		}
 		
@@ -246,7 +246,7 @@ public class AutoComplete {
 				//else suggest something 
 				for(int i = 0; i < tagDB.size(); i++) {
 					if (i < 3) {
-						availSuggestions.add(tagDB.get(i).getTagName());
+						availSuggestions.add("#" + tagDB.get(i).getTagName());
 					}
 				}
 				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);

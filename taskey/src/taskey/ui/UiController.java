@@ -350,8 +350,25 @@ public class UiController {
 	
 	private void processEnter() {
 		String selection = myDropDown.getSelectedItem();
-		if ( selection.isEmpty() == false ) { // make selected item as input text
-			input.setText(selection + " ");
+		if ( selection.isEmpty() == false ) { // add selected item as input text
+			String currentLine = input.getText().trim();
+			if ( selection.contains(currentLine)) {
+				input.setText(selection + " ");
+			} else {	
+				String [] tokens = selection.split(" ");
+				String [] lineTokens = currentLine.split(" ");
+				
+				for ( int i = 0; i < tokens.length; i ++ ) {
+					if ( currentLine.contains(tokens[i])) {
+						currentLine = currentLine.replace(tokens[i], ""); // remove
+					}
+					if ( selection.contains(lineTokens[lineTokens.length-1-i])) {
+						currentLine = currentLine.replace(lineTokens[lineTokens.length-1-i], "");
+					}
+				}
+				currentLine = currentLine.trim();
+				input.setText(currentLine + " " + selection + " ");
+			}
 			input.selectEnd();
 			input.deselect();
 			myDropDown.closeMenu();

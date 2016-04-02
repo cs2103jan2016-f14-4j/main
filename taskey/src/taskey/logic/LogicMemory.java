@@ -720,10 +720,7 @@ public class LogicMemory {
 	
 	/**
 	 * Performs a search on the given list using the given search phrase, and returns a list of search results.
-	 * A task is added to the list of search results if and only if every token in the search phrase is "found" in that 
-	 * task's name. A search token that is <= 2 characters is considered to be "found" if the task name tokens contain the 
-	 * exact same token. A search token that is >= 3 characters is considered to be "found" if there exists a task name 
-	 * token that contains the search token as a substring.
+	 * The search algorithm uses the Levenshtein distance metric.
 	 * @param list
 	 * @param searchPhrase
 	 * @return
@@ -737,8 +734,9 @@ public class LogicMemory {
 			boolean foundMatch = false;
 			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
 			
-			if (searchTokens.length == 1) { // Search phrase is only one word
-				if (searchPhrase.length() <= 2) {
+			if (searchTokens.length == 1) {
+				if (searchPhrase.length() <= 2) { // For search phrases that are only one word with <= 2 characters,
+					                              // perform whole word search only, for more precision.
 					if (searchWholeWord(searchPhrase, taskNameTokens)) {
 						searchResults.add(task);
 					}
@@ -757,7 +755,7 @@ public class LogicMemory {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.5) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.75) {
 				searchResults.add(task);
 			}
 		}
@@ -765,29 +763,9 @@ public class LogicMemory {
 		return searchResults;
 	}
 	
-	private boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
-		for (String s : taskNameTokens) {
-			if (s.contains(searchPhrase)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
-		double ratio = 0;
-		
-		for (String s : taskNameTokens) {
-			int currDist = getLevenshteinDist(searchToken, s);
-			ratio = Math.max(ratio, 1 - ((double) currDist / Math.max(searchToken.length(), s.length())));
-		}
-		
-		return ratio;
-	}
-
 	/**
-	 * Returns true if and only if a given search token is "found" within an an array of task name tokens.
+	 * Returns true if and only if the entire search phrase matches at least one of the task name tokens exactly.
+	 * 
 	 * @param searchToken
 	 * @param taskNameTokens
 	 * @return
@@ -802,6 +780,57 @@ public class LogicMemory {
 		return false;
 	}
 	
+	/**
+	 * Returns true if and only if the entire search phrase is a substring of at least one of the task name tokens.
+	 * @param searchPhrase
+	 * @param taskNameTokens
+	 * @return
+	 */
+	private boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
+		for (String s : taskNameTokens) {
+			if (s.contains(searchPhrase)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Returns the maximum Levenshtein ratio when the search token is compared to each of the task name tokens.
+	 * <p>The Levenshtein ratio between two Strings is calculated as follows: 
+	 * <br>First, find the Levenshtein distance between the two Strings.
+	 * <br>Then, divide the distance by the length of the longest String.
+	 * <br>Finally, subtract the result from the number 1.
+	 * 
+	 * @param searchToken
+	 * @param taskNameTokens
+	 * @return
+	 */
+	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
+		double maxRatio = 0;
+		
+		for (String s : taskNameTokens) {
+			int currDist = getLevenshteinDist(searchToken, s);
+			double currRatio = 1 - ((double) currDist / Math.max(searchToken.length(), s.length()));
+			
+			if (currRatio > maxRatio) {
+				maxRatio = currRatio;
+			}
+		}
+		
+		return maxRatio;
+	}
+
+	/**
+	 * Returns the Levenshtein distance between two Strings. The Levenshtein distance between two Strings is the minimum 
+	 * number of single-character edits (i.e. insertions, deletions or substitutions) required to change one String into 
+	 * the other.
+	 *  
+	 * @param source
+	 * @param target
+	 * @return
+	 */
 	private static int getLevenshteinDist(String source, String target) {
 		// For all i and j, d[i][j] will hold the Levenshtein distance between the first i characters of source and 
 		// the first j characters of target

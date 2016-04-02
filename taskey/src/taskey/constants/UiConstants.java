@@ -117,16 +117,16 @@ public class UiConstants {
 	public static final ArrayList<String> STYLE_UI_ALERT_WINDOW = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "alertStyles.css"));
 	
-	public static String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
+	public static final String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
 	
 	// Tray
-	public static String TRAY_SHOW_OPTION = "Show Taskey";
-	public static String TRAY_CLOSE_OPTION = "Close Program";
-	public static String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
-	public static String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
-	public static String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
-	public static String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";
-	public static String MINIMIZE_MESSAGE_BODY = "Taskey will continue running in the background, click to resume planning your tasks.";
+	public static final String TRAY_SHOW_OPTION = "Show Taskey";
+	public static final String TRAY_CLOSE_OPTION = "Close Program";
+	public static final String TRAY_CLOSE_NO_SAVE_OPTION = "Close Without Saving";
+	public static final String TRAY_IMAGE_PATH = "utility/images/windowIcon.png";
+	public static final String TRAY_IMAGE_LOAD_FAIL = "Failed to load tray icon";
+	public static final String MINIMIZE_MESSAGE_HEADER = "Taskey has been minimized.";
+	public static final String MINIMIZE_MESSAGE_BODY = "Taskey will continue running in the background, click to resume planning your tasks.";
 	
 	// Alert Window
 	public static final int MAX_ALERTS = 10; 

@@ -47,21 +47,13 @@
 }
 
 .inputError {
-  -fx-outer-border: red;
-  -fx-body-color: #e7e7e7;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2px;
+    -fx-background-color: red, #e7e7e7;
+    -fx-background-insets: 0, 2px;
 }
 
 .inputCorrect {
-  -fx-outer-border: #00ff00;
-  -fx-body-color: #e7e7e7;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2px;
+    -fx-background-color: #0000ff, #e7e7e7;
+    -fx-background-insets: 0, 2px;
 }
 
 

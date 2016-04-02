@@ -45,21 +45,13 @@
 	-fx-text-fill: #206ba4;
 }
 .inputError {
-  -fx-outer-border: red;
-  -fx-body-color: #ebf4fb;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2px;
+    -fx-background-color: red, #ebf4fb;
+	-fx-background-insets: 0, 2px;
 }
 
 .inputCorrect {
-  -fx-outer-border: #00ff00;
-  -fx-body-color: #ebf4fb;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2px;
+    -fx-background-color: #0000ff, #ebf4fb;
+    -fx-background-insets: 0, 2px;
 }
 
 .prompt {

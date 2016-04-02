@@ -81,7 +81,7 @@ public class UiConstants {
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP_MENU = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_CATEGORY = new UiGridSettings(0, 1,0, 15,65,25);
 	public static final UiGridSettings GRID_SETTINGS_SINGLE_CELL = new UiGridSettings(0, 0, 0, 100);
-	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 15, 100);
+	public static final UiGridSettings GRID_SETTINGS_ALERT = new UiGridSettings(0, 20, 0, 100);
 	public static final UiGridSettings GRID_SETTINGS_ALERT_ENTRY_PANE = new UiGridSettings(0, 0, 0, 10, 75,15);
 	
 	// Resources 

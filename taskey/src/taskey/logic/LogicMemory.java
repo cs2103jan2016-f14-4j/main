@@ -367,12 +367,16 @@ public class LogicMemory {
 	 * Updates the action list based on the view type. When the user wants to view tasks by priority i.e. "high", "medium"
 	 * or "low", only expired and pending tasks will be displayed.
 	 * @param viewType
+	 * @throws LogicException 
 	 */
-	void viewBasic(String viewType) {
+	void viewBasic(String viewType) throws LogicException {
+		String exceptionMsg;
+		
 		switch (viewType) {
 			case "general":
 				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
-				break;
+				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + " tasks.";
+				throw new LogicException(exceptionMsg);
 			
 			case "deadlines":
 				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
@@ -392,7 +396,8 @@ public class LogicMemory {
 				clearActionList();
 				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
 				viewPriority(taskLists.get(INDEX_PENDING), viewType);
-				break;
+				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW_PRIORITY, viewType);
+				throw new LogicException(exceptionMsg);
 							
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
 				clearActionList();
@@ -400,6 +405,9 @@ public class LogicMemory {
 			
 			default: // Should not reach this point
 		}
+		
+		exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + ".";
+		throw new LogicException(exceptionMsg);
 	}
 
 	/**

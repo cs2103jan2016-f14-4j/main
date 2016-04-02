@@ -12,7 +12,7 @@
     src: url('../fonts/Montserrat-Bold.ttf');
 }
 .textAll {
-	-fx-font-size: 14px;
+	-fx-font-size: 15px;
 	-fx-font-family: 'Montserrat';
 	-fx-font-smoothing-type: gray;
 }
@@ -29,3 +29,11 @@
 	-fx-fill: black;
 }
 
+#expiredIcon {
+	-fx-font-size: 14px;
+	-fx-text-fill: white;
+	-fx-background-color: red;
+	-fx-padding: 4px;
+	-fx-font-family: 'Montserrat';
+	-fx-font-weight: bold;
+}

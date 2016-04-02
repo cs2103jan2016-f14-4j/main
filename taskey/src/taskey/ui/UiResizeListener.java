@@ -60,8 +60,10 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 					stage.setHeight(UiConstants.WINDOW_MIN_SIZE.getHeight());
 				}
 			}
-			checkAspectRatio();
-			UiPopupManager.getInstance().updateWindowRatios(stage);
+			if ( resizeH || resizeV ) {
+				checkAspectRatio();
+				UiPopupManager.getInstance().updateWindowRatios(stage);
+			}
 		}
 	}
 

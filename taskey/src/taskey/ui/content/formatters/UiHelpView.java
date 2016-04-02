@@ -29,7 +29,6 @@ public class UiHelpView {
 	private UiPagination helpView;
 	private ArrayList<UiPagination> commandViews;
 	private UiPagination currentView;
-	private int entriesPerPage = 8; // main menu
 	private int imageWidth = 333;
 	
 	public UiHelpView() {
@@ -71,18 +70,18 @@ public class UiHelpView {
 				"This will guide you through how to tag tasks"
 				));
 		int numCommmands = headers.size();
-		int totalPages = (int) Math.ceil(numCommmands/1.0/entriesPerPage); // convert to double	
+		int totalPages = (int) Math.ceil(numCommmands/1.0/UiConstants.ENTRIES_PER_PAGE_HELP_MENU); // convert to double	
 		int entryNo = 0;
 		for ( int i = 0; i < totalPages; i++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ACTION_HELP);
 			ArrayList<StackPane> menuElements = new ArrayList<StackPane>();
 			//newGrid.setGridLinesVisible(true);
-			for ( int j = 0; j < entriesPerPage; j ++ ) {
+			for ( int j = 0; j < UiConstants.ENTRIES_PER_PAGE_HELP_MENU; j ++ ) {
 				if ( entryNo >= numCommmands ) {
 					break;
 				}
 				Label current = gridHelper.createLabelInCell(0, j, headers.get(entryNo), 
-															 UiConstants.STYLE_DROPDOWN_SELECTED, newGrid);
+															 UiConstants.STYLE_PROMPT_SELECTED, newGrid);
 				GridPane.setFillWidth(current.getParent(), false);
 				GridPane.setFillHeight(current.getParent(), false);
 				GridPane.setHalignment(current.getParent(), HPos.CENTER);
@@ -90,7 +89,7 @@ public class UiHelpView {
 					menuElements.add(gridHelper.getWrapperAtCell(0,j,newGrid));
 				}
 				UiTextBuilder myBuilder = new UiTextBuilder();
-				myBuilder.addMarker(0, UiConstants.STYLE_DROPDOWN_SELECTED);
+				myBuilder.addMarker(0, UiConstants.STYLE_PROMPT_SELECTED);
 				String line = info.get(entryNo);
 				gridHelper.createStyledCell(1, j, "", newGrid);
 				gridHelper.addTextFlowToCell(1, j, myBuilder.build(line),TextAlignment.LEFT, newGrid);

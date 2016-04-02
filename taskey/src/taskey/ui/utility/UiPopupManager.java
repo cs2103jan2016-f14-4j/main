@@ -27,7 +27,6 @@ import taskey.constants.UiConstants;
 public class UiPopupManager {
 	private double X_Ratio = 1, Y_Ratio = 1; // window ratios
 	private ArrayList<Popup> popupList = new ArrayList<Popup>();
-	private Popup promptMessage;
 	private static UiPopupManager instance = null;
 	private UiPopupManager() {
 	}
@@ -36,23 +35,6 @@ public class UiPopupManager {
 			instance = new UiPopupManager();
 		}
 		return instance;
-	}
-
-	public void removePrompt() {
-		if ( promptMessage != null ) {
-			promptMessage.hide();
-			popupList.remove(promptMessage);
-		}
-	}
-	
-	/**
-	 * This method implements a single prompt message that will be replaced
-	 * whenever this method is called
-	 * This method uses createPopupLabelAtNode() to replace the prompt
-	 */
-	public void updatePromptMessage( String text, Node node, double offsetX, double offsetY ) { 
-		removePrompt();
-		promptMessage = createPopupLabelAtNode(text,node,offsetX,offsetY,true);
 	}
 	
 	/**
@@ -72,8 +54,9 @@ public class UiPopupManager {
 		Label content = new Label();
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-		content.getStyleClass().add(UiConstants.STYLE_DROPDOWN_SELECTED);
+		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		thePopup.getContent().add(content);
+		resize(thePopup);
 		thePopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
 							screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  
 		popupList.add(thePopup);
@@ -81,7 +64,7 @@ public class UiPopupManager {
 		if ( deleteAfter == true ) {
 			FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(
 					thePopup.getContent().get(0), UiConstants.DEFAULT_FADE_START_DELAY, 
-					UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+					UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
 			fade.play();
 			fade.setOnFinished(new EventHandler<ActionEvent>() {
 				@Override
@@ -109,6 +92,18 @@ public class UiPopupManager {
 			Popup thePopup = (Popup) popupList.get(i);
 			thePopup.hide();
 		}
+	}
+	
+	/**
+	 * This method does a simple resize on a popup, assuming that the popup has a container
+	 * which should always be the case if it is created using UiPopupManager
+	 * @param popup
+	 */
+	public void resize(Popup popup) {
+		Node content = popup.getContent().get(0);
+		content.setScaleX(X_Ratio > 1 ? X_Ratio : 1); // such that problems with translation are avoided
+		content.setScaleY(Y_Ratio > 1 ? Y_Ratio : 1); 
+		// since nodes are positioned from top left and scaling is from center
 	}
 	
 	public double getYRatio() {

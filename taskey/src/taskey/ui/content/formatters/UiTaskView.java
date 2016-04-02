@@ -3,10 +3,13 @@ package taskey.ui.content.formatters;
 import java.util.ArrayList;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.messenger.Task;
@@ -29,7 +32,7 @@ public class UiTaskView {
 	private UiPagination taskView;
 	private int entriesPerPage;
 	private UiGridHelper gridHelper;
-	
+
 	public UiTaskView(int _entriesPerPage) {
 		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 		entriesPerPage = _entriesPerPage;
@@ -42,6 +45,8 @@ public class UiTaskView {
 	
 	public void createPaginationGrids(ArrayList<Task> myTaskList, int totalPages) {
 		int entryNo = 0;
+		ArrayList<Pair<Integer,Integer>> overlappingPairs = getIndexesOfOverlappingEvents(myTaskList);
+		
 		for ( int i = 0; i < totalPages; i ++ ) {
 			GridPane newGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_DEFAULT);
 			ArrayList<StackPane> pageEntries = new ArrayList<StackPane>();
@@ -58,8 +63,16 @@ public class UiTaskView {
 				addTaskID(theTask, entryNo, j, newGrid); // add to main grid
 				addTaskDescription(theTask,paneGrid);
 				addImage(theTask,paneGrid);
-				entryNo++;
 				
+				// Mark overlapping tasks
+				for ( int k = 0; k < overlappingPairs.size(); k ++ ) {
+					if ( overlappingPairs.get(k).getKey() == entryNo 
+						 || overlappingPairs.get(k).getValue() == entryNo) {
+						addOverlapIcon(theTask,paneGrid);
+						break;
+					}
+				}
+				entryNo++;	
 				pageEntries.add(entryPane);
 			}
 			taskView.addGridToPagination(newGrid,pageEntries);
@@ -138,6 +151,46 @@ public class UiTaskView {
 		}
 		gridHelper.createStyledCell(1, 0, "", newGrid);
 		gridHelper.createImageInCell(1,0,UiImageManager.getInstance().getImage(imgID),30,30,newGrid);
+	}
+	
+	
+	private void addOverlapIcon(Task theTask, GridPane newGrid ) {
+		ImageView img = gridHelper.createImageInCell(1,0,
+				UiImageManager.getInstance().getImage(ImageID.URGENT_MARK),15,15,newGrid);
+		StackPane.setAlignment(img, Pos.TOP_RIGHT);
+	}
+	
+	/**
+	 * This method provides an efficient method to check overlap of 2 ranges
+	 * http://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
+	 * Assumes start date is <= end date for both events
+	 * @param firstEvent
+	 * @param secondEvent
+	 * @return
+	 */
+	private boolean isOverlapping ( Task firstEvent, Task secondEvent) {
+		return (firstEvent.getStartDateEpoch() <= secondEvent.getEndDateEpoch())  &&  
+				(firstEvent.getEndDateEpoch() >= secondEvent.getStartDateEpoch());
+	}
+	
+	private ArrayList<Pair<Integer,Integer>> getIndexesOfOverlappingEvents(ArrayList<Task> taskList) {
+		ArrayList<Pair<Integer,Integer>> indexPairs = new ArrayList<Pair<Integer,Integer>>();
+		ArrayList<Pair<Integer,Task>> events = new ArrayList<Pair<Integer,Task>>();
+		for ( int i = 0; i < taskList.size(); i ++ ) {
+			if ( taskList.get(i).getTaskType().equals("EVENT")) {
+				events.add(new Pair<Integer,Task>(i,taskList.get(i)));  // original index in task list
+			}
+		}
+		if ( events.size() > 0 ) {
+			for ( int i = 0; i < events.size(); i ++ ) {
+				for ( int j = i+1; j < events.size(); j ++) {
+					if ( isOverlapping(events.get(i).getValue(), events.get(j).getValue())) {
+						indexPairs.add(new Pair<Integer,Integer>(events.get(i).getKey(),events.get(j).getKey()));
+					}
+				}
+			}
+		}
+		return indexPairs;
 	}
 	
 	public void clear() {

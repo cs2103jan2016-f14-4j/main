@@ -51,9 +51,9 @@ class StorageWriter {
 		}
 	}
 
-	/*================*
-	 * Save task list *
-	 *================*/
+	/*============*
+	 * Save tasks *
+	 *============*/
 	/**
 	 * Writes an ArrayList of Task objects to the File dest.
 	 * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.

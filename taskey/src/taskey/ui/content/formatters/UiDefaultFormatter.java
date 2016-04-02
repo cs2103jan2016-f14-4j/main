@@ -2,9 +2,12 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
+import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
+
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
@@ -18,13 +21,12 @@ import taskey.ui.content.UiFormatter;
  */
 
 public class UiDefaultFormatter extends UiFormatter {
-	private static final int entriesPerPage = 6;
 	private UiTaskView myTaskView;
 	private ArrayList<Task> prevList = null;
 	
 	public UiDefaultFormatter(ScrollPane thePane) {
 		super(thePane);
-		myTaskView = new UiTaskView(entriesPerPage);
+		myTaskView = new UiTaskView(UiConstants.ENTRIES_PER_PAGE_DEFAULT);
 		
 		mainPane.setContent(myTaskView.getView().getPagination());
 		mainPane.setFitToHeight(true);
@@ -59,13 +61,23 @@ public class UiDefaultFormatter extends UiFormatter {
 			mainPane.setContent(currentGrid);	
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
-			myTaskView.getView().clear();
-			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/entriesPerPage); // convert to double	
-			myTaskView.createPaginationGrids(myTaskList,totalPages);
+			myTaskView.clear();
 			
-			if ( prevList != null && myTaskList.size() > prevList.size() ) { // addition of a task
-				int index = findIndexOfAddedTask(prevList,myTaskList);	
-				myTaskView.getView().selectInPage(index/entriesPerPage, index%entriesPerPage); // select last
+			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
+											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
+			myTaskView.createPaginationGrids(myTaskList,totalPages);
+
+			if ( prevList != null ) { 
+				int index = 0;
+				if ( myTaskList.size() >= prevList.size()) {
+					index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
+					if ( index == -1) {
+						// no op as lists are the same
+					} else {
+						myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
+								  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
+					}
+				}
 			} 
 			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
 		}
@@ -79,13 +91,17 @@ public class UiDefaultFormatter extends UiFormatter {
 		return cloneList;
 	}
 	
-	private int findIndexOfAddedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
+	private int findIndexOfModifiedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
 		for ( int i = 0; i < prevList.size(); i++) {
 			if ( prevList.get(i).equals(currentList.get(i)) == false ) {
-				return i; // insertion point
+				return i; // index of first mismatch
 			}
 		}
-		return currentList.size();
+		if ( prevList.size() == currentList.size()) { // all tasks match
+			return -1;
+		} else {
+			return currentList.size(); // return newly added task
+		}	
 	}
 	
 	private void createPromptNoTasks() {

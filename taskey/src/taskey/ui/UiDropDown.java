@@ -54,7 +54,7 @@ public class UiDropDown {
 		myMenu = UiPopupManager.getInstance().createPopupMenu();
 		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
 																	 UiConstants.DEFAULT_FADE_START_DELAY*5, 
-																	 UiConstants.DEFAULT_FADE_TIME, 1.0, 0.0);
+																	 UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
 		// create custom handler
 		fade.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
@@ -75,15 +75,39 @@ public class UiDropDown {
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
 		menuItems.clear();
+		
+		if ( items.size() == 0 ) {
+			return;
+		}
+		
+		// find longest item
+		String longest = "";
+		int insertionIndex = -1;
+		for (int i = 0 ; i < items.size(); i++) {
+			if ( items.get(i).length() > longest.length() ) {
+				longest = items.get(i);
+				insertionIndex = i;
+			}
+		}
+		StackPane longestPane = new StackPane();
+		Label longestText = new Label(longest);
+		longestText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+		longestText.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
+		longestPane.getChildren().add(longestText);
+		
 		for (int i = 0; i < items.size() && i < MAX_ITEMS; i++) {
-			StackPane myPane = new StackPane();
-			Label text = new Label(items.get(i));
-			text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-			text.getStyleClass().add(UiConstants.STYLE_DROPDOWN_DEFAULT);
-			myPane.setAlignment(Pos.CENTER_LEFT);
-			myPane.getChildren().clear();
-			myPane.getChildren().add(text);
-			myContent.getChildren().add(myPane);
+			if ( i == insertionIndex ) {
+				myContent.getChildren().add(longestPane);
+			} else {
+				StackPane myPane = new StackPane();
+				Label text = new Label(items.get(i));
+				text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+				text.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
+				 // bind width (calculations delay till stage is shown)
+				text.prefWidthProperty().bind(longestPane.widthProperty());
+				myPane.getChildren().add(text);
+				myContent.getChildren().add(myPane);
+			}
 		}
 		currentItemSize = items.size();
 		deSelect();
@@ -110,6 +134,9 @@ public class UiDropDown {
 		double width = getWidthOfTextFieldInput(myInput);
 		Bounds bounds = myInput.getBoundsInLocal();
 		Bounds screenBounds = myInput.localToScreen(bounds);
+		UiPopupManager.getInstance().resize(myMenu);
+
+		// restrict menu from stretching beyond the TextField
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth() * UiPopupManager.getInstance().getXRatio(), 
 								   screenBounds.getMinX() + width * UiPopupManager.getInstance().getXRatio()));
 		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight() * UiPopupManager.getInstance().getYRatio());
@@ -178,8 +205,8 @@ public class UiDropDown {
 	private void deSelect() {
 		if ( selectedPane != null ) {
 			Label toStyle = (Label) selectedPane.getChildren().get(0);
-			toStyle.getStyleClass().remove(UiConstants.STYLE_DROPDOWN_SELECTED);
-			toStyle.getStyleClass().add(UiConstants.STYLE_DROPDOWN_DEFAULT);
+			toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
+			toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
 			selectedPane = null;
 			currentSelection = -1;
 		}	
@@ -196,8 +223,8 @@ public class UiDropDown {
 		ObservableList<Node> menuItems = ((VBox)myMenu.getContent().get(0)).getChildren(); // list of stack panes
 		selectedPane = (StackPane) menuItems.get(currentSelection);
 		Label toStyle = (Label) selectedPane.getChildren().get(0);
-		toStyle.getStyleClass().remove(UiConstants.STYLE_DROPDOWN_SELECTED);
-		toStyle.getStyleClass().add(UiConstants.STYLE_DROPDOWN_SELECTED);
+		toStyle.getStyleClass().remove(UiConstants.STYLE_PROMPT_SELECTED);
+		toStyle.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		restartFade();
 	}
 	

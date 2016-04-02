@@ -734,13 +734,28 @@ public class LogicMemory {
 		
 		for (Task task : list) {
 			double sumOfLevenshteinRatios = 0;
+			boolean foundMatch = false;
 			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
+			
+			if (searchTokens.length == 1) { // Search phrase is only one word
+				if (searchPhrase.length() <= 2 && searchWholeWord(searchPhrase, taskNameTokens)) {
+					searchResults.add(task);
+					foundMatch = true;
+				} else if (searchPhrase.length() >= 3 && searchSubstring(searchPhrase, taskNameTokens)) {
+					searchResults.add(task);
+					foundMatch = true;
+				}
+			}
+			
+			if (foundMatch) {
+				continue;
+			}
 			
 			for (String searchToken : searchTokens) {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.5) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.6) {
 				searchResults.add(task);
 			}
 		}
@@ -748,6 +763,16 @@ public class LogicMemory {
 		return searchResults;
 	}
 	
+	private boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
+		for (String s : taskNameTokens) {
+			if (s.contains(searchPhrase)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
 		double ratio = 0;
 		
@@ -765,18 +790,10 @@ public class LogicMemory {
 	 * @param taskNameTokens
 	 * @return
 	 */
-	private boolean foundToken(String searchToken, String[] taskNameTokens) {
-		if (searchToken.length() <= 2) {
-			for (String s : taskNameTokens) {
-				if (searchToken.equals(s)) {
-					return true;
-				}
-			}
-		} else {
-			for (String s : taskNameTokens) {
-				if (s.contains(searchToken)) {
-					return true;
-				}
+	private boolean searchWholeWord(String searchPhrase, String[] taskNameTokens) {
+		for (String s : taskNameTokens) {
+			if (searchPhrase.equals(s)) {
+				return true;
 			}
 		}
 		
@@ -812,7 +829,8 @@ public class LogicMemory {
 				d[i][j] = Math.min(d[i-1][j] + 1, // Deleting i-th character from source yields a cost of 1
 		                      	   Math.min(d[i][j-1] + 1, // Deleting j-th character from target yields a cost of 1
 		                                    d[i-1][j-1] + substitutionCost)); // Substituting the i-th character from 
-				                                                              // source to match the j-th character 
+				                                                              // source to match the j-th character in
+				                                                              // target
 			}
 	
 		}

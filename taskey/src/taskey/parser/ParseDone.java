@@ -51,7 +51,7 @@ public class ParseDone extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getTaskName(String stringInput) {
+	private String getTaskName(String stringInput) {
 		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		

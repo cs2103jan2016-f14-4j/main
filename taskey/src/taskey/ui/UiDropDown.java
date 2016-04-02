@@ -163,9 +163,8 @@ public class UiDropDown {
 	private double getWidthOfTextFieldInput(TextField field) {
 		assert(field != null);
 		Text text = new Text(field.getText());
-		text.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); // set Font here to recalculate width,
-		// Parameters are gotten from sharedStyles.css
-		// Note that setting style class does not calculate till node is shown
+		// setting font for Text recalculates layout bounds
+		text.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); 
 		double width = text.getLayoutBounds().getWidth();
 		return width;
 	}

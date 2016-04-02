@@ -306,8 +306,9 @@ public class UiController {
 			public void handle(KeyEvent event) {			
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_CORRECT); // remove any correct styles
-				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
-					 || event.getCode() == KeyCode.BACK_SPACE) {
+				if ( event.getCode().isArrowKey() == false && 
+					 event.getCode().isDigitKey() || event.getCode().isLetterKey() 
+					 || event.getCode() == KeyCode.BACK_SPACE || event.getCode() == KeyCode.SPACE) {
 					processAutoComplete();
 				}
 				if (event.getCode() == KeyCode.ENTER) {	
@@ -342,9 +343,13 @@ public class UiController {
 			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
 			myDropDown.closeMenu();
 		} else {
-			input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
-			myDropDown.updateMenuItems(suggestions);
-			myDropDown.updateMenu();
+			if ( suggestions.size() == 0 ) {
+				myDropDown.closeMenu();
+			} else {
+				input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
+				myDropDown.updateMenuItems(suggestions);
+				myDropDown.updateMenu();
+			}
 		}
 	}
 	

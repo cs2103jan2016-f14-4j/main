@@ -5,7 +5,6 @@
  		ObjShell.ShellExecute "wscript.exe", """" & _
  		WScript.ScriptFullName & """" &_
   		" RunAsAdministrator", , "runas", 1
- 		Wscript.Quit
   	End if
 
 	strDesktop = WshShell.SpecialFolders("Desktop")

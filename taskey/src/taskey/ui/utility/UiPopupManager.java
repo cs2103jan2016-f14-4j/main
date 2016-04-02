@@ -72,7 +72,7 @@ public class UiPopupManager {
 		Label content = new Label();
 		content.setText(text);
 		content.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-		content.getStyleClass().add(UiConstants.STYLE_DROPDOWN_SELECTED);
+		content.getStyleClass().add(UiConstants.STYLE_PROMPT_SELECTED);
 		thePopup.getContent().add(content);
 		thePopup.show(node, screenBounds.getMinX() + offsetX * X_Ratio, 
 							screenBounds.getMinY() + offsetY * Y_Ratio); // lower left hand corner  

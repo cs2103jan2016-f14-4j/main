@@ -30,7 +30,7 @@ public class ParseFileLocation extends ParseCommand {
 	 * @param stringInput
 	 * @return taskName without command
 	 */
-	public String getFileName(String stringInput) {
+	private String getFileName(String stringInput) {
 		String command = stringInput.split(" ")[0]; 
 		String task = stringInput.replaceFirst(command, "");
 		

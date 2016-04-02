@@ -51,6 +51,8 @@ public class AutoComplete {
 		commandList.put("clear","clear");
 		
 		viewList.add("all");
+		viewList.add("today");
+		viewList.add("tomorrow");
 		viewList.add("general");
 		viewList.add("deadlines");
 		viewList.add("events");
@@ -314,7 +316,6 @@ public class AutoComplete {
 			//anything more than 3 !s is an error
 			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
 		} else if (phrase.contains("[")) {
-			//TODO: this set of code assumes no space between event dates
 			String phrase2 = phrase.replace("]", ""); 
 			//suggest a date to the user 
 			String dates = phrase2.split("\\[")[1].trim();
@@ -323,10 +324,21 @@ public class AutoComplete {
 				//only auto complete the 2nd date 
 				date = dates.split(",")[1].trim(); 
 			} else {
-				//only 1 date, try to autocomplete that 
+				//only 1 date, try to auto complete that 
 				date = dates; 
 			}
-			availSuggestions = suggestDates(date); 	
+			ArrayList<String> suggestedDates = suggestDates(date); 
+			if (suggestedDates != null) {
+				availSuggestions = suggestDates(date); 	
+			} else {
+				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+			}
+		} else if (phrase.contains("\"")) {
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+		} else {
+			//user has not typed any changes, so suggest format 
+			availSuggestions.add("\"New Task Name\"");
+			availSuggestions.add("[New Date]");
 		}
 		
 		if (!availSuggestions.isEmpty()) {

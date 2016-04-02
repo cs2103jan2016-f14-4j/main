@@ -372,7 +372,6 @@ public class UiController {
 		}
 		input.selectEnd();
 		input.deselect();
-		
 	}
 	
 	private void processEnter() {

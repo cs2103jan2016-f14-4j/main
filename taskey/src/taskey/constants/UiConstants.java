@@ -131,7 +131,7 @@ public class UiConstants {
 	// Alert Window
 	public static final int MAX_ALERTS = 10; 
 	public static final float ALERTS_OPACITY = 0.8f;
-	
+	public static final int[] HOUR_MARKS = { 1, 3, 5, 12 };
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	public static final int UPDATE_SERVICE_INTERVAL = 300000; // in milliseconds (5 minutes)

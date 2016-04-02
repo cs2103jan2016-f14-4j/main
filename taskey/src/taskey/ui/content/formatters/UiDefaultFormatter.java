@@ -2,9 +2,12 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
+import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
+
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
@@ -59,6 +62,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
 			myTaskView.clear();
+			
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);

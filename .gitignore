@@ -1,6 +1,5 @@
 *.class
 taskey/Taskey savefiles
-taskey/last-used directory.taskey_config
 taskey/last_used_directory.taskeyconfig
 *.taskeyconfig
 javadoc

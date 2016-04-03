@@ -92,13 +92,15 @@ Examples:
 </ul> 
 
 ###Searching for a task
-If you have many tasks, you can search for your tasks by typing the command "<b>search</b>". 
+You can search for tasks via the command "**search**". 
+To increase the chances of finding the task(s) that you are looking for, try to include *at least 3 characters* in your search and *be as specific as possible*.
 
-Format: search \<phrase\>
+Format: search \<keyword(s)\>
 
 Example:
 <ul> 
   <li><b>search</b> meetings
+  <li><b>search</b> bio quiz
 </ul> 
 
 ###Undoing an Action

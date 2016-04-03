@@ -9,6 +9,9 @@ import taskey.parser.TimeConverter;
 
 /**
  * @@author A0121618M
+ * This class is used by StorageReader to check the validity of the task lists read from file,
+ * in case the user makes mistakes when editing them.
+ * It also checks whether the date(s) in the files have been edited and sets them accordingly.
  */
 public class TaskVerifier {
 	TimeConverter timeConverter = new TimeConverter();

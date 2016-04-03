@@ -1,6 +1,6 @@
 package taskey.storage;
 
-import static taskey.storage.Storage.TasklistEnum.PENDING;
+import static taskey.storage.Storage.TaskListEnum.PENDING;
 import static taskey.storage.StorageReader.DerivedList.DEADLINE_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.EVENT_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.GENERAL_TASKLIST;
@@ -16,7 +16,7 @@ import com.google.gson.reflect.TypeToken;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.Storage.TasklistEnum;
+import taskey.storage.Storage.TaskListEnum;
 import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
@@ -75,28 +75,6 @@ public class StorageReader {
 		return object;
 	}
 
-	
-	/*================*
-	 * Load directory *
-	 *================*/
-	/**
-	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
-	 * @param filename name of the config file to be read
-	 * @return the File representing the last-saved directory, or null if it was not found
-	 */
-	public File loadDirectoryConfigFile(String filename) {
-		File src = new File(filename);
-		try {
-			//FIXME: buggyPath will somehow always have user.dir prefixed in its absolute path
-			File buggyPath = readFromFile(src, new TypeToken<File>() {});
-			File fixedPath = new File(buggyPath.getPath()); //kludge solution
-			return fixedPath;
-		} catch (FileNotFoundException e) {
-			return null;
-		}
-	}
-
-
 	/*============*
 	 * Load tasks *
 	 *============*/
@@ -110,7 +88,7 @@ public class StorageReader {
 	 * @throws FileNotFoundException 
 	 * @throws InvalidTaskException 
 	 */
-	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
+	ArrayList<Task> loadTasklist(File src, TaskListEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
 		ArrayList<Task> tasklist;
 		switch (tasklistType) {
 			default: //default case is just to avoid compilation error
@@ -162,6 +140,25 @@ public class StorageReader {
 		}
 	}
 	
+	/*================*
+	 * Load directory *
+	 *================*/
+	/**
+	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
+	 * @param filename name of the config file to be read
+	 * @return the File representing the last-saved directory, or null if it was not found
+	 */
+	public File loadDirectoryConfigFile(String filename) {
+		File src = new File(filename);
+		try {
+			//FIXME: buggyPath will somehow always have user.dir prefixed in its absolute path
+			File buggyPath = readFromFile(src, new TypeToken<File>() {});
+			File fixedPath = new File(buggyPath.getPath()); //kludge solution
+			return fixedPath;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+	}
 
 	/*===========*
 	 * Load tags *

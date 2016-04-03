@@ -6,6 +6,7 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -33,6 +34,7 @@ import taskey.logger.TaskeyLog.LogSystems;
 */
 
 public class UiTrayModule {
+	private SystemTray tray = null;
 	private TrayIcon trayIcon;
 	private UiController mainController;
 	private UiAlertsController alertsController;
@@ -61,8 +63,24 @@ public class UiTrayModule {
 		mainStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
+				if ( tray != null ) {		
+					try {
+						tray.add(trayIcon);
+					} catch (AWTException e) {
+						e.printStackTrace();
+					}
+				}
 				hide(mainStage);
 				alertsController.show();
+			}
+		});
+		
+		mainStage.setOnShown(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent t) {
+				if ( tray != null ) {
+					tray.remove(trayIcon);
+				}
 			}
 		});
 		
@@ -86,7 +104,7 @@ public class UiTrayModule {
 		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Tray...", Level.ALL);
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
-			SystemTray tray = SystemTray.getSystemTray();
+			tray = SystemTray.getSystemTray();
 			
 			// create a action listeners to listen for default action executed on
 			// the tray icon
@@ -154,13 +172,6 @@ public class UiTrayModule {
 
 		// set the TrayIcon properties
 		trayIcon.addActionListener(showListener);
-		
-		// add the tray image
-		try {
-			tray.add(trayIcon);
-		} catch (AWTException e) {
-			System.err.println(e);
-		}
 	}
 
 	private void showProgramIsMinimizedMsg() {

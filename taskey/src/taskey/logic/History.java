@@ -2,6 +2,7 @@ package taskey.logic;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
@@ -116,13 +117,19 @@ public class History {
 	/**
 	 * @@author A0121618M
 	 * This method pops the last undid task lists and tag list from their respective redo stacks,
-	 * and pushes them back onto the main history stack.
-	 * Logic can then peek at the main stacks to redo the previously undid command. 
+	 * and pushes them back onto the main history stacks.
+	 * Logic can then peek at the main stack to redo the previously undid command.
+	 * @return false if there is nothing to redo; true if successful
 	 */
-	public void redo() {
-		ArrayList<ArrayList<Task>> undidTasks = redoTaskStack.pop();
-		ArrayList<TagCategory> undidTags = redoTagStack.pop();
-		taskStack.push(undidTasks);
-		tagStack.push(undidTags);
+	public boolean redo() {	
+		try {
+			ArrayList<ArrayList<Task>> undidTasks = redoTaskStack.pop();
+			ArrayList<TagCategory> undidTags = redoTagStack.pop();
+			taskStack.push(undidTasks);
+			tagStack.push(undidTags);
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+		return true;
 	}
 }

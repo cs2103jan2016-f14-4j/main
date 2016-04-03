@@ -15,7 +15,7 @@ import java.util.HashSet;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.StorageReader.InvalidTaskException;
+import taskey.storage.TaskVerifier.InvalidTaskException;
 
 
 /**

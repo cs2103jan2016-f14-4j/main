@@ -1,4 +1,4 @@
-package taskey.logic;
+package taskey.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,8 +6,6 @@ import java.util.HashMap;
 import taskey.constants.ParserConstants;
 import taskey.messenger.ProcessedAC;
 import taskey.messenger.TagCategory;
-import taskey.parser.DateTimePatternMatcher;
-import taskey.parser.TimeConverter;
 
 /**
  * @@author A0107345L
@@ -20,7 +18,6 @@ import taskey.parser.TimeConverter;
 public class AutoComplete {
 	private DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 	private TimeConverter tc = new TimeConverter(); 
-	private LogicMemory lm;
 	
 	private HashMap<String,String> commandList = new HashMap<String,String>();
 	private ArrayList<String> specialDays = new ArrayList<String>(); 
@@ -29,9 +26,7 @@ public class AutoComplete {
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
 	
-	public AutoComplete(LogicMemory logicMemory) {
-		lm = logicMemory;
-		
+	public AutoComplete() {
 		commands.add("add");
 		commands.add("view");
 		commands.add("del");
@@ -92,7 +87,7 @@ public class AutoComplete {
 		
 	}
 	
-	public ProcessedAC getSuggestions(String rawPhrase) {
+	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
 		ProcessedAC suggestions = null;
 		String phrase = rawPhrase.toLowerCase().trim();
 		String[] split = phrase.split(" ");
@@ -106,11 +101,11 @@ public class AutoComplete {
 		//look for the correct word to auto-suggest and return 
 		switch (split[0].trim()) {
 			case "view": 
-				suggestions = completeView(phrase); 
+				suggestions = completeView(phrase, tagDB); 
 				break;
 			
 			case "add": 
-				suggestions = completeAdd(phrase);
+				suggestions = completeAdd(phrase, tagDB);
 				break;
 				
 			case "set":
@@ -187,8 +182,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of views is available, return null 
 	 */
-	private ProcessedAC completeView(String phrase) {
-		ArrayList<TagCategory> tagDB = lm.getTagCategoryList(); 
+	private ProcessedAC completeView(String phrase, ArrayList<TagCategory> tagDB) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("view", "").trim(); 
@@ -225,8 +219,7 @@ public class AutoComplete {
 	 * @param utd 
 	 * @return ProcessedAutoComplete Object 
 	 */
-	private ProcessedAC completeAdd(String phrase) {
-		ArrayList<TagCategory> tagDB = lm.getTagCategoryList(); 
+	private ProcessedAC completeAdd(String phrase, ArrayList<TagCategory> tagDB) { 
 		String keyWords = "(at|on|by|from)";
 		ArrayList<String> availSuggestions = new ArrayList<String>(); 
 		phrase = phrase.toLowerCase();

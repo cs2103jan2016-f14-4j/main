@@ -357,22 +357,24 @@ public class LogicMemory {
 		clearActionList();
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
-		
-		if (actionList.isEmpty()) {
-			throw new LogicException(LogicException.MSG_ERROR_SEARCH_NOT_FOUND);
-		}
+		String exceptionMsg = String.format(LogicException.MSG_SUCCESS_SEARCH, searchPhrase);
+		throw new LogicException(exceptionMsg);
 	}
 	
 	/**
 	 * Updates the action list based on the view type. When the user wants to view tasks by priority i.e. "high", "medium"
 	 * or "low", only expired and pending tasks will be displayed.
 	 * @param viewType
+	 * @throws LogicException 
 	 */
-	void viewBasic(String viewType) {
+	void viewBasic(String viewType) throws LogicException {
+		String exceptionMsg;
+		
 		switch (viewType) {
 			case "general":
 				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_FLOATING)));
-				break;
+				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + " tasks.";
+				throw new LogicException(exceptionMsg);
 			
 			case "deadlines":
 				taskLists.set(INDEX_ACTION, new ArrayList<Task>(taskLists.get(INDEX_DEADLINE)));
@@ -392,14 +394,20 @@ public class LogicMemory {
 				clearActionList();
 				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
 				viewPriority(taskLists.get(INDEX_PENDING), viewType);
-				break;
+				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW_PRIORITY, viewType);
+				throw new LogicException(exceptionMsg);
 							
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
 				clearActionList();
 				break;
 			
 			default: // Should not reach this point
+				exceptionMsg = String.format(LogicException.MSG_ERROR_VIEWTYPE, viewType);
+				throw new LogicException(exceptionMsg);
 		}
+		
+		exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + ".";
+		throw new LogicException(exceptionMsg);
 	}
 
 	/**
@@ -413,9 +421,7 @@ public class LogicMemory {
 		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
 		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
 		
-		if (!tagFound) {
-			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
-		}
+		throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TAGS);
 	}
 	
     //================================================================================
@@ -720,10 +726,7 @@ public class LogicMemory {
 	
 	/**
 	 * Performs a search on the given list using the given search phrase, and returns a list of search results.
-	 * A task is added to the list of search results if and only if every token in the search phrase is "found" in that 
-	 * task's name. A search token that is <= 2 characters is considered to be "found" if the task name tokens contain the 
-	 * exact same token. A search token that is >= 3 characters is considered to be "found" if there exists a task name 
-	 * token that contains the search token as a substring.
+	 * The search algorithm uses the Levenshtein distance metric.
 	 * @param list
 	 * @param searchPhrase
 	 * @return
@@ -734,13 +737,31 @@ public class LogicMemory {
 		
 		for (Task task : list) {
 			double sumOfLevenshteinRatios = 0;
+			boolean foundMatch = false;
 			String[] taskNameTokens = task.getTaskName().toLowerCase().split(" ");
+			
+			if (searchTokens.length == 1) {
+				if (searchPhrase.length() <= 2) { // For search phrases that are only one word with <= 2 characters,
+					                              // perform whole word search only, for more precision.
+					if (searchWholeWord(searchPhrase, taskNameTokens)) {
+						searchResults.add(task);
+					}
+					continue;
+				} else if (searchPhrase.length() >= 3 && searchSubstring(searchPhrase, taskNameTokens)) {
+					searchResults.add(task);
+					foundMatch = true;
+				}
+			}
+			
+			if (foundMatch) {
+				continue;
+			}
 			
 			for (String searchToken : searchTokens) {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.5) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.75) {
 				searchResults.add(task);
 			}
 		}
@@ -748,41 +769,74 @@ public class LogicMemory {
 		return searchResults;
 	}
 	
-	private double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
-		double ratio = 0;
-		
-		for (String s : taskNameTokens) {
-			int currDist = getLevenshteinDist(searchToken, s);
-			ratio = Math.max(ratio, 1 - ((double) currDist / Math.max(searchToken.length(), s.length())));
-		}
-		
-		return ratio;
-	}
-
 	/**
-	 * Returns true if and only if a given search token is "found" within an an array of task name tokens.
+	 * Returns true if and only if the entire search phrase matches at least one of the task name tokens exactly.
+	 * 
 	 * @param searchToken
 	 * @param taskNameTokens
 	 * @return
 	 */
-	private boolean foundToken(String searchToken, String[] taskNameTokens) {
-		if (searchToken.length() <= 2) {
-			for (String s : taskNameTokens) {
-				if (searchToken.equals(s)) {
-					return true;
-				}
-			}
-		} else {
-			for (String s : taskNameTokens) {
-				if (s.contains(searchToken)) {
-					return true;
-				}
+	private static boolean searchWholeWord(String searchPhrase, String[] taskNameTokens) {
+		for (String s : taskNameTokens) {
+			if (searchPhrase.equals(s)) {
+				return true;
 			}
 		}
 		
 		return false;
 	}
 	
+	/**
+	 * Returns true if and only if the entire search phrase is a substring of at least one of the task name tokens.
+	 * @param searchPhrase
+	 * @param taskNameTokens
+	 * @return
+	 */
+	private static boolean searchSubstring(String searchPhrase, String[] taskNameTokens) {
+		for (String s : taskNameTokens) {
+			if (s.contains(searchPhrase)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Returns the maximum Levenshtein ratio when the search token is compared to each of the task name tokens.
+	 * <p>The Levenshtein ratio between two Strings is calculated as follows: 
+	 * <br>First, find the Levenshtein distance between the two Strings.
+	 * <br>Then, divide the distance by the length of the longest String.
+	 * <br>Finally, subtract the result from the number 1.
+	 * 
+	 * @param searchToken
+	 * @param taskNameTokens
+	 * @return
+	 */
+	private static double getMaxLevenshteinRatio(String searchToken, String[] taskNameTokens) {
+		double maxRatio = 0;
+		
+		for (String s : taskNameTokens) {
+			int currDist = getLevenshteinDist(searchToken, s);
+			double currRatio = 1 - ((double) currDist / Math.max(searchToken.length(), s.length()));
+			
+			if (currRatio > maxRatio) {
+				maxRatio = currRatio;
+			}
+		}
+		
+		return maxRatio;
+	}
+
+	/**
+	 * Returns the Levenshtein distance between two Strings. The Levenshtein distance between two Strings is the minimum 
+	 * number of single-character edits (i.e. insertions, deletions or substitutions) required to change one String into 
+	 * the other.
+	 *  
+	 * @param source
+	 * @param target
+	 * @return
+	 */
 	private static int getLevenshteinDist(String source, String target) {
 		// For all i and j, d[i][j] will hold the Levenshtein distance between the first i characters of source and 
 		// the first j characters of target
@@ -812,7 +866,8 @@ public class LogicMemory {
 				d[i][j] = Math.min(d[i-1][j] + 1, // Deleting i-th character from source yields a cost of 1
 		                      	   Math.min(d[i][j-1] + 1, // Deleting j-th character from target yields a cost of 1
 		                                    d[i-1][j-1] + substitutionCost)); // Substituting the i-th character from 
-				                                                              // source to match the j-th character 
+				                                                              // source to match the j-th character in
+				                                                              // target
 			}
 	
 		}
@@ -820,6 +875,7 @@ public class LogicMemory {
 		return d[source.length()][target.length()];
 	}
 	
+	// For testing
 	public static void main(String[] args) {
 		assert(getLevenshteinDist("kitten", "sitting") == 3);
 		assert(getLevenshteinDist("sitting", "kitten") == 3);

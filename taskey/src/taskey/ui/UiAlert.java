@@ -9,8 +9,8 @@ import taskey.ui.content.UiTextBuilder;
 /**
  * @@author A0125419H
  * 
- * This class implements a alert wrapper, which wraps an Task object
- * In order to have additional information
+ * This class implements a alert object used by UiAlertController, 
+ * which wraps an Task object in order to have additional information
  * @author Junwei
  *
  */
@@ -18,11 +18,11 @@ public class UiAlert {
 
 	private Task theTask;
 	private String alertMessage = "Stub";
-	private static int taskTestingID = 0;
+	private static int stubID = 0; // used for key generated Alerts
 	
 	public UiAlert() {
 		theTask = new Task();
-		theTask.setTaskName(String.valueOf(taskTestingID++));
+		theTask.setTaskName(String.valueOf(stubID++));
 		theTask.setTaskType("FLOATING");
 	}
 	

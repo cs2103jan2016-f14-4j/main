@@ -17,6 +17,7 @@ import taskey.ui.content.UiTextBuilder;
  * This class is responsible for formatting the Category box
  * 
  * @author junwei
+ * 
  */
 
 public class UiCategoryFormatter extends UiFormatter {
@@ -47,6 +48,7 @@ public class UiCategoryFormatter extends UiFormatter {
 		}
 	}
 	
+	// Unused as category does not take in inputs or uses tasks 
 	@Override
 	public void format(ArrayList<Task> myTaskList) {
 	}
@@ -55,6 +57,10 @@ public class UiCategoryFormatter extends UiFormatter {
 	public void processArrowKey(KeyEvent event) {
 	}
 
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {	
+	}
+	
 	@Override
 	public int processDeleteKey() {
 		return -1;
@@ -68,9 +74,5 @@ public class UiCategoryFormatter extends UiFormatter {
 	@Override
 	public void cleanUp() {
 		clearCurrentGridContents();
-	}
-
-	@Override
-	public void processPageUpAndDown(KeyEvent event) {	
 	}
 }

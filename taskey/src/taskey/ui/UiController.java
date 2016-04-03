@@ -42,10 +42,16 @@ import taskey.ui.utility.UiPopupManager;
 
 /**
  * @@author A0125419H
- * This class is the main class that handles all of the Ui nodes. 
- * UiController is the only interface between Ui and Logic
- *
+ * 
+ * This class is the main class that handles all of the main window Ui nodes
+ * UiController is the main interface between Ui and Logic
+ * One sub interface would be UiUpdateService inside UiController
+ * 
+ * This class is responsible for handling all user keyboard / mouse inputs within the
+ * main window, and delegates the actions to be handled into other classes if needed
+ * 
  * @author JunWei
+ * 
  */
 
 public class UiController {
@@ -79,22 +85,35 @@ public class UiController {
 	private ContentBox currentContent;
 	private ArrayList<String> inputHistory;
 	private int historyIterator;
-	private Timeline shake; // for notifications
+	private Timeline shakeNotification; // animation
 	
+	//----- Used by UiTrayModule ------
 	public Stage getStage() {
 		return stage;
 	}
-		
+	
+	public void setUpUpdateService(UiAlertsController alertController) {
+		updateService = new UiUpdateService(dateLabel,logic,alertController);
+		updateService.start();
+	}
+	
+	public void updateAlerts() {
+		updateService.pollFromLogic();
+	}
+	//---------------------------------
+	
 	/**
-	 * Sets up the nodes.
+	 * Performs the main setups for the controller
+	 * including nodes and logic
 	 *
 	 * @param primaryStage the primary stage
 	 * @param root the root
 	 */
-	public void setUpNodes(Stage primaryStage, Parent root) {
+	public void setUpController(Stage primaryStage, Parent root) {
 		assert(primaryStage != null);
 		assert(root != null);
 		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Main Controller...", Level.ALL);
+		
 		stage = primaryStage; // set up reference
 		myDropDown = new UiDropDown();
 		setUpContentBoxes();
@@ -103,14 +122,14 @@ public class UiController {
 		setUpInput();
 		registerEventHandlersToNodes(root);	
 		setUpLogic();	
-		
-		//myTabs.requestFocus(); // to display prompt at the start
+
 		TaskeyLog.getInstance().log(LogSystems.UI, "Main Controller has been set up...", Level.ALL);
 	}
 	
 	/**
 	 * Sets up nodes which need bounds.
 	 * nodes or classes that need layout bounds are initialized here
+	 * (Note that bounds are updated only when the node is shown)
 	 */
 	public void setUpNodesWhichNeedBounds() {
 		assert(myDropDown != null);
@@ -123,7 +142,7 @@ public class UiController {
 		for (int i = 0; i < myTabs.getTabs().size(); i++) {
 			AnchorPane tabContent = (AnchorPane) myTabs.getTabs().get(i).getContent();
 			ScrollPane content = (ScrollPane) tabContent.getChildren().get(0);
-			myContentManager.setUpContentBox(content, ContentBox.fromInteger(i));
+			myContentManager.setUpContentBox(content, ContentBox.fromInteger(i)); // add scrollpanes
 		}
 		myContentManager.setUpContentBox(categoryPane,ContentBox.CATEGORY);
 	}
@@ -147,7 +166,7 @@ public class UiController {
 		input.getStyleClass().add(UiConstants.STYLE_INPUT_NORMAL);		
 		inputHistory = new ArrayList<String>();
 		historyIterator = 0;
-		shake = UiAnimationManager.getInstance().createShakeTransition(notification, 
+		shakeNotification = UiAnimationManager.getInstance().createShakeTransition(notification, 
 																	   UiConstants.DEFAULT_SHAKE_DISTANCE, 
 																	   UiConstants.DEFAULT_SHAKE_INTERVAL, 
 																	   UiConstants.DEFAULT_ANIM_DURATION);
@@ -164,20 +183,10 @@ public class UiController {
 		logic = new Logic();
 		updateAllContents(logic.getTagCategoryList(),logic.getAllTaskLists());
 	}
-
-	public void setUpUpdateService(UiAlertsController alertController) {
-		updateService = new UiUpdateService(dateLabel,logic,alertController);
-		updateService.start();
-	}
 	
-	public void updateAlerts() {
-		updateService.pollFromLogic();
-	}
-	
-	public void displayTabContents(ContentBox toContent) {
+	private void displayTabContents(ContentBox toContent) {
 		SingleSelectionModel<Tab> selectionModel = myTabs.getSelectionModel();
 		selectionModel.select(toContent.getValue());
-		currentContent = toContent;
 	}
 	
 	private ContentBox getCurrentContent() {
@@ -187,7 +196,7 @@ public class UiController {
 	
 	/**
 	 * Sets scene style sheets, input is assumed to be valid before calling
-	 * this method, if input is invalid, throws an exception
+	 * this method, if input is invalid, prints an exception message
 	 *
 	 * @param styleSheets - style sheets to use for the display as an Array List
 	 */
@@ -210,13 +219,13 @@ public class UiController {
 		Exception statusCode = feedback.getException();
 		if ( statusCode != null ) {
 			notification.setText(statusCode.getMessage());	
-			shake.playFromStart();
+			shakeNotification.playFromStart();
 		}
 		
 		ArrayList<ArrayList<Task>> allLists = feedback.getTaskLists();	
 		ProcessedObject processed = feedback.getPo();
 		String command = processed.getCommand();
-		switch (command) {		 // change display based on which command was input
+		switch (command) {		 // change display based on which command was processed
 			case "ADD_DEADLINE": 
 			case "ADD_EVENT":
 			case "ADD_FLOATING":
@@ -251,6 +260,7 @@ public class UiController {
 		ArrayList<Triplet<Color,String,Integer>> categoryListHeader = new ArrayList<Triplet<Color,String,Integer>>();
 		ArrayList<Task> pendingList = allLists.get(LogicMemory.INDEX_PENDING);
 		ArrayList<Task> expiredList = allLists.get(LogicMemory.INDEX_EXPIRED);
+		
 		int priorityNums[] = new int[3];
 		for ( int i = 0; i < pendingList.size(); i++ ) {
 			priorityNums[pendingList.get(i).getPriority()-1]++; // increase numbers for each priority
@@ -282,8 +292,8 @@ public class UiController {
 			categoryList.add(new Triplet<Color,String,Integer>(Color.DIMGRAY,tagList.get(i).getTagName(), 
 															   tagList.get(i).getNumTags()));
 		}
+		// update every box
 		myContentManager.updateCategoryContentBox(categoryList);
-		
 		myContentManager.updateContentBox(allLists.get(LogicMemory.INDEX_THIS_WEEK), UiConstants.ContentBox.THIS_WEEK);
 		myContentManager.updateContentBox(allLists.get(LogicMemory.INDEX_PENDING), UiConstants.ContentBox.PENDING);
 		myContentManager.updateContentBox(allLists.get(LogicMemory.INDEX_EXPIRED), UiConstants.ContentBox.EXPIRED);	
@@ -297,18 +307,15 @@ public class UiController {
 		UiPopupManager.getInstance().cleanUp();
 	}
 	
-	/**
-	 * ********************************** EVENT HANDLERS  ******************************************.
-	 */
+	//----------------------------------- EVENT HANDLERS -----------------------------------------
 	private void registerInputEventHandler() {
 		assert(input != null);
 		input.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {			
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_CORRECT); // remove any correct styles
-				if ( event.getCode().isArrowKey() == false && 
-					 event.getCode().isDigitKey() || event.getCode().isLetterKey() 
-					 || event.getCode() == KeyCode.BACK_SPACE || event.getCode() == KeyCode.SPACE) {
+				
+				if ( isInputChanged(event.getCode()) == true ) {
 					processAutoComplete();
 				}
 				if (event.getCode() == KeyCode.ENTER) {	
@@ -333,6 +340,17 @@ public class UiController {
 		});
 	}
 
+	private boolean isInputChanged(KeyCode code) {
+		if ( code.isArrowKey() == false && 
+			 code.isDigitKey() ||
+			 code.isLetterKey() || 
+			 code == KeyCode.BACK_SPACE ||
+			 code == KeyCode.SPACE) {
+			return true;
+		}
+		return false;
+	}
+	
 	private void processAutoComplete() {	
 		if ( input.getText().isEmpty()) {
 			myDropDown.closeMenu();
@@ -340,22 +358,27 @@ public class UiController {
 		}
 		ArrayList<String> suggestions = logic.autoCompleteLine(input.getText().trim(), getCurrentContent());		
 		if ( suggestions == null ) {
-			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
+			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // invalid input
 			myDropDown.closeMenu();
 		} else {
-			if ( suggestions.size() == 0 ) {
+			input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT); 		
+			if ( suggestions.size() == 0 ) { // no suggestions but input is valid
 				myDropDown.closeMenu();
 			} else {
-				input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
 				myDropDown.updateMenuItems(suggestions);
 				myDropDown.updateMenu();
 			}
 		}
 	}
 	
+	/**
+	 * This method adds a selection from the drop down
+	 * to the input Textfield
+	 * @param selection
+	 */
 	private void addSelectionToInput(String selection) {
 		String currentLine = input.getText().trim();
-		if ( selection.contains(currentLine)) {
+		if ( selection.contains(currentLine)) { 
 			input.setText(selection + " ");
 		} else {	
 			String [] tokens = selection.split(" ");
@@ -381,15 +404,16 @@ public class UiController {
 	
 	private void processEnter() {
 		String selection = myDropDown.getSelectedItem();
-		if ( selection.isEmpty() == false ) { // add selected item as input text
+		if ( selection.isEmpty() == false ) { // add selected item into input text
 			addSelectionToInput(selection);
 			myDropDown.closeMenu();
 		} else  {
 			String line = input.getText();
-			if ( line.isEmpty() == false ) {						
+			if ( line.isEmpty() == false ) { // we send to command to logic for processing						
 				input.clear();	
-				handleFeedback(logic.executeCommand(getCurrentContent(),line));
 				myDropDown.closeMenu();
+				handleFeedback(logic.executeCommand(getCurrentContent(),line));
+				
 				inputHistory.add(line);
 				if ( inputHistory.size() > UiConstants.MAX_INPUT_HISTORY ) {
 					inputHistory.remove(0);
@@ -423,7 +447,7 @@ public class UiController {
 				line = inputHistory.get(historyIterator);
 			}
 			input.setText(line);
-		} else { // wipe
+		} else if ( code == KeyCode.DOWN ){ // wipe on down
 			input.setText("");
 		}
 		input.selectEnd();
@@ -450,7 +474,8 @@ public class UiController {
 	}
 	
 	private void handleKeyPressInRoot(KeyEvent event) {
-		input.requestFocus(); // give focus to textfield
+		input.requestFocus(); // give focus to textfield on any inputs
+		
 		if (myDropDown.isMenuShowing()) {
 			if (event.getCode().isArrowKey()) {
 				myDropDown.processArrowKey(event);

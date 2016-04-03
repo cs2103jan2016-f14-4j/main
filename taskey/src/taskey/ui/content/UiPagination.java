@@ -15,20 +15,22 @@ import javafx.util.Callback;
  * @@author A0125419H
  * This class is used to provide pagination support with extensions.
  * Such as selecting of elements
+ * It is used in almost all of the tab contents of the UiFormatters
  * 
  * @author junwei
+ * 
  */
 
 public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;
+	private ArrayList<ArrayList<StackPane>> totalEntries; // track for key events
 	private int currentPage;
-	private int currentSelection; // against total number of entries
 	private int selectionInPage;
-	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
+	private int currentSelection; // against total number of entries
 	private String selectionStyle;
 	private StackPane selectedPane = null;
-	private boolean isSettingUp;
+	private boolean isSettingUp; // this is for preventing reset of uiPagination to page 0
 	
 	public Pagination getPagination() {
 		return myPages;
@@ -70,6 +72,7 @@ public class UiPagination {
 			myPages.setMaxPageIndicatorCount(totalPages);
 		}
 		myPages.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+		
 		myPages.setPageFactory(new Callback<Integer, Node>() {
             @Override
             public Node call(Integer pageIndex) {
@@ -141,7 +144,7 @@ public class UiPagination {
 			}
 		} else if ( event.getCode() == KeyCode.PAGE_UP) {
 			if ( selectionInPage - 1 < 0 && currentPage >= 1 ) { // there exists a previous page
-				int prevPageSize = totalEntries.get(currentPage-1).size();
+				int prevPageSize = totalEntries.get(currentPage-1).size(); // go previous
 				selectInPage(currentPage-1, prevPageSize-1);
 			} else {
 				selectInPage(currentPage,selectionInPage-1);

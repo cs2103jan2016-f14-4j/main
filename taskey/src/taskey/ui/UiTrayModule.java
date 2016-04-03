@@ -6,15 +6,13 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
+
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
@@ -39,8 +37,8 @@ public class UiTrayModule {
 	private UiController mainController;
 	private UiAlertsController alertsController;
 	
-	public UiTrayModule ( ) {
-		Platform.setImplicitExit(false);
+	public UiTrayModule() {
+		Platform.setImplicitExit(false); // such that stage hide does not exit program
 	}
 	
 	/**
@@ -59,13 +57,23 @@ public class UiTrayModule {
 		Stage alertsStage = alertsController.getStage();
 		
 		mainController.setUpUpdateService(alertsController); // starts update service with alertController
-		
+		registerMainControllerHandlers(mainStage,alertsStage);
+		registerAlertsControllerHandlers(mainStage,alertsStage);
+	}
+	
+	/**
+	 * Register handlers that wait for stage open / close
+	 * and perform the necessary functions
+	 * @param mainStage
+	 * @param alertStage
+	 */
+	private void registerMainControllerHandlers(Stage mainStage, Stage alertStage) {
 		mainStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
 				if ( tray != null ) {		
 					try {
-						tray.add(trayIcon);
+						tray.add(trayIcon); // do note that the same trayIcon cannot be added twice
 					} catch (AWTException e) {
 						e.printStackTrace();
 					}
@@ -79,11 +87,13 @@ public class UiTrayModule {
 			@Override
 			public void handle(WindowEvent t) {
 				if ( tray != null ) {
-					tray.remove(trayIcon);
+					tray.remove(trayIcon); 
 				}
 			}
 		});
-		
+	}
+	
+	private void registerAlertsControllerHandlers(Stage mainStage, Stage alertsStage) {
 		alertsStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	
@@ -102,6 +112,7 @@ public class UiTrayModule {
 	
 	public void initTrayVariables(final Stage stage) {
 		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Tray...", Level.ALL);
+		
 		if (SystemTray.isSupported()) {
 			// get the SystemTray instance
 			tray = SystemTray.getSystemTray();
@@ -137,6 +148,7 @@ public class UiTrayModule {
 			
 			createTrayIcon(tray,showListener,closeNoSaveListener,closeListener);
 		}
+		
 		TaskeyLog.getInstance().log(LogSystems.UI, "Tray has been set up...", Level.ALL);
 	}
 	
@@ -169,8 +181,7 @@ public class UiTrayModule {
 
 		trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH), 
 																UiConstants.PROGRAM_NAME, popup);
-
-		// set the TrayIcon properties
+		// set the TrayIcon click properties
 		trayIcon.addActionListener(showListener);
 	}
 

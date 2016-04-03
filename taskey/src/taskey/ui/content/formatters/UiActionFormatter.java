@@ -14,7 +14,9 @@ import taskey.ui.content.UiPagination;
  * @@author A0125419H
  * This class is responsible to formatting the Action Content box
  * It provides additional functions like the help menu
+ * 
  * @author junwei
+ * 
  */
 
 public class UiActionFormatter extends UiFormatter {
@@ -38,7 +40,7 @@ public class UiActionFormatter extends UiFormatter {
 	@Override
 	public int processDeleteKey() {	
 		if ( currentView == taskView.getView() ) {
-			return currentView.getSelection() + 1;
+			return currentView.getSelection() + 1; // add one as selection is from 0
 		}
 		return -1;
 	}
@@ -76,7 +78,7 @@ public class UiActionFormatter extends UiFormatter {
 				mainPane.setContent(currentView.getPagination());
 				break;
 			default:
-				System.out.println("Mode invalid For ActionFormatter");
+				System.out.println(UiConstants.ACTION_MODE_INVALID);
 		}
 	}
 	

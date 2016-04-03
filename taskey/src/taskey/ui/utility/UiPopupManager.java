@@ -10,15 +10,14 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
-import javafx.stage.PopupWindow;
 import javafx.stage.Window;
-import javafx.stage.PopupWindow.AnchorLocation;
 import taskey.constants.UiConstants;
 
 /**
  * @@author A0125419H
- * This class creates various types of pop up windows, and supports the use of
- * animations
+ * This class creates various types of pop up windows, 
+ * and provides methods to scale / hide pop ups as they are not handled by 
+ * the main window.
  * 
  * @author JunWei
  *
@@ -39,7 +38,7 @@ public class UiPopupManager {
 	
 	/**
 	 * This method creates a label at the node position with offset
-	 *  Note that this offset is in screen space coordinates
+	 * Note that this offset is in screen space coordinates
 	 * 
 	 * @param text - what to display in the label
 	 * @param offsetX - from node X position
@@ -79,7 +78,7 @@ public class UiPopupManager {
 	/**
 	 * This method sets the X and Y ratio of the stage
 	 * such that when pop ups are created, they are positioned correctly
-	 * but not scaled, or shifted when window changes
+	 * but not scaled, or shifted as window changes
 	 * these need to depend on anchor points which makes it difficult to alter 
 	 * @param mainStage
 	 */

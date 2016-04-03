@@ -37,7 +37,9 @@ import taskey.ui.utility.UiImageManager;
 /**
  * @@author A0125419H
  * 
- * This class implements another Stage / window for displaying tasks as alerts
+ * This class implements another Stage / window for displaying alerts
+ * Note that this is separate from the main window, and hence
+ * we are reusing some classes for formatting data
  * @author Junwei
  *
  */
@@ -45,62 +47,19 @@ public class UiAlertsController {
 
 	@FXML
 	private ScrollPane scrollPane;
-	private GridPane theGrid;
-	private AnchorPane root;
+	
+	private GridPane displayGrid;
+	private AnchorPane rootNode;
 	private Stage stage;
 	private UiGridHelper gridHelper = new UiGridHelper("");
-	private ArrayList<UiAlert> currentAlerts = new ArrayList<UiAlert>(); // used as array
+	private ArrayList<UiAlert> currentAlerts = new ArrayList<UiAlert>();
 	private ArrayList<UiAlert> alertHistory = new ArrayList<UiAlert>(); // dismissed alerts are not re-added
 	
+	//----- Used by UiTrayModule ------
 	public Stage getStage() {
 		return stage;
 	}
 		
-	public void setUpStage(Region contentRootRegion) {
-		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Alert Window...", Level.ALL);
-		
-		stage = new Stage();
-        stage.initStyle(StageStyle.TRANSPARENT);
-		stage.setScene(new Scene(contentRootRegion));
-		stage.getScene().setFill(null);
-		
-        root = (AnchorPane) contentRootRegion;
-        root.setOpacity(UiConstants.ALERTS_OPACITY);
-        
-        setUpScene();
-        addRootEventHandlers();
-        for ( int i = 0; i < UiConstants.MAX_ALERTS; i++ ) {
-        	currentAlerts.add(null); // set as null array
-        }
-        
-        TaskeyLog.getInstance().log(LogSystems.UI, "Alert Window has been set up...", Level.ALL);
-	}
-	
-	private void setUpScene() {
-		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
-        for ( int i = 0; i < UiConstants.STYLE_UI_ALERT_WINDOW.size(); i++ ) {
-        	myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET 
-        										     + UiConstants.STYLE_UI_ALERT_WINDOW.get(i)).toExternalForm());
-        }
-        theGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT);
-        theGrid.setAlignment(Pos.BOTTOM_CENTER);
-        scrollPane.setContent(theGrid);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-	}
-	
-	private void addRootEventHandlers() {
-		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.F5) { // for testing purposes
-					addEntry(new UiAlert());
-				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
-					hide();
-				}
-			}
-		});
-	}	
-	
 	public void hide() {
 		stage.hide();
 	}
@@ -111,9 +70,57 @@ public class UiAlertsController {
         stage.setX(primaryScreenBounds.getMaxX() - stage.getWidth());
         stage.setY(0);
         stage.setHeight(primaryScreenBounds.getHeight());      
-        root.setMinHeight(primaryScreenBounds.getHeight()); // resize anchorPane, scrollpane will resize to fit    
-        root.requestFocus();
+        rootNode.setMinHeight(primaryScreenBounds.getHeight()); // resize anchorPane, scrollpane will resize to fit    
+        rootNode.requestFocus();
 	}
+	//-------------------------------
+	
+	public void setUpStage(Region contentRootRegion) {
+		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Alert Window...", Level.ALL);
+		
+		stage = new Stage();
+        stage.initStyle(StageStyle.TRANSPARENT); 
+		stage.setScene(new Scene(contentRootRegion));
+		stage.getScene().setFill(null);
+		
+        rootNode = (AnchorPane) contentRootRegion;
+        rootNode.setOpacity(UiConstants.ALERTS_OPACITY);
+        
+        setUpScene();
+        addRootEventHandlers();
+
+        TaskeyLog.getInstance().log(LogSystems.UI, "Alert Window has been set up...", Level.ALL);
+	}
+	
+	private void setUpScene() {
+		ObservableList<String> myStyleSheets = stage.getScene().getStylesheets();
+        for ( int i = 0; i < UiConstants.STYLE_UI_ALERT_WINDOW.size(); i++ ) {
+        	myStyleSheets.add(getClass().getResource(UiConstants.UI_CSS_PATH_OFFSET 
+        										     + UiConstants.STYLE_UI_ALERT_WINDOW.get(i)).toExternalForm());
+        }
+        
+        displayGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT);
+        displayGrid.setAlignment(Pos.BOTTOM_CENTER); // such that alerts appear from the bottom
+        scrollPane.setContent(displayGrid);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        
+        for ( int i = 0; i < UiConstants.MAX_ALERTS; i++ ) {  // used as an array
+        	currentAlerts.add(null); 
+        }
+	}
+	
+	private void addRootEventHandlers() {
+		rootNode.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent event) {
+				if (event.getCode() == KeyCode.F5) { // for testing purposes
+					addEntry(new UiAlert());
+				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
+					hide();
+				}
+			}
+		});
+	}	
 	
 	private void addClickHandler(StackPane thePane) {
 		thePane.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -130,13 +137,13 @@ public class UiAlertsController {
 						removeEntry(index);
 					}
 				});
-				thePane.setOnMouseReleased(null);
+				thePane.setOnMouseReleased(null); // remove handler
 			}
 		});	
 	}
 	
 	private void addStartAnimation(StackPane thePane) {
-		// animate within the grid, hence coordinates are 0
+		// animate within the grid, hence translation coordinates are 0.0
 		TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
 				new Pair<Double,Double>(stage.getWidth(), 0.0), 
 				new Pair<Double,Double>(0.0, 0.0), UiConstants.DEFAULT_ANIM_DURATION/2);
@@ -152,39 +159,39 @@ public class UiAlertsController {
 		});
 	}
 	
-	public void addEntry(UiAlert newEntry) {
-		if ( checkAlertExisted(newEntry) == true ) {
+	public void addEntry(UiAlert newAlert) {
+		if ( checkAlertExisted(newAlert) == true ) {
 			return;
 		}
 		int gridIndex = findFirstFreeSlot();
 		if ( gridIndex == -1 ) {
 			return;
 		} else {
-			StackPane thePane = gridHelper.createStackPaneInCell(0, gridIndex, UiConstants.STYLE_ALERT_BOX, theGrid);
+			StackPane thePane = gridHelper.createStackPaneInCell(0, gridIndex, UiConstants.STYLE_ALERT_BOX, displayGrid);
 			GridPane entryGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT_ENTRY_PANE);
-			gridHelper.createScaledRectInCell(0, 0, newEntry.getColor(), entryGrid);
-			gridHelper.addTextFlowToCell(1, 0, newEntry.getTextFlow(),TextAlignment.LEFT, entryGrid);	
+			gridHelper.createScaledRectInCell(0, 0, newAlert.getColor(), entryGrid);
+			gridHelper.addTextFlowToCell(1, 0, newAlert.getTextFlow(),TextAlignment.LEFT, entryGrid);	
 			gridHelper.createImageInCell(2, 0, UiImageManager.getInstance().getImage(ImageID.URGENT_MARK), 
 										 15, 15, entryGrid);
 			thePane.getChildren().add(entryGrid);
 			
 			addStartAnimation(thePane);
 			addClickHandler(thePane);					
-			currentAlerts.set(gridIndex, newEntry);	
+			currentAlerts.set(gridIndex, newAlert);	// set to array
 		}
 	}
 	
-	private boolean checkAlertExisted(UiAlert newEntry) {
-		if ( currentAlerts.contains(newEntry)) {
+	private boolean checkAlertExisted(UiAlert newAlert) {
+		if ( currentAlerts.contains(newAlert)) {
 			return true;
-		} else if ( alertHistory.contains(newEntry)) {
+		} else if ( alertHistory.contains(newAlert)) {
 			return true;
 		}
 		return false;
 	}
 	
 	private int findFirstFreeSlot() {
-		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
+		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) { // search from the bottom of screen
 			if ( currentAlerts.get(i) == null ) {
 				return i;
 			}
@@ -193,10 +200,10 @@ public class UiAlertsController {
 	}
 	
 	private void removeEntry( int gridIndex ) {
-		StackPane wrapper = gridHelper.getWrapperAtCell(0, gridIndex, theGrid);
-		theGrid.getChildren().remove(wrapper); // free the slot	
-		alertHistory.add(currentAlerts.get(gridIndex));
-		currentAlerts.set(gridIndex, null);
+		StackPane wrapper = gridHelper.getWrapperAtCell(0, gridIndex, displayGrid);
+		displayGrid.getChildren().remove(wrapper); // free the slot	in the grid display
+		alertHistory.add(currentAlerts.get(gridIndex)); 
+		currentAlerts.set(gridIndex, null); 
 		
 		 // shift all entries down
 		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
@@ -204,10 +211,10 @@ public class UiAlertsController {
 				int swapIndex = -1;
 				UiAlert swapAlert = null;
 				for ( int j = i-1; j >= 0; j -- ) {
-					if ( currentAlerts.get(j) != null ) { // non empty
-						StackPane temp = gridHelper.getWrapperAtCell(0, j, theGrid);
-						theGrid.getChildren().remove(temp);
-						theGrid.add(temp, 0, i); // move to empty slot
+					if ( currentAlerts.get(j) != null ) { // has an alert
+						StackPane temp = gridHelper.getWrapperAtCell(0, j, displayGrid);
+						displayGrid.getChildren().remove(temp);
+						displayGrid.add(temp, 0, i); // move to empty slot
 						swapIndex = j;
 						swapAlert = currentAlerts.get(j);
 						break;
@@ -225,9 +232,9 @@ public class UiAlertsController {
 	 * Convenience method for setting all alerts
 	 * @param alertList
 	 */
-	public void setAll(ArrayList<UiAlert> alertList) { // set all alert lists
+	public void setAll(ArrayList<UiAlert> alertList) { 
 		for ( int i = 0; i < UiConstants.MAX_ALERTS; i ++ ) {
-			if ( alertList.contains(currentAlerts.get(i)) == false ) { // remove old alerts
+			if ( alertList.contains(currentAlerts.get(i)) == false ) { // remove old / invalid alerts
 				removeEntry(i);
 			}
 		}

@@ -962,4 +962,56 @@ public class LogicTest {
 		assertTrue(floatingList.get(0).getPriority() == 2);
 		assertTrue(floatingList.get(1).getPriority() == 1);
 	}
+	
+	@Test
+	public void savingShouldSaveAllTaskAndTagDataToDisk() {
+		String input = "add task #ayy #lmao";
+		Task task1 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime);
+		input = "add task on " + deadline + " #lmao #420";
+		Task task2 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		String startDate = deadline;
+		String endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		input = "add task from " + startDate + " to " + endDate + " #ayy #memes #lmao";
+		Task task3 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		logic.executeCommand(ContentBox.PENDING, "save");
+		
+		logic = new Logic(); // To simulate exiting and reloading the software
+		
+		ArrayList<ArrayList<Task>> expected = getEmptyLists();
+		expected.get(LogicMemory.INDEX_PENDING).add(task1);
+		expected.get(LogicMemory.INDEX_PENDING).add(task2);
+		expected.get(LogicMemory.INDEX_PENDING).add(task3);
+		expected.get(LogicMemory.INDEX_FLOATING).add(task1);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(task2);
+		expected.get(LogicMemory.INDEX_THIS_WEEK).add(task3);
+		expected.get(LogicMemory.INDEX_DEADLINE).add(task2);
+		expected.get(LogicMemory.INDEX_EVENT).add(task3);
+		sortListsReversed(expected);
+		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
+		assertEquals(expected, actual);
+		
+		ArrayList<TagCategory> expected2 = new ArrayList<TagCategory>();
+		TagCategory tag1 = new TagCategory("ayy");
+		tag1.increaseCount();
+		TagCategory tag2 = new TagCategory("lmao");
+		tag2.increaseCount();
+		tag2.increaseCount();
+		TagCategory tag3 = new TagCategory("420");
+		TagCategory tag4 = new TagCategory("memes");
+		expected2.add(tag1);
+		expected2.add(tag2);
+		expected2.add(tag3);
+		expected2.add(tag4);
+		Collections.sort(expected2);
+		ArrayList<TagCategory> actual2 = logic.getTagCategoryList();
+		assertEquals(expected2, actual2);
+	}
 }

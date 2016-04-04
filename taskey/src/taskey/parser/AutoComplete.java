@@ -27,6 +27,8 @@ public class AutoComplete {
 	private ArrayList<String> specialDaysNext = new ArrayList<String>(); 
 	private ArrayList<String> commands = new ArrayList<String>();
 	private ArrayList<String> viewList = new ArrayList<String>();
+	private ArrayList<String> months = new ArrayList<String>(); 
+	private HashMap<String, String> monthsMap = new HashMap<String,String>(); 
 	
 	public AutoComplete() {
 		commands.add("add");
@@ -86,6 +88,32 @@ public class AutoComplete {
 		specialDaysNext.add("next thu");
 		specialDaysNext.add("next fri");
 		specialDaysNext.add("next sat");
+		
+		months.add("jan");
+		months.add("feb");
+		months.add("mar");
+		months.add("apr");
+		months.add("may");
+		months.add("jun");
+		months.add("jul");
+		months.add("aug");
+		months.add("sep");
+		months.add("oct");
+		months.add("nov");
+		months.add("dec");
+		
+		monthsMap.put("jan", "jan"); 
+		monthsMap.put("feb", "feb"); 
+		monthsMap.put("mar", "mar"); 
+		monthsMap.put("apr", "apr"); 
+		monthsMap.put("may", "may"); 
+		monthsMap.put("jun", "jun"); 
+		monthsMap.put("jul", "jul"); 
+		monthsMap.put("aug", "aug"); 
+		monthsMap.put("sep", "sep"); 
+		monthsMap.put("oct", "oct"); 
+		monthsMap.put("nov", "nov"); 
+		monthsMap.put("dec", "dec"); 
 		
 	}
 	
@@ -405,9 +433,18 @@ public class AutoComplete {
 			date = date.replace("h", "");
 			date = date.replace("a", "");
 			date = date.replace("p", "");
-			availDates.add(date.trim()+"am");
-			availDates.add(date.trim()+"pm"); 
-			availDates.add(date.trim()+"h"); 
+			try {
+				int num = Integer.parseInt(date.trim()); 
+				if (num <= 12) {
+					availDates.add(date.trim()+"am");
+					availDates.add(date.trim()+"pm"); 
+				}
+				if (date.trim().length() == 4) { 
+					availDates.add(date.trim()+"h"); 
+				}
+			} catch (Exception e) {
+				//do nth 
+			}
 		}
 		
 		//check for normal date
@@ -441,9 +478,16 @@ public class AutoComplete {
 		}
 		
 		//eg. sun... mon... 
-		for(int i = 0; i < specialDays.size(); i++) { 
-			if (specialDays.get(i).indexOf(date) == 0) {
-				availDates.add(specialDays.get(i));
+		String parts[] = phrase.split(" "); 
+		String number = parts[parts.length-2]; //get 2nd last word
+		try {
+			int num = Integer.parseInt(number); 
+		} catch (Exception e) {
+			//only add stuff like sun mon if the thing is not a number
+			for(int i = 0; i < specialDays.size(); i++) { 
+				if (specialDays.get(i).indexOf(date) == 0) {
+					availDates.add(specialDays.get(i));
+				}
 			}
 		}
 		
@@ -454,9 +498,18 @@ public class AutoComplete {
 			date = date.replace("h", "");
 			date = date.replace("a", "");
 			date = date.replace("p", "");
-			availDates.add(date.trim()+"am");
-			availDates.add(date.trim()+"pm"); 
-			availDates.add(date.trim()+"h"); 
+			try {
+				int num = Integer.parseInt(date.trim()); 
+				if (num <= 12) {
+					availDates.add(date.trim()+"am");
+					availDates.add(date.trim()+"pm"); 
+				}
+				if (date.trim().length() == 4) { 
+					availDates.add(date.trim()+"h"); 
+				}
+			} catch (Exception e) {
+				//do nth 
+			}
 		}
 		
 		//check for normal date
@@ -466,15 +519,53 @@ public class AutoComplete {
 				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
 			}
 		}
+		
+		//check if month 
+		if (date.length() <= 3) {
+			if (date.length() == 3) {
+				if (monthsMap.containsKey(date.trim())) {
+					//do nth
+				} else {
+					ArrayList<String> suggestTemp = correctDateError(date.trim()); 
+					for(int i = 0; i < suggestTemp.size(); i++) {
+						availDates.add(suggestTemp.get(i)); 
+					}
+				}
+			} else {
+				for(int i = 0; i < months.size(); i++) {
+					String month = months.get(i);
+					if (month.indexOf(date) == 0) {
+						availDates.add(month); 
+					}
+				}
+			}
+		}
 		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		return null; 
 	}
 	
-	
-	private void correctDateError() {
-		//TODO: help user correct his date. 
+	/**
+	 * If the user has misspelt his date, suggest a correction for him 
+	 * @param misSpelled
+	 * @return list of possible correctly spelled dates 
+	 */
+	private ArrayList<String> correctDateError(String misSpelled) {
+		ArrayList<String> suggestions = new ArrayList<String>(); 
+		for(int i = 0; i < months.size(); i++) {
+			String month = months.get(i); 
+			int temp = levenshteinDist(misSpelled, month); 
+			System.out.println(temp);
+			if (temp == 0) {
+				//exactly the same
+				return null;  
+			}
+			if (temp <= 2) {
+				suggestions.add(month); 
+			}
+		}
+		return suggestions; 
 	}
 	
 	/**
@@ -491,7 +582,7 @@ public class AutoComplete {
 	 * @param tar
 	 * @return distance between the 2 strings 
 	 */
-	private int levenshteinDist(String src, String tar) {
+	public int levenshteinDist(String src, String tar) {
 		//init to 0 automatically by java 
 		int[][] d = new int[src.length()+1][tar.length()+1]; 
 		
@@ -505,7 +596,7 @@ public class AutoComplete {
 		
 		for(int j = 1; j <= tar.length(); j++) {
 			for(int i = 1; i <= src.length(); i++) {
-				int substitutionCost = 0; 
+				int substitutionCost; 
 				
 				if (src.charAt(i-1) == tar.charAt(j-1)) {
 					substitutionCost = 0; 
@@ -521,6 +612,13 @@ public class AutoComplete {
 		
 		return d[src.length()][tar.length()]; 
 	}
+	
+	
+	/*
+	public static void main(String[] args) {
+		AutoComplete ac = new AutoComplete(); 
+		ac.correctDateError("fbr"); 
+	} */ 
 	
 	
 	/* @@author A0107345L-unused

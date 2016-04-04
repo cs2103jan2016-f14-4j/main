@@ -87,7 +87,14 @@ public class DateTimePatternMatcher {
 	 */
 	public boolean hasDateAC(String input) {
 		if (input.matches(pattern8)) {
-			return true;
+			try {
+				int num = Integer.parseInt(input); 
+				if (num >= 1 && num <= 31) {
+					return true; 
+				}
+			} catch (Exception e) {
+				return false; 
+			}
 		}
 		return false; 
 	}

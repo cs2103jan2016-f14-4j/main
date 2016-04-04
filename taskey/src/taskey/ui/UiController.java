@@ -381,6 +381,12 @@ public class UiController {
 		if ( selection.contains(currentLine)) { 
 			input.setText(selection + " ");
 		} else {	
+			// special case
+			currentLine = currentLine.replace("[", "[ "); // add space for processing
+			currentLine = currentLine.replace("[  ", "[ "); // bound it within
+			currentLine = currentLine.replace("]", " ]");
+			currentLine = currentLine.replace("  ]", " ]"); 
+			
 			String [] lineTokens = currentLine.split(" ");		
 			// remove all tokens from input that appear in current selection
 			for ( int i = lineTokens.length-1; i >= 0; i-- ) {			

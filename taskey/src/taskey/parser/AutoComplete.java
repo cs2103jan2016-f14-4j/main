@@ -176,21 +176,6 @@ public class AutoComplete {
 		
 		ArrayList<String> availCommands = new ArrayList<String>();
 		
-		/*//if only one letter, don't search the wrong part of the command
-		if (phrase.length() == 1) {
-			for(int i = 0; i < commands.size(); i++) {
-				String tempCommand = commands.get(i); 
-				int temp = tempCommand.indexOf(phrase);
-				if (temp == 0) { //first pos 
-					availCommands.add(tempCommand); 		
-				}
-			}
-			if (!availCommands.isEmpty()) {
-				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
-			}
-			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
-		} */
-		
 		//find list normally  
 		for(int i = 0; i < commands.size(); i++) {
 			if (commands.get(i).indexOf(phrase) == 0) {
@@ -428,22 +413,49 @@ public class AutoComplete {
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			date = date.replace("pm", "");
-			date = date.replace("am", "");
-			date = date.replace("h", "");
-			date = date.replace("a", "");
-			date = date.replace("p", "");
+			String date2 = date.replace("pm", "");
+			date2 = date2.replace("am", "");
+			date2 = date2.replace("h", "");
+			date2 = date2.replace("a", "");
+			date2 = date2.replace("p", "");
 			try {
-				int num = Integer.parseInt(date.trim()); 
+				int num = Integer.parseInt(date2.trim()); 
 				if (num <= 12) {
-					availDates.add(date.trim()+"am");
-					availDates.add(date.trim()+"pm"); 
+					availDates.add(date2.trim()+"am");
+					availDates.add(date2.trim()+"pm"); 
 				}
-				if (date.trim().length() == 4) { 
-					availDates.add(date.trim()+"h"); 
+				if (date2.trim().length() == 4) { 
+					availDates.add(date2.trim()+"h"); 
 				}
 			} catch (Exception e) {
 				//do nth 
+			}
+		}
+		
+		//check if month 
+		if (date.split(" ").length >= 2) { 
+			String day = date.split(" ")[0]; 
+			String mth = date.split(" ")[1]; //get the month
+			if (mth.length() <= 3) {
+				if (mth.length() == 3) {
+					if (monthsMap.containsKey(mth)) {
+						//do nth
+					} else {
+						ArrayList<String> suggestTemp = correctDateError(mth); 
+						if (suggestTemp != null) { 
+							for(int i = 0; i < suggestTemp.size(); i++) {
+								availDates.add(suggestTemp.get(i)); 
+							}
+						}
+					}
+				} else {
+					for(int i = 0; i < months.size(); i++) {
+						String month = months.get(i);
+						if (month.indexOf(mth) == 0) {
+							availDates.add(day + " " + month); 
+						}
+					}
+				}
 			}
 		}
 		
@@ -454,6 +466,8 @@ public class AutoComplete {
 				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
 			}
 		}
+		
+		
 		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
@@ -527,8 +541,10 @@ public class AutoComplete {
 					//do nth
 				} else {
 					ArrayList<String> suggestTemp = correctDateError(date.trim()); 
-					for(int i = 0; i < suggestTemp.size(); i++) {
-						availDates.add(suggestTemp.get(i)); 
+					if (suggestTemp != null) {
+						for(int i = 0; i < suggestTemp.size(); i++) {
+							availDates.add(suggestTemp.get(i)); 
+						}
 					}
 				}
 			} else {
@@ -556,7 +572,6 @@ public class AutoComplete {
 		for(int i = 0; i < months.size(); i++) {
 			String month = months.get(i); 
 			int temp = levenshteinDist(misSpelled, month); 
-			System.out.println(temp);
 			if (temp == 0) {
 				//exactly the same
 				return null;  
@@ -576,7 +591,7 @@ public class AutoComplete {
 	 * 1) It is at least the difference in the size of the 2 strings
 	 * 2) It is at most the length of the longer string
 	 * 3) 0 iff the 2 strings are equal
-	 * 4) If the 2 strings are the same size, upperBound of Levenstein distence is the Hamming Distance
+	 * 4) If the 2 strings are the same size, upperBound of Levenstein distance is the Hamming Distance
 	 * 5) Satisfies Triangle Inequality (LD(string1,string2) >= LD(string1) + LD(string2) 
 	 * @param src
 	 * @param tar
@@ -614,7 +629,7 @@ public class AutoComplete {
 	}
 	
 	
-	/*
+	/* for testing 
 	public static void main(String[] args) {
 		AutoComplete ac = new AutoComplete(); 
 		ac.correctDateError("fbr"); 

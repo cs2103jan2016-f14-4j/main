@@ -1,20 +1,23 @@
 package taskey.storage;
 
+import static taskey.storage.Storage.TaskListEnum.savedLists;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.StorageReader.InvalidTaskException;
-
+import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
@@ -28,31 +31,40 @@ public class Storage {
 	private HashSet<File> directoriesCreated;
 
 	private static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
-	private static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
-	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig"; //name of the directory config file
-	public static final String FILENAME_EXTENSION = ".taskey";						    //public for unit tests
-	private static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
+	public static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
+	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig";
+	public static final String FILENAME_EXTENSION = ".taskey"; //TODO use whole filename rather than just the extension
+	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
-	public enum TasklistEnum {
-		// Index 0 (THIS_WEEK list) and 7 (ACTION list) from Logic is to be ignored
+	/**
+	 * This is an enum of all the task lists that are handled by Storage.
+	 * That is, these are the task lists that need to be returned from Storage to Logic during load.
+	 * However, not all of these task lists are saved to file.
+	 * Only lists in the EnumSet savedLists are actually written to file;
+	 * the rest are derived from the PENDING list.
+	 */
+	public enum TaskListEnum {
+		// In the lists from Logic, index 0 (THIS_WEEK list) and 7 (ACTION list) are not handled by Storage
 		PENDING		("PENDING.taskey", 1),
 		EXPIRED		("EXPIRED.taskey", 2),
-		GENERAL		("GENERAL.taskey", 3),	//TODO: consolidate files?
-		DEADLINE	("DEADLINE.taskey", 4),	//
-		EVENT		("EVENT.taskey", 5),	//
+		GENERAL		("GENERAL.taskey", 3),	//not saved
+		DEADLINE	("DEADLINE.taskey", 4),	//not saved
+		EVENT		("EVENT.taskey", 5),	//not saved
 		COMPLETED	("COMPLETED.taskey", 6);
-
-		private static final int size = TasklistEnum.values().length;
-		public static int size() {
-			return size;
-		}
-
+		
+		static final EnumSet<TaskListEnum> savedLists = EnumSet.of(PENDING, EXPIRED, COMPLETED);
+		private static final int size = TaskListEnum.values().length;
+		
 		private final String filename;
 		private final int index;
 
-		TasklistEnum(String filename, int index) {
+		TaskListEnum(String filename, int index) {
 			this.filename = filename;
 			this.index = index;
+		}
+		
+		public static int size() {
+			return size;
 		}
 
 		public String filename() {
@@ -62,48 +74,31 @@ public class Storage {
 		public int index() {
 			return index;
 		}
-
+		
 		/**
-		 * Checks whether TasklistEnum contains the given filename string.
-		 * @param fileName
-		 * @return true if the given filename matches any of the enum fields; false otherwise
+		 * Returns the enum type corresponding to the given filename string,
+		 * or null if the given filename does not exist in TaskListEnum.
 		 */
-		public static boolean contains(String fileName) {
-			for (TasklistEnum e : TasklistEnum.values()) {
-				if (e.filename.equals(fileName)) {
-					return true;
+		public static TaskListEnum enumOf(String fileName) {
+			for (TaskListEnum enumType : TaskListEnum.values()) {
+				if (enumType.filename.equals(fileName)) {
+					return enumType;
 				}
 			}
-			return false;
-		}
-
-		/**
-		 * Get the corresponding index of the given filename string.
-		 * @param fileName
-		 * @return the index of the enum constant that has the given filename;
-		 * 		   -1 is returned if the given filename does not exist in the enum
-		 */
-		public static int indexOf(String fileName) {
-			for (TasklistEnum e : TasklistEnum.values()) {
-				if (e.filename.equals(fileName)) {
-					return e.index;
-				}
-			}
-			return -1;
+			return null;
 		}
 	}
 
 	/**
 	 * For testing
+	 * @throws IOException 
+	 * @throws NotDirectoryException 
+	 * @throws InvalidPathException 
+	 * @throws FileAlreadyExistsException 
 	 */
-	public static void main(String args[]) {
-		// The default or last-used directory is automatically set in the constructor method.
+	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-
-		// Can optionally set the directory again, if requested by user.
-		//System.out.println(storage.setDirectory("c:\\taskey"));
-
-		// Initialize tasklists
+		System.out.println(storage.setDirectory("***")); //throws invalid path exception
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -139,7 +134,7 @@ public class Storage {
 
 		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory != null) {
-			if (createDirectory(loadedDirectory) == true) {
+			if (Boolean.TRUE.equals(createDirectory(loadedDirectory))) { //createDirectory could possibly return null
 				directory = loadedDirectory;
 				System.out.println("{Storage} Directory loaded | " + directory.getAbsolutePath());
 			} else { //loaded directory was invalid or could not be created
@@ -160,22 +155,22 @@ public class Storage {
 	 * Returns the superlist of tasklists loaded from Storage.
 	 * Logic calls this on program startup.
 	 * <p>Post-conditions:
-	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
-	 * <br>- These lists are read from disk and hence do not include the THIS_WEEK and ACTION list.
+	 * <br>- The lists in the returned superlist are in the same order as the enum constants in StorageTaskList.
+	 * <br>- These lists do not include the THIS_WEEK and ACTION list.
 	 * <br>- If any one list was not found, or is invalid, an empty superlist is returned.
 	 * @return the superlist of tasklists read from disk, or an empty superlist
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			File src = new File(directory, tasklist.filename());
+		for (TaskListEnum listType : TaskListEnum.values()) {
+			File src = new File(directory, listType.filename());
 			try {
-				ArrayList<Task> loadedList = storageReader.loadTasklist(src);
+				ArrayList<Task> loadedList = storageReader.loadTasklist(src, listType);
 				superlist.add(loadedList);
-			} catch (FileNotFoundException | InvalidTaskException e) {
+			} catch (FileNotFoundException | InvalidTaskException e) { //TODO handle invalid tasks
 				superlist.clear();
-				while (superlist.size() < TasklistEnum.size()) {
+				while (superlist.size() < TaskListEnum.size()) {
 					superlist.add(new ArrayList<Task>());
 				}
 				return superlist; //return an empty superlist if any tasklist was not found or is invalid
@@ -185,26 +180,26 @@ public class Storage {
 	}
 
 	/**
-	 * Saves the superlist of tasklists to Storage.
-	 * Logic calls this after every operation.
+	 * Saves the PENDING, EXPIRED and COMPLETED lists of the given superlist to file.
 	 * <p>Pre-conditions:
 	 * <br>- Starting from index 1, the lists in the given superlist
-	 * 		 must be in the same order as the enum constants in TasklistEnum.
+	 * 		 must be in the same order as the enum constants in StorageTaskList.
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
 	 * <br>- Index 7 is reserved for the ACTION list and is not saved to disk because it is session-dependent.
+	 * <br>- GENERAL, DEADLINE and EVENT lists are not saved to disk because they can be derived from the PENDING list.
 	 * @param superlist the list of tasklists to be saved
 	 * @throws IOException
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
-		for (TasklistEnum tasklist : TasklistEnum.values()) {
-			File dest = new File(directory, tasklist.filename());
-			ArrayList<Task> listToSave = superlist.get(tasklist.index());
+		for (TaskListEnum listType : savedLists) {
+			File dest = new File(directory, listType.filename());
+			ArrayList<Task> listToSave = superlist.get(listType.index());
 			try {
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (FileNotFoundException e) {
-				createDirectory(directory); //in case user deletes their storage directory
+				createDirectory(directory); //in case user deletes their storage directory during runtime
 				storageWriter.saveTasklist(listToSave, dest); //try again
 			}
 		}
@@ -251,7 +246,8 @@ public class Storage {
 	/**
 	 * Has the same effect as calling setDirectory(pathname, true)
 	 */
-	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException {
+	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException, 
+														InvalidPathException, NotDirectoryException {
 		return setDirectory(pathname, true);
 	}
 
@@ -272,24 +268,32 @@ public class Storage {
 	 * @param shouldMove [true] if move operation should be performed; 
 	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
-	 * @return <br>- False if the pathname is invalid due to illegal characters (e.g. *), 
-	 * 		   reserved words (e.g. CON in Windows), or nonexistent root drive letters
-	 *         <br>- True if the new directory was successfully set
+	 * @return <br>- True if the new directory was successfully set; otherwise,
+	 * 		   <br>- False for any other reason not covered under InvalidPathException or NotDirectoryException
 	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
-	 *			This will update Storage's directory and load from the new directory, 
-	 *			without moving files from the previous one.
+	 *			This will update Storage's directory and load from the new directory, without moving files from the previous one.
 	 *
 	 * @throws IOException if an I/O error occurs when moving the files.
 	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 
-	 *			Logic should save everything after this to ensure that the current directory still has all the savefiles.
+	 *			Logic should save everything after this to ensure that the current directory has all the savefiles.
+	 *
+	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters, 
+	 *			or is invalid for other file system specific reasons. On Windows, this could be due to: 
+	 *			illegal characters (e.g. *), reserved words (e.g. CON), or nonexistent root drive letters.
+	 *
+	 * @throws NotDirectoryException when the path points to a normal file and not a directory
 	 */
-	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException {
+	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException, 
+																			InvalidPathException, NotDirectoryException {
 		File newDir = new File(pathname);
-		boolean isValidDir = createDirectory(newDir);
-		if (!isValidDir) {
-			return false;
+		Boolean isValidDir = createDirectory(newDir);
+		if (isValidDir == null) {
+			throw new NotDirectoryException(pathname); //the abstract path newDir is a normal file and not a directory/folder
+		} else if (isValidDir == false) {
+			newDir.toPath(); //this line throws InvalidPathException if newDir is invalid
+			return false; 	 //otherwise return false for whatever other reason
 		}
 
 		if (shouldMove) {
@@ -300,8 +304,7 @@ public class Storage {
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
-
-		deleteCurrDir(); //delete the old folder if it was created by Taskey and is currently empty
+		deleteCurrDir(); //delete the old folder if it's currently empty and was created by Taskey during runtime
 
 		if (shouldSaveNewDir(newDir)) {
 			storageWriter.saveDirectoryConfigFile(newDir, FILENAME_DIRCONFIG);
@@ -316,9 +319,10 @@ public class Storage {
 	 * Creates the full directory path of the given abstract pathname and also checks that it is valid.
 	 * @param dir directory to be created
 	 * @return true if the directory was successfully created or already exists;
-	 * 		   false if dir is not a valid directory
+	 * 		   false if dir is not a valid abstract path;
+	 * 		   null if dir exists but is not a directory
 	 */
-	private boolean createDirectory(File dir) {
+	private Boolean createDirectory(File dir) {
 		if (!dir.exists()) {
 			if (dir.mkdirs() == true) {
 				directoriesCreated.add(dir);
@@ -329,7 +333,7 @@ public class Storage {
 		} else if (dir.isDirectory()) { //dir already exists && is a directory
 			return true;
 		} else { //dir exists but is not a directory
-			return false;
+			return null;
 		}
 	}
 
@@ -381,17 +385,18 @@ public class Storage {
 	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
-		Boolean[] tasklistFlags = new Boolean[TasklistEnum.size()];
+		EnumSet<TaskListEnum> set = EnumSet.noneOf(TaskListEnum.class);
 		for (String filename : dir.list()) {
-			if (TasklistEnum.contains(filename)) {
-				tasklistFlags[TasklistEnum.indexOf(filename)-1] = true;
+			TaskListEnum listType = TaskListEnum.enumOf(filename);
+			if (savedLists.contains(listType)) { //does return false when listType == null
+				set.add(listType);
 			}
 		}
 
-		if (Arrays.asList(tasklistFlags).contains(null) || Arrays.asList(tasklistFlags).contains(false)) {
-			return false; //at least one tasklist file is missing (note: should not contain false)
-		} else {
+		if (set.equals(savedLists)) {
 			return true; //all tasklist files are present in dir
+		} else {
+			return false;//at least one tasklist file is missing
 		}
 	}
 

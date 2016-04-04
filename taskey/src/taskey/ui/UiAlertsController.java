@@ -21,7 +21,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -31,9 +30,7 @@ import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.messenger.Task;
 import taskey.ui.content.UiGridHelper;
-import taskey.ui.content.UiTextBuilder;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
 
@@ -52,9 +49,9 @@ public class UiAlertsController {
 	private AnchorPane root;
 	private Stage stage;
 	private UiGridHelper gridHelper = new UiGridHelper("");
-	private ArrayList<Task> currentAlerts = new ArrayList<Task>(); // used as array
-	private ArrayList<Task> alertHistory = new ArrayList<Task>(); // dismissed tasks are not re-added
-
+	private ArrayList<UiAlert> currentAlerts = new ArrayList<UiAlert>(); // used as array
+	private ArrayList<UiAlert> alertHistory = new ArrayList<UiAlert>(); // dismissed alerts are not re-added
+	
 	public Stage getStage() {
 		return stage;
 	}
@@ -96,9 +93,7 @@ public class UiAlertsController {
 		root.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.F5) { // for testing purposes
-					Task temp = new Task();
-					temp.setTaskName(String.valueOf(Math.random()).substring(0, 10));
-					addEntry(temp);
+					addEntry(new UiAlert());
 				} else if (event.getCode() == KeyCode.W && event.isControlDown()) {
 					hide();
 				}
@@ -125,7 +120,7 @@ public class UiAlertsController {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				FadeTransition fade = UiAnimationManager.getInstance().createFadeTransition(thePane, 0,
-						UiConstants.DEFAULT_FADE_TIME/2, 1.0, 0.0);
+						UiConstants.DEFAULT_ANIM_DURATION/2, 1.0, 0.0);
 				fade.play();
 				fade.setOnFinished(new EventHandler<ActionEvent>() {
 					@Override
@@ -144,44 +139,31 @@ public class UiAlertsController {
 		// animate within the grid, hence coordinates are 0
 		TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
 				new Pair<Double,Double>(stage.getWidth(), 0.0), 
-				new Pair<Double,Double>(0.0, 0.0), 500);
+				new Pair<Double,Double>(0.0, 0.0), UiConstants.DEFAULT_ANIM_DURATION/2);
 		shift.play();
 		shift.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				ScaleTransition scale = UiAnimationManager.getInstance().
-						createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 200);
+						createScaleTransition(thePane, 1.25f, 1.25f, 4, true, 
+											  UiConstants.DEFAULT_ANIM_DURATION/5);
 				scale.play();
 			}
 		});
 	}
 	
-	public void addEntry(Task newEntry) {
-		if ( checkTaskExisted(newEntry) == true ) {
+	public void addEntry(UiAlert newEntry) {
+		if ( checkAlertExisted(newEntry) == true ) {
 			return;
 		}
 		int gridIndex = findFirstFreeSlot();
 		if ( gridIndex == -1 ) {
 			return;
 		} else {
-			UiTextBuilder myBuilder = new UiTextBuilder();
-			myBuilder.addMarker(0, UiConstants.STYLE_TEXT_DEFAULT);
-			String line = "" + newEntry.getTaskName();
-			myBuilder.addMarker(line.length(), UiConstants.STYLE_TEXT_RED);
-			line += "\n " + newEntry.getDeadline();
-			Color theColor = null;
-			switch ( newEntry.getPriority()) {
-				case 2: theColor = Color.RED;
-						break;
-				case 1: theColor = Color.ORANGE;
-						break;
-				default:
-						theColor = Color.GREEN;
-			}
 			StackPane thePane = gridHelper.createStackPaneInCell(0, gridIndex, UiConstants.STYLE_ALERT_BOX, theGrid);
 			GridPane entryGrid = gridHelper.setUpGrid(UiConstants.GRID_SETTINGS_ALERT_ENTRY_PANE);
-			gridHelper.createScaledRectInCell(0, 0, theColor, entryGrid);
-			gridHelper.addTextFlowToCell(1, 0, myBuilder.build(line),TextAlignment.LEFT, entryGrid);	
+			gridHelper.createScaledRectInCell(0, 0, newEntry.getColor(), entryGrid);
+			gridHelper.addTextFlowToCell(1, 0, newEntry.getTextFlow(),TextAlignment.LEFT, entryGrid);	
 			gridHelper.createImageInCell(2, 0, UiImageManager.getInstance().getImage(ImageID.URGENT_MARK), 
 										 15, 15, entryGrid);
 			thePane.getChildren().add(entryGrid);
@@ -192,7 +174,7 @@ public class UiAlertsController {
 		}
 	}
 	
-	private boolean checkTaskExisted(Task newEntry) {
+	private boolean checkAlertExisted(UiAlert newEntry) {
 		if ( currentAlerts.contains(newEntry)) {
 			return true;
 		} else if ( alertHistory.contains(newEntry)) {
@@ -220,20 +202,20 @@ public class UiAlertsController {
 		for ( int i = UiConstants.MAX_ALERTS-1; i >= 0; i -- ) {
 			if ( currentAlerts.get(i) == null ) {
 				int swapIndex = -1;
-				Task swapTask = null;
+				UiAlert swapAlert = null;
 				for ( int j = i-1; j >= 0; j -- ) {
 					if ( currentAlerts.get(j) != null ) { // non empty
 						StackPane temp = gridHelper.getWrapperAtCell(0, j, theGrid);
 						theGrid.getChildren().remove(temp);
 						theGrid.add(temp, 0, i); // move to empty slot
 						swapIndex = j;
-						swapTask = currentAlerts.get(j);
+						swapAlert = currentAlerts.get(j);
 						break;
 					}	
 				}
 				if ( swapIndex != -1 ) {
-					currentAlerts.set(swapIndex, null); // free slot of task to be shifted down
-					currentAlerts.set(i, swapTask);
+					currentAlerts.set(swapIndex, null); // free slot of alert to be shifted down
+					currentAlerts.set(i, swapAlert);
 				}
 			}	
 		}
@@ -241,16 +223,16 @@ public class UiAlertsController {
 	
 	/**
 	 * Convenience method for setting all alerts
-	 * @param taskList
+	 * @param alertList
 	 */
-	public void setAll(ArrayList<Task> taskList) { // set all task lists
+	public void setAll(ArrayList<UiAlert> alertList) { // set all alert lists
 		for ( int i = 0; i < UiConstants.MAX_ALERTS; i ++ ) {
-			if ( taskList.contains(currentAlerts.get(i)) == false ) { // remove old alerts
+			if ( alertList.contains(currentAlerts.get(i)) == false ) { // remove old alerts
 				removeEntry(i);
 			}
 		}
-		for ( int i = 0; i < taskList.size() ; i ++) {
-			addEntry(taskList.get(i));
+		for ( int i = 0; i < alertList.size() ; i ++) {
+			addEntry(alertList.get(i));
 		}
 	}
 }

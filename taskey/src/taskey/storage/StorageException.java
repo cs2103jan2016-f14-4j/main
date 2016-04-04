@@ -1,5 +1,5 @@
-/*package taskey.storage;
-
+package taskey.storage;
+/*
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,3 +57,7 @@ public class StorageException extends IOException {
  *//*
 class History {
 }*/
+
+public class StorageException {
+	// Blank class to allow compilation of JAR file
+}

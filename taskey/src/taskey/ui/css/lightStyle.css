@@ -34,12 +34,9 @@
 	-fx-background-color: #206ba4;
 }
 
-#expiredIcon {
-	-fx-text-fill: white;
-	-fx-background-color: red;
-	-fx-background-radius: 15px;
-	-fx-padding: 2px;
-	-fx-font-family: 'Montserrat';
+#notification {
+	-fx-text-fill: #206ba4;
+	-fx-font-weight: bold;
 }
 
 /* Switchable styles */
@@ -47,30 +44,27 @@
 	-fx-background-color: #ebf4fb;
 	-fx-text-fill: #206ba4;
 }
-
 .inputError {
-  -fx-outer-border: red;
-  -fx-body-color: #ebf4fb;
-  -fx-background-color: 
-       -fx-outer-border, 
-       -fx-body-color;
-  -fx-background-insets: 0, 2;
-  -fx-background-radius: 2px, 0px;
+    -fx-background-color: red, #ebf4fb;
+	-fx-background-insets: 0, 2px;
+}
+
+.inputCorrect {
+    -fx-background-color: #0000ff, #ebf4fb;
+    -fx-background-insets: 0, 2px;
 }
 
 .prompt {
-	-fx-padding: 2px;
-	-fx-background-color: #ebf4fb;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 1px;
+	-fx-padding: 6px;
+	-fx-background-color: #206ba4, #ebf4fb;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #206ba4;
 }
 
 .promptSelect {
-	-fx-padding: 2px;
-	-fx-background-color:#206ba4;
-    -fx-background-radius: 5px;
-    -fx-background-insets: 0px, 3px;
+	-fx-padding: 6px;
+	-fx-background-color: #206ba4, #206ba4;
+    -fx-background-insets: 0px, 4px;
     -fx-text-fill: #ebf4fb;
 }
 

@@ -37,10 +37,6 @@ public class UiTrayModule {
 	private UiController mainController;
 	private UiAlertsController alertsController;
 	
-	public UiTrayModule() {
-		Platform.setImplicitExit(false); // such that stage hide does not exit program
-	}
-	
 	/**
 	 * This method creates the dependency link between the alertsController and the uiController
 	 * @param myController - main Stage
@@ -49,6 +45,8 @@ public class UiTrayModule {
 	public void createLinkage(UiController _mainController, UiAlertsController _alertsController) {
 		assert(_mainController != null);
 		assert(_alertsController != null);
+		
+		Platform.setImplicitExit(false); // such that stage hide does not exit program
 		
 		mainController = _mainController;
 		alertsController = _alertsController;

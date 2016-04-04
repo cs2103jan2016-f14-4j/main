@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content.views;
 
 import java.util.ArrayList;
 
@@ -13,9 +13,8 @@ import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.messenger.Task;
-import taskey.ui.content.UiGridHelper;
-import taskey.ui.content.UiPagination;
-import taskey.ui.content.UiTextBuilder;
+import taskey.ui.tools.UiGridHelper;
+import taskey.ui.tools.UiTextBuilder;
 import taskey.ui.utility.UiImageManager;
 
 /**

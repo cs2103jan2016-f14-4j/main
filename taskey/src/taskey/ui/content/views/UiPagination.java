@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.content.views;
 
 import java.util.ArrayList;
 
@@ -32,10 +32,6 @@ public class UiPagination {
 	private StackPane selectedPane = null;
 	private boolean isSettingUp; // this is for preventing reset of uiPagination to page 0
 	
-	public Pagination getPagination() {
-		return myPages;
-	}
-	
 	public UiPagination(String _selectionStyle) {
 		selectionStyle = _selectionStyle;
 		myPages = new Pagination(); 
@@ -47,6 +43,10 @@ public class UiPagination {
 		isSettingUp = true;
 		
 		disableKeyInputs();
+	}
+	
+	public Pagination getPagination() {
+		return myPages;
 	}
 	
 	private void disableKeyInputs() {

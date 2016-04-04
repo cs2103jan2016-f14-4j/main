@@ -383,7 +383,7 @@ public class UiController {
 		} else {	
 			// special case
 			currentLine = currentLine.replace("[", "[ "); // add space for processing
-			currentLine = currentLine.replace("[  ", "[ "); // bound it within
+			currentLine = currentLine.replace("[  ", "[ "); // bound it within 1 space
 			currentLine = currentLine.replace("]", " ]");
 			currentLine = currentLine.replace("  ]", " ]"); 
 			

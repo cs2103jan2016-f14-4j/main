@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.content.UiFormatter;
+import taskey.ui.content.views.UiTaskView;
 
 /**
  * @@author A0125419H

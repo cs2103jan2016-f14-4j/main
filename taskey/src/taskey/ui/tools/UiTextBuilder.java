@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.tools;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ public class UiTextBuilder {
 		addMarkers(styles);
 	}
 	
-	public void initVariables() {
+	private void initVariables() {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
@@ -44,16 +44,13 @@ public class UiTextBuilder {
 		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
 	}
 	
+	// for buildBySymbol
 	public void addMarkers(String ...styles) {
 		for ( String style : styles) {
 			styleMarkers.add(new Pair<Integer, String>(0, style));
 		}
 	}
 
-	public void removeMarkers() {
-		styleMarkers.clear();
-	}
-	
 	/**
 	 * This method converts an arraylist of Text objects into a Textflow
 	 * for displaying

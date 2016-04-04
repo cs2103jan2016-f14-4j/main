@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextFlow;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.content.UiTextBuilder;
+import taskey.ui.tools.UiTextBuilder;
 
 /**
  * @@author A0125419H

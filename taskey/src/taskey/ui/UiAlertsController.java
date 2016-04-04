@@ -30,7 +30,7 @@ import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
-import taskey.ui.content.UiGridHelper;
+import taskey.ui.tools.UiGridHelper;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
 
@@ -159,7 +159,7 @@ public class UiAlertsController {
 		});
 	}
 	
-	public void addEntry(UiAlert newAlert) {
+	private void addEntry(UiAlert newAlert) {
 		if ( checkAlertExisted(newAlert) == true ) {
 			return;
 		}
@@ -232,7 +232,7 @@ public class UiAlertsController {
 	 * Convenience method for setting all alerts
 	 * @param alertList
 	 */
-	public void setAll(ArrayList<UiAlert> alertList) { 
+	public void setAllAlerts(ArrayList<UiAlert> alertList) { 
 		for ( int i = 0; i < UiConstants.MAX_ALERTS; i ++ ) {
 			if ( alertList.contains(currentAlerts.get(i)) == false ) { // remove old / invalid alerts
 				removeEntry(i);

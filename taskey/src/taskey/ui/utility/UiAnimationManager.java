@@ -7,7 +7,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
-import javafx.beans.property.DoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -21,6 +20,7 @@ import javafx.util.Pair;
  * as well as custom ones.
  *
  * @author JunWei
+ * 
  */
 
 public class UiAnimationManager {
@@ -78,7 +78,16 @@ public class UiAnimationManager {
 		return shift;	
 	}
 	
-	
+	/**
+	 * Creates the scale transition
+	 * @param theNode - the node
+	 * @param scaleByX - scale to X
+	 * @param scaleByY - scale to Y
+	 * @param cycleCount - Number times to animate to and from initial scale
+	 * @param autoReverse - Reverse scaling animation on finish
+	 * @param animDuration - the anim duration
+	 * @return - the scale transition
+	 */
 	public ScaleTransition createScaleTransition(Node theNode, double scaleByX, double scaleByY, int cycleCount, 
 												 boolean autoReverse, int animDuration) {
 		ScaleTransition scale = new ScaleTransition(Duration.millis(animDuration), theNode);
@@ -90,6 +99,17 @@ public class UiAnimationManager {
 	}
 	
 	
+	/**
+	 * This method creates a shaking animation on the X axis
+	 * using an Interpolator
+	 * It does this using a Timeline, which has frames to set the translation
+	 * 
+	 * @param theNode - the node
+	 * @param xShift - distance to shift on X
+	 * @param interval - to set new translation
+	 * @param animDuration - anim duration
+	 * @return - the timeline 
+	 */
 	public Timeline createShakeTransition(Node theNode, int xShift, int interval, int animDuration) {
 		Interpolator WEB_EASE = Interpolator.SPLINE(0.25, 0.1, 0.25, 1);
 		int numShifts = animDuration / interval; // milliseconds

@@ -13,6 +13,7 @@ import taskey.constants.UiConstants;
  * It builds an array of Text objects to be returned 
  *
  * @author Junwei
+ * 
  */
 
 public class UiTextBuilder {
@@ -53,6 +54,12 @@ public class UiTextBuilder {
 		styleMarkers.clear();
 	}
 	
+	/**
+	 * This method converts an arraylist of Text objects into a Textflow
+	 * for displaying
+	 * @param theText
+	 * @return
+	 */
 	public TextFlow convertTextArray(ArrayList<Text> theText) {
 		TextFlow element = new TextFlow();
 		element.getChildren().addAll(theText);
@@ -63,7 +70,7 @@ public class UiTextBuilder {
 	 * so that styles can be switched then
 	 *
 	 * @param line - the line to process
-	 * @return -TextFlow object
+	 * @return - TextFlow object
 	 */
 	public TextFlow build(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
@@ -100,7 +107,7 @@ public class UiTextBuilder {
 	/**
 	 * Using a symbol like #, etc to build, reuse markers but not using indexes
 	 * Markers are ignored in a queue-like fashion for each symbol encountered.
-	 * This is very slow because it goes through each character
+	 * This is very slow because it goes through each character, but is more convenient
 	 *
 	 * @param line - line to build text objects from
 	 * @return - the text flow object

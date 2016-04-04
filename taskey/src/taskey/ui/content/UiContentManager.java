@@ -18,15 +18,15 @@ import taskey.ui.content.formatters.UiDefaultFormatter;
 
 /**
  * @@author A0125419H
- * This class acts as the interface for all content display related operations
+ * This class acts as the manager for all tab content display related operations
  * It does the main job of setting up the UiFormatters, and redirecting input from UiController.
  *
  * @author JunWei
+ * 
  */
 
 public class UiContentManager {
 	private ArrayList<UiFormatter> myFormatters; // for each content box
-
 	public UiContentManager() {
 		myFormatters = new ArrayList<UiFormatter>();
 	}
@@ -57,8 +57,8 @@ public class UiContentManager {
 	}
 
 	/**
-	 * Generic update Content Box method, which would just call format on the formatters, regardless of grid type
-	 * Used if the Content Box only has a single grid .
+	 * Generic update Content Box method, which would just call format on the formatters
+	 * the format is handled differently by different formatters
 	 *
 	 * @param myTaskList - list of tasks
 	 * @param contentID - id of content box
@@ -101,12 +101,19 @@ public class UiContentManager {
 		myFormatters.clear();
 	}
 	
+	//----------------------- Inputs Redirection -----------------------
 	public void processArrowKey(KeyEvent event, ContentBox currentContent) {
 		assert(event != null);
 		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		myFormatter.processArrowKey(event);
 	}
 
+	public void processPageUpAndDown(KeyEvent event, ContentBox currentContent) {
+		assert(event != null);
+		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
+		myFormatter.processPageUpAndDown(event);
+	}
+	
 	public int processDelete(ContentBox currentContent) {
 		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		return myFormatter.processDeleteKey();
@@ -115,11 +122,5 @@ public class UiContentManager {
 	public void processEnter(ContentBox currentContent) {
 		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
 		myFormatter.processEnterKey();
-	}
-	
-	public void processPageUpAndDown(KeyEvent event, ContentBox currentContent) {
-		assert(event != null);
-		UiFormatter myFormatter = myFormatters.get(currentContent.getValue());
-		myFormatter.processPageUpAndDown(event);
 	}
 }

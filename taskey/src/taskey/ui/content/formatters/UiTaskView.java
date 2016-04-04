@@ -24,18 +24,19 @@ import taskey.ui.utility.UiImageManager;
  * as DefaultFormatter, ActionFormatter both use it
  * 
  * @author junwei
+ * 
  */
 
 public class UiTaskView {
-
-	private int stackPanePadding = 4;
+	private static final int stackPanePadding = 4;
+	
 	private UiPagination taskView;
 	private int entriesPerPage;
 	private UiGridHelper gridHelper;
 
 	public UiTaskView(int _entriesPerPage) {
-		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 		entriesPerPage = _entriesPerPage;
+		gridHelper = new UiGridHelper(UiConstants.STYLE_DEFAULT_BOX);
 		taskView = new UiPagination(UiConstants.STYLE_HIGHLIGHT_BOX);
 	}
 	
@@ -63,15 +64,8 @@ public class UiTaskView {
 				addTaskID(theTask, entryNo, j, newGrid); // add to main grid
 				addTaskDescription(theTask,paneGrid);
 				addImage(theTask,paneGrid);
+				checkOverlaps(overlappingPairs, entryNo, paneGrid); // Mark overlapping tasks
 				
-				// Mark overlapping tasks
-				for ( int k = 0; k < overlappingPairs.size(); k ++ ) {
-					if ( overlappingPairs.get(k).getKey() == entryNo 
-						 || overlappingPairs.get(k).getValue() == entryNo) {
-						addOverlapIcon(theTask,paneGrid);
-						break;
-					}
-				}
 				entryNo++;	
 				pageEntries.add(entryPane);
 			}
@@ -79,7 +73,7 @@ public class UiTaskView {
 		}
 		taskView.initializeDisplay(totalPages); // update UI and bind call back
 	}
-
+	
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {
 		assert(theTask != null);
 		UiTextBuilder myBuilder = new UiTextBuilder();
@@ -153,13 +147,22 @@ public class UiTaskView {
 		gridHelper.createImageInCell(1,0,UiImageManager.getInstance().getImage(imgID),30,30,newGrid);
 	}
 	
-	
-	private void addOverlapIcon(Task theTask, GridPane newGrid ) {
+	private void addOverlapIcon(GridPane newGrid ) {
 		ImageView img = gridHelper.createImageInCell(1,0,
 				UiImageManager.getInstance().getImage(ImageID.URGENT_MARK),15,15,newGrid);
 		StackPane.setAlignment(img, Pos.TOP_RIGHT);
 	}
 	
+	private void checkOverlaps(ArrayList<Pair<Integer, Integer>> overlappingPairs, int entryNo, GridPane paneGrid) {
+		for ( int k = 0; k < overlappingPairs.size(); k ++ ) {
+			if ( overlappingPairs.get(k).getKey() == entryNo 
+				 || overlappingPairs.get(k).getValue() == entryNo) {
+				addOverlapIcon(paneGrid);
+				break;
+			}
+		}
+	}
+
 	/**
 	 * This method provides an efficient method to check overlap of 2 ranges
 	 * http://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap

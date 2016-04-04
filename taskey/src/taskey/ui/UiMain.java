@@ -113,7 +113,7 @@ public class UiMain extends Application {
 		group.scaleXProperty().bind(newScene.widthProperty().divide(origW));
 		group.scaleYProperty().bind(newScene.heightProperty().divide(origH));
 
-		// set event handlers / listener
+		// set event handlers / listeners
 		UiResizeListener listener = new UiResizeListener(newScene, primaryStage);
 		newScene.setOnMouseMoved(listener);
 		newScene.setOnMousePressed(listener);
@@ -134,7 +134,7 @@ public class UiMain extends Application {
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		primaryStage.getIcons().add(UiImageManager.getInstance().getImage(ImageID.WINDOW_ICON));
 
-		myController.setUpNodes(primaryStage, root); // must be done after loading .fxml file
+		myController.setUpController(primaryStage, root); // must be done after loading .fxml file
 		myController.setStyleSheets(UiConstants.STYLE_UI_DEFAULT);
 		primaryStage.show();
 		myController.setUpNodesWhichNeedBounds(); // layout bounds of nodes are only updated on primaryStage.show()	

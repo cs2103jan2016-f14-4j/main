@@ -2,12 +2,9 @@ package taskey.ui.content.formatters;
 
 import java.util.ArrayList;
 
-import org.ocpsoft.prettytime.shade.edu.emory.mathcs.backport.java.util.Collections;
-
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
-import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
 import taskey.ui.content.UiFormatter;
@@ -67,20 +64,24 @@ public class UiDefaultFormatter extends UiFormatter {
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
 
-			if ( prevList != null ) { 
-				int index = 0;
-				if ( myTaskList.size() >= prevList.size()) {
-					index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
-					if ( index == -1) {
-						// no op as lists are the same
-					} else {
-						myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
-								  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
-					}
-				}
-			} 
-			prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
+			updateSelection(myTaskList);
 		}
+	}
+	
+	private void updateSelection(ArrayList<Task> myTaskList) {
+		if ( prevList != null ) { 
+			int index = 0;
+			if ( myTaskList.size() >= prevList.size()) {
+				index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
+				if ( index == -1) {
+					// no op as lists are the same
+				} else {
+					myTaskView.getView().selectInPage(index/UiConstants.ENTRIES_PER_PAGE_DEFAULT, 
+							  index%UiConstants.ENTRIES_PER_PAGE_DEFAULT); 
+				}
+			}
+		} 
+		prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
 	}
 	
 	private ArrayList<Task> cloneList(ArrayList<Task> toClone) {

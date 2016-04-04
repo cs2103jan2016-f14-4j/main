@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -16,7 +15,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
@@ -31,18 +29,21 @@ import taskey.ui.utility.UiPopupManager;
 /**
  * @@author A0125419H
  * This class implements the dropdown box used by AutoComplete
+ * Note that the menu created is not within the main window,
+ * but as a dropDown box implemented in a pop up
  * 
  * @author JunWei
  */
 
 public class UiDropDown {
-	private static final int TEXT_SIZE_FROM_CSS = 15;
+	private static final int TEXT_SIZE_FROM_CSS = 15; // these have to be referenced from sharedStyles.css
 	private static final String FONT_NAME_FROM_CSS = "Montserrat";
-	private TextField myInput;
+	
+	private TextField inputBox;
+	private Window mainWindow;
 	private Popup myMenu = null;
 	private FadeTransition fade;
-	private Window myWindow;
-	private StackPane selectedPane;
+	private StackPane selectedPane; // selected stack pane for styling
 	private int currentSelection;
 	private int currentItemSize;
 	
@@ -52,19 +53,11 @@ public class UiDropDown {
 		
 		TaskeyLog.getInstance().log(LogSystems.UI, "Setting up Drop down Menu...", Level.ALL);
 		
-		myInput = input; // set up reference
+		// set up references
+		inputBox = input; 
+		mainWindow = primaryStage.getScene().getWindow();
 		myMenu = UiPopupManager.getInstance().createPopupMenu();
-		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
-																	 UiConstants.DEFAULT_FADE_START_DELAY*5, 
-																	 UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
-		// create custom handler
-		fade.setOnFinished(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				closeMenu();
-			}
-		});
-		myWindow = primaryStage.getScene().getWindow();
+		createFadeAnimation();
 		currentItemSize = 0;
 		currentSelection = -1;
 		selectedPane = null;
@@ -72,66 +65,86 @@ public class UiDropDown {
 		TaskeyLog.getInstance().log(LogSystems.UI, "Drop down menu has been set up...", Level.ALL);
 	}
 
+	private void createFadeAnimation() {
+		fade = UiAnimationManager.getInstance().createFadeTransition(myMenu.getContent().get(0), 
+				 UiConstants.DEFAULT_FADE_START_DELAY*5, 
+				 UiConstants.DEFAULT_ANIM_DURATION, 1.0, 0.0);
+		// create custom handler
+		fade.setOnFinished(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				closeMenu();
+			}
+		});
+	}
+	
 	public void updateMenuItems(ArrayList<String> items) {
 		assert(items != null);
-		VBox myContent = (VBox) myMenu.getContent().get(0);
-		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
-		menuItems.clear();
-		currentItemSize = items.size();
+		currentItemSize = items.size(); 
 		deSelect();
-		
 		if ( items.size() == 0 ) {		
 			return;
 		}
-	
-		int insertionIndex = findIndexOfLongestItem(items);
-		
-		StackPane longestPane = new StackPane();
-		Label longestText = new Label(items.get(insertionIndex)); // gap for box
-		longestText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-		longestText.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
-		longestPane.getChildren().add(longestText);
-		
-		for (int i = 0; i < items.size(); i++) {
-			if ( i == insertionIndex ) {
-				myContent.getChildren().add(longestPane);
-			} else {
-				StackPane myPane = new StackPane();
-				Label text = new Label(items.get(i));
-				text.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
-				text.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
-				 // bind width (calculations delay till stage is shown)
-				text.prefWidthProperty().bind(longestPane.widthProperty());
-				myPane.getChildren().add(text);
-				myContent.getChildren().add(myPane);
-			}
-		}
+		int longestIndex = findIndexOfLongestItem(items);
+		createStackPanes(items,longestIndex);
 	}
 	
 	private int findIndexOfLongestItem(ArrayList<String> items) {
-		int insertionIndex = 0;
+		int longestIndex = 0;
 		// find longest text bounds
 		Text longest = new Text(items.get(0));
+		// setting font for Text recalculates layout bounds
 		longest.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS));
 		for ( int i = 1; i < items.size(); i++) {
 			Text itemText = new Text(items.get(i));
 			itemText.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); 
 			if ( itemText.getLayoutBounds().getWidth() > longest.getLayoutBounds().getWidth() ) {
 				longest = itemText;
-				insertionIndex = i;
+				longestIndex = i;
 			}
 		}
-		return insertionIndex;
+		return longestIndex;
+	}
+	
+	private void createStackPanes(ArrayList<String> items, int longestIndex) {
+		VBox myContent = (VBox) myMenu.getContent().get(0);
+		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
+		menuItems.clear();
+		
+		StackPane longestPane = new StackPane();
+		Label longestLabel = new Label(items.get(longestIndex)); 
+		longestPane.getChildren().add(longestLabel);
+		
+		for (int i = 0; i < items.size(); i++) {
+			if ( i == longestIndex ) {
+				myContent.getChildren().add(longestPane);
+			} else {
+				StackPane myPane = new StackPane();
+				Label myLabel = new Label(items.get(i));
+				myPane.getChildren().add(myLabel);
+				
+				 // bind width (calculations delay till stage is shown)
+				myLabel.prefWidthProperty().bind(longestPane.widthProperty());				
+				myContent.getChildren().add(myPane);
+			}
+		}	
+		// add styles
+		for ( int i = 0; i < myContent.getChildren().size(); i ++ ) {
+			StackPane currentPane = (StackPane) myContent.getChildren().get(i);
+			Label currentLabel = (Label) currentPane.getChildren().get(0);
+			currentLabel.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
+			currentLabel.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
+		}
 	}
 	
 	/**
 	 * Update menu, called to update position and correct the display issues.
 	 */
 	public void updateMenu() {
-		if (myWindow == null || myMenu == null) { // if not initialized yet and received input
+		if (mainWindow == null || myMenu == null) { // if not initialized yet and received input
 			return;
 		}
-		String line = myInput.getText();
+		String line = inputBox.getText();
 		if (line.equals("")) {
 			closeMenu();
 		} else {
@@ -141,16 +154,16 @@ public class UiDropDown {
 	}
 
 	private void ShiftMenu() {
-		assert(myInput != null);
-		double width = getWidthOfTextFieldInput(myInput);
-		Bounds bounds = myInput.getBoundsInLocal();
-		Bounds screenBounds = myInput.localToScreen(bounds);
+		assert(inputBox != null);
+		double width = getWidthOfTextFieldInput(inputBox);
+		Bounds bounds = inputBox.getBoundsInLocal();
+		Bounds screenBounds = inputBox.localToScreen(bounds);
 		UiPopupManager.getInstance().resize(myMenu);
 
 		// restrict menu from stretching beyond the TextField
-		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + myInput.getWidth() * UiPopupManager.getInstance().getXRatio(), 
+		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + inputBox.getWidth() * UiPopupManager.getInstance().getXRatio(), 
 								   screenBounds.getMinX() + width * UiPopupManager.getInstance().getXRatio()));
-		myMenu.setAnchorY(screenBounds.getMinY() + myInput.getHeight() * UiPopupManager.getInstance().getYRatio());
+		myMenu.setAnchorY(screenBounds.getMinY() + inputBox.getHeight() * UiPopupManager.getInstance().getYRatio());
 	}
 
 	/**
@@ -163,7 +176,6 @@ public class UiDropDown {
 	private double getWidthOfTextFieldInput(TextField field) {
 		assert(field != null);
 		Text text = new Text(field.getText());
-		// setting font for Text recalculates layout bounds
 		text.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); 
 		double width = text.getLayoutBounds().getWidth();
 		return width;
@@ -202,7 +214,7 @@ public class UiDropDown {
 		assert(fade != null);
 		myMenu.hide();
 		restartFade();
-		myMenu.show(myWindow);
+		myMenu.show(mainWindow);
 	}
 	
 	/**
@@ -228,7 +240,7 @@ public class UiDropDown {
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		assert(selection >= 0 && selection < myContent.getChildren().size());
 
-		deSelect(); 
+		deSelect(); // remove styles first if any
 		
 		// do selection
 		currentSelection = selection;

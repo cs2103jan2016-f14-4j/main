@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
  * Helper class for static initialization objects for grid, placed in UiConstants.
  *
  * @author JunWei
+ * 
  */
 
 public class UiGridSettings {

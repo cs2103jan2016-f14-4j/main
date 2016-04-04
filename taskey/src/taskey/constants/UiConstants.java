@@ -23,7 +23,6 @@ public class UiConstants {
 	public static final String FXML_PATH = "layout.fxml";
 	public static final String FXML_ALERT_PATH = "alert.fxml";
 	public static final String FXML_LOAD_FAIL = "Fxml file not found";
-	
 	public static final Dimension WINDOW_MIN_SIZE = new Dimension(370,285); // half of original window size
 	
 	// Content Boxes
@@ -74,7 +73,9 @@ public class UiConstants {
 	public enum ActionMode {
 		LIST, HELP;
 	}
-
+	public static final String ACTION_MODE_INVALID = "Mode invalid For ActionFormatter";
+	
+	// Grid settings
 	public static final UiGridSettings GRID_SETTINGS_DEFAULT = new UiGridSettings(1, 1, 3, 5, 98);
 	public static final UiGridSettings GRID_SETTINGS_ENTRY_PANE = new UiGridSettings(0, 0, 0, 80, 20);
 	public static final UiGridSettings GRID_SETTINGS_ACTION_HELP = new UiGridSettings(0, 20, 10, 25, 75);
@@ -116,7 +117,6 @@ public class UiConstants {
 			Arrays.asList("sharedStyles.css", "lightStyle.css", "lightTab.css" ));
 	public static final ArrayList<String> STYLE_UI_ALERT_WINDOW = new ArrayList<String>(
 			Arrays.asList("sharedStyles.css", "alertStyles.css"));
-	
 	public static final String STYLE_SHEETS_LOAD_FAIL = " loading style sheets";
 	
 	// Tray
@@ -132,6 +132,7 @@ public class UiConstants {
 	public static final int MAX_ALERTS = 10; 
 	public static final float ALERTS_OPACITY = 0.8f;
 	public static final int[] HOUR_MARKS = { 1, 3, 5, 12 };
+	
 	// Others
 	public static final DateFormat CLOCK_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 	public static final int UPDATE_SERVICE_INTERVAL = 300000; // in milliseconds (5 minutes)
@@ -142,4 +143,5 @@ public class UiConstants {
 	public static final int MAX_INPUT_HISTORY = 5; // number of inputs to remember for uicontroller
 	public static final int ENTRIES_PER_PAGE_DEFAULT = 5;
 	public static final int ENTRIES_PER_PAGE_HELP_MENU = 6;
+	public static final int WINDOW_RESIZE_PICK_BOUNDS = 10;
 }

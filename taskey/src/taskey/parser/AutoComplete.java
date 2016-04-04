@@ -480,6 +480,13 @@ public class AutoComplete {
 	/**
 	 * This algorithm measure the difference in distance between
 	 * a source (src) string and a target (tar) string
+	 * Algorithm taken from: https://en.wikipedia.org/wiki/Levenshtein_distance
+	 * Upper and lower bounds of the algorithm: 
+	 * 1) It is at least the difference in the size of the 2 strings
+	 * 2) It is at most the length of the longer string
+	 * 3) 0 iff the 2 strings are equal
+	 * 4) If the 2 strings are the same size, upperBound of Levenstein distence is the Hamming Distance
+	 * 5) Satisfies Triangle Inequality (LD(string1,string2) >= LD(string1) + LD(string2) 
 	 * @param src
 	 * @param tar
 	 * @return distance between the 2 strings 

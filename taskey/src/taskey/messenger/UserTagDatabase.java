@@ -19,7 +19,7 @@ public class UserTagDatabase {
 	ArrayList<TagCategory> userTags = new ArrayList<TagCategory>(); 
 	Storage db; 
 	
-	//@@author A0134177E
+	//@@author A0134177E-unused
 	public UserTagDatabase(Storage storage) {
 		db = storage;
 		//initialise the database of tags. 
@@ -39,7 +39,7 @@ public class UserTagDatabase {
 	}
 	
 	/**
-	 * @@author A0107345L
+	 * @@author A0107345L-unused
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
 	 */
@@ -85,7 +85,7 @@ public class UserTagDatabase {
 		return false;
 	}
 	
-	//@@author A0134177E
+	//@@author A0134177E-unused
 	public boolean removeTagCategory(String tag) {
 		for (Iterator<TagCategory> it = userTags.iterator(); it.hasNext();) {
 			TagCategory tc = it.next();
@@ -100,7 +100,7 @@ public class UserTagDatabase {
 	}
 
 	/**
-	 * @@author A0107345L
+	 * @@author A0107345L-unused
 	 * For Logic: Get the entire tagList so that 
 	 * it can be displayed by the UI.
 	 * @return
@@ -110,7 +110,7 @@ public class UserTagDatabase {
 	}
 	
 	/**
-	 * @@author A0134177E
+	 * @@author A0134177E-unused
 	 * Save the tag hash map into a file for persistent storage. 
 	 * @return true if save was successful; false otherwise
 	 */
@@ -149,7 +149,7 @@ public class UserTagDatabase {
 	}
    
     /*
-     * @@author A0107345L
+     * @@author A0107345L-unused
      * FOR DEBUGGING
      */
 	@Override

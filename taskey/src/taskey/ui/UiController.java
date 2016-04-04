@@ -86,7 +86,7 @@ public class UiController {
 	private ArrayList<String> inputHistory;
 	private int historyIterator;
 	private Timeline shakeNotification; // animation
-	
+
 	//----- Used by UiTrayModule ------
 	public Stage getStage() {
 		return stage;
@@ -384,17 +384,17 @@ public class UiController {
 			String [] tokens = selection.split(" ");
 			String [] lineTokens = currentLine.split(" ");		
 			for ( int i = 0; i < tokens.length; i ++ ) {
+				// remove all tokens from selection that appear in current input
 				if ( currentLine.contains(tokens[i])) {
-					currentLine = currentLine.replace(tokens[i], ""); // remove
-				}
-				if ( lineTokens.length >= tokens.length) {
-					if ( selection.contains(lineTokens[lineTokens.length-1-i])) {
-						currentLine = currentLine.replace(lineTokens[lineTokens.length-1-i], "");
-					}
-				} else {
-					currentLine = lineTokens[0];
+					currentLine = currentLine.replace(tokens[i], ""); 
 				}
 			}
+			// remove all tokens from input that appear in current selection
+			for ( int i = lineTokens.length-1; i >= 0 && i >= lineTokens.length-1 - tokens.length; i-- ) {			
+				if ( selection.contains(lineTokens[i])) {
+					currentLine = currentLine.replace(lineTokens[i], "");
+				}
+			}	
 			currentLine = currentLine.trim();
 			input.setText(currentLine + " " + selection + " ");
 		}

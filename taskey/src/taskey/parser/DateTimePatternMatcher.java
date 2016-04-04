@@ -35,7 +35,6 @@ public class DateTimePatternMatcher {
 	private String pattern9 = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; //for time
 	private String pattern10= "(morning|night)";
 	
-	
 	public DateTimePatternMatcher() {
 		
 	}

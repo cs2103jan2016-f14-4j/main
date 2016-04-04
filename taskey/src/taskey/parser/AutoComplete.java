@@ -2,6 +2,8 @@ package taskey.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import taskey.constants.ParserConstants;
 import taskey.messenger.ProcessedAC;
@@ -192,18 +194,18 @@ public class AutoComplete {
 		
 		//check if basic view exists 
 		for(int i = 0; i < viewList.size(); i++) {
-			if (viewList.get(i).contains(word)) {
+			if (viewList.get(i).indexOf(word) == 0) {
 				availViews.add(viewList.get(i)); 
 			}
 		}
 		
 		//check if tag view exists 
 		for(int i = 0; i < tagDB.size(); i++) {
-			String tag = tagDB.get(i).getTagName(); 
-			if (tag.contains(phrase)) {
+			String tag = "#" + tagDB.get(i).getTagName(); 
+			if (tag.contains(word)) {
 				//if user types without #, 
 				//then he should select the dropdown suggestion
-				availViews.add("#"+ tag); 
+				availViews.add(tag); 
 			}
 		}
 		
@@ -221,6 +223,7 @@ public class AutoComplete {
 	 */
 	private ProcessedAC completeAdd(String phrase, ArrayList<TagCategory> tagDB) { 
 		String keyWords = "(at|on|by|from)";
+		
 		ArrayList<String> availSuggestions = new ArrayList<String>(); 
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("add", "").trim();
@@ -274,8 +277,10 @@ public class AutoComplete {
 			availSuggestions.add("tmr");
 			availSuggestions.add("8pm");
 			availSuggestions.add("next mon");
+		} else if (!hasKeywords(splitString)) {
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 		} else {
-			availSuggestions = suggestDates(latestWord); 
+			availSuggestions = suggestDates(latestWord, phrase); 
 			if (availSuggestions == null) {
 				//might be task name, don't indicate error 
 				return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
@@ -286,6 +291,23 @@ public class AutoComplete {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions); 
 		}
 		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+	}
+
+	/**
+	 * Checks if any word in an input contains keywords
+	 * @param phraseSplit
+	 * @return true if the keywords at/on/by/from exists anywhere
+	 */
+	private boolean hasKeywords(String[] phraseSplit) {
+		String keyWords = "(at|on|by|from)";
+		
+		for (int i = 0; i < phraseSplit.length; i++) {
+			String word = phraseSplit[i];
+			if (word.matches(keyWords)) {
+				return true; 
+			}	
+		}
+		return false; 
 	}
 	
 	/**
@@ -299,23 +321,32 @@ public class AutoComplete {
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("set", "").trim();
 		
-		if (phrase.contains("!")) {
-			availSuggestions.add("!"); 
-			availSuggestions.add("!!");
-			availSuggestions.add("!!!");
+		if (phrase.contains("!!!!")) {
+			//anything more than 3 !s is an error
+			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+		} else if (phrase.contains("!!!")) {
+			//no need to suggest anything else 
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 		} else if (phrase.contains("!!")) {
 			availSuggestions.add("!!");
 			availSuggestions.add("!!!");
-		} else if (phrase.contains("!!!")) {
-			//no need to suggest anything else 
-			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-		} else if (phrase.contains("!!!!")) {
-			//anything more than 3 !s is an error
-			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+		} else if (phrase.contains("!")) {
+			availSuggestions.add("!"); 
+			availSuggestions.add("!!");
+			availSuggestions.add("!!!"); 
 		} else if (phrase.contains("[")) {
-			String phrase2 = phrase.replace("]", ""); 
+			System.out.println(phrase);
 			//suggest a date to the user 
-			String dates = phrase2.split("\\[")[1].trim();
+			String dates; 
+			String[] rawDates = phrase.split("\\[");
+			if (rawDates.length > 1) {
+				dates = rawDates[1].trim();
+				dates = dates.replace("]", "");
+			} else {
+				//probably an empty [] from autocomplete
+				availSuggestions.add("tomorrow"); 
+				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions); 
+			}
 			String date;
 			if (dates.split(",").length == 2) {
 				//only auto complete the 2nd date 
@@ -336,6 +367,7 @@ public class AutoComplete {
 			//user has not typed any changes, so suggest format 
 			availSuggestions.add("\"New Task Name\"");
 			availSuggestions.add("[New Date]");
+			availSuggestions.add("!!"); 
 		}
 		
 		if (!availSuggestions.isEmpty()) {
@@ -345,6 +377,7 @@ public class AutoComplete {
 	}
 	
 	/**
+	 * FOR PARSING EDIT/SET 
 	 * Suggest some dates and times that the user can type
 	 * @param date
 	 * @return a list of date/time that the user can type
@@ -352,25 +385,76 @@ public class AutoComplete {
 	private ArrayList<String> suggestDates(String date) {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
-		if ("this".contains(date.trim())) { //eg. this ... 
+		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
 			availDates = specialDaysThis; 
 			return availDates; 
-		} else if ("next".contains(date.trim())) { //eg. that ...
+		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
 			availDates = specialDaysNext; 
 			return availDates; 
 		}
 		
 		//eg. sun... mon... 
 		for(int i = 0; i < specialDays.size(); i++) { 
-			if (specialDays.get(i).contains(date)) {
+			if (specialDays.get(i).indexOf(date) == 0) {
 				availDates.add(specialDays.get(i));
 			}
 		}
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
+			date = date.replace("pm", "");
+			date = date.replace("am", "");
+			date = date.replace("h", "");
 			availDates.add(date.trim()+"am");
 			availDates.add(date.trim()+"pm"); 
+			availDates.add(date.trim()+"h"); 
+		}
+		
+		//check for normal date
+		if (pm.hasDateAC(date.trim())) {
+			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+			for(int i = 0; i < dateRaw.size(); i++) {
+				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			}
+		}
+		if (!availDates.isEmpty()) {
+			return availDates; 
+		}
+		return null; 
+	}
+	
+	/**
+	 * OVERLOADED METHOD: FOR PARSING ADD 
+	 * Suggest some dates and times that the user can type
+	 * @param date
+	 * @return a list of date/time that the user can type
+	 */
+	private ArrayList<String> suggestDates(String date, String phrase) {
+		ArrayList<String> availDates = new ArrayList<String>();
+		
+		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
+			availDates = specialDaysThis; 
+			return availDates; 
+		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
+			availDates = specialDaysNext; 
+			return availDates; 
+		}
+		
+		//eg. sun... mon... 
+		for(int i = 0; i < specialDays.size(); i++) { 
+			if (specialDays.get(i).indexOf(date) == 0) {
+				availDates.add(specialDays.get(i));
+			}
+		}
+		
+		//check for possible time formats, and suggest times
+		if (pm.hasTimeAC(date.trim())) {
+			date = date.replace("pm", "");
+			date = date.replace("am", "");
+			date = date.replace("h", "");
+			availDates.add(date.trim()+"am");
+			availDates.add(date.trim()+"pm"); 
+			availDates.add(date.trim()+"h"); 
 		}
 		
 		//check for normal date
@@ -399,7 +483,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
-	public ArrayList<String> completeDelete(String phrase, ArrayList<String> tasks) {
+	private ArrayList<String> completeDelete(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("del", ""); 
@@ -423,7 +507,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
-	public ArrayList<String> completeDone(String phrase, ArrayList<String> tasks) {
+	private ArrayList<String> completeDone(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("done", ""); 

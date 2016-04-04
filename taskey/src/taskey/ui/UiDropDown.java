@@ -17,6 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -35,7 +36,8 @@ import taskey.ui.utility.UiPopupManager;
  */
 
 public class UiDropDown {
-	private static final int MAX_ITEMS = 4;
+	private static final int TEXT_SIZE_FROM_CSS = 15;
+	private static final String FONT_NAME_FROM_CSS = "Montserrat";
 	private TextField myInput;
 	private Popup myMenu = null;
 	private FadeTransition fade;
@@ -75,27 +77,22 @@ public class UiDropDown {
 		VBox myContent = (VBox) myMenu.getContent().get(0);
 		ObservableList<Node> menuItems = myContent.getChildren(); // list of stack panes
 		menuItems.clear();
+		currentItemSize = items.size();
+		deSelect();
 		
-		if ( items.size() == 0 ) {
+		if ( items.size() == 0 ) {		
 			return;
 		}
+	
+		int insertionIndex = findIndexOfLongestItem(items);
 		
-		// find longest item
-		String longest = "";
-		int insertionIndex = -1;
-		for (int i = 0 ; i < items.size(); i++) {
-			if ( items.get(i).length() > longest.length() ) {
-				longest = items.get(i);
-				insertionIndex = i;
-			}
-		}
 		StackPane longestPane = new StackPane();
-		Label longestText = new Label(longest);
+		Label longestText = new Label(items.get(insertionIndex)); // gap for box
 		longestText.getStyleClass().add(UiConstants.STYLE_TEXT_ALL);
 		longestText.getStyleClass().add(UiConstants.STYLE_PROMPT_DEFAULT);
 		longestPane.getChildren().add(longestText);
 		
-		for (int i = 0; i < items.size() && i < MAX_ITEMS; i++) {
+		for (int i = 0; i < items.size(); i++) {
 			if ( i == insertionIndex ) {
 				myContent.getChildren().add(longestPane);
 			} else {
@@ -109,8 +106,22 @@ public class UiDropDown {
 				myContent.getChildren().add(myPane);
 			}
 		}
-		currentItemSize = items.size();
-		deSelect();
+	}
+	
+	private int findIndexOfLongestItem(ArrayList<String> items) {
+		int insertionIndex = 0;
+		// find longest text bounds
+		Text longest = new Text(items.get(0));
+		longest.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS));
+		for ( int i = 1; i < items.size(); i++) {
+			Text itemText = new Text(items.get(i));
+			itemText.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); 
+			if ( itemText.getLayoutBounds().getWidth() > longest.getLayoutBounds().getWidth() ) {
+				longest = itemText;
+				insertionIndex = i;
+			}
+		}
+		return insertionIndex;
 	}
 	
 	/**
@@ -152,7 +163,8 @@ public class UiDropDown {
 	private double getWidthOfTextFieldInput(TextField field) {
 		assert(field != null);
 		Text text = new Text(field.getText());
-		text.setFont(field.getFont()); // Set the same font, so the size is the same
+		// setting font for Text recalculates layout bounds
+		text.setFont(Font.font(FONT_NAME_FROM_CSS, TEXT_SIZE_FROM_CSS)); 
 		double width = text.getLayoutBounds().getWidth();
 		return width;
 	}

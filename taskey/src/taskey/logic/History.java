@@ -2,28 +2,40 @@ package taskey.logic;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 
 /**
- * This class is to allow Storage to easily retrieve the last successfully saved tasklist/tagmap from memory
- * so that Storage can throw it to Logic when an error is encountered during saving.
- * This will in turn allow Logic to undo the last operation so that its data remains in sync with Storage.
- *
- * For now, this class is only meant to be used by Storage for the above purpose.
- * But, in the future, if more methods are added to this class, Logic could also use this for the undo command.
- * TODO: multiple undos/redos using stacks?
- *
- * @author Dylan
+ * @@author A0121618M
+ * This class is used by Logic for the undo and redo commands.
+ * Every time the task lists are updated, they are pushed onto the taskStack.
+ * At the same time, the tag list is also pushed onto the tagStack.
+ * 
+ * The undo command pops the most recently added task and tag data from the main stack
+ * and pushes them onto the redo stack, to be held there until new data is added to History
+ * (whereupon the redo stack is cleared), or the user invokes the redo command.
+ * 
+ * This class's redo method does the reverse of the undo routine: 
+ * it pops the previously "undone" data from the redo stack and pushes them back onto the main stack.
+ * Logic can then peek at the main stack to get the data for the redo command.
  */
 public class History {
+	// The main History stack
 	private ArrayDeque<ArrayList<ArrayList<Task>>> taskStack;
 	private ArrayDeque<ArrayList<TagCategory>> tagStack;
+	
+	// The redo stack that temporarily holds data popped from the main stack
+	private ArrayDeque<ArrayList<ArrayList<Task>>> redoTaskStack;
+	private ArrayDeque<ArrayList<TagCategory>> redoTagStack;
 
 	public History() {
 		taskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
 		tagStack = new ArrayDeque<ArrayList<TagCategory>>();
+		
+		redoTaskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
+		redoTagStack = new ArrayDeque<ArrayList<TagCategory>>();
 	}
 
 	public boolean taskStackIsEmpty() {
@@ -44,6 +56,7 @@ public class History {
 	 */
 	public void addTaskLists(ArrayList<ArrayList<Task>> taskLists) {
 		taskStack.push(taskLists);
+		redoTaskStack.clear();
 	}
 	
 	/**
@@ -52,7 +65,7 @@ public class History {
 	 */
 	public void addTagCategoryList(ArrayList<TagCategory> tagCategoryList) {
 		tagStack.push(tagCategoryList);
-
+		redoTagStack.clear();
 	}
 
 	/*=========*
@@ -83,7 +96,9 @@ public class History {
 	 * @return 
 	 */
 	public ArrayList<ArrayList<Task>> popTaskStack() {
-		return taskStack.pop();
+		ArrayList<ArrayList<Task>> popped = taskStack.pop();
+		redoTaskStack.push(popped);
+		return popped;
 	}
 
 	/**
@@ -91,7 +106,30 @@ public class History {
 	 * @return 
 	 */
 	public ArrayList<TagCategory> popTagStack() {
-		return tagStack.pop();
+		ArrayList<TagCategory> popped = tagStack.pop();
+		redoTagStack.push(popped);
+		return popped;
 	}
 
+	/*==========*
+	 * For redo *
+	 *==========*/
+	/**
+	 * @@author A0121618M
+	 * This method pops the last undid task lists and tag list from their respective redo stacks,
+	 * and pushes them back onto the main history stacks.
+	 * Logic can then peek at the main stack to redo the previously undid command.
+	 * @return false if there is nothing to redo; true if successful
+	 */
+	public boolean redo() {	
+		try {
+			ArrayList<ArrayList<Task>> undidTasks = redoTaskStack.pop();
+			ArrayList<TagCategory> undidTags = redoTagStack.pop();
+			taskStack.push(undidTasks);
+			tagStack.push(undidTags);
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+		return true;
+	}
 }

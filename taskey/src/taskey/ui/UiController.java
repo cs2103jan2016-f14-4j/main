@@ -306,8 +306,9 @@ public class UiController {
 			public void handle(KeyEvent event) {			
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_ERROR); // remove any error styles
 				input.getStyleClass().remove(UiConstants.STYLE_INPUT_CORRECT); // remove any correct styles
-				if ( event.getCode().isDigitKey() || event.getCode().isLetterKey() 
-					 || event.getCode() == KeyCode.BACK_SPACE) {
+				if ( event.getCode().isArrowKey() == false && 
+					 event.getCode().isDigitKey() || event.getCode().isLetterKey() 
+					 || event.getCode() == KeyCode.BACK_SPACE || event.getCode() == KeyCode.SPACE) {
 					processAutoComplete();
 				}
 				if (event.getCode() == KeyCode.ENTER) {	
@@ -342,18 +343,46 @@ public class UiController {
 			input.getStyleClass().add(UiConstants.STYLE_INPUT_ERROR); // suggestion not found, invalid input
 			myDropDown.closeMenu();
 		} else {
-			input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
-			myDropDown.updateMenuItems(suggestions);
-			myDropDown.updateMenu();
+			if ( suggestions.size() == 0 ) {
+				myDropDown.closeMenu();
+			} else {
+				input.getStyleClass().add(UiConstants.STYLE_INPUT_CORRECT);
+				myDropDown.updateMenuItems(suggestions);
+				myDropDown.updateMenu();
+			}
 		}
+	}
+	
+	private void addSelectionToInput(String selection) {
+		String currentLine = input.getText().trim();
+		if ( selection.contains(currentLine)) {
+			input.setText(selection + " ");
+		} else {	
+			String [] tokens = selection.split(" ");
+			String [] lineTokens = currentLine.split(" ");		
+			for ( int i = 0; i < tokens.length; i ++ ) {
+				if ( currentLine.contains(tokens[i])) {
+					currentLine = currentLine.replace(tokens[i], ""); // remove
+				}
+				if ( lineTokens.length >= tokens.length) {
+					if ( selection.contains(lineTokens[lineTokens.length-1-i])) {
+						currentLine = currentLine.replace(lineTokens[lineTokens.length-1-i], "");
+					}
+				} else {
+					currentLine = lineTokens[0];
+				}
+			}
+			currentLine = currentLine.trim();
+			input.setText(currentLine + " " + selection + " ");
+		}
+		input.selectEnd();
+		input.deselect();
 	}
 	
 	private void processEnter() {
 		String selection = myDropDown.getSelectedItem();
-		if ( selection.isEmpty() == false ) { // make selected item as input text
-			input.setText(selection + " ");
-			input.selectEnd();
-			input.deselect();
+		if ( selection.isEmpty() == false ) { // add selected item as input text
+			addSelectionToInput(selection);
 			myDropDown.closeMenu();
 		} else  {
 			String line = input.getText();
@@ -480,7 +509,8 @@ public class UiController {
 			  @Override public void handle(MouseEvent mouseEvent) {
 			  	stage.setX(mouseEvent.getScreenX() + mouseX);
 			    stage.setY(mouseEvent.getScreenY() + mouseY);
-			  }
+			    myDropDown.closeMenu();
+			  } 
 		});
 	}
 	

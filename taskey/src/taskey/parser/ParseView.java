@@ -28,6 +28,8 @@ public class ParseView extends ParseCommand {
 		viewList.put("high", "high");
 		viewList.put("medium", "medium"); 
 		viewList.put("low", "low"); 
+		viewList.put("today", "today");
+		viewList.put("tomorrow", "tomorrow"); 
 	}
 	
 	/**
@@ -61,7 +63,7 @@ public class ParseView extends ParseCommand {
 	 * @param stringInput
 	 * @return string without the "view" command attached to it. 
 	 */
-	public String getStringWithoutCommand(String stringInput) {
+	private String getStringWithoutCommand(String stringInput) {
 		String command = stringInput.split(" ")[0]; 
 		return stringInput.replace(command, "").trim().toLowerCase();
 	}
@@ -72,7 +74,7 @@ public class ParseView extends ParseCommand {
 	 * @param stringInput
 	 * @return ProcessedObject of the processed VIEW
 	 */
-	public ProcessedObject getView(String stringInput) {
+	private ProcessedObject getView(String stringInput) {
 		ArrayList<String> views = new ArrayList<String>(); 
 		String[] split = stringInput.split(" ");
 		String category; 

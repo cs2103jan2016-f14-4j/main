@@ -1,5 +1,12 @@
 
-	set WshShell = WScript.CreateObject("WScript.Shell")
+	Set WshShell = WScript.CreateObject("WScript.Shell")
+ 	If WScript.Arguments.length = 0 Then
+ 		Set ObjShell = CreateObject("Shell.Application")
+ 		ObjShell.ShellExecute "wscript.exe", """" & _
+ 		WScript.ScriptFullName & """" &_
+  		" RunAsAdministrator", , "runas", 1
+  	End if
+
 	strDesktop = WshShell.SpecialFolders("Desktop")
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
 

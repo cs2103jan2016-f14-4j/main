@@ -11,6 +11,7 @@ import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
+import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
 
 /**
@@ -41,7 +42,7 @@ public class Logic {
 		history = new History();
 		cmdExecutor = new CommandExecutor();
 		logicMemory = new LogicMemory();
-		autoComplete = new AutoComplete(logicMemory);
+		autoComplete = new AutoComplete();
 		updateHistory();
 	}
 	
@@ -315,7 +316,7 @@ public class Logic {
 				return null;
 			}
 		}*/
-		ProcessedAC pac = autoComplete.getSuggestions(line);
+		ProcessedAC pac = autoComplete.getSuggestions(line, getTagCategoryList());
 		String pacCommand = pac.getCommand();
 		
 		if (pacCommand.equals(DISPLAY_COMMAND)) { // to complete a command

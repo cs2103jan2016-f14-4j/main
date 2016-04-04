@@ -59,4 +59,5 @@ class History {
 }*/
 
 public class StorageException {
+	// Blank class to allow compilation of JAR file
 }

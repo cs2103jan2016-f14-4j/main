@@ -357,10 +357,8 @@ public class LogicMemory {
 		clearActionList();
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
-		
-		if (actionList.isEmpty()) {
-			throw new LogicException(LogicException.MSG_ERROR_SEARCH_NOT_FOUND);
-		}
+		String exceptionMsg = String.format(LogicException.MSG_SUCCESS_SEARCH, searchPhrase);
+		throw new LogicException(exceptionMsg);
 	}
 	
 	/**
@@ -404,6 +402,8 @@ public class LogicMemory {
 				break;
 			
 			default: // Should not reach this point
+				exceptionMsg = String.format(LogicException.MSG_ERROR_VIEWTYPE, viewType);
+				throw new LogicException(exceptionMsg);
 		}
 		
 		exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW, viewType) + ".";
@@ -421,9 +421,7 @@ public class LogicMemory {
 		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
 		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
 		
-		if (!tagFound) {
-			throw new LogicException(LogicException.MSG_ERROR_TAG_NOT_FOUND);
-		}
+		throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TAGS);
 	}
 	
     //================================================================================

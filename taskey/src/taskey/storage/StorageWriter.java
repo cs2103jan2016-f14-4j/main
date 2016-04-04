@@ -32,25 +32,6 @@ class StorageWriter {
 		writer.close();
 	}
 
-	/*================*
-	 * Save directory *
-	 *================*/
-	/**
-	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
-	 * @param dir the File representing the directory to be saved
-	 * @param filename name of the destination file
-	 */
-	void saveDirectoryConfigFile(File dir, String filename) {
-		File dest = new File(filename);
-		try {
-			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
-			//System.out.println("{New storage directory saved}");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("{Storage} Error saving new directory");
-		}
-	}
-
 	/*============*
 	 * Save tasks *
 	 *============*/
@@ -72,6 +53,25 @@ class StorageWriter {
 		}
 	}
 
+	/*================*
+	 * Save directory *
+	 *================*/
+	/**
+	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
+	 * @param dir the File representing the directory to be saved
+	 * @param filename name of the destination file
+	 */
+	void saveDirectoryConfigFile(File dir, String filename) {
+		File dest = new File(filename);
+		try {
+			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
+			//System.out.println("{New storage directory saved}");
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("{Storage} Error saving new directory");
+		}
+	}
+	
 	/*===========*
 	 * Save tags *
 	 *===========*/

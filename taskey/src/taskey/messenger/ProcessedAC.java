@@ -79,11 +79,12 @@ public class ProcessedAC {
 		}
 		
 		if (availCommands != null) {
-			stringRep += "Options: "
+			stringRep += "Options: "; 
 			for(int i=0; i < availCommands.size(); i++) {
 				stringRep += availCommands.get(i) + ", ";
 			}
 		}
+		stringRep += "\n";
 		
 		return stringRep; 
 	}

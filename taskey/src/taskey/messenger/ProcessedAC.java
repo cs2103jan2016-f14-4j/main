@@ -68,4 +68,24 @@ public class ProcessedAC {
 		this.availCommands = availCommands; 
 	}
 	
+	/**
+	 * For Debugging purposes
+	 */
+	public String toString() {
+		String stringRep = ""; 
+		
+		if (command != null) {
+			stringRep += "Command: " + command + "\n";
+		}
+		
+		if (availCommands != null) {
+			stringRep += "Options: "
+			for(int i=0; i < availCommands.size(); i++) {
+				stringRep += availCommands.get(i) + ", ";
+			}
+		}
+		
+		return stringRep; 
+	}
+	
 }

@@ -565,7 +565,7 @@ public class AutoComplete {
 	 * @param misSpelled
 	 * @return list of possible correctly spelled dates 
 	 */
-	private ArrayList<String> correctDateError(String misSpelled) {
+	public ArrayList<String> correctDateError(String misSpelled) {
 		ArrayList<String> suggestions = new ArrayList<String>(); 
 		for(int i = 0; i < months.size(); i++) {
 			String month = months.get(i); 
@@ -595,7 +595,7 @@ public class AutoComplete {
 	 * @param tar
 	 * @return distance between the 2 strings 
 	 */
-	public int levenshteinDist(String src, String tar) {
+	private int levenshteinDist(String src, String tar) {
 		//init to 0 automatically by java 
 		int[][] d = new int[src.length()+1][tar.length()+1]; 
 		

@@ -381,18 +381,16 @@ public class UiController {
 		if ( selection.contains(currentLine)) { 
 			input.setText(selection + " ");
 		} else {	
-			String [] tokens = selection.split(" ");
 			String [] lineTokens = currentLine.split(" ");		
-			for ( int i = 0; i < tokens.length; i ++ ) {
-				// remove all tokens from selection that appear in current input
-				if ( currentLine.contains(tokens[i])) {
-					currentLine = currentLine.replace(tokens[i], ""); 
-				}
-			}
 			// remove all tokens from input that appear in current selection
-			for ( int i = lineTokens.length-1; i >= 0 && i >= lineTokens.length-1 - tokens.length; i-- ) {			
-				if ( selection.contains(lineTokens[i])) {
-					currentLine = currentLine.replace(lineTokens[i], "");
+			for ( int i = lineTokens.length-1; i >= 0; i-- ) {			
+				if ( selection.contains(lineTokens[i])) {		
+					// replace last occurrence of token
+					int index = currentLine.lastIndexOf(lineTokens[i]);
+					currentLine =  currentLine.substring(0, index) + 
+					currentLine.substring(index + lineTokens[i].length(),currentLine.length()); 
+				} else {
+					break;
 				}
 			}	
 			currentLine = currentLine.trim();

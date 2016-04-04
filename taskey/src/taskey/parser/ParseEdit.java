@@ -19,7 +19,7 @@ import taskey.messenger.Task;
  *
  */
 public class ParseEdit extends ParseCommand {
-	ArrayList<String> timeWords = new ArrayList<String>(); 
+	private DateTimePatternMatcher timeChecker = new DateTimePatternMatcher(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
@@ -33,12 +33,6 @@ public class ParseEdit extends ParseCommand {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		timeWords.add("am");
-		timeWords.add("pm");
-		//PrettyTime's default time for morning/night is 8am/8pm
-		timeWords.add("morning"); 
-		timeWords.add("night"); //can be tonight, tomorrow night, etc
 	}
 	
 	/**
@@ -497,15 +491,14 @@ public class ParseEdit extends ParseCommand {
 	 * @return epochTime (long) of rawDate
 	 */
 	private long getPrettyTime(String rawDate) {
-		for(int i = 0; i < timeWords.size(); i++) {
-			if (rawDate.contains(timeWords.get(i))) {
-				//if the date contains any of the time words, call prettyParser
-				List<Date> processedTime = prettyParser.parse(rawDate); 
-				if (!processedTime.isEmpty()) {
-					return processedTime.get(0).getTime() / 1000; 
-				} else {
-					return -1; //unable to process 
-				}
+		//use regex to check for time format
+		if (timeChecker.hasTimeEdit(rawDate)) {
+			//if the date contains any of the time words, call PrettyParser
+			List<Date> processedTime = prettyParser.parse(rawDate); 
+			if (!processedTime.isEmpty()) {
+				return processedTime.get(0).getTime() / 1000; 
+			} else {
+				return -1; //unable to process 
 			}
 		}
 		return -1; //no time indicated, or time is in the wrong format

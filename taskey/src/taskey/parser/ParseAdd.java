@@ -19,7 +19,7 @@ import taskey.messenger.Task;
  *
  */
 public class ParseAdd extends ParseCommand { 
-	ArrayList<String> timeWords = new ArrayList<String>(); 
+	private DateTimePatternMatcher timeChecker = new DateTimePatternMatcher(); 
 	private HashMap<String,String> keywordsList = new HashMap<String,String>(); 
 	private HashMap<String,Long> specialDays = new SpecialDaysConverter().getSpecialDays();
 	
@@ -35,12 +35,6 @@ public class ParseAdd extends ParseCommand {
 		keywordsList.put("on", "on");
 		keywordsList.put("from", "from");
 		keywordsList.put("to", "to");
-		
-		timeWords.add("am");
-		timeWords.add("pm");
-		//PrettyTime's default time for morning/night is 8am/8pm
-		timeWords.add("morning"); 
-		timeWords.add("night"); //can be tonight, tomorrow night, etc	
 	}
 	
 	/**
@@ -410,15 +404,14 @@ public class ParseAdd extends ParseCommand {
 	 * @return epochTime (long) of rawDate
 	 */
 	private long getPrettyTime(String rawDate) {
-		for(int i = 0; i < timeWords.size(); i++) {
-			if (rawDate.contains(timeWords.get(i))) {
-				//if the date contains any of the time words, call prettyParser
-				List<Date> processedTime = prettyParser.parse(rawDate); 
-				if (!processedTime.isEmpty()) { 
-					return processedTime.get(0).getTime() / 1000; 
-				} else {
-					return -1; 
-				}
+		//use regex to check for time format
+		if (timeChecker.hasTimeEdit(rawDate)) {
+			//if the date contains any of the time words, call PrettyParser
+			List<Date> processedTime = prettyParser.parse(rawDate); 
+			if (!processedTime.isEmpty()) {
+				return processedTime.get(0).getTime() / 1000; 
+			} else {
+				return -1; //unable to process 
 			}
 		}
 		return -1; //no time indicated, or time is in the wrong format
@@ -431,18 +424,17 @@ public class ParseAdd extends ParseCommand {
 	 * @return epochTime (long array) of rawDate (FOR EVENTS) 
 	 */
 	private long[] getPrettyTimeEvent(String rawDate) throws Error {
-		for(int i = 0; i < timeWords.size(); i++) {
-			if (rawDate.contains(timeWords.get(i))) {
-				//if the date contains any of the time words, call prettyParser
-				List<Date> processedTime = prettyParser.parse(rawDate); 
-				if (processedTime.size() >= 2) {
-					long[] epochTimes = {processedTime.get(0).getTime() / 1000,
-							processedTime.get(1).getTime() / 1000}; 
+		//use regex to check for time format
+		if (timeChecker.hasTimeEdit(rawDate)) {
+			//if the date contains any of the time words, call prettyParser
+			List<Date> processedTime = prettyParser.parse(rawDate); 
+			if (processedTime.size() >= 2) {
+				long[] epochTimes = {processedTime.get(0).getTime() / 1000,
+						processedTime.get(1).getTime() / 1000}; 
 					
-					return epochTimes; 
-				} else {
-					throw new Error(); 
-				}
+				return epochTimes; 
+			} else {
+				throw new Error(); 
 			}
 		}
 		throw new Error(); //no time indicated, or time is in the wrong format
@@ -506,8 +498,9 @@ public class ParseAdd extends ParseCommand {
 	 */
 	private String removeTimeFromName(String taskName) {
 		String keyword = "(at|from|on|by)";
-		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm)";
-		String timeSpecifier = "(am|pm)";
+		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm|h)";
+		String combinedTime2 = "(tonight|night|morning)"; //not in special days converter
+		String timeSpecifier = "(am|pm|h)";
 		String timePattern = "\\d{1,2}(:|.)?\\d{0,2}"; //regex
 		String specialDaysKeywords = "(this|next)";
 		String stringRep = ""; 
@@ -519,8 +512,9 @@ public class ParseAdd extends ParseCommand {
 			if (word.matches(keyword)) {
 				if (i+1 < size) {
 					String time = splitName[i+1];
-					if (time.matches(combinedTime) || specialDays.containsKey(time)) {
-						//eg. 3pm or today/tomorrow/fri
+					if (time.matches(combinedTime) || specialDays.containsKey(time) ||
+							time.matches(combinedTime2)) {
+						//eg. 3pm or 3h or today/tomorrow/fri
 						i += 2; 
 						break;
 					} else if (time.matches(timePattern) || time.matches(specialDaysKeywords)) {
@@ -529,7 +523,8 @@ public class ParseAdd extends ParseCommand {
 							String time2 = splitName[i+2];
 							String time3 = time + " " + time2; 
 							if (time2.matches(timeSpecifier) || time2.length() == 3) {
-								//eg. 3 pm or a month like feb (assume v. few words len(3) after num) 
+								//eg. 3 pm or 2300 h or a month like feb 
+								//(assume v. few words len(3) after num) 
 								i += 2;
 								break;								
 							} else if (specialDays.containsKey(time3)) {

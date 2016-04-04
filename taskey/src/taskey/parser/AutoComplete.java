@@ -335,7 +335,6 @@ public class AutoComplete {
 			availSuggestions.add("!!");
 			availSuggestions.add("!!!"); 
 		} else if (phrase.contains("[")) {
-			System.out.println(phrase);
 			//suggest a date to the user 
 			String dates; 
 			String[] rawDates = phrase.split("\\[");
@@ -384,7 +383,6 @@ public class AutoComplete {
 	 */
 	private ArrayList<String> suggestDates(String date) {
 		ArrayList<String> availDates = new ArrayList<String>();
-		
 		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
 			availDates = specialDaysThis; 
 			return availDates; 
@@ -405,6 +403,8 @@ public class AutoComplete {
 			date = date.replace("pm", "");
 			date = date.replace("am", "");
 			date = date.replace("h", "");
+			date = date.replace("a", "");
+			date = date.replace("p", "");
 			availDates.add(date.trim()+"am");
 			availDates.add(date.trim()+"pm"); 
 			availDates.add(date.trim()+"h"); 
@@ -452,6 +452,8 @@ public class AutoComplete {
 			date = date.replace("pm", "");
 			date = date.replace("am", "");
 			date = date.replace("h", "");
+			date = date.replace("a", "");
+			date = date.replace("p", "");
 			availDates.add(date.trim()+"am");
 			availDates.add(date.trim()+"pm"); 
 			availDates.add(date.trim()+"h"); 
@@ -468,6 +470,49 @@ public class AutoComplete {
 			return availDates; 
 		}
 		return null; 
+	}
+	
+	
+	private void correctDateError() {
+		//TODO: help user correct his date. 
+	}
+	
+	/**
+	 * This algorithm measure the difference in distance between
+	 * a source (src) string and a target (tar) string
+	 * @param src
+	 * @param tar
+	 * @return distance between the 2 strings 
+	 */
+	private int levenshteinDist(String src, String tar) {
+		//init to 0 automatically by java 
+		int[][] d = new int[src.length()+1][tar.length()+1]; 
+		
+		for(int i = 1; i <= src.length(); i++) {
+		      d[i][0] = i;
+		}
+		
+		for(int j = 1; j <= tar.length(); j++) {
+			d[0][j] = j; 
+		}
+		
+		for(int j = 1; j <= tar.length(); j++) {
+			for(int i = 1; i <= src.length(); i++) {
+				int substitutionCost = 0; 
+				
+				if (src.charAt(i-1) == tar.charAt(j-1)) {
+					substitutionCost = 0; 
+				} else {
+					substitutionCost = 1; 
+				}
+				d[i][j] = Math.min(d[i-1][j] + 1, //deletion
+							Math.min(d[i][j-1] + 1, //insertion
+									d[i-1][j-1] + substitutionCost)); //substitution
+				
+			}
+		}
+		
+		return d[src.length()][tar.length()]; 
 	}
 	
 	

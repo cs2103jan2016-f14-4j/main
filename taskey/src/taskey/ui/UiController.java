@@ -481,9 +481,13 @@ public class UiController {
 		input.requestFocus(); // give focus to textfield on any inputs
 		
 		if (myDropDown.isMenuShowing()) {
-			if (event.getCode().isArrowKey()) {
-				myDropDown.processArrowKey(event);
-				event.consume();
+			if (event.getCode().isArrowKey()) {	
+				if ( event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+					myDropDown.processArrowKey(event);
+					event.consume(); // give input only to drop down
+				} else {
+					myDropDown.closeMenu();
+				}
 			}
 		} else if (input.getText().isEmpty()) { // user not typing in command, do pagination
 			if (event.getCode() == KeyCode.DELETE) {

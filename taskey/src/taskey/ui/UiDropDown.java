@@ -38,6 +38,7 @@ import taskey.ui.utility.UiPopupManager;
 public class UiDropDown {
 	private static final int TEXT_SIZE_FROM_CSS = 15; // these have to be referenced from sharedStyles.css
 	private static final String FONT_NAME_FROM_CSS = "Montserrat";
+	private static final int DROPDOWN_OFFSET = 10; // so dropdown doesn't cover text if window is too big
 	
 	private TextField inputBox;
 	private Window mainWindow;
@@ -148,8 +149,8 @@ public class UiDropDown {
 		if (line.equals("")) {
 			closeMenu();
 		} else {
-			ShiftMenu();
 			refresh();  // fix display issues
+			ShiftMenu();
 		}
 	}
 
@@ -164,6 +165,7 @@ public class UiDropDown {
 		myMenu.setAnchorX(Math.min(screenBounds.getMinX() + inputBox.getWidth() * UiPopupManager.getInstance().getXRatio(), 
 								   screenBounds.getMinX() + width * UiPopupManager.getInstance().getXRatio()));
 		myMenu.setAnchorY(screenBounds.getMinY() + inputBox.getHeight() * UiPopupManager.getInstance().getYRatio());
+		myMenu.setAnchorX(myMenu.getAnchorX() + DROPDOWN_OFFSET * UiPopupManager.getInstance().getXRatio());
 	}
 
 	/**

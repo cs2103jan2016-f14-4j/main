@@ -11,6 +11,7 @@ import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
+import taskey.parser.AutoComplete;
 import taskey.parser.Parser;
 
 /**
@@ -41,7 +42,7 @@ public class Logic {
 		history = new History();
 		cmdExecutor = new CommandExecutor();
 		logicMemory = new LogicMemory();
-		autoComplete = new AutoComplete(logicMemory);
+		autoComplete = new AutoComplete();
 		updateHistory();
 	}
 	
@@ -98,7 +99,7 @@ public class Logic {
 				
 			case "CLEAR":
 	    		cmd = new Clear();
-				return executeClear(cmd);
+				return executeClear(po, cmd);
 				
 			case "DELETE_BY_CATEGORY":
 				cmd = new DeleteByTagName(po.getCategory());
@@ -117,7 +118,7 @@ public class Logic {
 				
 			case "SAVE":
 	    		cmd = new Save();
-				return executeSave(cmd);
+				return executeSave(po, cmd);
 				
 			case "SEARCH":
 				cmd = new Search(po.getSearchPhrase());
@@ -164,6 +165,9 @@ public class Logic {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
+			if (le.getMessage().equals(LogicException.MSG_SUCCESS_ADD_EXPIRED)) {
+				updateHistory();
+			}
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
@@ -179,15 +183,14 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));
 	}
 	
-	private LogicFeedback executeClear(Command cmd) {
+	private LogicFeedback executeClear(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), le);
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
-		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("CLEAR"), 
-				                 new LogicException(LogicException.MSG_SUCCESS_CLEAR));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CLEAR));
 	}
 	
 	private LogicFeedback executeDelete(ProcessedObject po, Command cmd) {
@@ -210,14 +213,13 @@ public class Logic {
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_DONE));
 	}
 	
-	private LogicFeedback executeSave(Command cmd) {
+	private LogicFeedback executeSave(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
-			return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), le);
+			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
-		return new LogicFeedback(getAllTaskLists(), new ProcessedObject("SAVE"), 
-				                 new LogicException(LogicException.MSG_SUCCESS_SAVE));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_SAVE));
 	}
 	
 	private LogicFeedback executeSearch(ProcessedObject po, Command cmd) {
@@ -242,13 +244,16 @@ public class Logic {
 		logicMemory.setTaskLists(ListCloner.cloneTaskLists(previousTaskLists));
 		logicMemory.setTagCategoryList(ListCloner.cloneTagCategoryList(previousTagCategoryList));
 		
-		return new LogicFeedback(getAllTaskLists(), po, null);
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_UNDO));
 	}
 	
 	private LogicFeedback executeUpdate(ProcessedObject po, Command cmd) {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
+			if (le.getMessage().equals(LogicException.MSG_SUCCESS_UPDATE_EXPIRED)) {
+				updateHistory();
+			}
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		updateHistory();
@@ -315,7 +320,7 @@ public class Logic {
 				return null;
 			}
 		}*/
-		ProcessedAC pac = autoComplete.getSuggestions(line);
+		ProcessedAC pac = autoComplete.getSuggestions(line, getTagCategoryList());
 		String pacCommand = pac.getCommand();
 		
 		if (pacCommand.equals(DISPLAY_COMMAND)) { // to complete a command

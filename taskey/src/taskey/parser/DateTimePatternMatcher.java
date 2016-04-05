@@ -28,22 +28,74 @@ public class DateTimePatternMatcher {
 	private String pattern6 = "at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by"; 
 	
 	/* White-list for AutoComplete to suggest date/time */
-	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2}"; //for time
-	private String pattern8 = "\\d{1,2} ?"; //for date
+	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2} ?(a|p|h)?"; //for time
+	private String pattern8 = "\\d{1,2}"; //for date
+	private String checkTime = "(am|pm)";
+	private String correctTimeFormat = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm)"; //for time
+	private String dateFormat = "\\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"; 
+	private String dayFormat = "(mon|tue|wed|thu|fri|sat|sun|monday|tuesday|wednesday|thursday|"
+			+ "friday|saturday|sunday|tues|thurs|tmr|tomorrow|today)";
 	
+	/* White-list for ParseEdit to check if the time has am, pm or h, or morning or night */ 
+	private String pattern9 = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; //for time
+	private String pattern10= "(morning|night)";
 	
 	public DateTimePatternMatcher() {
 		
 	}
 	
 	/**
-	 * For AutoComplete class:
+	 * Checks if any 3letter input has am or pm in it,
+	 * so that AutoComplete does not suggest a month correction
+	 * @param input
+	 * @return true if it has am or pm in it 
+	 */
+	public boolean hasAmPm(String input) {
+		Pattern p = Pattern.compile(checkTime);
+		Matcher m = p.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		return false; 
+	}
+	
+	/**
+	 * For ParseEdit class:
 	 * Checks if the input contains something that looks like a time format
 	 * @param input
 	 * @return true if there seems to be some kind of time format
 	 */
-	public boolean hasTimeAC(String input) {
-		Pattern p = Pattern.compile(pattern7);
+	public boolean hasTimeEdit(String input) {
+		Pattern p = Pattern.compile(pattern9);
+		Matcher m = p.matcher(input);
+		
+		Pattern p2 = Pattern.compile(pattern10);
+		Matcher m2 = p2.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m2.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		return false; 
+	}
+	
+	/**
+	 * For AutoComplete class:
+	 * Checks if the input contains an exact time format
+	 * @param input
+	 * @return true if there seems to be some kind of time format
+	 */
+	public boolean hasCorrectTimeFormat(String input) {
+		Pattern p = Pattern.compile(correctTimeFormat);
 		Matcher m = p.matcher(input);
 		
 		while (m.find()) {
@@ -55,14 +107,68 @@ public class DateTimePatternMatcher {
 	
 	/**
 	 * For AutoComplete class:
+	 * Checks if the input contains something that looks like a time format
+	 * @param input
+	 * @return true if there seems to be some kind of time format
+	 */
+	public boolean hasTimeAC(String input) {
+		if (input.matches(pattern7)) {
+			return true; 
+		}
+		return false; 
+	}
+	
+	/**
+	 * For AutoComplete class:
 	 * Checks if the input contains something that looks like a date format
 	 * @param input
-	 * @return
+	 * @return true if it matches pattern 
 	 */
 	public boolean hasDateAC(String input) {
 		if (input.matches(pattern8)) {
+			try {
+				int num = Integer.parseInt(input); 
+				if (num >= 1 && num <= 31) {
+					return true; 
+				}
+			} catch (Exception e) {
+				return false; 
+			}
+		}
+		return false; 
+	}
+	
+	/**
+	 * For AutoComplete class:
+	 * Checks if the input contains any date format in the string 
+	 * @param input
+	 * @return true if there is any date format 
+	 */
+	public boolean hasFullDateAC(String input) {
+		Pattern p = Pattern.compile(dateFormat);
+		Matcher m = p.matcher(input);
+		
+		Pattern p2 = Pattern.compile(dayFormat);
+		Matcher m2 = p2.matcher(input);
+		
+		Pattern p3 = Pattern.compile(pattern8);
+		Matcher m3 = p3.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
 			return true;
 		}
+		
+		while (m2.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m3.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
 		return false; 
 	}
 	
@@ -123,7 +229,7 @@ public class DateTimePatternMatcher {
 		return false; 
 	}
 	
-	/*
+	
 	public static void main(String[] args) {
 		DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 		String string1 = "add project meeting by 3 pm on 17 feb";
@@ -133,6 +239,11 @@ public class DateTimePatternMatcher {
 		System.out.println(pm.hasPattern(string1));
 		System.out.println(pm.hasPattern(string2));
 		System.out.println(pm.hasPattern(string3));
-	}
-	*/ 
+		
+		String string4 = "add do homework by 23:00h";
+		String string5 = "add do homework by tonight"; 
+		System.out.println(pm.hasTimeEdit(string4));
+		System.out.println(pm.hasTimeEdit(string5));
+	} 
+	
 }

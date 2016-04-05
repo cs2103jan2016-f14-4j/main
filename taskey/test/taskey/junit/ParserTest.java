@@ -483,13 +483,14 @@ public class ParserTest {
 				parser.parseInput("write oo").toString());
 	}
 	
-	@Test
+	
+	/* 
 	public void testDate() {
 		PrettyTimeParser p  = new PrettyTimeParser(); 
 		System.out.println(p.parse("today 3pm"));
 		System.out.println(p.parse("tomorrow 3pm"));
 		System.out.println(parser.parseInput("set 1 [today 3pm, tmr 3pm]"));
-	}
+	} */ 
 	
 	
 	/*
@@ -498,7 +499,7 @@ public class ParserTest {
 	 * change every time the the unit test is run 
 	 */
 	
-	
+	@Test
 	/**
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
@@ -509,7 +510,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
-
+	@Test
 	/**
 	 * Test human date edits
 	 */
@@ -518,7 +519,7 @@ public class ParserTest {
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
 	
-	
+	@Test 
 	/**
 	 * Test human deadlines
 	 */

@@ -73,11 +73,14 @@ public class UiUpdateService extends ScheduledService<Void> {
 			checkTaskBounds(currentTask,alertList);
 		}
 		
-		alertController.setAll(alertList);
+		alertController.setAllAlerts(alertList);
 	}
 
 	/**
 	 * This methods adds periodic reminders for events and deadlines
+	 * Note that intervals that are closer have higher precedence over further ones
+	 * such that if there is 3 hours left, > 3 hours are not added as alerts
+	 * 
 	 * @param currentTask
 	 * @param alertList
 	 */
@@ -88,6 +91,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 		for (int index = 0; index < UiConstants.HOUR_MARKS.length; index++) {
 			checkIntervals.add(UiConstants.HOUR_MARKS[index]);
 		}
+		
 		for ( int i = 0; i < checkIntervals.size(); i ++ ) {
 			int hoursBefore = checkIntervals.get(i);
 			int secondsBefore = secondsInOneHour * hoursBefore;

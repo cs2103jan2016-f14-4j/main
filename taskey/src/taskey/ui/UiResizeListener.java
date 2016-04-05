@@ -12,18 +12,19 @@ import taskey.ui.utility.UiPopupManager;
  * @@author A0125419H
  * 
  * This class implements a stage resizelistener
- * Adapted and modified heavily from:  
+ * Adapted and modified from:  
  * https://geektortoise.wordpress.com/2014/02/07/how-to-programmatically-resize-the-stage-in-a-javafx-app/
  * 
  * @author JunWei
  */
 class UiResizeListener implements EventHandler<MouseEvent> {
+	
 	private double dx, dy;
-	private double border = 10; // border for picking
 	private boolean resizeH = false, resizeV = false;
 	private Scene scene;
 	private Stage stage;
 	private double aspectRatio;
+	
 	public UiResizeListener(Scene theScene, Stage theStage) {
 		scene = theScene;
 		stage = theStage;
@@ -33,7 +34,8 @@ class UiResizeListener implements EventHandler<MouseEvent> {
 	@Override
 	public void handle(MouseEvent t) {
 		if (MouseEvent.MOUSE_MOVED.equals(t.getEventType())) {
-			if (t.getX() > scene.getWidth() - border && t.getY() > scene.getHeight() - border) {
+			if (t.getX() > scene.getWidth() - UiConstants.WINDOW_RESIZE_PICK_BOUNDS && 
+			    t.getY() > scene.getHeight() - UiConstants.WINDOW_RESIZE_PICK_BOUNDS) {
 				scene.setCursor(Cursor.SE_RESIZE);
 				resizeH = true;
 				resizeV = true;

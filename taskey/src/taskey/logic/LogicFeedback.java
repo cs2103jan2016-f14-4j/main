@@ -23,7 +23,7 @@ public class LogicFeedback {
 	 * @param po         an object encapsulating information on the executed command and its associated task
 	 * @param le         an exception containing a message to reflect the outcome of command execution. It can be null.
 	 */
-	public LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, LogicException le) {
+	LogicFeedback(ArrayList<ArrayList<Task>> taskLists, ProcessedObject po, LogicException le) {
 		assert (taskLists != null);
 		assert (taskLists.size() == 8); //taskLists should be fully initialized
 		assert (!taskLists.contains(null)); //All lists should be instantiated
@@ -38,7 +38,7 @@ public class LogicFeedback {
 		return taskLists;
 	}
 
-	protected void setTaskLists(ArrayList<ArrayList<Task>> taskLists) {
+	void setTaskLists(ArrayList<ArrayList<Task>> taskLists) {
 		assert (taskLists != null);
 		this.taskLists = taskLists;
 	}
@@ -47,7 +47,7 @@ public class LogicFeedback {
 		return po;
 	}
 
-	protected void setPo(ProcessedObject po) {
+	void setPo(ProcessedObject po) {
 		assert (po != null);
 		this.po = po;
 	}
@@ -56,7 +56,7 @@ public class LogicFeedback {
 		return le;
 	}
 	
-	protected void setException(LogicException le) {
+	void setException(LogicException le) {
 		this.le = le;
 	}
 }

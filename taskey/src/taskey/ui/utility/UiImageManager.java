@@ -10,13 +10,15 @@ import taskey.constants.UiConstants.ImageID;
  * @@author A0125419H
  * This class handles loading of image resources 
  * which are likely to be permanent throughout the application life
+ * 
  * @author Junwei
  *
  */
 
 public class UiImageManager {
-	private String helpFolder = UiConstants.UI_IMAGE_PATH_OFFSET + UiConstants.UI_IMAGE_HELP_PATH_OFFSET;
+	private String helpFolder = UiConstants.UI_IMAGE_PATH_OFFSET + UiConstants.UI_IMAGE_HELP_PATH_OFFSET; // path
 	private HashMap<ImageID, Image> myImageContainer = new HashMap<ImageID, Image>();
+	
 	private static UiImageManager instance = null;
 	private UiImageManager() {
 	}
@@ -47,7 +49,9 @@ public class UiImageManager {
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "deadline.png")));
 			myImageContainer.put(ImageID.EVENT, 
 					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + "event.png")));
+			
 			loadHelpMenuImages();
+			
 		} catch ( NullPointerException e ) {
 			System.out.println("Images cant be loaded for some reason, please refresh the taskey.ui.images package");
 		}
@@ -65,7 +69,7 @@ public class UiImageManager {
 		myImageContainer.clear();
 	}
 	
-	public void loadHelpMenuImages() {	
+	private void loadHelpMenuImages() {	
 		loadAddMenuImages();
 		loadDeleteMenuImages();
 		loadSetMenuImages();

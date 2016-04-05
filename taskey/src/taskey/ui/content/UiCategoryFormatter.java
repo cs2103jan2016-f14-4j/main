@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 
@@ -9,14 +9,14 @@ import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.content.UiFormatter;
-import taskey.ui.content.UiTextBuilder;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H
  * This class is responsible for formatting the Category box
  * 
  * @author junwei
+ * 
  */
 
 public class UiCategoryFormatter extends UiFormatter {
@@ -47,14 +47,15 @@ public class UiCategoryFormatter extends UiFormatter {
 		}
 	}
 	
-	@Override
-	public void format(ArrayList<Task> myTaskList) {
-	}
-
+	// Unused as category does not take in inputs or uses tasks 
 	@Override
 	public void processArrowKey(KeyEvent event) {
 	}
 
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {	
+	}
+	
 	@Override
 	public int processDeleteKey() {
 		return -1;
@@ -66,11 +67,11 @@ public class UiCategoryFormatter extends UiFormatter {
 	}
 
 	@Override
+	public void format(ArrayList<Task> myTaskList) {
+	}
+	
+	@Override
 	public void cleanUp() {
 		clearCurrentGridContents();
-	}
-
-	@Override
-	public void processPageUpAndDown(KeyEvent event) {	
 	}
 }

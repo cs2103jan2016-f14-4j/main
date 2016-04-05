@@ -28,13 +28,43 @@ public class DateTimePatternMatcher {
 	private String pattern6 = "at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by"; 
 	
 	/* White-list for AutoComplete to suggest date/time */
-	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2}"; //for time
+	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2} ?(a|p|am|pm|h)?"; //for time
 	private String pattern8 = "\\d{1,2} ?"; //for date
 	
+	/* White-list for ParseEdit to check if the time has am, pm or h, or morning or night */ 
+	private String pattern9 = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; //for time
+	private String pattern10= "(morning|night)";
 	
 	public DateTimePatternMatcher() {
 		
 	}
+	
+	/**
+	 * For ParseEdit class:
+	 * Checks if the input contains something that looks like a time format
+	 * @param input
+	 * @return true if there seems to be some kind of time format
+	 */
+	public boolean hasTimeEdit(String input) {
+		Pattern p = Pattern.compile(pattern9);
+		Matcher m = p.matcher(input);
+		
+		Pattern p2 = Pattern.compile(pattern10);
+		Matcher m2 = p2.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		while (m2.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		return false; 
+	}
+	
 	
 	/**
 	 * For AutoComplete class:
@@ -43,12 +73,8 @@ public class DateTimePatternMatcher {
 	 * @return true if there seems to be some kind of time format
 	 */
 	public boolean hasTimeAC(String input) {
-		Pattern p = Pattern.compile(pattern7);
-		Matcher m = p.matcher(input);
-		
-		while (m.find()) {
-			//System.out.println("Found a match.");
-			return true;
+		if (input.matches(pattern7)) {
+			return true; 
 		}
 		return false; 
 	}
@@ -61,7 +87,14 @@ public class DateTimePatternMatcher {
 	 */
 	public boolean hasDateAC(String input) {
 		if (input.matches(pattern8)) {
-			return true;
+			try {
+				int num = Integer.parseInt(input); 
+				if (num >= 1 && num <= 31) {
+					return true; 
+				}
+			} catch (Exception e) {
+				return false; 
+			}
 		}
 		return false; 
 	}
@@ -123,7 +156,7 @@ public class DateTimePatternMatcher {
 		return false; 
 	}
 	
-	/*
+	
 	public static void main(String[] args) {
 		DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 		String string1 = "add project meeting by 3 pm on 17 feb";
@@ -133,6 +166,11 @@ public class DateTimePatternMatcher {
 		System.out.println(pm.hasPattern(string1));
 		System.out.println(pm.hasPattern(string2));
 		System.out.println(pm.hasPattern(string3));
-	}
-	*/ 
+		
+		String string4 = "add do homework by 23:00h";
+		String string5 = "add do homework by tonight"; 
+		System.out.println(pm.hasTimeEdit(string4));
+		System.out.println(pm.hasTimeEdit(string5));
+	} 
+	
 }

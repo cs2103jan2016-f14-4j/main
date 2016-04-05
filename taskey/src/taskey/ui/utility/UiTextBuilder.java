@@ -1,4 +1,4 @@
-package taskey.ui.content;
+package taskey.ui.utility;
 
 import java.util.ArrayList;
 
@@ -13,6 +13,7 @@ import taskey.constants.UiConstants;
  * It builds an array of Text objects to be returned 
  *
  * @author Junwei
+ * 
  */
 
 public class UiTextBuilder {
@@ -28,7 +29,7 @@ public class UiTextBuilder {
 		addMarkers(styles);
 	}
 	
-	public void initVariables() {
+	private void initVariables() {
 		styleMarkers = new ArrayList<Pair<Integer, String>>(); // where to start certain styles 
 		addMarker(0, UiConstants.STYLE_TEXT_BLACK); // default marker, will get overridden if there exists another marker at 0
 		symbol = '$'; // default symbol
@@ -43,16 +44,19 @@ public class UiTextBuilder {
 		styleMarkers.add(new Pair<Integer, String>(startIndex, style));
 	}
 	
+	// for buildBySymbol
 	public void addMarkers(String ...styles) {
 		for ( String style : styles) {
 			styleMarkers.add(new Pair<Integer, String>(0, style));
 		}
 	}
 
-	public void removeMarkers() {
-		styleMarkers.clear();
-	}
-	
+	/**
+	 * This method converts an arraylist of Text objects into a Textflow
+	 * for displaying
+	 * @param theText
+	 * @return
+	 */
 	public TextFlow convertTextArray(ArrayList<Text> theText) {
 		TextFlow element = new TextFlow();
 		element.getChildren().addAll(theText);
@@ -63,7 +67,7 @@ public class UiTextBuilder {
 	 * so that styles can be switched then
 	 *
 	 * @param line - the line to process
-	 * @return -TextFlow object
+	 * @return - TextFlow object
 	 */
 	public TextFlow build(String line) {
 		ArrayList<Text> myTexts = new ArrayList<Text>();
@@ -100,7 +104,7 @@ public class UiTextBuilder {
 	/**
 	 * Using a symbol like #, etc to build, reuse markers but not using indexes
 	 * Markers are ignored in a queue-like fashion for each symbol encountered.
-	 * This is very slow because it goes through each character
+	 * This is very slow because it goes through each character, but is more convenient
 	 *
 	 * @param line - line to build text objects from
 	 * @return - the text flow object

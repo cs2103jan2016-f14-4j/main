@@ -1,16 +1,14 @@
-package taskey.ui.content;
+package taskey.ui.utility;
 
 import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -22,16 +20,17 @@ import taskey.constants.UiConstants;
 
 /**
  * @@author A0125419H
- * This class contains convenience methods to manipulate a GridPane,
- * It is used by all operations that involve a gridpane.
+ * This class contains convenience methods to manipulate a GridPane
+ * It is used by all operations that involve a gridpane, including UiAlertsController.
+ * Hence it is a very important class
  * 
  * @author junwei
+ * 
  */
 
 public class UiGridHelper {
 	
 	private String defaultWrapperStyle; // used to style the initial StackPane in a cell on creation 
-	
 	public UiGridHelper(String wrapperStyle) {
 		defaultWrapperStyle = wrapperStyle;
 	}
@@ -57,8 +56,15 @@ public class UiGridHelper {
 		}
 		return gridPane;
 	}
-	
 
+	/**
+	 * Note that every cell in the grid is wrapped by a StackPane for styling
+	 * @param col - the column
+	 * @param row - the row
+	 * @param cellStyle - the style you want to use
+	 * @param gridPane - the grid pane
+	 * @return
+	 */
 	public StackPane createStyledCell(int col, int row, String cellStyle, GridPane gridPane) {
 		assert(gridPane != null);
 		StackPane styledCell = new StackPane();

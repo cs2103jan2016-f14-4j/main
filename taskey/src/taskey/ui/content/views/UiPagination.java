@@ -1,10 +1,11 @@
-package taskey.ui.content;
+package taskey.ui.content.views;
 
 import java.util.ArrayList;
 
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -15,24 +16,23 @@ import javafx.util.Callback;
  * @@author A0125419H
  * This class is used to provide pagination support with extensions.
  * Such as selecting of elements
+ * It is used in almost all of the tab contents of the UiFormatters
  * 
  * @author junwei
+ * 
  */
 
 public class UiPagination {
 	private Pagination myPages;
 	private ArrayList<GridPane> myGrids;
+	private ArrayList<ArrayList<StackPane>> totalEntries; // track for key events
 	private int currentPage;
-	private int currentSelection; // against total number of entries
 	private int selectionInPage;
-	private ArrayList<ArrayList<StackPane>> totalEntries; // track for arrow key events
+	private int currentSelection; // against total number of entries
 	private String selectionStyle;
 	private StackPane selectedPane = null;
-	private boolean isSettingUp;
-	
-	public Pagination getPagination() {
-		return myPages;
-	}
+	private boolean isSettingUp; // this is for preventing reset of uiPagination to page 0
+	private ScrollPane scrollPane = null; // such that scrollbar will move with selection
 	
 	public UiPagination(String _selectionStyle) {
 		selectionStyle = _selectionStyle;
@@ -45,6 +45,10 @@ public class UiPagination {
 		isSettingUp = true;
 		
 		disableKeyInputs();
+	}
+	
+	public Pagination getPagination() {
+		return myPages;
 	}
 	
 	private void disableKeyInputs() {
@@ -70,6 +74,7 @@ public class UiPagination {
 			myPages.setMaxPageIndicatorCount(totalPages);
 		}
 		myPages.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+		
 		myPages.setPageFactory(new Callback<Integer, Node>() {
             @Override
             public Node call(Integer pageIndex) {
@@ -121,6 +126,8 @@ public class UiPagination {
 		}	
 		selectedPane = (StackPane) pageContent.get(selectionInPage);
 		selectedPane.getStyleClass().add(selectionStyle);		
+		
+		adjustScrollPaneToSelection(); 
 	}
 	
 	/**
@@ -141,7 +148,7 @@ public class UiPagination {
 			}
 		} else if ( event.getCode() == KeyCode.PAGE_UP) {
 			if ( selectionInPage - 1 < 0 && currentPage >= 1 ) { // there exists a previous page
-				int prevPageSize = totalEntries.get(currentPage-1).size();
+				int prevPageSize = totalEntries.get(currentPage-1).size(); // go previous
 				selectInPage(currentPage-1, prevPageSize-1);
 			} else {
 				selectInPage(currentPage,selectionInPage-1);
@@ -151,6 +158,7 @@ public class UiPagination {
 		} else if ( event.getCode() == KeyCode.LEFT) {
 			selectInPage(currentPage-1,selectionInPage);
 		}
+		
 	}	
 
 	/**
@@ -194,5 +202,23 @@ public class UiPagination {
 		myGrids.clear();
 		totalEntries.clear();
 		selectedPane = null;
+	}
+
+	public void setScrollPane(ScrollPane mainPane) {
+		scrollPane = mainPane;
+	}
+	
+	private void adjustScrollPaneToSelection() {
+		if ( scrollPane == null ) {
+			return;
+		}
+
+		// crude shifting of layout
+		// Since layout bounds are updated internally, and not at this point in time
+		scrollPane.vvalueProperty().bind(
+				selectedPane.layoutYProperty().
+				subtract(selectedPane.getLayoutY() + 
+						 scrollPane.getViewportBounds().getHeight() > selectedPane.getLayoutY() ? 
+						 scrollPane.getViewportBounds().getHeight() - selectedPane.getLayoutY() : 0));
 	}
 }

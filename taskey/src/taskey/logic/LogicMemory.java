@@ -99,7 +99,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_FLOATING).add(taskToAdd);
-		clearActionList();
+		clearActionList(); // Action list not relevant for "add" command.
 	}
 	
 	/**
@@ -112,14 +112,17 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
+		clearActionList(); // Action list not relevant for "add" command.
+		
 		if (taskToAdd.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
+			taskLists.get(INDEX_EXPIRED).add(taskToAdd);
+			addTags(taskToAdd.getTaskTags());
+			throw new LogicException(LogicException.MSG_SUCCESS_ADD_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_DEADLINE).add(taskToAdd);
-		clearActionList();
-		
+	
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
 		}
@@ -135,14 +138,17 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
+		clearActionList(); // Action list not relevant for "add" command.
+		
 		if (taskToAdd.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
+			taskLists.get(INDEX_EXPIRED).add(taskToAdd);
+			addTags(taskToAdd.getTaskTags());
+			throw new LogicException(LogicException.MSG_SUCCESS_ADD_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_EVENT).add(taskToAdd);
-		clearActionList();
-		
+
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
 		}
@@ -257,10 +263,6 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
 		}
 		
-		if (newTask.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
-		}
-		
 		newTask.setTaskName(newName);
 		
 		if (taskAlreadyExists(newTask)) {
@@ -272,6 +274,10 @@ public class LogicMemory {
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
 			clearActionList();
+		}
+		
+		if (newTask.isExpired()) {
+			throw new LogicException(LogicException.MSG_SUCCESS_UPDATE_EXPIRED);
 		}
 	}
 	
@@ -554,7 +560,7 @@ public class LogicMemory {
 		} else if (listIndex == INDEX_EVENT) {
 			return (!isExpired && taskType.equals("EVENT"));
 		} else if (listIndex == INDEX_ACTION) {
-			return contentBox.equals(ContentBox.ACTION);
+			return (!isExpired && contentBox.equals(ContentBox.ACTION));
 		} else {
 			return false;
 		}
@@ -653,6 +659,19 @@ public class LogicMemory {
 		}
 		
 		return priorityFound;
+	}
+	
+	/** 
+	 * Adds all task tags in the given list into the tag category list.
+	 * 
+	 * @param taskTags
+	 */
+	void addTags(ArrayList<String> taskTags) {
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				addTag(s);
+			}
+		}
 	}
 	
 	/** 

@@ -149,43 +149,11 @@ public class LogicTest {
 		assertEquals(expected, actual);
 	}
 	
-	@Test
-	public void addingExpiredDeadlineTaskShouldThrowExceptionMessage() {
-		long currTime = timeConverter.getCurrTime();
-		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
-		String input = "add task on " + deadline;
-		String expected = LogicException.MSG_ERROR_DATE_EXPIRED;
-		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
-		assertEquals(expected, actual);
-	}
-	
-	@Test
+	@Ignore
 	public void addingExpiredDeadlineTaskShouldNotUpdateAnyLists() {
 		long currTime = timeConverter.getCurrTime();
 		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
 		String input = "add task on " + deadline;
-		logic.executeCommand(ContentBox.PENDING, input);
-		assertEquals(getEmptyLists(), logic.getAllTaskLists());
-	}
-	
-	@Test
-	public void addingExpiredEventTaskShouldThrowException() {
-		long currTime = timeConverter.getCurrTime();
-		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
-		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
-		String input = "add task from " + startDate + " to " + endDate;
-		String exceptionMsg = LogicException.MSG_ERROR_DATE_EXPIRED;
-		Exception expected = new Exception(exceptionMsg);
-		Exception actual = logic.executeCommand(ContentBox.PENDING, input).getException();
-		assertEquals(expected.getMessage(), actual.getMessage());
-	}
-	
-	@Test
-	public void addingExpiredEventTaskShouldNotUpdateAnyLists() {
-		long currTime = timeConverter.getCurrTime();
-		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
-		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
-		String input = "add task from " + startDate + " to " + endDate;
 		logic.executeCommand(ContentBox.PENDING, input);
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 	}
@@ -543,33 +511,27 @@ public class LogicTest {
 	}
 	
 	@Test
-	public void changingTaskDateToExpiredShouldThrowException() {
+	public void changingTaskDateToExpiredShouldUpdateTaskLists() {
 		long currTime = timeConverter.getCurrTime();
-		String input = "add task";
-		logic.executeCommand(ContentBox.PENDING, input);
-		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
-		input = "set 1 [" + deadline + "]";
-		String actual = logic.executeCommand(ContentBox.PENDING, input).getException().getMessage();
-		String expected = LogicException.MSG_ERROR_DATE_EXPIRED;
-		assertEquals(expected, actual);
-	}
-	
-	@Test
-	public void changingTaskDateToExpiredShouldNotChangeTaskLists() {
-		long currTime = timeConverter.getCurrTime();
-		String input = "add task";
-		logic.executeCommand(ContentBox.PENDING, input);
+		String deadline = timeConverter.getDate(currTime);
+		String input = "add task on " + deadline;
 		Task oldTask = parser.parseInput(input).getTask();
-		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
-		input = "set 1 [" + deadline + "]";
 		logic.executeCommand(ContentBox.PENDING, input);
+
+		input = "view deadlines";
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "set 1 [" + deadline + "]";
+		Task newTask = parser.parseInput(input).getTask();
+		newTask.setTaskName(oldTask.getTaskName());
+		logic.executeCommand(ContentBox.ACTION, input);
+		
 		ArrayList<ArrayList<Task>> expected = getEmptyLists();
-		expected.get(LogicMemory.INDEX_FLOATING).add(oldTask);
-		expected.get(LogicMemory.INDEX_PENDING).add(oldTask);
+		expected.get(LogicMemory.INDEX_EXPIRED).add(newTask);
 		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
 		assertEquals(expected, actual);
 	}
-	
 
 	@Test
 	public void changingTaskNameAndDateShouldUpdateTaskLists() {
@@ -1013,5 +975,124 @@ public class LogicTest {
 		Collections.sort(expected2);
 		ArrayList<TagCategory> actual2 = logic.getTagCategoryList();
 		assertEquals(expected2, actual2);
+	}
+	
+	// A pending deadline task should be added to this week list if its deadline falls within this week and it is not
+	// expired.
+	// A pending event task should be added to this week list if it is not expired, and its start date or end date falls
+	// within this week, or the current time is between the start date and end date.
+	@Test
+	public void testUpdateThisWeekListScenarios() {
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime); 
+		String input = "add task on " + deadline;
+		Task task1 = parser.parseInput(input).getTask(); // Unexpired, this week
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY); 
+		input = "add task on " + deadline;
+		Task task2 = parser.parseInput(input).getTask(); // Expired
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY); 
+		input = "add task from " + startDate + " to " + endDate;
+		Task task3 = parser.parseInput(input).getTask(); // Expired
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		endDate = timeConverter.getDate(currTime + NUM_SECONDS_BUFFER_TIME); 
+		input = "add task from " + startDate + " to " + endDate;
+		Task task4 = parser.parseInput(input).getTask(); // Unexpired, this week
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime + NUM_SECONDS_BUFFER_TIME);
+		endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_DAY); 
+		input = "add task from " + startDate + " to " + endDate;
+		Task task5 = parser.parseInput(input).getTask(); // Unexpired, this week
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK + NUM_SECONDS_1_DAY); 
+		input = "add task from " + startDate + " to " + endDate;
+		Task task6 = parser.parseInput(input).getTask(); // Unexpired, not this week
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		ArrayList<Task> expected = new ArrayList<Task>();
+		expected.add(task1);
+		expected.add(task4);
+		expected.add(task5);
+		sortListReversed(expected);
+		ArrayList<Task> actual = logic.getAllTaskLists().get(LogicMemory.INDEX_THIS_WEEK);
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void addingExpiredTaskShouldUpdateExpiredListAndTagCategoryList() {
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		String input = "add task on " + deadline + " #ayy #lmao";
+		Task task1 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate + " #lmao #420";
+		Task task2 = parser.parseInput(input).getTask();
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		ArrayList<ArrayList<Task>> expected = getEmptyLists();
+		expected.get(LogicMemory.INDEX_EXPIRED).add(task1);
+		expected.get(LogicMemory.INDEX_EXPIRED).add(task2);
+		sortListsReversed(expected);
+		ArrayList<ArrayList<Task>> actual = logic.getAllTaskLists();
+		assertEquals(expected, actual);
+		
+		ArrayList<TagCategory> expected2 = new ArrayList<TagCategory>();
+		TagCategory tag1 = new TagCategory("ayy");
+		TagCategory tag2 = new TagCategory("lmao");
+		tag2.increaseCount();
+		TagCategory tag3 = new TagCategory("420");
+		expected2.add(tag1);
+		expected2.add(tag2);
+		expected2.add(tag3);
+		Collections.sort(expected2);
+		ArrayList<TagCategory> actual2 = logic.getTagCategoryList();
+		assertEquals(expected2, actual2);
+	}
+	
+	@Test
+	public void addingExpiredTaskShouldThrowTheCorrectException() {
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		String input = "add task on " + deadline + " #ayy #lmao";
+		LogicException expected1 = logic.executeCommand(ContentBox.PENDING, input).getException();
+		
+		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate + " #lmao #420";
+		Task task2 = parser.parseInput(input).getTask();
+		LogicException expected2 = logic.executeCommand(ContentBox.PENDING, input).getException();
+		
+		LogicException actual = new LogicException(LogicException.MSG_SUCCESS_ADD_EXPIRED);
+		assertEquals(expected1, actual);
+		assertEquals(expected2, actual);
+	}
+	
+	@Test
+	public void updatingToExpiredTaskShouldThrowTheCorrectException() {
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime);
+		String input = "add task on " + deadline;
+		logic.executeCommand(ContentBox.PENDING, input);
+
+		input = "view deadlines";
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "set 1 [" + deadline + "]";
+		LogicException expected = logic.executeCommand(ContentBox.ACTION, input).getException();
+		LogicException actual = new LogicException(LogicException.MSG_SUCCESS_UPDATE_EXPIRED);
+		assertEquals(expected, actual);
 	}
 }

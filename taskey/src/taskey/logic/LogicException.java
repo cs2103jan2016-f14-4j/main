@@ -24,9 +24,11 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_VIEW_PRIORITY = "Viewing tasks with \"%1$s\" priority.";
 	public static final String MSG_SUCCESS_VIEW_TAGS = "Viewing tag(s).";
 	public static final String MSG_SUCCESS_SEARCH = "Searching \"%1$s\".";
+	public static final String MSG_SUCCESS_ADD_EXPIRED = "Added task to expired tab.";
+	public static final String MSG_SUCCESS_UPDATE_EXPIRED = "Moved task to expired tab.";
+	public static final String MSG_SUCCESS_UNDO = "Undo successful.";
 	public static final String MSG_ERROR_INVALID_COMMAND = "Invalid command!";
 	public static final String MSG_ERROR_DUPLICATE_TASKS = "Duplicate tasks are not allowed.";	                                             
-	public static final String MSG_ERROR_DATE_EXPIRED = "The deadline/end date is already past!";
 	public static final String MSG_ERROR_INVALID_INDEX = "Invalid index specified!";
 	public static final String MSG_ERROR_DONE_INVALID = "This task is already archived!";
 	public static final String MSG_ERROR_UPDATE_INVALID = "Cannot update archived tasks!";

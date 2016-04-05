@@ -21,6 +21,8 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_SAVE = "Save successful.";
 	public static final String MSG_SUCCESS_CHANGE_DIR = "Successfully changed save directory.";
 	public static final String MSG_SUCCESS_VIEW = "Viewing \"%1$s\"";
+	public static final String MSG_SUCCESS_VIEW_TODAY = "Viewing today's tasks.";
+	public static final String MSG_SUCCESS_VIEW_TOMORROW = "Viewing tomorrow's tasks.";
 	public static final String MSG_SUCCESS_VIEW_PRIORITY = "Viewing tasks with \"%1$s\" priority.";
 	public static final String MSG_SUCCESS_VIEW_TAGS = "Viewing tag(s).";
 	public static final String MSG_SUCCESS_SEARCH = "Searching \"%1$s\".";

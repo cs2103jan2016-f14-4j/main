@@ -7,6 +7,7 @@ import java.util.Iterator;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
+import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 
 /**
@@ -22,6 +23,7 @@ public class LogicMemory {
     //================================================================================
 	
 	public static final int NUM_TASK_LISTS = 8;
+	public static final int NUM_SECONDS_1_DAY = 86400;
 	
 	// Indices of each list
 	public static final int INDEX_THIS_WEEK = 0;
@@ -410,6 +412,16 @@ public class LogicMemory {
 				clearActionList();
 				break;
 			
+			case "today":
+				clearActionList();
+				viewToday(taskLists.get(INDEX_PENDING));
+				throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TODAY);
+			
+			case "tomorrow":
+				clearActionList();
+				viewTomorrow(taskLists.get(INDEX_PENDING));
+				throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TOMORROW);
+			
 			default: // Should not reach this point
 				exceptionMsg = String.format(LogicException.MSG_ERROR_VIEWTYPE, viewType);
 				throw new LogicException(exceptionMsg);
@@ -662,6 +674,52 @@ public class LogicMemory {
 		}
 		
 		return priorityFound;
+	}
+	
+	/** Views all tasks from the given list which are happening today. 
+	 * 
+	 * @param list
+	 */
+	private void viewToday(ArrayList<Task> list) {
+		TimeConverter tc = new TimeConverter();
+		
+		for (Task t : list) {
+			if (t.getTaskType().equals("DEADLINE") && tc.isToday(t.getDeadlineEpoch())) {
+				taskLists.get(INDEX_ACTION).add(t);
+			} else if (t.getTaskType().equals("EVENT")) {
+				long currTime = tc.getCurrTime();
+				long startDate = t.getStartDateEpoch();
+				long endDate = t.getEndDateEpoch();
+				
+				if (tc.isToday(startDate) || tc.isToday(endDate)
+				    || (startDate <= currTime && currTime <= endDate)) {
+					taskLists.get(INDEX_ACTION).add(t);
+				}
+			}
+		}
+	}
+	
+	/** Views all tasks from the given list which are happening tomorrow. 
+	 * 
+	 * @param list
+	 */
+	private void viewTomorrow(ArrayList<Task> list) {
+		TimeConverter tc = new TimeConverter();
+		
+		for (Task t : list) {
+			if (t.getTaskType().equals("DEADLINE") && tc.isTmr(t.getDeadlineEpoch())) {
+				taskLists.get(INDEX_ACTION).add(t);
+			} else if (t.getTaskType().equals("EVENT")) {
+				long tmrTime = tc.getCurrTime() + NUM_SECONDS_1_DAY;
+				long startDate = t.getStartDateEpoch();
+				long endDate = t.getEndDateEpoch();
+				
+				if (tc.isTmr(startDate) || tc.isTmr(endDate)
+				    || (startDate <= tmrTime && tmrTime <= endDate)) {
+					taskLists.get(INDEX_ACTION).add(t);
+				}
+			}
+		}
 	}
 	
 	/** 

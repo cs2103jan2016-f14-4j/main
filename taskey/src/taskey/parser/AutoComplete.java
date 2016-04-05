@@ -427,11 +427,8 @@ public class AutoComplete {
 	private ArrayList<String> suggestDates(String date) {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
-		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
-			availDates = specialDaysThis; 
-			return availDates; 
-		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
-			availDates = specialDaysNext; 
+		availDates = checkIfSpecialDate(date, availDates);
+		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		
@@ -481,41 +478,64 @@ public class AutoComplete {
 					availDates.add(date2.trim()+ " " + dateRaw.get(i)); //dd mmm
 				}
 			} else {
-				//check if month 
-				if (date2.split(" ").length >= 2) { 
-					String day = date2.split(" ")[0]; 
-					String mth = date2.split(" ")[1]; //get the month
-					if (mth.length() <= 3) {
-						if (mth.length() == 3) {
-							if (monthsMap.containsKey(mth)) {
-								//do nth
-							} else if (pm.hasAmPm(mth)) {
-								//do nth 
-							} else {
-								ArrayList<String> suggestTemp = correctDateError(mth); 
-								if (suggestTemp != null) { 
-									for(int i = 0; i < suggestTemp.size(); i++) {
-										availDates.add(suggestTemp.get(i)); 
-									}
-								}
-							}
-						} else {
-							for(int i = 0; i < months.size(); i++) {
-								String month = months.get(i);
-								if (month.indexOf(mth) == 0) {
-									availDates.add(day + " " + month); 
-								}
-							}
-						}
-					}
-				}
+				checkIfContainsMonth(date2, availDates);
 			}
 		} else {
 			//suggest a time? 
-			availDates.add("9pm");
+			//availDates.add("9pm");
 		}
 		
 		//check if month 
+		checkIfContainsMonth(date, availDates);
+		
+		//check for normal date
+		checkIfContainsNormalDate(date, availDates);		
+		
+		if (!availDates.isEmpty()) {
+			return availDates; 
+		}
+		return null; 
+	}
+	
+	/**
+	 * Checks if the input contains what looks like a special date
+	 * @param date
+	 * @param availDates
+	 * @return list of avail special dates to autocomplete 
+	 */
+	private ArrayList<String> checkIfSpecialDate(String date, ArrayList<String> availDates) {
+		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
+			availDates = specialDaysThis; 
+			return availDates; 
+		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
+			availDates = specialDaysNext; 
+			return availDates; 
+		}
+		return availDates;
+	}
+
+	/**
+	 * Checks if the input possibly contains some normal date,
+	 * and attempts to autocomplete it 
+	 * @param date
+	 * @param availDates
+	 */
+	private void checkIfContainsNormalDate(String date, ArrayList<String> availDates) {
+		if (pm.hasDateAC(date.trim())) {
+			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+			for(int i = 0; i < dateRaw.size(); i++) {
+				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			}
+		}
+	}
+	
+	/**
+	 * If the date input looks like it contains a month, try to autocomplete the 
+	 * month, or autocorrect it if it is spelled wrongly 
+	 * @param date
+	 * @param availDates
+	 */
+	private void checkIfContainsMonth(String date, ArrayList<String> availDates) {
 		if (date.split(" ").length >= 2) { 
 			String day = date.split(" ")[0]; 
 			String mth = date.split(" ")[1]; //get the month
@@ -543,19 +563,6 @@ public class AutoComplete {
 				}
 			}
 		}
-		
-		//check for normal date
-		if (pm.hasDateAC(date.trim())) {
-			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-			for(int i = 0; i < dateRaw.size(); i++) {
-				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
-			}
-		}		
-		
-		if (!availDates.isEmpty()) {
-			return availDates; 
-		}
-		return null; 
 	}
 	
 	/**
@@ -567,11 +574,8 @@ public class AutoComplete {
 	private ArrayList<String> suggestDates(String date, String phrase) {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
-		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
-			availDates = specialDaysThis; 
-			return availDates; 
-		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
-			availDates = specialDaysNext; 
+		availDates = checkIfSpecialDate(date, availDates);
+		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		

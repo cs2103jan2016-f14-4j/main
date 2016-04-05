@@ -366,7 +366,7 @@ public class LogicMemory {
 	void search(String searchPhrase) throws LogicException {
 		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
 		clearActionList();
-		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
+		//actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
 		String exceptionMsg = String.format(LogicException.MSG_SUCCESS_SEARCH, searchPhrase);
 		throw new LogicException(exceptionMsg);
@@ -403,7 +403,7 @@ public class LogicMemory {
 			case "medium":
 			case "low":
 				clearActionList();
-				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
+				// viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
 				viewPriority(taskLists.get(INDEX_PENDING), viewType);
 				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW_PRIORITY, viewType);
 				throw new LogicException(exceptionMsg);
@@ -439,8 +439,8 @@ public class LogicMemory {
 	 */
 	void viewTags(ArrayList<String> tagNames) throws LogicException {
 		clearActionList();
-		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
-		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
+		//boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
+		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
 		
 		throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TAGS);
 	}

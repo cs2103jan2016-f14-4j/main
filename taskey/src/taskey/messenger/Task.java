@@ -672,9 +672,13 @@ public class Task implements Comparable<Task> {
 		if (taskType.equals("DEADLINE")) { // TODO: remove magic strings
 			long deadline = getDeadlineEpoch();
 			return (timeConverter.isSameWeek(currTime, deadline));
-		} else if (taskType.equals("EVENT")) {
+		} else if (taskType.equals("EVENT")) { // An event is considered to be occurring this week if its start date or
+			                                   // end date is within the current week, or the current time is between
+			                                   // the start date and end date.
 			long startDate = getStartDateEpoch();
-			return (timeConverter.isSameWeek(currTime, startDate));
+			long endDate = getEndDateEpoch();
+			return (timeConverter.isSameWeek(currTime, startDate) || timeConverter.isSameWeek(currTime, endDate)
+					|| (startDate <= currTime && currTime <= endDate));
 		} else { // Floating tasks are never this week
 			return false;
 		}

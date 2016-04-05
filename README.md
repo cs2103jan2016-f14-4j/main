@@ -26,7 +26,6 @@ The following characters are reserved for special usage and should not be used i
 <ul>
   <li>! : Used for specifying task priorities (low:!, medium: !!, high: !!!)
   <li># : Used for specifying hashtags for a task 
-  <li>^ : Get suggestions a list of dates you can use
 </ul>
 
 ###Accepted date/time formats

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import taskey.constants.UiConstants.ContentBox;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
+import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 
 /**
@@ -22,6 +23,7 @@ public class LogicMemory {
     //================================================================================
 	
 	public static final int NUM_TASK_LISTS = 8;
+	public static final int NUM_SECONDS_1_DAY = 86400;
 	
 	// Indices of each list
 	public static final int INDEX_THIS_WEEK = 0;
@@ -99,7 +101,7 @@ public class LogicMemory {
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_FLOATING).add(taskToAdd);
-		clearActionList();
+		clearActionList(); // Action list not relevant for "add" command.
 	}
 	
 	/**
@@ -112,14 +114,17 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
+		clearActionList(); // Action list not relevant for "add" command.
+		
 		if (taskToAdd.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
+			taskLists.get(INDEX_EXPIRED).add(taskToAdd);
+			addTags(taskToAdd.getTaskTags());
+			throw new LogicException(LogicException.MSG_SUCCESS_ADD_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_DEADLINE).add(taskToAdd);
-		clearActionList();
-		
+	
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
 		}
@@ -135,14 +140,17 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
 		}
 		
+		clearActionList(); // Action list not relevant for "add" command.
+		
 		if (taskToAdd.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
+			taskLists.get(INDEX_EXPIRED).add(taskToAdd);
+			addTags(taskToAdd.getTaskTags());
+			throw new LogicException(LogicException.MSG_SUCCESS_ADD_EXPIRED);
 		}
 		
 		taskLists.get(INDEX_PENDING).add(taskToAdd);
 		taskLists.get(INDEX_EVENT).add(taskToAdd);
-		clearActionList();
-		
+
 		if (taskToAdd.isThisWeek()) {
 			taskLists.get(INDEX_THIS_WEEK).add(taskToAdd);
 		}
@@ -257,11 +265,10 @@ public class LogicMemory {
 			throw new LogicException(LogicException.MSG_ERROR_UPDATE_INVALID);
 		}
 		
-		if (newTask.isExpired()) {
-			throw new LogicException(LogicException.MSG_ERROR_DATE_EXPIRED);
-		}
-		
 		newTask.setTaskName(newName);
+		if (toUpdate.getTaskTags() != null) {
+			newTask.setTaskTags(new ArrayList<String>(toUpdate.getTaskTags()));
+		}
 		
 		if (taskAlreadyExists(newTask)) {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);
@@ -272,6 +279,10 @@ public class LogicMemory {
 		
 		if (!contentBox.equals(ContentBox.ACTION)) { // User not in ACTION tab, clear it to remove clutter
 			clearActionList();
+		}
+		
+		if (newTask.isExpired()) {
+			throw new LogicException(LogicException.MSG_SUCCESS_UPDATE_EXPIRED);
 		}
 	}
 	
@@ -355,7 +366,7 @@ public class LogicMemory {
 	void search(String searchPhrase) throws LogicException {
 		ArrayList<Task> actionList = taskLists.get(INDEX_ACTION);
 		clearActionList();
-		actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
+		//actionList.addAll(getSearchResults(taskLists.get(INDEX_EXPIRED), searchPhrase));
 		actionList.addAll(getSearchResults(taskLists.get(INDEX_PENDING), searchPhrase));
 		String exceptionMsg = String.format(LogicException.MSG_SUCCESS_SEARCH, searchPhrase);
 		throw new LogicException(exceptionMsg);
@@ -392,7 +403,7 @@ public class LogicMemory {
 			case "medium":
 			case "low":
 				clearActionList();
-				viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
+				// viewPriority(taskLists.get(INDEX_EXPIRED), viewType);
 				viewPriority(taskLists.get(INDEX_PENDING), viewType);
 				exceptionMsg = String.format(LogicException.MSG_SUCCESS_VIEW_PRIORITY, viewType);
 				throw new LogicException(exceptionMsg);
@@ -400,6 +411,16 @@ public class LogicMemory {
 			case "help": // Display of help will be handled by UI. UI should disallow any commands while in help mode.
 				clearActionList();
 				break;
+			
+			case "today":
+				clearActionList();
+				viewToday(taskLists.get(INDEX_PENDING));
+				throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TODAY);
+			
+			case "tomorrow":
+				clearActionList();
+				viewTomorrow(taskLists.get(INDEX_PENDING));
+				throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TOMORROW);
 			
 			default: // Should not reach this point
 				exceptionMsg = String.format(LogicException.MSG_ERROR_VIEWTYPE, viewType);
@@ -418,8 +439,8 @@ public class LogicMemory {
 	 */
 	void viewTags(ArrayList<String> tagNames) throws LogicException {
 		clearActionList();
-		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
-		tagFound = tagFound || viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
+		//boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_EXPIRED), tagNames);
+		boolean tagFound = viewTaggedTasks(taskLists.get(INDEX_PENDING), tagNames);
 		
 		throw new LogicException(LogicException.MSG_SUCCESS_VIEW_TAGS);
 	}
@@ -554,7 +575,7 @@ public class LogicMemory {
 		} else if (listIndex == INDEX_EVENT) {
 			return (!isExpired && taskType.equals("EVENT"));
 		} else if (listIndex == INDEX_ACTION) {
-			return contentBox.equals(ContentBox.ACTION);
+			return (!isExpired && contentBox.equals(ContentBox.ACTION));
 		} else {
 			return false;
 		}
@@ -653,6 +674,65 @@ public class LogicMemory {
 		}
 		
 		return priorityFound;
+	}
+	
+	/** Views all tasks from the given list which are happening today. 
+	 * 
+	 * @param list
+	 */
+	private void viewToday(ArrayList<Task> list) {
+		TimeConverter tc = new TimeConverter();
+		
+		for (Task t : list) {
+			if (t.getTaskType().equals("DEADLINE") && tc.isToday(t.getDeadlineEpoch())) {
+				taskLists.get(INDEX_ACTION).add(t);
+			} else if (t.getTaskType().equals("EVENT")) {
+				long currTime = tc.getCurrTime();
+				long startDate = t.getStartDateEpoch();
+				long endDate = t.getEndDateEpoch();
+				
+				if (tc.isToday(startDate) || tc.isToday(endDate)
+				    || (startDate <= currTime && currTime <= endDate)) {
+					taskLists.get(INDEX_ACTION).add(t);
+				}
+			}
+		}
+	}
+	
+	/** Views all tasks from the given list which are happening tomorrow. 
+	 * 
+	 * @param list
+	 */
+	private void viewTomorrow(ArrayList<Task> list) {
+		TimeConverter tc = new TimeConverter();
+		
+		for (Task t : list) {
+			if (t.getTaskType().equals("DEADLINE") && tc.isTmr(t.getDeadlineEpoch())) {
+				taskLists.get(INDEX_ACTION).add(t);
+			} else if (t.getTaskType().equals("EVENT")) {
+				long tmrTime = tc.getCurrTime() + NUM_SECONDS_1_DAY;
+				long startDate = t.getStartDateEpoch();
+				long endDate = t.getEndDateEpoch();
+				
+				if (tc.isTmr(startDate) || tc.isTmr(endDate)
+				    || (startDate <= tmrTime && tmrTime <= endDate)) {
+					taskLists.get(INDEX_ACTION).add(t);
+				}
+			}
+		}
+	}
+	
+	/** 
+	 * Adds all task tags in the given list into the tag category list.
+	 * 
+	 * @param taskTags
+	 */
+	void addTags(ArrayList<String> taskTags) {
+		if (taskTags != null) {
+			for (String s : taskTags) {
+				addTag(s);
+			}
+		}
 	}
 	
 	/** 
@@ -761,7 +841,7 @@ public class LogicMemory {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.75) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.65) {
 				searchResults.add(task);
 			}
 		}

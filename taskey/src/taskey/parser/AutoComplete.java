@@ -2,8 +2,6 @@ package taskey.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import taskey.constants.ParserConstants;
 import taskey.messenger.ProcessedAC;
@@ -29,8 +27,25 @@ public class AutoComplete {
 	private ArrayList<String> viewList = new ArrayList<String>();
 	private ArrayList<String> months = new ArrayList<String>(); 
 	private HashMap<String, String> monthsMap = new HashMap<String,String>(); 
+	private HashMap<String, String> daysOfWeek = new HashMap<String,String>(); 
+	private HashMap<String, String> allDaysOfWeek = new HashMap<String, String>(); 
 	
 	public AutoComplete() {
+		
+		processCommands();
+		processViewList();
+		processSpecialDays();
+		processMonths(); 
+		processDaysOfWeek();
+		processAllDaysOfWeek();
+		
+		
+	}
+
+	/**
+	 * Process command database
+	 */
+	private void processCommands() {
 		commands.add("add");
 		commands.add("view");
 		commands.add("del");
@@ -52,7 +67,12 @@ public class AutoComplete {
 		commandList.put("setdir","setdir");
 		commandList.put("save","save");
 		commandList.put("clear","clear");
-		
+	}
+
+	/**
+	 * Process ViewList Database 
+	 */
+	private void processViewList() {
 		viewList.add("all");
 		viewList.add("today");
 		viewList.add("tomorrow");
@@ -64,7 +84,12 @@ public class AutoComplete {
 		viewList.add("high");
 		viewList.add("medium");
 		viewList.add("low");
-		
+	}
+
+	/**
+	 * Process Special days database 
+	 */
+	private void processSpecialDays() {
 		specialDays.add("sun");
 		specialDays.add("mon");
 		specialDays.add("tue");
@@ -88,7 +113,12 @@ public class AutoComplete {
 		specialDaysNext.add("next thu");
 		specialDaysNext.add("next fri");
 		specialDaysNext.add("next sat");
-		
+	}
+
+	/**
+	 * Process months database
+	 */
+	private void processMonths() {
 		months.add("jan");
 		months.add("feb");
 		months.add("mar");
@@ -113,8 +143,81 @@ public class AutoComplete {
 		monthsMap.put("sep", "sep"); 
 		monthsMap.put("oct", "oct"); 
 		monthsMap.put("nov", "nov"); 
-		monthsMap.put("dec", "dec"); 
+		monthsMap.put("dec", "dec");
+	}
+
+	/**
+	 * Process dayOfWeek database
+	 */
+	private void processDaysOfWeek() {
+		daysOfWeek.put("mon", "mon");
+		daysOfWeek.put("tue", "tue");
+		daysOfWeek.put("wed", "wed");
+		daysOfWeek.put("thu", "thu");
+		daysOfWeek.put("fri", "fri");
+		daysOfWeek.put("sat", "sat");
+		daysOfWeek.put("sun", "sun");
 		
+		daysOfWeek.put("monday", "monday");
+		daysOfWeek.put("tuesday", "tuesday");
+		daysOfWeek.put("wednesday", "wednesday");
+		daysOfWeek.put("thursday", "thursday");
+		daysOfWeek.put("friday", "friday");
+		daysOfWeek.put("saturday", "saturday");
+		daysOfWeek.put("sunday", "sunday");
+	}
+
+	/**
+	 * Process alldaysofweek database
+	 */
+	private void processAllDaysOfWeek() {
+		allDaysOfWeek.put("mon", "mon");
+		allDaysOfWeek.put("tue", "tue");
+		allDaysOfWeek.put("wed", "wed");
+		allDaysOfWeek.put("thu", "thu");
+		allDaysOfWeek.put("fri", "fri");
+		allDaysOfWeek.put("sat", "sat");
+		allDaysOfWeek.put("sun", "sun");
+		
+		allDaysOfWeek.put("monday", "monday");
+		allDaysOfWeek.put("tuesday", "tuesday");
+		allDaysOfWeek.put("wednesday", "wednesday");
+		allDaysOfWeek.put("thursday", "thursday");
+		allDaysOfWeek.put("friday", "friday");
+		allDaysOfWeek.put("saturday", "saturday");
+		allDaysOfWeek.put("sunday", "sunday");
+		
+		allDaysOfWeek.put("this mon", "mon");
+		allDaysOfWeek.put("this tue", "tue");
+		allDaysOfWeek.put("this wed", "wed");
+		allDaysOfWeek.put("this thu", "thu");
+		allDaysOfWeek.put("this fri", "fri");
+		allDaysOfWeek.put("this sat", "sat");
+		allDaysOfWeek.put("this sun", "sun");
+		
+		allDaysOfWeek.put("this monday", "monday");
+		allDaysOfWeek.put("this tuesday", "tuesday");
+		allDaysOfWeek.put("this wednesday", "wednesday");
+		allDaysOfWeek.put("this thursday", "thursday");
+		allDaysOfWeek.put("this friday", "friday");
+		allDaysOfWeek.put("this saturday", "saturday");
+		allDaysOfWeek.put("this sunday", "sunday");
+		
+		allDaysOfWeek.put("next mon", "mon");
+		allDaysOfWeek.put("next tue", "tue");
+		allDaysOfWeek.put("next wed", "wed");
+		allDaysOfWeek.put("next thu", "thu");
+		allDaysOfWeek.put("next fri", "fri");
+		allDaysOfWeek.put("next sat", "sat");
+		allDaysOfWeek.put("next sun", "sun");
+		
+		allDaysOfWeek.put("next monday", "monday");
+		allDaysOfWeek.put("next tuesday", "tuesday");
+		allDaysOfWeek.put("next wednesday", "wednesday");
+		allDaysOfWeek.put("nextthursday", "thursday");
+		allDaysOfWeek.put("next friday", "friday");
+		allDaysOfWeek.put("next saturday", "saturday");
+		allDaysOfWeek.put("next sunday", "sunday");
 	}
 	
 	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
@@ -185,7 +288,13 @@ public class AutoComplete {
 		
 		if (!availCommands.isEmpty()) {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
-		} 
+		} else {
+			//try to check if command is misspelt
+			availCommands = correctCommandError(phrase); 
+			if (availCommands != null) {
+				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands); 
+			}
+		}
 		//no such command containing that sub-string
 		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
@@ -242,6 +351,15 @@ public class AutoComplete {
 		phrase = phrase.replaceFirst("add", "").trim();
 		String[] splitString = phrase.split(" ");
 		String latestWord = splitString[splitString.length - 1]; 
+		
+		/*
+		if (splitString.length >= 3) { 
+			String beforeLatestWord = splitString[splitString.length - 2]; 
+		
+			if (monthsMap.containsKey(beforeLatestWord)) {
+				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+			}
+		} */
 		
 		if (latestWord.contains("#")) {
 			latestWord = latestWord.replace("#", "").trim(); 
@@ -396,11 +514,12 @@ public class AutoComplete {
 	 */
 	private ArrayList<String> suggestDates(String date) {
 		ArrayList<String> availDates = new ArrayList<String>();
-		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
-			availDates = specialDaysThis; 
-			return availDates; 
-		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
-			availDates = specialDaysNext; 
+		
+		availDates = checkIfSpecialDate(date, availDates);
+		if (availDates == null) {
+			return null; 
+		}
+		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		
@@ -411,11 +530,14 @@ public class AutoComplete {
 			}
 		}
 		
+		String[] tempArr = date.split(" ");
+		String timeBehind = tempArr[tempArr.length-1]; 
+		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			String date2 = date.replace("pm", "");
-			date2 = date2.replace("am", "");
-			date2 = date2.replace("h", "");
+			//String date2 = date.replace("pm", "");
+			//date2 = date2.replace("am", "");
+			String date2 = date.replace("h", "");
 			date2 = date2.replace("a", "");
 			date2 = date2.replace("p", "");
 			try {
@@ -424,15 +546,91 @@ public class AutoComplete {
 					availDates.add(date2.trim()+"am");
 					availDates.add(date2.trim()+"pm"); 
 				}
-				if (date2.trim().length() == 4) { 
+				if (date2.trim().length() == 4 && num <= 2400 
+						&& num != 2016 && num != 2017) { 
 					availDates.add(date2.trim()+"h"); 
 				}
 			} catch (Exception e) {
 				//do nth 
 			}
+		} else if (pm.hasCorrectTimeFormat(date.trim())) {
+			//don't suggest any time, if there's no other date format,
+			//then suggest "tomorrow"
+			String[] temp = date.split(" ");
+			String date2 = ""; 
+			for (int i = 1; i < temp.length; i++) {
+				date2 += temp[i]; 
+			}
+			if (!pm.hasFullDateAC(date2)) {
+				availDates.add("tomorrow"); 
+			} else if (pm.hasDateAC(date2)) {
+				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+				for(int i = 0; i < dateRaw.size(); i++) {
+					availDates.add(date2.trim()+ " " + dateRaw.get(i)); //dd mmm
+				}
+			} else {
+				checkIfContainsMonth(date2, availDates);
+			}
+		} else {
+			//suggest a time? 
+			//availDates.add("9pm");
 		}
 		
 		//check if month 
+		checkIfContainsMonth(date, availDates);
+		
+		//check for normal date
+		checkIfContainsNormalDate(date, availDates);		
+		
+		if (!availDates.isEmpty()) {
+			return availDates; 
+		}
+		return null; 
+	}
+	
+	/**
+	 * Checks if the input contains what looks like a special date
+	 * @param date
+	 * @param availDates
+	 * @return list of avail special dates to autocomplete 
+	 */
+	private ArrayList<String> checkIfSpecialDate(String date, ArrayList<String> availDates) {
+		if (allDaysOfWeek.containsKey(date.trim())) {
+			return null; 
+		}
+		
+		if ("this".indexOf(date) == 0) { //eg. this ... 
+			availDates = specialDaysThis; 
+			return availDates; 
+		} else if ("next".indexOf(date) == 0) { //eg. next ...
+			availDates = specialDaysNext; 
+			return availDates; 
+		}
+		return availDates;
+	}
+
+	/**
+	 * Checks if the input possibly contains some normal date,
+	 * and attempts to autocomplete it 
+	 * @param date
+	 * @param availDates
+	 */
+	private void checkIfContainsNormalDate(String date, ArrayList<String> availDates) {
+		if (pm.hasDateAC(date.trim())) {
+			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+			for(int i = 0; i < dateRaw.size(); i++) {
+				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			}
+		}
+	}
+	
+	/**
+	 * If the date input looks like it contains a month, try to autocomplete the 
+	 * month, or autocorrect it if it is spelled wrongly 
+	 * @param date
+	 * @param availDates
+	 */
+	private void checkIfContainsMonth(String date, ArrayList<String> availDates) {
 		if (date.split(" ").length >= 2) { 
 			String day = date.split(" ")[0]; 
 			String mth = date.split(" ")[1]; //get the month
@@ -440,6 +638,10 @@ public class AutoComplete {
 				if (mth.length() == 3) {
 					if (monthsMap.containsKey(mth)) {
 						//do nth
+					} else if (daysOfWeek.containsKey(mth)) {
+						//do nth
+					} else if (pm.hasAmPm(mth)) {
+						//do nth 
 					} else {
 						ArrayList<String> suggestTemp = correctDateError(mth); 
 						if (suggestTemp != null) { 
@@ -458,20 +660,6 @@ public class AutoComplete {
 				}
 			}
 		}
-		
-		//check for normal date
-		if (pm.hasDateAC(date.trim())) {
-			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-			for(int i = 0; i < dateRaw.size(); i++) {
-				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
-			}
-		}
-		
-		
-		if (!availDates.isEmpty()) {
-			return availDates; 
-		}
-		return null; 
 	}
 	
 	/**
@@ -483,11 +671,11 @@ public class AutoComplete {
 	private ArrayList<String> suggestDates(String date, String phrase) {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
-		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
-			availDates = specialDaysThis; 
-			return availDates; 
-		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
-			availDates = specialDaysNext; 
+		availDates = checkIfSpecialDate(date, availDates);
+		if (availDates == null) {
+			return null; 
+		}
+		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		
@@ -497,18 +685,23 @@ public class AutoComplete {
 		try {
 			int num = Integer.parseInt(number); 
 		} catch (Exception e) {
-			//only add stuff like sun mon if the thing is not a number
-			for(int i = 0; i < specialDays.size(); i++) { 
-				if (specialDays.get(i).indexOf(date) == 0) {
-					availDates.add(specialDays.get(i));
+			//check if completed first : 
+			if (daysOfWeek.containsKey(date)) {
+				return null; 
+			} else {
+				//only add stuff like sun mon if the thing is not a number
+				for(int i = 0; i < specialDays.size(); i++) { 
+					if (specialDays.get(i).indexOf(date) == 0) {
+						availDates.add(specialDays.get(i));
+					}
 				}
 			}
 		}
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			date = date.replace("pm", "");
-			date = date.replace("am", "");
+			//date = date.replace("pm", "");
+			//date = date.replace("am", "");
 			date = date.replace("h", "");
 			date = date.replace("a", "");
 			date = date.replace("p", "");
@@ -518,7 +711,8 @@ public class AutoComplete {
 					availDates.add(date.trim()+"am");
 					availDates.add(date.trim()+"pm"); 
 				}
-				if (date.trim().length() == 4) { 
+				if (date.trim().length() == 4 && num <= 2400 
+						&& num != 2016 && num != 2017) { 
 					availDates.add(date.trim()+"h"); 
 				}
 			} catch (Exception e) {
@@ -528,9 +722,18 @@ public class AutoComplete {
 		
 		//check for normal date
 		if (pm.hasDateAC(date.trim())) {
-			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-			for(int i = 0; i < dateRaw.size(); i++) {
-				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			String tempDateRaw = getDateRaw(phrase); 
+			boolean hasMonth = false; 
+			for(int i = 0; i < months.size(); i++) {
+				if (tempDateRaw.contains(months.get(i)) && !tempDateRaw.contains("from")) {
+					hasMonth = true; 
+				}
+			}
+			if (hasMonth == false) { 
+				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+				for(int i = 0; i < dateRaw.size(); i++) {
+					availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+				}
 			}
 		}
 		
@@ -539,6 +742,8 @@ public class AutoComplete {
 			if (date.length() == 3) {
 				if (monthsMap.containsKey(date.trim())) {
 					//do nth
+				} else if (pm.hasAmPm(date.trim())) {
+					//do nth 
 				} else {
 					ArrayList<String> suggestTemp = correctDateError(date.trim()); 
 					if (suggestTemp != null) {
@@ -563,12 +768,61 @@ public class AutoComplete {
 	}
 	
 	/**
+	 * Get a rough estimate of date from an input phrase
+	 * (doesn't matter if location is included) 
+	 * @param phrase
+	 * @return estimated date phrase
+	 */
+	private String getDateRaw(String phrase) {
+		String dateRaw = ""; 
+		String[] parts = phrase.split(" "); 
+		boolean canAdd = false;
+		
+		for(int i = 0; i < parts.length; i++) {
+			String temp = parts[i]; 
+			if (temp.equalsIgnoreCase("by") || 
+					temp.equalsIgnoreCase("from") ||
+					temp.equalsIgnoreCase("at") ||
+					temp.equalsIgnoreCase("on")) {
+				canAdd = true;
+			} else if (canAdd == true) {
+				dateRaw += temp; 
+			}
+		}
+		return dateRaw; 
+	}
+	
+	/**
+	 * If a command has been spelt wrongly, try to correct it
+	 * @param misSpelled
+	 * @return an array list of suggestions for the correct command spelling
+	 */
+	public ArrayList<String> correctCommandError(String misSpelled) {
+		ArrayList<String> suggestions = new ArrayList<String>(); 
+		
+		for(int i = 0; i < commands.size(); i++) {
+			String correctComm = commands.get(i); 
+			int temp = levenshteinDist(misSpelled, correctComm); 
+			if (temp == 0) {
+				//exactly the same
+				return null;  
+			}
+			if (temp <= 2) {
+				suggestions.add(correctComm); 
+			}
+			
+		}
+		return suggestions; 
+	}
+	
+	/**
 	 * If the user has misspelt his date, suggest a correction for him 
 	 * @param misSpelled
 	 * @return list of possible correctly spelled dates 
 	 */
-	private ArrayList<String> correctDateError(String misSpelled) {
+	public ArrayList<String> correctDateError(String misSpelled) {
 		ArrayList<String> suggestions = new ArrayList<String>(); 
+		
 		for(int i = 0; i < months.size(); i++) {
 			String month = months.get(i); 
 			int temp = levenshteinDist(misSpelled, month); 
@@ -592,12 +846,12 @@ public class AutoComplete {
 	 * 2) It is at most the length of the longer string
 	 * 3) 0 iff the 2 strings are equal
 	 * 4) If the 2 strings are the same size, upperBound of Levenstein distance is the Hamming Distance
-	 * 5) Satisfies Triangle Inequality (LD(string1,string2) >= LD(string1) + LD(string2) 
+	 * 5) Satisfies Triangle Inequality [LD(string1,string2) >= LD(string1) + LD(string2)]
 	 * @param src
 	 * @param tar
 	 * @return distance between the 2 strings 
 	 */
-	public int levenshteinDist(String src, String tar) {
+	private int levenshteinDist(String src, String tar) {
 		//init to 0 automatically by java 
 		int[][] d = new int[src.length()+1][tar.length()+1]; 
 		

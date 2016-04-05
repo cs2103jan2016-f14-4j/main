@@ -1,6 +1,7 @@
 package taskey.ui.content;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
@@ -69,6 +70,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	}
 	
 	private void updateSelection(ArrayList<Task> myTaskList) {
+		ArrayList<Task> cloned = cloneList(myTaskList); // as list is going to be changed
 		if ( prevList != null ) { 
 			int index = 0;
 			if ( myTaskList.size() >= prevList.size()) {
@@ -81,7 +83,7 @@ public class UiDefaultFormatter extends UiFormatter {
 				}
 			}
 		} 
-		prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
+		prevList = cloned; // Need to clone a new list because otherwise the task list is the same
 	}
 	
 	private ArrayList<Task> cloneList(ArrayList<Task> toClone) {
@@ -92,16 +94,32 @@ public class UiDefaultFormatter extends UiFormatter {
 		return cloneList;
 	}
 	
+	/**
+	 * This method finds the index of the modified task to select in a page
+	 * Note that this method changes the currentList passed in
+	 * @param prevList
+	 * @param currentList
+	 * @return index
+	 */
 	private int findIndexOfModifiedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
+		int initialSize = currentList.size();
 		for ( int i = 0; i < prevList.size(); i++) {
-			if ( prevList.get(i).equals(currentList.get(i)) == false ) {
-				return i; // index of first mismatch
+			Task task = prevList.get(i);
+			int indexOf = currentList.indexOf(task);
+			if ( indexOf != -1 ) {
+				currentList.set(indexOf, null); // we pick out elements, but retain the array
 			}
 		}
-		if ( prevList.size() == currentList.size()) { // all tasks match
+		for ( int i = 0; i < currentList.size(); i++ )  {
+			if ( currentList.get(i) != null ) { // return first mismatch
+				return i;
+			}
+		}
+		currentList.removeAll(Collections.singleton(null));
+		if ( currentList.size() == 0) { // all tasks match
 			return -1;
 		} else {
-			return currentList.size(); // return newly added task
+			return initialSize; // return newly added task
 		}	
 	}
 	

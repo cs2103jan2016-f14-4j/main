@@ -28,8 +28,24 @@ public class AutoComplete {
 	private ArrayList<String> months = new ArrayList<String>(); 
 	private HashMap<String, String> monthsMap = new HashMap<String,String>(); 
 	private HashMap<String, String> daysOfWeek = new HashMap<String,String>(); 
+	private HashMap<String, String> allDaysOfWeek = new HashMap<String, String>(); 
 	
 	public AutoComplete() {
+		
+		processCommands();
+		processViewList();
+		processSpecialDays();
+		processMonths(); 
+		processDaysOfWeek();
+		processAllDaysOfWeek();
+		
+		
+	}
+
+	/**
+	 * Process command database
+	 */
+	private void processCommands() {
 		commands.add("add");
 		commands.add("view");
 		commands.add("del");
@@ -51,7 +67,12 @@ public class AutoComplete {
 		commandList.put("setdir","setdir");
 		commandList.put("save","save");
 		commandList.put("clear","clear");
-		
+	}
+
+	/**
+	 * Process ViewList Database 
+	 */
+	private void processViewList() {
 		viewList.add("all");
 		viewList.add("today");
 		viewList.add("tomorrow");
@@ -63,7 +84,12 @@ public class AutoComplete {
 		viewList.add("high");
 		viewList.add("medium");
 		viewList.add("low");
-		
+	}
+
+	/**
+	 * Process Special days database 
+	 */
+	private void processSpecialDays() {
 		specialDays.add("sun");
 		specialDays.add("mon");
 		specialDays.add("tue");
@@ -87,7 +113,12 @@ public class AutoComplete {
 		specialDaysNext.add("next thu");
 		specialDaysNext.add("next fri");
 		specialDaysNext.add("next sat");
-		
+	}
+
+	/**
+	 * Process months database
+	 */
+	private void processMonths() {
 		months.add("jan");
 		months.add("feb");
 		months.add("mar");
@@ -112,8 +143,13 @@ public class AutoComplete {
 		monthsMap.put("sep", "sep"); 
 		monthsMap.put("oct", "oct"); 
 		monthsMap.put("nov", "nov"); 
-		monthsMap.put("dec", "dec"); 
-		
+		monthsMap.put("dec", "dec");
+	}
+
+	/**
+	 * Process dayOfWeek database
+	 */
+	private void processDaysOfWeek() {
 		daysOfWeek.put("mon", "mon");
 		daysOfWeek.put("tue", "tue");
 		daysOfWeek.put("wed", "wed");
@@ -129,7 +165,59 @@ public class AutoComplete {
 		daysOfWeek.put("friday", "friday");
 		daysOfWeek.put("saturday", "saturday");
 		daysOfWeek.put("sunday", "sunday");
+	}
+
+	/**
+	 * Process alldaysofweek database
+	 */
+	private void processAllDaysOfWeek() {
+		allDaysOfWeek.put("mon", "mon");
+		allDaysOfWeek.put("tue", "tue");
+		allDaysOfWeek.put("wed", "wed");
+		allDaysOfWeek.put("thu", "thu");
+		allDaysOfWeek.put("fri", "fri");
+		allDaysOfWeek.put("sat", "sat");
+		allDaysOfWeek.put("sun", "sun");
 		
+		allDaysOfWeek.put("monday", "monday");
+		allDaysOfWeek.put("tuesday", "tuesday");
+		allDaysOfWeek.put("wednesday", "wednesday");
+		allDaysOfWeek.put("thursday", "thursday");
+		allDaysOfWeek.put("friday", "friday");
+		allDaysOfWeek.put("saturday", "saturday");
+		allDaysOfWeek.put("sunday", "sunday");
+		
+		allDaysOfWeek.put("this mon", "mon");
+		allDaysOfWeek.put("this tue", "tue");
+		allDaysOfWeek.put("this wed", "wed");
+		allDaysOfWeek.put("this thu", "thu");
+		allDaysOfWeek.put("this fri", "fri");
+		allDaysOfWeek.put("this sat", "sat");
+		allDaysOfWeek.put("this sun", "sun");
+		
+		allDaysOfWeek.put("this monday", "monday");
+		allDaysOfWeek.put("this tuesday", "tuesday");
+		allDaysOfWeek.put("this wednesday", "wednesday");
+		allDaysOfWeek.put("this thursday", "thursday");
+		allDaysOfWeek.put("this friday", "friday");
+		allDaysOfWeek.put("this saturday", "saturday");
+		allDaysOfWeek.put("this sunday", "sunday");
+		
+		allDaysOfWeek.put("next mon", "mon");
+		allDaysOfWeek.put("next tue", "tue");
+		allDaysOfWeek.put("next wed", "wed");
+		allDaysOfWeek.put("next thu", "thu");
+		allDaysOfWeek.put("next fri", "fri");
+		allDaysOfWeek.put("next sat", "sat");
+		allDaysOfWeek.put("next sun", "sun");
+		
+		allDaysOfWeek.put("next monday", "monday");
+		allDaysOfWeek.put("next tuesday", "tuesday");
+		allDaysOfWeek.put("next wednesday", "wednesday");
+		allDaysOfWeek.put("nextthursday", "thursday");
+		allDaysOfWeek.put("next friday", "friday");
+		allDaysOfWeek.put("next saturday", "saturday");
+		allDaysOfWeek.put("next sunday", "sunday");
 	}
 	
 	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
@@ -428,6 +516,9 @@ public class AutoComplete {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
 		availDates = checkIfSpecialDate(date, availDates);
+		if (availDates == null) {
+			return null; 
+		}
 		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
@@ -504,10 +595,14 @@ public class AutoComplete {
 	 * @return list of avail special dates to autocomplete 
 	 */
 	private ArrayList<String> checkIfSpecialDate(String date, ArrayList<String> availDates) {
-		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
+		if (allDaysOfWeek.containsKey(date.trim())) {
+			return null; 
+		}
+		
+		if ("this".indexOf(date) == 0) { //eg. this ... 
 			availDates = specialDaysThis; 
 			return availDates; 
-		} else if ("next".indexOf(date.trim()) == 0) { //eg. next ...
+		} else if ("next".indexOf(date) == 0) { //eg. next ...
 			availDates = specialDaysNext; 
 			return availDates; 
 		}
@@ -543,6 +638,8 @@ public class AutoComplete {
 				if (mth.length() == 3) {
 					if (monthsMap.containsKey(mth)) {
 						//do nth
+					} else if (daysOfWeek.containsKey(mth)) {
+						//do nth
 					} else if (pm.hasAmPm(mth)) {
 						//do nth 
 					} else {
@@ -575,6 +672,9 @@ public class AutoComplete {
 		ArrayList<String> availDates = new ArrayList<String>();
 		
 		availDates = checkIfSpecialDate(date, availDates);
+		if (availDates == null) {
+			return null; 
+		}
 		if (!availDates.isEmpty()) {
 			return availDates; 
 		}

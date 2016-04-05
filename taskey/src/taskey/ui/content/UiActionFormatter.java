@@ -90,7 +90,7 @@ public class UiActionFormatter extends UiFormatter {
 		taskView.getView().clear();
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 										 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
-		taskView.createPaginationGrids(myTaskList,totalPages);
+		taskView.createPaginationGrids(mainPane,myTaskList,totalPages);
 	}
 
 	@Override

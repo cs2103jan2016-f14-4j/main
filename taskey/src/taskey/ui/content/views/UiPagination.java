@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -31,6 +32,7 @@ public class UiPagination {
 	private String selectionStyle;
 	private StackPane selectedPane = null;
 	private boolean isSettingUp; // this is for preventing reset of uiPagination to page 0
+	private ScrollPane scrollPane = null; // such that scrollbar will move with selection
 	
 	public UiPagination(String _selectionStyle) {
 		selectionStyle = _selectionStyle;
@@ -154,6 +156,7 @@ public class UiPagination {
 		} else if ( event.getCode() == KeyCode.LEFT) {
 			selectInPage(currentPage-1,selectionInPage);
 		}
+		adjustScrollPaneToSelection(); 
 	}	
 
 	/**
@@ -197,5 +200,21 @@ public class UiPagination {
 		myGrids.clear();
 		totalEntries.clear();
 		selectedPane = null;
+	}
+
+	public void setScrollPane(ScrollPane mainPane) {
+		scrollPane = mainPane;
+	}
+	
+	private void adjustScrollPaneToSelection() {
+		if ( scrollPane == null ) {
+			return;
+		}
+		// crude shifting of layout
+		scrollPane.vvalueProperty().bind(
+				selectedPane.layoutYProperty().
+				subtract(selectedPane.getLayoutY() + 
+						scrollPane.getViewportBounds().getHeight() > selectedPane.getLayoutY() ? 
+								scrollPane.getViewportBounds().getHeight() - selectedPane.getLayoutY() : 0));
 	}
 }

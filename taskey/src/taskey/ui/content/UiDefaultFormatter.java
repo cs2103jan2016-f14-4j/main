@@ -66,10 +66,9 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
 			myTaskView.clear();
-			
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
-			myTaskView.createPaginationGrids(myTaskList,totalPages);
+			myTaskView.createPaginationGrids(mainPane,myTaskList,totalPages);
 
 			updateSelection(myTaskList);		
 		}

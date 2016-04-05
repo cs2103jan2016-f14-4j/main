@@ -13,9 +13,9 @@ import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.messenger.Task;
-import taskey.ui.tools.UiGridHelper;
-import taskey.ui.tools.UiTextBuilder;
+import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H

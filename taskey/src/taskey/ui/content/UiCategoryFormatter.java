@@ -9,7 +9,7 @@ import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.tools.UiTextBuilder;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H

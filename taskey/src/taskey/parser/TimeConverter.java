@@ -111,6 +111,48 @@ public class TimeConverter {
 	}
 	
 	/**
+	 * Checks if the task falls on today
+	 * @param epochTime
+	 * @return true if the task deadline/event is today 
+	 */
+	public boolean isToday(long epochTime) {
+		long dateToday = getCurrTime(); 
+		int yearDiff = Math.abs(getYear(epochTime) - getYear(dateToday)); 
+		int monthDiff = Math.abs(getMonth(epochTime) - getMonth(dateToday));
+		int dayDiff = Math.abs(getDay(epochTime) - getDay(dateToday));
+		
+		if (yearDiff == 0) {
+			if (monthDiff == 0) {
+				if (dayDiff == 0) {
+					return true;
+				}
+			}
+		} 
+		return false; 
+	}
+	
+	/**
+	 * Checks if the task falls on tomorrow
+	 * @param epochTime
+	 * @return true if the task deadline/event is tomorrow 
+	 */
+	public boolean isTmr(long epochTime) {
+		long dateToday = getCurrTime(); 
+		int yearDiff = Math.abs(getYear(epochTime) - getYear(dateToday)); 
+		int monthDiff = Math.abs(getMonth(epochTime) - getMonth(dateToday));
+		int dayDiff = Math.abs(getDay(epochTime) - getDay(dateToday));
+		
+		if (yearDiff == 0) {
+			if (monthDiff == 0) {
+				if (dayDiff == 1) {
+					return true;
+				}
+			}
+		} 
+		return false; 
+	}
+	
+	/**
 	 * Checks if 2 given times in Epoch Format are in the same week
 	 * @param epochTime1
 	 * @param epochTime2

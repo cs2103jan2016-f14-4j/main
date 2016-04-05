@@ -761,7 +761,7 @@ public class LogicMemory {
 				sumOfLevenshteinRatios += getMaxLevenshteinRatio(searchToken, taskNameTokens);
 			}
 			
-			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.75) {
+			if ((sumOfLevenshteinRatios / searchTokens.length) >= 0.65) {
 				searchResults.add(task);
 			}
 		}

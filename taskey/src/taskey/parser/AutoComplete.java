@@ -426,6 +426,7 @@ public class AutoComplete {
 	 */
 	private ArrayList<String> suggestDates(String date) {
 		ArrayList<String> availDates = new ArrayList<String>();
+		
 		if ("this".indexOf(date.trim()) == 0) { //eg. this ... 
 			availDates = specialDaysThis; 
 			return availDates; 
@@ -441,11 +442,14 @@ public class AutoComplete {
 			}
 		}
 		
+		String[] tempArr = date.split(" ");
+		String timeBehind = tempArr[tempArr.length-1]; 
+		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			String date2 = date.replace("pm", "");
-			date2 = date2.replace("am", "");
-			date2 = date2.replace("h", "");
+			//String date2 = date.replace("pm", "");
+			//date2 = date2.replace("am", "");
+			String date2 = date.replace("h", "");
 			date2 = date2.replace("a", "");
 			date2 = date2.replace("p", "");
 			try {
@@ -461,6 +465,54 @@ public class AutoComplete {
 			} catch (Exception e) {
 				//do nth 
 			}
+		} else if (pm.hasCorrectTimeFormat(date.trim())) {
+			//don't suggest any time, if there's no other date format,
+			//then suggest "tomorrow"
+			String[] temp = date.split(" ");
+			String date2 = ""; 
+			for (int i = 1; i < temp.length; i++) {
+				date2 += temp[i]; 
+			}
+			if (!pm.hasFullDateAC(date2)) {
+				availDates.add("tomorrow"); 
+			} else if (pm.hasDateAC(date2)) {
+				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+				for(int i = 0; i < dateRaw.size(); i++) {
+					availDates.add(date2.trim()+ " " + dateRaw.get(i)); //dd mmm
+				}
+			} else {
+				//check if month 
+				if (date2.split(" ").length >= 2) { 
+					String day = date2.split(" ")[0]; 
+					String mth = date2.split(" ")[1]; //get the month
+					if (mth.length() <= 3) {
+						if (mth.length() == 3) {
+							if (monthsMap.containsKey(mth)) {
+								//do nth
+							} else if (pm.hasAmPm(mth)) {
+								//do nth 
+							} else {
+								ArrayList<String> suggestTemp = correctDateError(mth); 
+								if (suggestTemp != null) { 
+									for(int i = 0; i < suggestTemp.size(); i++) {
+										availDates.add(suggestTemp.get(i)); 
+									}
+								}
+							}
+						} else {
+							for(int i = 0; i < months.size(); i++) {
+								String month = months.get(i);
+								if (month.indexOf(mth) == 0) {
+									availDates.add(day + " " + month); 
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			//suggest a time? 
+			availDates.add("9pm");
 		}
 		
 		//check if month 
@@ -498,8 +550,7 @@ public class AutoComplete {
 			for(int i = 0; i < dateRaw.size(); i++) {
 				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
 			}
-		}
-		
+		}		
 		
 		if (!availDates.isEmpty()) {
 			return availDates; 
@@ -637,6 +688,11 @@ public class AutoComplete {
 		return dateRaw; 
 	}
 	
+	/**
+	 * If a command has been spelt wrongly, try to correct it
+	 * @param misSpelled
+	 * @return an array list of suggestions for the correct command spelling
+	 */
 	public ArrayList<String> correctCommandError(String misSpelled) {
 		ArrayList<String> suggestions = new ArrayList<String>(); 
 		
@@ -686,7 +742,7 @@ public class AutoComplete {
 	 * 2) It is at most the length of the longer string
 	 * 3) 0 iff the 2 strings are equal
 	 * 4) If the 2 strings are the same size, upperBound of Levenstein distance is the Hamming Distance
-	 * 5) Satisfies Triangle Inequality (LD(string1,string2) >= LD(string1) + LD(string2) 
+	 * 5) Satisfies Triangle Inequality [LD(string1,string2) >= LD(string1) + LD(string2)]
 	 * @param src
 	 * @param tar
 	 * @return distance between the 2 strings 

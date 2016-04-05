@@ -264,6 +264,7 @@ public class LogicMemory {
 		}
 		
 		newTask.setTaskName(newName);
+		newTask.setTaskTags(new ArrayList<String>(toUpdate.getTaskTags()));
 		
 		if (taskAlreadyExists(newTask)) {
 			throw new LogicException(LogicException.MSG_ERROR_DUPLICATE_TASKS);

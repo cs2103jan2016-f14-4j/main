@@ -3,9 +3,14 @@ package taskey.ui.content;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
 import taskey.ui.content.views.UiTaskView;
@@ -40,6 +45,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	@Override
 	public void processArrowKey(KeyEvent event) {
 		myTaskView.getView().processKey(event);
+		
 	}
 
 	@Override
@@ -49,7 +55,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	@Override
 	public void processPageUpAndDown(KeyEvent event) {
-		myTaskView.getView().processKey(event);
+		myTaskView.getView().processKey(event);	
 	}
 	
 	@Override
@@ -65,7 +71,7 @@ public class UiDefaultFormatter extends UiFormatter {
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
 			myTaskView.createPaginationGrids(myTaskList,totalPages);
 
-			updateSelection(myTaskList);
+			updateSelection(myTaskList);		
 		}
 	}
 	
@@ -74,7 +80,7 @@ public class UiDefaultFormatter extends UiFormatter {
 		if ( prevList != null ) { 
 			int index = 0;
 			if ( myTaskList.size() >= prevList.size()) {
-				index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
+				index = findIndexOfModifiedTask(prevList,cloned);	// modification of a task
 				if ( index == -1) {
 					// no op as lists are the same
 				} else {
@@ -83,7 +89,7 @@ public class UiDefaultFormatter extends UiFormatter {
 				}
 			}
 		} 
-		prevList = cloned; // Need to clone a new list because otherwise the task list is the same
+		prevList = myTaskList; // note that myTaskList is cloned from Logic
 	}
 	
 	private ArrayList<Task> cloneList(ArrayList<Task> toClone) {
@@ -105,9 +111,9 @@ public class UiDefaultFormatter extends UiFormatter {
 		int initialSize = currentList.size();
 		for ( int i = 0; i < prevList.size(); i++) {
 			Task task = prevList.get(i);
-			int indexOf = currentList.indexOf(task);
-			if ( indexOf != -1 ) {
-				currentList.set(indexOf, null); // we pick out elements, but retain the array
+			int indexOfTask = currentList.indexOf(task); 
+			if ( indexOfTask != -1 ) {
+				currentList.set(indexOfTask, null); // we pick out elements, but retain the array
 			}
 		}
 		for ( int i = 0; i < currentList.size(); i++ )  {

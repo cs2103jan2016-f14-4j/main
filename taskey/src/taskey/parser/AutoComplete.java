@@ -27,6 +27,7 @@ public class AutoComplete {
 	private ArrayList<String> viewList = new ArrayList<String>();
 	private ArrayList<String> months = new ArrayList<String>(); 
 	private HashMap<String, String> monthsMap = new HashMap<String,String>(); 
+	private HashMap<String, String> daysOfWeek = new HashMap<String,String>(); 
 	
 	public AutoComplete() {
 		commands.add("add");
@@ -113,6 +114,22 @@ public class AutoComplete {
 		monthsMap.put("nov", "nov"); 
 		monthsMap.put("dec", "dec"); 
 		
+		daysOfWeek.put("mon", "mon");
+		daysOfWeek.put("tue", "tue");
+		daysOfWeek.put("wed", "wed");
+		daysOfWeek.put("thu", "thu");
+		daysOfWeek.put("fri", "fri");
+		daysOfWeek.put("sat", "sat");
+		daysOfWeek.put("sun", "sun");
+		
+		daysOfWeek.put("monday", "monday");
+		daysOfWeek.put("tuesday", "tuesday");
+		daysOfWeek.put("wednesday", "wednesday");
+		daysOfWeek.put("thursday", "thursday");
+		daysOfWeek.put("friday", "friday");
+		daysOfWeek.put("saturday", "saturday");
+		daysOfWeek.put("sunday", "sunday");
+		
 	}
 	
 	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
@@ -183,7 +200,13 @@ public class AutoComplete {
 		
 		if (!availCommands.isEmpty()) {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands);
-		} 
+		} else {
+			//try to check if command is misspelt
+			availCommands = correctCommandError(phrase); 
+			if (availCommands != null) {
+				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands); 
+			}
+		}
 		//no such command containing that sub-string
 		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND); 
 	}
@@ -507,10 +530,15 @@ public class AutoComplete {
 		try {
 			int num = Integer.parseInt(number); 
 		} catch (Exception e) {
-			//only add stuff like sun mon if the thing is not a number
-			for(int i = 0; i < specialDays.size(); i++) { 
-				if (specialDays.get(i).indexOf(date) == 0) {
-					availDates.add(specialDays.get(i));
+			//check if completed first : 
+			if (daysOfWeek.containsKey(date)) {
+				return null; 
+			} else {
+				//only add stuff like sun mon if the thing is not a number
+				for(int i = 0; i < specialDays.size(); i++) { 
+					if (specialDays.get(i).indexOf(date) == 0) {
+						availDates.add(specialDays.get(i));
+					}
 				}
 			}
 		}
@@ -542,7 +570,7 @@ public class AutoComplete {
 			String tempDateRaw = getDateRaw(phrase); 
 			boolean hasMonth = false; 
 			for(int i = 0; i < months.size(); i++) {
-				if (tempDateRaw.contains(months.get(i))) {
+				if (tempDateRaw.contains(months.get(i)) && !tempDateRaw.contains("from")) {
 					hasMonth = true; 
 				}
 			}
@@ -609,6 +637,24 @@ public class AutoComplete {
 		return dateRaw; 
 	}
 	
+	public ArrayList<String> correctCommandError(String misSpelled) {
+		ArrayList<String> suggestions = new ArrayList<String>(); 
+		
+		for(int i = 0; i < commands.size(); i++) {
+			String correctComm = commands.get(i); 
+			int temp = levenshteinDist(misSpelled, correctComm); 
+			if (temp == 0) {
+				//exactly the same
+				return null;  
+			}
+			if (temp <= 2) {
+				suggestions.add(correctComm); 
+			}
+			
+		}
+		return suggestions; 
+	}
+	
 	/**
 	 * If the user has misspelt his date, suggest a correction for him 
 	 * @param misSpelled
@@ -616,6 +662,7 @@ public class AutoComplete {
 	 */
 	public ArrayList<String> correctDateError(String misSpelled) {
 		ArrayList<String> suggestions = new ArrayList<String>(); 
+		
 		for(int i = 0; i < months.size(); i++) {
 			String month = months.get(i); 
 			int temp = levenshteinDist(misSpelled, month); 

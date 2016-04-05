@@ -241,6 +241,15 @@ public class AutoComplete {
 		String[] splitString = phrase.split(" ");
 		String latestWord = splitString[splitString.length - 1]; 
 		
+		/*
+		if (splitString.length >= 3) { 
+			String beforeLatestWord = splitString[splitString.length - 2]; 
+		
+			if (monthsMap.containsKey(beforeLatestWord)) {
+				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+			}
+		} */
+		
 		if (latestWord.contains("#")) {
 			latestWord = latestWord.replace("#", "").trim(); 
 			//suggest categories to the user 
@@ -422,7 +431,8 @@ public class AutoComplete {
 					availDates.add(date2.trim()+"am");
 					availDates.add(date2.trim()+"pm"); 
 				}
-				if (date2.trim().length() == 4) { 
+				if (date2.trim().length() == 4 && num <= 2400 
+						&& num != 2016 && num != 2017) { 
 					availDates.add(date2.trim()+"h"); 
 				}
 			} catch (Exception e) {
@@ -438,6 +448,8 @@ public class AutoComplete {
 				if (mth.length() == 3) {
 					if (monthsMap.containsKey(mth)) {
 						//do nth
+					} else if (pm.hasAmPm(mth)) {
+						//do nth 
 					} else {
 						ArrayList<String> suggestTemp = correctDateError(mth); 
 						if (suggestTemp != null) { 
@@ -505,8 +517,8 @@ public class AutoComplete {
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			date = date.replace("pm", "");
-			date = date.replace("am", "");
+			//date = date.replace("pm", "");
+			//date = date.replace("am", "");
 			date = date.replace("h", "");
 			date = date.replace("a", "");
 			date = date.replace("p", "");
@@ -516,7 +528,8 @@ public class AutoComplete {
 					availDates.add(date.trim()+"am");
 					availDates.add(date.trim()+"pm"); 
 				}
-				if (date.trim().length() == 4) { 
+				if (date.trim().length() == 4 && num <= 2400 
+						&& num != 2016 && num != 2017) { 
 					availDates.add(date.trim()+"h"); 
 				}
 			} catch (Exception e) {
@@ -526,9 +539,18 @@ public class AutoComplete {
 		
 		//check for normal date
 		if (pm.hasDateAC(date.trim())) {
-			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-			for(int i = 0; i < dateRaw.size(); i++) {
-				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			String tempDateRaw = getDateRaw(phrase); 
+			boolean hasMonth = false; 
+			for(int i = 0; i < months.size(); i++) {
+				if (tempDateRaw.contains(months.get(i))) {
+					hasMonth = true; 
+				}
+			}
+			if (hasMonth == false) { 
+				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+				for(int i = 0; i < dateRaw.size(); i++) {
+					availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+				}
 			}
 		}
 		
@@ -537,6 +559,8 @@ public class AutoComplete {
 			if (date.length() == 3) {
 				if (monthsMap.containsKey(date.trim())) {
 					//do nth
+				} else if (pm.hasAmPm(date.trim())) {
+					//do nth 
 				} else {
 					ArrayList<String> suggestTemp = correctDateError(date.trim()); 
 					if (suggestTemp != null) {
@@ -558,6 +582,31 @@ public class AutoComplete {
 			return availDates; 
 		}
 		return null; 
+	}
+	
+	/**
+	 * Get a rough estimate of date from an input phrase
+	 * (doesn't matter if location is included) 
+	 * @param phrase
+	 * @return estimated date phrase
+	 */
+	private String getDateRaw(String phrase) {
+		String dateRaw = ""; 
+		String[] parts = phrase.split(" "); 
+		boolean canAdd = false;
+		
+		for(int i = 0; i < parts.length; i++) {
+			String temp = parts[i]; 
+			if (temp.equalsIgnoreCase("by") || 
+					temp.equalsIgnoreCase("from") ||
+					temp.equalsIgnoreCase("at") ||
+					temp.equalsIgnoreCase("on")) {
+				canAdd = true;
+			} else if (canAdd == true) {
+				dateRaw += temp; 
+			}
+		}
+		return dateRaw; 
 	}
 	
 	/**

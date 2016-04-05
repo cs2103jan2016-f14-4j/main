@@ -28,8 +28,9 @@ public class DateTimePatternMatcher {
 	private String pattern6 = "at \\d{1,2}(:|.)?\\d{0,2} ?(am|pm) by"; 
 	
 	/* White-list for AutoComplete to suggest date/time */
-	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2} ?(a|p|am|pm|h)?"; //for time
-	private String pattern8 = "\\d{1,2} ?"; //for date
+	private String pattern7 = "\\d{1,2}(:|.)?\\d{0,2} ?(a|p|h)?"; //for time
+	private String pattern8 = "\\d{1,2}"; //for date
+	private String checkTime = "(am|pm)";
 	
 	/* White-list for ParseEdit to check if the time has am, pm or h, or morning or night */ 
 	private String pattern9 = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; //for time
@@ -37,6 +38,24 @@ public class DateTimePatternMatcher {
 	
 	public DateTimePatternMatcher() {
 		
+	}
+	
+	/**
+	 * Checks if any 3letter input has am or pm in it,
+	 * so that AutoComplete does not suggest a month correction
+	 * @param input
+	 * @return true if it has am or pm in it 
+	 */
+	public boolean hasAmPm(String input) {
+		Pattern p = Pattern.compile(checkTime);
+		Matcher m = p.matcher(input);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			return true;
+		}
+		
+		return false; 
 	}
 	
 	/**

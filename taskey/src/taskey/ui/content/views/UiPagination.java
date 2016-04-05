@@ -126,6 +126,8 @@ public class UiPagination {
 		}	
 		selectedPane = (StackPane) pageContent.get(selectionInPage);
 		selectedPane.getStyleClass().add(selectionStyle);		
+		
+		adjustScrollPaneToSelection(); 
 	}
 	
 	/**
@@ -156,7 +158,7 @@ public class UiPagination {
 		} else if ( event.getCode() == KeyCode.LEFT) {
 			selectInPage(currentPage-1,selectionInPage);
 		}
-		adjustScrollPaneToSelection(); 
+		
 	}	
 
 	/**
@@ -210,11 +212,13 @@ public class UiPagination {
 		if ( scrollPane == null ) {
 			return;
 		}
+
 		// crude shifting of layout
+		// Since layout bounds are updated internally, and not at this point in time
 		scrollPane.vvalueProperty().bind(
 				selectedPane.layoutYProperty().
 				subtract(selectedPane.getLayoutY() + 
-						scrollPane.getViewportBounds().getHeight() > selectedPane.getLayoutY() ? 
-								scrollPane.getViewportBounds().getHeight() - selectedPane.getLayoutY() : 0));
+						 scrollPane.getViewportBounds().getHeight() > selectedPane.getLayoutY() ? 
+						 scrollPane.getViewportBounds().getHeight() - selectedPane.getLayoutY() : 0));
 	}
 }

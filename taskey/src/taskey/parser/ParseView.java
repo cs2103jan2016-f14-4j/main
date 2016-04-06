@@ -46,7 +46,7 @@ public class ParseView extends ParseCommand {
 	 * @param stringInput
 	 * @return processedStuff
 	 */
-	public ProcessedObject processView(String stringInput) {
+	protected ProcessedObject processView(String stringInput) {
 		String stringWithoutCommand = getStringWithoutCommand(stringInput);
 		
 		//empty view

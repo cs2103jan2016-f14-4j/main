@@ -16,7 +16,7 @@ public class ParseFileLocation extends ParseCommand {
 		super(); 
 	}
 	
-	public ProcessedObject processLoc(String rawInput) {
+	protected ProcessedObject processLoc(String rawInput) {
 		String pathname = getFileName(rawInput); 
 		ProcessedObject po = new ProcessedObject(ParserConstants.NEW_FILE_LOC);
 		po.setNewFileLoc(pathname); 

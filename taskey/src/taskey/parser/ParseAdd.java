@@ -46,7 +46,7 @@ public class ParseAdd extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processAdd(String command, String stringInput) {
+	protected ProcessedObject processAdd(String command, String stringInput) {
 		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 

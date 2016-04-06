@@ -40,7 +40,6 @@ public class TimeConverterTest {
 			assertTrue(timeConverter.isSameWeek(time1, time2));
 			
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//compare 10Feb 11pm vs 11Feb 1am 

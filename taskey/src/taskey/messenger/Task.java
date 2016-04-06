@@ -634,6 +634,10 @@ public class Task implements Comparable<Task> {
 			return false;
 		}
 		
+		if ( priority != other.getPriority() ) {
+			return false;
+		}
+		
 		if (!Arrays.equals(datesEpoch, other.datesEpoch)) {
 			return false;
 		}

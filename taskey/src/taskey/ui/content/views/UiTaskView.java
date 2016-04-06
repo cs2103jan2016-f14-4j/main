@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -13,9 +14,9 @@ import javafx.util.Pair;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
 import taskey.messenger.Task;
-import taskey.ui.tools.UiGridHelper;
-import taskey.ui.tools.UiTextBuilder;
+import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H
@@ -43,7 +44,7 @@ public class UiTaskView {
 		return taskView;
 	}
 	
-	public void createPaginationGrids(ArrayList<Task> myTaskList, int totalPages) {
+	public void createPaginationGrids(ScrollPane mainPane, ArrayList<Task> myTaskList, int totalPages) {
 		int entryNo = 0;
 		ArrayList<Pair<Integer,Integer>> overlappingPairs = getIndexesOfOverlappingEvents(myTaskList);
 		
@@ -70,7 +71,9 @@ public class UiTaskView {
 			}
 			taskView.addGridToPagination(newGrid,pageEntries);
 		}
+		taskView.setScrollPane(mainPane);
 		taskView.initializeDisplay(totalPages); // update UI and bind call back
+		
 	}
 	
 	private void addTaskID(Task theTask, int id, int row, GridPane theGrid) {

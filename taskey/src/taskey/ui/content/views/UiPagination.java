@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -31,13 +32,13 @@ public class UiPagination {
 	private String selectionStyle;
 	private StackPane selectedPane = null;
 	private boolean isSettingUp; // this is for preventing reset of uiPagination to page 0
+	private ScrollPane scrollPane = null; // such that scrollbar will move with selection
 	
 	public UiPagination(String _selectionStyle) {
 		selectionStyle = _selectionStyle;
 		myPages = new Pagination(); 
 		myGrids = new ArrayList<GridPane>();	
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
-		myPages.setVisible(false);
 		currentSelection = 0;
 		selectionInPage = 0;
 		isSettingUp = true;
@@ -79,7 +80,6 @@ public class UiPagination {
                 return createPage(pageIndex);
             }
         });
-		myPages.setVisible(true);
 		isSettingUp = false;
 	}
 	
@@ -124,6 +124,8 @@ public class UiPagination {
 		}	
 		selectedPane = (StackPane) pageContent.get(selectionInPage);
 		selectedPane.getStyleClass().add(selectionStyle);		
+		
+		adjustScrollPaneToSelection(); 
 	}
 	
 	/**
@@ -154,6 +156,7 @@ public class UiPagination {
 		} else if ( event.getCode() == KeyCode.LEFT) {
 			selectInPage(currentPage-1,selectionInPage);
 		}
+		
 	}	
 
 	/**
@@ -197,5 +200,25 @@ public class UiPagination {
 		myGrids.clear();
 		totalEntries.clear();
 		selectedPane = null;
+	}
+
+	public void setScrollPane(ScrollPane mainPane) {
+		scrollPane = mainPane;
+	}
+	
+	private void adjustScrollPaneToSelection() {
+		if ( scrollPane == null ) {
+			return;
+		}
+
+		// crude shifting of layout
+		// Since layout bounds are updated internally, and not at this point in time
+		scrollPane.vvalueProperty().bind(
+				selectedPane.layoutYProperty().
+				subtract(selectedPane.getLayoutY() + 
+						 scrollPane.getViewportBounds().getMaxY() > 
+						 selectedPane.layoutBoundsProperty().getValue().getMaxY() ? 
+						 scrollPane.getViewportBounds().getMaxY() - 
+						 selectedPane.layoutBoundsProperty().getValue().getMaxY() : 0));
 	}
 }

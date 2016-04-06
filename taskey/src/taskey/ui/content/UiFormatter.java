@@ -8,7 +8,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.tools.UiGridHelper;
+import taskey.ui.utility.UiGridHelper;
 
 /**
  * @@author A0125419H

@@ -52,7 +52,7 @@ public class ParseAdd extends ParseCommand {
 		Task task = new Task(); 
 		//simpString: basically string without the command
 		String simpString = stringNoCommand(stringInput);
-		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
+		//simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		String simpString2 = simpString.split("#")[0].trim(); 
 		
 		if (isEmptyAdd(simpString2)) {
@@ -227,11 +227,18 @@ public class ParseAdd extends ParseCommand {
 	private ProcessedObject handleEvent(Task task, String taskName, String rawDate) {
 		long epochTime;
 		ProcessedObject processed;
-	
-		String simpString2 = rawDate.replace("today", "2day"); 
-		simpString2 = simpString2.replace("tomorrow", "tmr"); 
+		
+		String[] changeSplitter = rawDate.split(" ");
+		for(int i = 0; i < changeSplitter.length; i++) {
+			if (changeSplitter[i].equals("to")) {
+				changeSplitter[i] = ";"; 
+			}
+		}
+		String rawDate2 = String.join(" ", changeSplitter);
+		String simpString2 = rawDate2.replace("2day", "today"); 
+		simpString2 = simpString2.replace("tmr", "tomorrow"); 
 		simpString2 = simpString2.replace("from", "").trim();
-		String[] dateList = simpString2.split("to"); 
+		String[] dateList = simpString2.split(";"); 
 		String dateForPrettyParser = rawDate;
 		
 		String rawStartDate = dateList[0].trim().toLowerCase();
@@ -242,6 +249,7 @@ public class ParseAdd extends ParseCommand {
 		//if date contains am or pm or morning or night, 
 		//call pretty parser to process the time and return. 
 		try {
+			//TODO: deal with from 12pm to tmr, cos tmr isnt a time. 
 			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
 			epochTimeStart = epochTimeEvent[0]; 
 			epochTimeEnd = epochTimeEvent[1]; 
@@ -320,7 +328,6 @@ public class ParseAdd extends ParseCommand {
 		if (eventStartTime == -1 || eventEndTime == -1) {
 			return false; 
 		}
-		
 		if (eventStartTime >= eventEndTime) {
 			return false; 
 		}
@@ -343,6 +350,7 @@ public class ParseAdd extends ParseCommand {
 			rawDate += splitDate[i] + " "; 
 		}
 		rawDate = rawDate.trim(); 
+		rawDate = rawDate.replace("tmr", "tomorrow"); 
 		
 		
 		//if time contains am or pm or morning or night, 
@@ -544,7 +552,7 @@ public class ParseAdd extends ParseCommand {
 							}
 						} else {
 							stringRep += time + " "; 
-							i += 1; 
+							i += 2; 
 						}
 					} else {
 						//probably a place and not time,

@@ -229,21 +229,4 @@ public class DateTimePatternMatcher {
 		return false; 
 	}
 	
-	
-	public static void main(String[] args) {
-		DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
-		String string1 = "add project meeting by 3 pm on 17 feb";
-		String string2 = "add project meeting on 19 feb from 4pm to 5pm";
-		String string3 = "add do homework at 3pm by tomorrow";
-		
-		System.out.println(pm.hasPattern(string1));
-		System.out.println(pm.hasPattern(string2));
-		System.out.println(pm.hasPattern(string3));
-		
-		String string4 = "add do homework by 23:00h";
-		String string5 = "add do homework by tonight"; 
-		System.out.println(pm.hasTimeEdit(string4));
-		System.out.println(pm.hasTimeEdit(string5));
-	} 
-	
 }

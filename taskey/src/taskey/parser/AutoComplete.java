@@ -30,6 +30,9 @@ public class AutoComplete {
 	private HashMap<String, String> daysOfWeek = new HashMap<String,String>(); 
 	private HashMap<String, String> allDaysOfWeek = new HashMap<String, String>(); 
 	
+	/**
+	 * CONSTRUCTOR 
+	 */
 	public AutoComplete() {
 		
 		processCommands();
@@ -38,7 +41,6 @@ public class AutoComplete {
 		processMonths(); 
 		processDaysOfWeek();
 		processAllDaysOfWeek();
-		
 		
 	}
 
@@ -220,6 +222,13 @@ public class AutoComplete {
 		allDaysOfWeek.put("next sunday", "sunday");
 	}
 	
+	/**
+	 * For Logic: Get a list of suggestions for the user to input 
+	 * (in case he forgets any command or misspelt them, etc... ) 
+	 * @param rawPhrase
+	 * @param tagDB
+	 * @return ProcessedAC
+	 */
 	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
 		ProcessedAC suggestions = null;
 		String phrase = rawPhrase.toLowerCase().trim();

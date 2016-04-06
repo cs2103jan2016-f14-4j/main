@@ -6,6 +6,12 @@ import org.junit.Test;
 
 import taskey.parser.DateTimePatternMatcher;
 
+/**
+ * @@author A0107345L
+ * Junit testing class for DateTimePatternMatcher
+ * @author Xue Hui
+ *
+ */
 public class PatternMatcherTest {
 	DateTimePatternMatcher pm = new DateTimePatternMatcher(); 
 	

@@ -156,17 +156,17 @@ public class ParseAdd extends ParseCommand {
 				//event
 				processed = handleEvent(task, taskName, rawDate);
 			}
-		} else if (rawDate.contains("by")) {
+		} else if (rawDate.indexOf("by") == 0) {
 			if (simpString.split("by").length != 1) {
 				//deadline 
 				processed = handleDeadline(task, taskName, rawDate);
 			} 
-		} else if (rawDate.contains("on")) {
+		} else if (rawDate.indexOf("on") == 0) {
 			if (simpString.split("on").length != 1) {
 				//deadline
 				processed = handleDeadline(task, taskName, rawDate);	
 			}
-		} else if (rawDate.contains("at")) {
+		} else if (rawDate.indexOf("at") == 0) {
 			if (simpString.split("at").length != 1) {
 				//handle as deadline 
 				processed = handleDeadline(task, taskName, rawDate);

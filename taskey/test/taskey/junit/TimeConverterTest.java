@@ -7,10 +7,17 @@ import java.text.ParseException;
 import org.junit.Test;
 import taskey.parser.TimeConverter;
 
-/* @@author A0107345L */
+/**
+ *  @@author A0107345L
+ *  Tests the TimeConverter class
+ *  @author: Xue Hui 
+ **/
 public class TimeConverterTest {
 
 	@Test
+	/**
+	 * Test basic methods for TimeConverter 
+	 */
 	public void test() {
 		TimeConverter timeConverter = new TimeConverter(); 
 		
@@ -47,7 +54,10 @@ public class TimeConverterTest {
 
 	}
 	
-	@Test //Test that the week starts on sunday and not monday 
+	@Test 
+	/**
+	 * Test that the week starts on sunday and not monday 
+	 */
 	public void testSameWeek() {
 		TimeConverter tc = new TimeConverter();
 		try {

@@ -126,7 +126,12 @@ public class ParseAdd extends ParseCommand {
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {
-		String taskNameRaw = removeTimeFromName(simpString); 
+		String taskNameRaw; 
+		try {
+			taskNameRaw = removeTimeFromName(simpString); 
+		} catch (Exception e) {
+			return super.processError(ParserConstants.ERROR_DATE_KEYWORD); 
+		}
 		String taskName = taskNameRaw.substring(0, 1).toUpperCase() + taskNameRaw.substring(1);
 		String rawDate = simpString.replace(taskNameRaw, "").trim();
 		int priority = getPriority(rawDate); 
@@ -189,7 +194,7 @@ public class ParseAdd extends ParseCommand {
 	 * If the task description is empty, it is considered an 
 	 * empty add. So, return true to indicate error. 
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private boolean isEmptyAdd(String simpString) {
 		if (simpString.compareTo("") == 0) {
@@ -202,7 +207,7 @@ public class ParseAdd extends ParseCommand {
 	 * if taskname consists entirely of numbers, return true
 	 * to indicate error
 	 * @param simpString
-	 * @return
+	 * @return true if taskname only consists of numbers
 	 */
 	private boolean isOnlyNumbers(String simpString) {
 		try {
@@ -217,7 +222,7 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: process event 
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleEvent(Task task, String taskName, String rawDate) {
 		long epochTime;
@@ -326,7 +331,7 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: process deadlines with the keyword "by", "on" and "at" 
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleDeadline(Task task, String taskName, String rawDate) {
 		long epochTime;
@@ -371,7 +376,7 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: Process floating event 
 	 * @param command
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleFloating(String command, String simpString) {
 		ProcessedObject processed;
@@ -444,7 +449,7 @@ public class ParseAdd extends ParseCommand {
 	 * Get tag list for a task
 	 * Assumptions: all tags must be added to the back of the userInput
 	 * @param rawInput
-	 * @return
+	 * @return ArrayList of Tags
 	 */
 	private ArrayList<String> getTagList(String rawInput) {
 		ArrayList<String> tagList = new ArrayList<String>();
@@ -494,9 +499,9 @@ public class ParseAdd extends ParseCommand {
 	 * might still contain the time in it. So this function will remove
 	 * the time from the task name (if it is there) 
 	 * @param taskName
-	 * @return
+	 * @return task name without time. 
 	 */
-	private String removeTimeFromName(String taskName) {
+	private String removeTimeFromName(String taskName) throws Exception {
 		String keyword = "(at|from|on|by)";
 		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm|h)";
 		String combinedTime2 = "(tonight|night|morning)"; //not in special days converter
@@ -537,6 +542,9 @@ public class ParseAdd extends ParseCommand {
 								i += 3; 
 								continue; 
 							}
+						} else {
+							stringRep += time + " "; 
+							i += 1; 
 						}
 					} else {
 						//probably a place and not time,
@@ -545,6 +553,9 @@ public class ParseAdd extends ParseCommand {
 						i += 2; 
 						continue; 
 					}
+				} else {
+					//i+1 doesnt exist 
+					throw new Exception(); 
 				}
 			} else {
 				stringRep += word + " "; 

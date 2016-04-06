@@ -1095,4 +1095,124 @@ public class LogicTest {
 		LogicException actual = new LogicException(LogicException.MSG_SUCCESS_UPDATE_EXPIRED);
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void viewTodayShouldOnlyShowTodaysDeadlineAndEventTasks() {
+		String input = "add task";
+		Task task1 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime); // Today
+		input = "add task on " + deadline;
+		Task task2 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime + NUM_SECONDS_1_DAY); // Tmr
+		input = "add task on " + deadline;
+		Task task3 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY); // Yesterday
+		input = "add task on " + deadline;
+		Task task4 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task5 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		endDate = timeConverter.getDate(currTime);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task6 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task7 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task8 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime + NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task9 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		logic.executeCommand(ContentBox.PENDING, "view today");
+		
+		ArrayList<Task> expected = new ArrayList<Task>();
+		expected.add(task2);
+		expected.add(task6);
+		expected.add(task7);
+		expected.add(task8);
+		sortListReversed(expected);
+		ArrayList<Task> actual = logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION);
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void viewTmrShouldOnlyShowTmrsDeadlineAndEventTasks() {
+		String input = "add task";
+		Task task1 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		long currTime = timeConverter.getCurrTime();
+		String deadline = timeConverter.getDate(currTime); // Today
+		input = "add task on " + deadline;
+		Task task2 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime + NUM_SECONDS_1_DAY); // Tmr
+		input = "add task on " + deadline;
+		Task task3 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		deadline = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY); // Yesterday
+		input = "add task on " + deadline;
+		Task task4 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		String startDate = timeConverter.getDate(currTime - NUM_SECONDS_1_WEEK);
+		String endDate = timeConverter.getDate(currTime - NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task5 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		endDate = timeConverter.getDate(currTime);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task6 = parser.parseInput(input).getTask(); // Should not be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		endDate = timeConverter.getDate(currTime + NUM_SECONDS_1_WEEK);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task7 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task8 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		startDate = timeConverter.getDate(currTime + NUM_SECONDS_1_DAY);
+		input = "add task from " + startDate + " to " + endDate;
+		Task task9 = parser.parseInput(input).getTask(); // Should be shown
+		logic.executeCommand(ContentBox.PENDING, input);
+		
+		logic.executeCommand(ContentBox.PENDING, "view tomorrow");
+		
+		ArrayList<Task> expected = new ArrayList<Task>();
+		expected.add(task3);
+		expected.add(task7);
+		expected.add(task8);
+		expected.add(task9);
+		sortListReversed(expected);
+		ArrayList<Task> actual = logic.getAllTaskLists().get(LogicMemory.INDEX_ACTION);
+		assertEquals(expected, actual);
+	}
 }

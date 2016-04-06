@@ -39,7 +39,6 @@ public class UiPagination {
 		myPages = new Pagination(); 
 		myGrids = new ArrayList<GridPane>();	
 		totalEntries = new ArrayList<ArrayList<StackPane>>();
-		myPages.setVisible(false);
 		currentSelection = 0;
 		selectionInPage = 0;
 		isSettingUp = true;
@@ -81,7 +80,6 @@ public class UiPagination {
                 return createPage(pageIndex);
             }
         });
-		myPages.setVisible(true);
 		isSettingUp = false;
 	}
 	
@@ -218,7 +216,9 @@ public class UiPagination {
 		scrollPane.vvalueProperty().bind(
 				selectedPane.layoutYProperty().
 				subtract(selectedPane.getLayoutY() + 
-						 scrollPane.getViewportBounds().getHeight() > selectedPane.getLayoutY() ? 
-						 scrollPane.getViewportBounds().getHeight() - selectedPane.getLayoutY() : 0));
+						 scrollPane.getViewportBounds().getMaxY() > 
+						 selectedPane.layoutBoundsProperty().getValue().getMaxY() ? 
+						 scrollPane.getViewportBounds().getMaxY() - 
+						 selectedPane.layoutBoundsProperty().getValue().getMaxY() : 0));
 	}
 }

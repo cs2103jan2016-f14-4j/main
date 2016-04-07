@@ -841,10 +841,6 @@ public class AutoComplete {
 		for(int i = 0; i < commands.size(); i++) {
 			String correctComm = commands.get(i); 
 			int temp = levenshteinDist(misSpelled, correctComm); 
-			if (temp == 0) {
-				//exactly the same
-				return null;  
-			}
 			if (temp <= 2) {
 				suggestions.add(correctComm); 
 			}

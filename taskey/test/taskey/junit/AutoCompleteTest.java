@@ -109,13 +109,25 @@ public class AutoCompleteTest {
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: tomorrow, \n",
 				ac.getSuggestions("set 1 [", tagDB).toString());
 		
+		//TODO: move this to human time
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: 18 apr, 18 may, 18 jun, \n",
 				ac.getSuggestions("set 1 [18", tagDB).toString());
+		
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: 1800h, \n",
 				ac.getSuggestions("set 1 [1800", tagDB).toString());
 		
+		assertEquals("Command: DISPLAY_COMMAND\nOptions: tomorrow, \n",
+				ac.getSuggestions("set 1 [9pm ", tagDB).toString()); 
+		
+		//TODO: move this to human time
+		assertEquals("Command: DISPLAY_COMMAND\nOptions: 18 apr, 18 may, 18 jun, \n",
+				ac.getSuggestions("set 1 [9pm 18", tagDB).toString()); 
+		
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: 19 apr, 19 may, 19 jun, \n",
 				ac.getSuggestions("set 1 [18 may, 19", tagDB).toString());
+		
+		assertEquals("Command: FINISHED_COMMAND\n\n",
+				ac.getSuggestions("set 1 [18 may", tagDB).toString());
 		
 		assertEquals("Command: FINISHED_COMMAND\n\n",
 				ac.getSuggestions("set 1 \"sth\"", tagDB).toString());

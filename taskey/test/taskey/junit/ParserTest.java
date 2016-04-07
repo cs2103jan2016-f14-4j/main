@@ -485,6 +485,46 @@ public class ParserTest {
 				parser.parseInput("write oo").toString());
 	}
 	
+	@Test
+	/**
+	 * Test parsing of empty search
+	 */
+	public void testSearchEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No search phrase entered\n",
+				parser.parseInput("search ").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of empty done
+	 */
+	public void testDoneEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No task has been selected as done\n",
+				parser.parseInput("done ").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of empty delete
+	 */
+	public void testDeleteEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No task has been selected for deletion\n",
+				parser.parseInput("del ").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Cannot delete an empty category!\n",
+				parser.parseInput("del #").toString());
+	}
+	
+	@Test 
+	/**
+	 * Test parsing of empty views and
+	 * parsing of incorrect category
+	 */
+	public void testViewIncorrect() {
+		assertEquals("Command: ERROR\nerror type: Error: No view type selected\n",
+				parser.parseInput("view ").toString());
+		assertEquals("Command: ERROR\nerror type: Error: \"wonder\" is not a valid category\n",
+				parser.parseInput("view wonder").toString());
+	}
 	
 	/* 
 	public void testDate() {

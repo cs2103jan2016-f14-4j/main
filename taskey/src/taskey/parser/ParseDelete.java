@@ -26,7 +26,7 @@ public class ParseDelete extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processDelete(String stringInput) {
+	protected ProcessedObject processDelete(String stringInput) {
 		ProcessedObject processed; 
 		String taskName = getTaskName(stringInput);
 		

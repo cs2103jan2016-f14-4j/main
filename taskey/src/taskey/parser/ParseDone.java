@@ -25,7 +25,7 @@ public class ParseDone extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processDone(String stringInput) {
+	protected ProcessedObject processDone(String stringInput) {
 		ProcessedObject processed; 
 		String taskName = getTaskName(stringInput);
 		

@@ -14,7 +14,7 @@ public class ParseSave extends ParseCommand {
 		super(); 
 	}
 	
-	public ProcessedObject processSave(String command) {
+	protected ProcessedObject processSave(String command) {
 		return new ProcessedObject(command.toUpperCase()); 
 	}
 	

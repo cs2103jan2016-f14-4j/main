@@ -425,22 +425,22 @@ public class Task implements Comparable<Task> {
 			return compareTaskNames(otherTaskName);
 		} else if (this.taskType.equals("FLOATING") && otherTaskType.equals("EVENT")) {
 			return -1; 
-		} else if (this.taskType.compareTo("FLOATING") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+		} else if (this.taskType.equals("FLOATING") && otherTaskType.equals("DEADLINE")) {
 			return -1; 
-		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+		} else if (this.taskType.equals("EVENT") && otherTaskType.equals("FLOATING")) { 
 			return 1; 
-		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+		} else if (this.taskType.equals("EVENT") && otherTaskType.equals("DEADLINE")) {
 			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
 					otherStartTime, otherEndTime);
-		} else if (this.taskType.compareTo("EVENT") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+		} else if (this.taskType.equals("EVENT") && otherTaskType.equals("EVENT")) {
 			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
 					otherStartTime, otherEndTime);
-		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("FLOATING") == 0) { 
+		} else if (this.taskType.equals("DEADLINE") && otherTaskType.equals("FLOATING")) { 
 			return 1; 
-		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("EVENT") == 0) {
+		} else if (this.taskType.equals("DEADLINE") && otherTaskType.equals("EVENT")) {
 			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
 					otherStartTime, otherEndTime);
-		} else if (this.taskType.compareTo("DEADLINE") == 0 && otherTaskType.compareTo("DEADLINE") == 0) {
+		} else if (this.taskType.equals("DEADLINE") && otherTaskType.equals("DEADLINE")) {
 			return compareNonFloating(startTime, endTime, otherTaskName, otherTaskType,
 					otherStartTime, otherEndTime);
 		} 
@@ -575,9 +575,9 @@ public class Task implements Comparable<Task> {
 	 */
 	private int compareTaskNames(String otherTaskName) {
 		//compare by name 
-		if (this.taskName.compareTo(otherTaskName) == 0) {
+		if (this.taskName.compareToIgnoreCase(otherTaskName) == 0) {
 			return 0; 
-		} else if (this.taskName.compareTo(otherTaskName) > 0) {
+		} else if (this.taskName.compareToIgnoreCase(otherTaskName) > 0) {
 			//this task name is greater than the other task name and should be ordered in front,
 			//so that sortReverse() will return it in alphabetical order. 
 			//eg. this is Zephyr, that is Wine, then that should come before this. 

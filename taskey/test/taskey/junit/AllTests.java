@@ -11,7 +11,9 @@ import org.junit.runners.Suite.SuiteClasses;
 	 StorageTest.class,
 	 TimeConverterTest.class,
 	 LoggerTest.class,
-	 IntegrationTest.class
+	 IntegrationTest.class,
+	 PatternMatcherTest.class,
+	 AutoCompleteTest.class 
 })
 public class AllTests {
 }

@@ -46,13 +46,13 @@ public class ParseAdd extends ParseCommand {
 	 * @param stringInput
 	 * @return appropriate ProcessedObject 
 	 */
-	public ProcessedObject processAdd(String command, String stringInput) {
+	protected ProcessedObject processAdd(String command, String stringInput) {
 		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
 		//simpString: basically string without the command
 		String simpString = stringNoCommand(stringInput);
-		simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
+		//simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
 		String simpString2 = simpString.split("#")[0].trim(); 
 		
 		if (isEmptyAdd(simpString2)) {
@@ -126,7 +126,12 @@ public class ParseAdd extends ParseCommand {
 	 */
 	private ProcessedObject processNormally(String command, 
 			ProcessedObject processed, Task task, String simpString) {
-		String taskNameRaw = removeTimeFromName(simpString); 
+		String taskNameRaw; 
+		try {
+			taskNameRaw = removeTimeFromName(simpString); 
+		} catch (Exception e) {
+			return super.processError(ParserConstants.ERROR_DATE_KEYWORD); 
+		}
 		String taskName = taskNameRaw.substring(0, 1).toUpperCase() + taskNameRaw.substring(1);
 		String rawDate = simpString.replace(taskNameRaw, "").trim();
 		int priority = getPriority(rawDate); 
@@ -151,17 +156,17 @@ public class ParseAdd extends ParseCommand {
 				//event
 				processed = handleEvent(task, taskName, rawDate);
 			}
-		} else if (rawDate.contains("by")) {
+		} else if (rawDate.indexOf("by") == 0) {
 			if (simpString.split("by").length != 1) {
 				//deadline 
 				processed = handleDeadline(task, taskName, rawDate);
 			} 
-		} else if (rawDate.contains("on")) {
+		} else if (rawDate.indexOf("on") == 0) {
 			if (simpString.split("on").length != 1) {
 				//deadline
 				processed = handleDeadline(task, taskName, rawDate);	
 			}
-		} else if (rawDate.contains("at")) {
+		} else if (rawDate.indexOf("at") == 0) {
 			if (simpString.split("at").length != 1) {
 				//handle as deadline 
 				processed = handleDeadline(task, taskName, rawDate);
@@ -189,7 +194,7 @@ public class ParseAdd extends ParseCommand {
 	 * If the task description is empty, it is considered an 
 	 * empty add. So, return true to indicate error. 
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private boolean isEmptyAdd(String simpString) {
 		if (simpString.compareTo("") == 0) {
@@ -202,7 +207,7 @@ public class ParseAdd extends ParseCommand {
 	 * if taskname consists entirely of numbers, return true
 	 * to indicate error
 	 * @param simpString
-	 * @return
+	 * @return true if taskname only consists of numbers
 	 */
 	private boolean isOnlyNumbers(String simpString) {
 		try {
@@ -217,48 +222,60 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: process event 
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleEvent(Task task, String taskName, String rawDate) {
 		long epochTime;
-		ProcessedObject processed;
-	
-		String simpString2 = rawDate.replace("today", "2day"); 
-		simpString2 = simpString2.replace("tomorrow", "tmr"); 
+		ProcessedObject processed = null;
+		
+		String[] changeSplitter = rawDate.split(" ");
+		for(int i = 0; i < changeSplitter.length; i++) {
+			if (changeSplitter[i].equals("to")) {
+				changeSplitter[i] = ";"; 
+			}
+		}
+		String rawDate2 = String.join(" ", changeSplitter);
+		String simpString2 = rawDate2.replace("2day", "today"); 
+		simpString2 = simpString2.replace("tmr", "tomorrow"); 
 		simpString2 = simpString2.replace("from", "").trim();
-		String[] dateList = simpString2.split("to"); 
+		String[] dateList = simpString2.split(";"); 
 		String dateForPrettyParser = rawDate;
 		
-		String rawStartDate = dateList[0].trim().toLowerCase();
-		String rawEndDate = dateList[1].trim().toLowerCase(); 
+		String rawStartDate = dateList[0].trim().toLowerCase().trim();
+		String rawEndDate = dateList[1].trim().toLowerCase().trim(); 
 		long epochTimeStart = -1;
-		long epochTimeEnd = -1; 
+		long epochTimeEnd = -1;  
 		
-		//if date contains am or pm or morning or night, 
-		//call pretty parser to process the time and return. 
-		try {
-			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
-			epochTimeStart = epochTimeEvent[0]; 
-			epochTimeEnd = epochTimeEvent[1]; 
-			task.setStartDate(epochTimeStart);
-			task.setEndDate(epochTimeEnd);
-			task.setTaskName(taskName);
-			task.setTaskType("EVENT");
-			processed = new ProcessedObject("ADD_EVENT",task);
-			
-			//make sure start time < end Time 
-			if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
-				return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
+		if (pm.isBothTime(rawStartDate, rawEndDate)) {
+			try {
+				long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
+				epochTimeStart = epochTimeEvent[0]; 
+				epochTimeEnd = epochTimeEvent[1]; 
+				task.setStartDate(epochTimeStart);
+				task.setEndDate(epochTimeEnd);
+				task.setTaskName(taskName);
+				task.setTaskType("EVENT");
+				processed = new ProcessedObject("ADD_EVENT",task);
+				
+				//make sure start time < end Time 
+				if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
+					return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
+				}
+				
+				return processed;
+			} catch (Error e) {
+				//do nothing
+				//ie. date format wrong or has no time in the date
 			}
-			
-			return processed;
-		} catch (Error e) {
-			//do nothing, continue to code below
-			//ie. date format wrong or has no time in the date
-		}
+		} 
 		
-		//process start date/time
-		if (!specialDays.containsKey(rawStartDate.toLowerCase())) {
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(rawStartDate);
+		if (epochTime != -1) {
+			epochTimeStart = epochTime; 
+			task.setStartDate(epochTime); 
+		} else if (!specialDays.containsKey(rawStartDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawStartDate);
 				epochTimeStart = epochTime; 
@@ -270,17 +287,20 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawStartDate.toLowerCase());
+			epochTime = specialDays.get(rawStartDate);
 			epochTimeStart = epochTime; 
 			task.setStartDate(epochTime);
 		}
 		
-		//process end date/time 
-		if (!specialDays.containsKey(rawEndDate.toLowerCase())) {
+		epochTime = getPrettyTime(rawEndDate);
+		if (epochTime != -1) {
+			epochTimeEnd = epochTime; 
+			task.setEndDate(epochTime); 
+		} else if (!specialDays.containsKey(rawEndDate)) {
 			try {
 				epochTime = timeConverter.toEpochTime(rawEndDate);
 				epochTimeEnd = epochTime; 
-				task.setEndDate(epochTime); 	
+				task.setEndDate(epochTime);
 			} catch (ParseException error) {
 				processed = super.processError(String.format(
 						ParserConstants.ERROR_DATE_FORMAT, rawEndDate)); 
@@ -288,7 +308,7 @@ public class ParseAdd extends ParseCommand {
 			}
 		} else {
 			//process the special day
-			epochTime = specialDays.get(rawEndDate.toLowerCase());
+			epochTime = specialDays.get(rawEndDate);
 			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
 		}
@@ -296,6 +316,7 @@ public class ParseAdd extends ParseCommand {
 		task.setTaskName(taskName);
 		task.setTaskType("EVENT");
 		processed = new ProcessedObject("ADD_EVENT",task);
+		
 		
 		//check to make sure startDate < end date 
 		if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
@@ -315,7 +336,6 @@ public class ParseAdd extends ParseCommand {
 		if (eventStartTime == -1 || eventEndTime == -1) {
 			return false; 
 		}
-		
 		if (eventStartTime >= eventEndTime) {
 			return false; 
 		}
@@ -326,7 +346,7 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: process deadlines with the keyword "by", "on" and "at" 
 	 * @param task
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleDeadline(Task task, String taskName, String rawDate) {
 		long epochTime;
@@ -338,6 +358,7 @@ public class ParseAdd extends ParseCommand {
 			rawDate += splitDate[i] + " "; 
 		}
 		rawDate = rawDate.trim(); 
+		rawDate = rawDate.replace("tmr", "tomorrow"); 
 		
 		
 		//if time contains am or pm or morning or night, 
@@ -371,7 +392,7 @@ public class ParseAdd extends ParseCommand {
 	 * ADD: Process floating event 
 	 * @param command
 	 * @param simpString
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject handleFloating(String command, String simpString) {
 		ProcessedObject processed;
@@ -444,7 +465,7 @@ public class ParseAdd extends ParseCommand {
 	 * Get tag list for a task
 	 * Assumptions: all tags must be added to the back of the userInput
 	 * @param rawInput
-	 * @return
+	 * @return ArrayList of Tags
 	 */
 	private ArrayList<String> getTagList(String rawInput) {
 		ArrayList<String> tagList = new ArrayList<String>();
@@ -494,9 +515,9 @@ public class ParseAdd extends ParseCommand {
 	 * might still contain the time in it. So this function will remove
 	 * the time from the task name (if it is there) 
 	 * @param taskName
-	 * @return
+	 * @return task name without time. 
 	 */
-	private String removeTimeFromName(String taskName) {
+	private String removeTimeFromName(String taskName) throws Exception {
 		String keyword = "(at|from|on|by)";
 		String combinedTime = "\\d{1,2}(:|.)?\\d{0,2}(am|pm|h)";
 		String combinedTime2 = "(tonight|night|morning)"; //not in special days converter
@@ -537,6 +558,9 @@ public class ParseAdd extends ParseCommand {
 								i += 3; 
 								continue; 
 							}
+						} else {
+							stringRep += time + " "; 
+							i += 2; 
 						}
 					} else {
 						//probably a place and not time,
@@ -545,6 +569,9 @@ public class ParseAdd extends ParseCommand {
 						i += 2; 
 						continue; 
 					}
+				} else {
+					//i+1 doesnt exist 
+					throw new Exception(); 
 				}
 			} else {
 				stringRep += word + " "; 

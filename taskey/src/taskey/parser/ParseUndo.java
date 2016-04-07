@@ -19,7 +19,7 @@ public class ParseUndo extends ParseCommand {
 	 * @param command
 	 * @return
 	 */
-	public ProcessedObject processUndo(String command) {
+	protected ProcessedObject processUndo(String command) {
 		return new ProcessedObject(command.toUpperCase()); 
 	}
 }

@@ -254,6 +254,7 @@ public class AutoComplete {
 				suggestions = completeEdit(phrase);
 				break;
 				
+			/*	
 			case "del":
 			case "search":
 			case "done":
@@ -262,7 +263,7 @@ public class AutoComplete {
 			case "save":
 			case "clear": 
 				suggestions = new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-				break; 
+				break; */ 
 				
 			default:
 				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
@@ -278,7 +279,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such command exists, return null
 	 */
-	public ProcessedAC completeCommand(String phrase) {
+	private ProcessedAC completeCommand(String phrase) {
 		phrase = phrase.toLowerCase().trim(); 
 		
 		//if the command is completed, don't need to process
@@ -300,7 +301,7 @@ public class AutoComplete {
 		} else {
 			//try to check if command is misspelt
 			availCommands = correctCommandError(phrase); 
-			if (availCommands != null) {
+			if (availCommands != null && !availCommands.isEmpty()) {
 				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands); 
 			}
 		}
@@ -454,8 +455,11 @@ public class AutoComplete {
 		for(int i = 0; i < tagDB.size(); i++) {
 			String tag = tagDB.get(i).getTagName(); 
 			if (tag.contains(latestWord)) {
-				availSuggestions.add(tag); 
+				availSuggestions.add("#" + tag); 
 			}
+		}
+		if (!availSuggestions.isEmpty()) {
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
 		}
 		//if tag doesnt exist, maybe it's a new tag. don't highlight error
 		return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
@@ -929,6 +933,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
+	/*
 	private ArrayList<String> completeDelete(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
@@ -944,7 +949,7 @@ public class AutoComplete {
 			return availViews; 
 		}
 		return null; 
-	}
+	} */ 
 	
 	/**
 	 * Given a partial input that contains "done xxxx",
@@ -953,6 +958,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
+	/*
 	private ArrayList<String> completeDone(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
@@ -968,5 +974,5 @@ public class AutoComplete {
 			return availViews; 
 		}
 		return null; 
-	}
+	} */ 
 }

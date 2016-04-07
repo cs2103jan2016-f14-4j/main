@@ -246,6 +246,52 @@ public class ParseAdd extends ParseCommand {
 		long epochTimeStart = -1;
 		long epochTimeEnd = -1; 
 		
+		/*
+		//if time contains am or pm or morning or night, 
+		//call pretty parser to process the time.
+		epochTime = getPrettyTime(rawStartDate);
+		if (epochTime != -1) {
+			epochTimeStart = epochTime; 
+			task.setStartDate(epochTime); 
+		} else if (!specialDays.containsKey(rawStartDate)) {
+			try {
+				epochTime = timeConverter.toEpochTime(rawStartDate);
+				epochTimeStart = epochTime; 
+				task.setStartDate(epochTime);
+			} catch (ParseException error) {
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, rawStartDate)); 
+				return processed; 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawStartDate);
+			epochTimeStart = epochTime; 
+			task.setStartDate(epochTime);
+		}
+		
+		epochTime = getPrettyTime(rawEndDate);
+		if (epochTime != -1) {
+			epochTimeEnd = epochTime; 
+			task.setEndDate(epochTime); 
+		} else if (!specialDays.containsKey(rawEndDate)) {
+			try {
+				epochTime = timeConverter.toEpochTime(rawEndDate);
+				epochTimeEnd = epochTime; 
+				task.setEndDate(epochTime);
+			} catch (ParseException error) {
+				processed = super.processError(String.format(
+						ParserConstants.ERROR_DATE_FORMAT, rawEndDate)); 
+				return processed; 
+			}
+		} else {
+			//process the special day
+			epochTime = specialDays.get(rawEndDate);
+			epochTimeEnd = epochTime; 
+			task.setEndDate(epochTime);
+		} */ 
+		
+		
 		//if date contains am or pm or morning or night, 
 		//call pretty parser to process the time and return. 
 		try {
@@ -304,7 +350,7 @@ public class ParseAdd extends ParseCommand {
 			epochTime = specialDays.get(rawEndDate.toLowerCase());
 			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
-		}
+		} 
 		
 		task.setTaskName(taskName);
 		task.setTaskType("EVENT");

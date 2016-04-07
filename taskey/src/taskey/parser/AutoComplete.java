@@ -566,8 +566,8 @@ public class AutoComplete {
 			}
 		}
 		
-		String[] tempArr = date.split(" ");
-		String timeBehind = tempArr[tempArr.length-1]; 
+		//String[] tempArr = date.split(" ");
+		//String timeBehind = tempArr[tempArr.length-1]; 
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
@@ -915,13 +915,6 @@ public class AutoComplete {
 		
 		return d[src.length()][tar.length()]; 
 	}
-	
-	
-	/* for testing 
-	public static void main(String[] args) {
-		AutoComplete ac = new AutoComplete(); 
-		ac.correctDateError("fbr"); 
-	} */ 
 	
 	
 	/* @@author A0107345L-unused

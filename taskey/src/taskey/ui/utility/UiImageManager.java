@@ -69,7 +69,7 @@ public class UiImageManager {
 		myImageContainer.clear();
 	}
 	
-	public void loadHelpMenuImages() {	
+	private void loadHelpMenuImages() {	
 		loadAddMenuImages();
 		loadDeleteMenuImages();
 		loadSetMenuImages();

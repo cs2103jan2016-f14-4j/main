@@ -12,9 +12,6 @@ import taskey.constants.UiConstants.ContentBox;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.messenger.Task;
-import taskey.ui.content.formatters.UiActionFormatter;
-import taskey.ui.content.formatters.UiCategoryFormatter;
-import taskey.ui.content.formatters.UiDefaultFormatter;
 
 /**
  * @@author A0125419H
@@ -26,10 +23,8 @@ import taskey.ui.content.formatters.UiDefaultFormatter;
  */
 
 public class UiContentManager {
-	private ArrayList<UiFormatter> myFormatters; // for each content box
-	public UiContentManager() {
-		myFormatters = new ArrayList<UiFormatter>();
-	}
+	// for each content box
+	private ArrayList<UiFormatter> myFormatters = new ArrayList<UiFormatter>(); 
 
 	/**
 	 * Sets up the UiFormatters for each pane

@@ -18,10 +18,6 @@ abstract class Add extends Command {
 	}
 	
 	protected void addTagsToMemory(LogicMemory logicMemory, ArrayList<String> tagList) {
-		if (tagList != null) {
-			for (String s : tagList) {
-				logicMemory.addTag(s);
-			}
-		}
+		logicMemory.addTags(tagList);
 	}
 }

@@ -73,7 +73,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 			checkTaskBounds(currentTask,alertList);
 		}
 		
-		alertController.setAll(alertList);
+		alertController.setAllAlerts(alertList);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content.views;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,10 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ImageID;
-import taskey.ui.content.UiGridHelper;
-import taskey.ui.content.UiPagination;
-import taskey.ui.content.UiTextBuilder;
+import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H

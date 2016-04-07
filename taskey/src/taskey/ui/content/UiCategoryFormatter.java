@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 
@@ -9,8 +9,7 @@ import javafx.scene.text.TextAlignment;
 import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.content.UiFormatter;
-import taskey.ui.content.UiTextBuilder;
+import taskey.ui.utility.UiTextBuilder;
 
 /**
  * @@author A0125419H
@@ -50,10 +49,6 @@ public class UiCategoryFormatter extends UiFormatter {
 	
 	// Unused as category does not take in inputs or uses tasks 
 	@Override
-	public void format(ArrayList<Task> myTaskList) {
-	}
-
-	@Override
 	public void processArrowKey(KeyEvent event) {
 	}
 
@@ -71,6 +66,10 @@ public class UiCategoryFormatter extends UiFormatter {
 		return 0;
 	}
 
+	@Override
+	public void format(ArrayList<Task> myTaskList) {
+	}
+	
 	@Override
 	public void cleanUp() {
 		clearCurrentGridContents();

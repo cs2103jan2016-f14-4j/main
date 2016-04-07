@@ -1,13 +1,19 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
 import taskey.constants.UiConstants;
 import taskey.messenger.Task;
-import taskey.ui.content.UiFormatter;
+import taskey.ui.content.views.UiTaskView;
 
 /**
  * @@author A0125419H
@@ -39,6 +45,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	@Override
 	public void processArrowKey(KeyEvent event) {
 		myTaskView.getView().processKey(event);
+		
 	}
 
 	@Override
@@ -48,7 +55,7 @@ public class UiDefaultFormatter extends UiFormatter {
 	
 	@Override
 	public void processPageUpAndDown(KeyEvent event) {
-		myTaskView.getView().processKey(event);
+		myTaskView.getView().processKey(event);	
 	}
 	
 	@Override
@@ -59,20 +66,20 @@ public class UiDefaultFormatter extends UiFormatter {
 		} else {
 			mainPane.setContent(myTaskView.getView().getPagination());
 			myTaskView.clear();
-			
 			int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 											 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
-			myTaskView.createPaginationGrids(myTaskList,totalPages);
+			myTaskView.createPaginationGrids(mainPane,myTaskList,totalPages);
 
-			updateSelection(myTaskList);
+			updateSelection(myTaskList);		
 		}
 	}
 	
 	private void updateSelection(ArrayList<Task> myTaskList) {
+		ArrayList<Task> cloned = cloneList(myTaskList); // as list is going to be changed
 		if ( prevList != null ) { 
 			int index = 0;
 			if ( myTaskList.size() >= prevList.size()) {
-				index = findIndexOfModifiedTask(prevList,myTaskList);	// modification of a task
+				index = findIndexOfModifiedTask(prevList,cloned);	// modification of a task
 				if ( index == -1) {
 					// no op as lists are the same
 				} else {
@@ -81,7 +88,7 @@ public class UiDefaultFormatter extends UiFormatter {
 				}
 			}
 		} 
-		prevList = cloneList(myTaskList); // Need to clone a new list because otherwise the task list is the same
+		prevList = myTaskList; // note that myTaskList is cloned from Logic
 	}
 	
 	private ArrayList<Task> cloneList(ArrayList<Task> toClone) {
@@ -92,16 +99,32 @@ public class UiDefaultFormatter extends UiFormatter {
 		return cloneList;
 	}
 	
+	/**
+	 * This method finds the index of the modified task to select in a page
+	 * Note that this method changes the currentList passed in
+	 * @param prevList
+	 * @param currentList
+	 * @return index
+	 */
 	private int findIndexOfModifiedTask(ArrayList<Task> prevList, ArrayList<Task> currentList) {
+		int initialSize = currentList.size();
 		for ( int i = 0; i < prevList.size(); i++) {
-			if ( prevList.get(i).equals(currentList.get(i)) == false ) {
-				return i; // index of first mismatch
+			Task task = prevList.get(i);
+			int indexOfTask = currentList.indexOf(task); 
+			if ( indexOfTask != -1 ) {
+				currentList.set(indexOfTask, null); // we pick out elements, but retain the array
 			}
 		}
-		if ( prevList.size() == currentList.size()) { // all tasks match
+		for ( int i = 0; i < currentList.size(); i++ )  {
+			if ( currentList.get(i) != null ) { // return first mismatch
+				return i;
+			}
+		}
+		currentList.removeAll(Collections.singleton(null));
+		if ( currentList.size() == 0) { // all tasks match
 			return -1;
 		} else {
-			return currentList.size(); // return newly added task
+			return initialSize; // return newly added task
 		}	
 	}
 	

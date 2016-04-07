@@ -381,6 +381,12 @@ public class UiController {
 		if ( selection.contains(currentLine)) { 
 			input.setText(selection + " ");
 		} else {	
+			// special case
+			currentLine = currentLine.replace("[", "[ "); // add space for processing
+			currentLine = currentLine.replace("[  ", "[ "); // bound it within 1 space
+			currentLine = currentLine.replace("]", " ]");
+			currentLine = currentLine.replace("  ]", " ]"); 
+			
 			String [] lineTokens = currentLine.split(" ");		
 			// remove all tokens from input that appear in current selection
 			for ( int i = lineTokens.length-1; i >= 0; i-- ) {			
@@ -475,9 +481,13 @@ public class UiController {
 		input.requestFocus(); // give focus to textfield on any inputs
 		
 		if (myDropDown.isMenuShowing()) {
-			if (event.getCode().isArrowKey()) {
-				myDropDown.processArrowKey(event);
-				event.consume();
+			if (event.getCode().isArrowKey()) {	
+				if ( event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+					myDropDown.processArrowKey(event);
+					event.consume(); // give input only to drop down
+				} else {
+					myDropDown.closeMenu();
+				}
 			}
 		} else if (input.getText().isEmpty()) { // user not typing in command, do pagination
 			if (event.getCode() == KeyCode.DELETE) {

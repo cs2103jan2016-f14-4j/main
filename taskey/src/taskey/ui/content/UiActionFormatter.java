@@ -1,4 +1,4 @@
-package taskey.ui.content.formatters;
+package taskey.ui.content;
 
 import java.util.ArrayList;
 
@@ -7,8 +7,9 @@ import javafx.scene.input.KeyEvent;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.messenger.Task;
-import taskey.ui.content.UiFormatter;
-import taskey.ui.content.UiPagination;
+import taskey.ui.content.views.UiHelpView;
+import taskey.ui.content.views.UiPagination;
+import taskey.ui.content.views.UiTaskView;
 
 /**
  * @@author A0125419H
@@ -37,6 +38,14 @@ public class UiActionFormatter extends UiFormatter {
 			currentView.processKey(event);
 		}
 	}
+	
+	@Override
+	public void processPageUpAndDown(KeyEvent event) {
+		if ( currentView != null ) {
+			currentView.processKey(event);
+		}
+	}
+
 	@Override
 	public int processDeleteKey() {	
 		if ( currentView == taskView.getView() ) {
@@ -54,13 +63,6 @@ public class UiActionFormatter extends UiFormatter {
 		return 0;
 	}
 	
-	@Override
-	public void processPageUpAndDown(KeyEvent event) {
-		if ( currentView != null ) {
-			currentView.processKey(event);
-		}
-	}
-
 	/**
 	 * Update content mode 
 	 *
@@ -88,7 +90,7 @@ public class UiActionFormatter extends UiFormatter {
 		taskView.getView().clear();
 		int totalPages = (int) Math.ceil(myTaskList.size()/1.0/
 										 UiConstants.ENTRIES_PER_PAGE_DEFAULT); // convert to double	
-		taskView.createPaginationGrids(myTaskList,totalPages);
+		taskView.createPaginationGrids(mainPane,myTaskList,totalPages);
 	}
 
 	@Override

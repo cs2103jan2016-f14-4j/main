@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import taskey.ui.content.UiGridSettings;
+import taskey.ui.utility.UiGridSettings;
 
 /**
  * @@author A0125419H

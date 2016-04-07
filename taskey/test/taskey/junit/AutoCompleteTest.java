@@ -45,9 +45,6 @@ public class AutoCompleteTest {
 		for(int i = 0; i < months.length; i++) {
 			assertEquals(months[i], correction.get(i)); 
 		}
-		
-
-		//TODO: implement correctDateError test 
 	}
 	
 	@Test
@@ -93,7 +90,13 @@ public class AutoCompleteTest {
 				ac.getSuggestions("add sth #y", tagDB).toString());
 		assertEquals("Command: FINISHED_COMMAND\n\n",
 				ac.getSuggestions("add sth #babablack", tagDB).toString());
-		
+	}
+	
+	@Test
+	/**
+	 * Test the Add spelling corrector for months
+	 */
+	public void testAddSpellingCorrector() {
 		//test spelling corrector
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: feb, mar, apr, \n",
 				ac.getSuggestions("add task by 17 fbr", tagDB).toString());
@@ -109,19 +112,13 @@ public class AutoCompleteTest {
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: tomorrow, \n",
 				ac.getSuggestions("set 1 [", tagDB).toString());
 		
-		//TODO: move this to human time
-		assertEquals("Command: DISPLAY_COMMAND\nOptions: 18 apr, 18 may, 18 jun, \n",
-				ac.getSuggestions("set 1 [18", tagDB).toString());
-		
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: 1800h, \n",
 				ac.getSuggestions("set 1 [1800", tagDB).toString());
 		
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: tomorrow, \n",
 				ac.getSuggestions("set 1 [9pm ", tagDB).toString()); 
 		
-		//TODO: move this to human time
-		assertEquals("Command: DISPLAY_COMMAND\nOptions: 18 apr, 18 may, 18 jun, \n",
-				ac.getSuggestions("set 1 [9pm 18", tagDB).toString()); 
+		
 		
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: 19 apr, 19 may, 19 jun, \n",
 				ac.getSuggestions("set 1 [18 may, 19", tagDB).toString());
@@ -131,7 +128,13 @@ public class AutoCompleteTest {
 		
 		assertEquals("Command: FINISHED_COMMAND\n\n",
 				ac.getSuggestions("set 1 \"sth\"", tagDB).toString());
-		
+	}
+	
+	@Test
+	/**
+	 * Test changing of task priority suggestions
+	 */
+	public void testEditPrioritySuggestions() {
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: !, !!, !!!, \n",
 				ac.getSuggestions("set 1 !", tagDB).toString());
 		assertEquals("Command: DISPLAY_COMMAND\nOptions: !!, !!!, \n",
@@ -162,6 +165,16 @@ public class AutoCompleteTest {
 				ac.getSuggestions("finderrrr 1", tagDB).toString());
 	}
 	
+	/*
+	 * Manual Testing: Human Times
+	 */
 	
-
+	@Test
+	/**
+	 * Test human time suggestions for set 
+	 */
+	public void testEditSuggestionsHuman() {
+		System.out.println(ac.getSuggestions("set 1 [9pm 18", tagDB).toString()); 
+		System.out.println(ac.getSuggestions("set 1 [18", tagDB).toString());
+	}
 }

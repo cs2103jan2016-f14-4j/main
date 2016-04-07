@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.text.ParseException;
 
 import org.junit.Test;
+
+import taskey.constants.ParserConstants;
 import taskey.parser.TimeConverter;
 
 /**
@@ -13,44 +15,56 @@ import taskey.parser.TimeConverter;
  *  @author: Xue Hui 
  **/
 public class TimeConverterTest {
-
+	private TimeConverter tc = new TimeConverter();
+	
 	@Test
 	/**
 	 * Test basic methods for TimeConverter 
 	 */
-	public void test() {
-		TimeConverter timeConverter = new TimeConverter(); 
+	public void testEpoch() {
+		tc.setCurrTime();
 		
 		try {
 			//System.out.println(timeConverter.toHumanTime(1455692400));
 			//System.out.println("Current Time in Epoch: " + timeConverter.getCurrTime()); 
-			assertEquals(1455123600,timeConverter.toEpochTime("11 Feb 2016 01:00:00"));
+			assertEquals(1455123600,tc.toEpochTime("11 Feb 2016 01:00:00"));
 			
-			assertFalse(timeConverter.isSameDay(timeConverter.getCurrTime(),
-					timeConverter.toEpochTime("11 Feb 2016 23:00:00")));
+			assertFalse(tc.isSameDay(tc.getCurrTime(),
+					tc.toEpochTime("11 Feb 2016 23:00:00")));
 			
-			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb 2016"));
-			assertEquals(1455206399,timeConverter.toEpochTime("11 Feb"));
-			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb 2016"));
-			assertEquals(1454342399,timeConverter.toEpochTime("1 Feb"));
-			assertEquals("01 Feb 2016 23:59",timeConverter.toHumanTime(1454342399));
-			
-			long time1 = timeConverter.toEpochTime("31 Mar");
-			long time2 = timeConverter.toEpochTime("1 Apr");
-			assertTrue(timeConverter.isSameWeek(time1, time2));
+			assertEquals(1455206399,tc.toEpochTime("11 Feb 2016"));
+			assertEquals(1455206399,tc.toEpochTime("11 Feb"));
+			assertEquals(1454342399,tc.toEpochTime("1 Feb 2016"));
+			assertEquals(1454342399,tc.toEpochTime("1 Feb"));
+			assertEquals("01 Feb 2016 23:59",tc.toHumanTime(1454342399));			
 			
 		} catch (ParseException e) {
-			e.printStackTrace();
+			
 		}
-		//compare 10Feb 11pm vs 11Feb 1am 
-		assertFalse(timeConverter.isSameDay(1455123600,1455116400));
-		//compare 11 feb a few minutes later 
-		assertTrue(timeConverter.isSameDay(1455123600,1455123800));
-		//compare 10Feb 11pm and 11Feb 1am 
-		assertTrue(timeConverter.isSameWeek(1455123600,1455116400));
+		assertEquals("11 Feb 2016 01:00",tc.toHumanTime(1455123600)); 
+	}
+	
+	@Test
+	/**
+	 * Test isSameWeek and isSameDay 
+	 */
+	public void testWeekDay() {
+		try { 
+			
+		long time1 = tc.toEpochTime("31 Mar");
+		long time2 = tc.toEpochTime("1 Apr");
+		assertTrue(tc.isSameWeek(time1, time2));
 		
-		assertEquals("11 Feb 2016 01:00",timeConverter.toHumanTime(1455123600)); 
-
+		} catch (Exception e) {
+			
+		}
+		
+		//compare 10Feb 11pm vs 11Feb 1am 
+		assertFalse(tc.isSameDay(1455123600,1455116400));
+		//compare 11 feb a few minutes later 
+		assertTrue(tc.isSameDay(1455123600,1455123800));
+		//compare 10Feb 11pm and 11Feb 1am 
+		assertTrue(tc.isSameWeek(1455123600,1455116400));
 	}
 	
 	@Test 
@@ -58,7 +72,6 @@ public class TimeConverterTest {
 	 * Test that the week starts on sunday and not monday 
 	 */
 	public void testSameWeek() {
-		TimeConverter tc = new TimeConverter();
 		try {
 			long epochTime1 = tc.toEpochTime("27 Mar");
 			long epochTime2 = tc.toEpochTime("28 Mar"); 
@@ -70,6 +83,40 @@ public class TimeConverterTest {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+	}
+	
+	@Test 
+	/**
+	 * Test isToday and isTmr 
+	 */
+	public void testTodayTmr() {
+		assertFalse(tc.isToday(1455123600));
+		assertFalse(tc.isTmr(1455123600));
+		
+		assertTrue(tc.isToday(tc.getCurrTime()));
+		assertTrue(tc.isTmr(tc.getCurrTime()+ ParserConstants.ONE_DAY));
+	}
+	
+	@Test 
+	/**
+	 * Test that the right time/day of the week is given back 
+	 */
+	public void testTimeConversion() {
+		assertEquals("01:00",tc.getTime(1455123600));
+		assertEquals("THU",tc.getDayOfTheWeek(1455123600));
+	}
+	
+	/*
+	 * Manual Testing: Test human methods
+	 */
+	
+	@Test
+	/**
+	 * Test that the correct 3 months are given back
+	 */
+	public void testHumanFunctions() {
+		System.out.println(tc.get3MonthsFromNow());
+		System.out.println(tc.getDayOfTheWeek());
 	}
 
 }

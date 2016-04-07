@@ -51,11 +51,11 @@ public class AutoComplete {
 		commands.add("add");
 		commands.add("view");
 		commands.add("del");
+		commands.add("setdir");
 		commands.add("set");
 		commands.add("search");
 		commands.add("done");
 		commands.add("undo");
-		commands.add("setdir");
 		commands.add("save");
 		commands.add("clear");
 		

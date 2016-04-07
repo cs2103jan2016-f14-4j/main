@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import taskey.ui.utility.UiGridSettings;
 
@@ -59,14 +60,70 @@ public class UiConstants {
 	public enum ImageID {
 		WINDOW_ICON, CROSS_DEFAULT, CROSS_SELECT, MINUS_DEFAULT, MINUS_SELECT, URGENT_MARK, 
 		FLOATING, DEADLINE, EVENT,
-		ADD_FLOAT, ADD_DEADLINE, ADD_DEADLINE_DATE, ADD_EVENT, ADD_LAST,
-		DELETE_ID, DELETE_NAME, DELETE_LAST,
-		SET_ID_DATE, SET_ID_EVENT, SET_LAST,
-		DONE_ID, DONE_NAME, DONE_LAST,
-		SEARCH_NAME, SEARCH_LAST,
-		UNDO, UNDO_LAST,
-		TAG, TAG_LAST,
-		VIEW_GENERAL, VIEW_DEADLINE, VIEW_EVENT;
+		
+		// Help images
+		ADD1_FLOAT ("add1_Float.png", "type: add <task name> to add a general task"),
+		ADD2_DEADLINE_TMR ("add2_DeadlineTmr.png", "type: add <task name> on/by <date> to add a deadline task."),
+		ADD3_DEADLINE_DATE ("add3_DeadlineDate.png", "<date> can also be an actual date format"),
+		ADD4_EVENT ("add4_Event.png", "type: add <task name> from <date> to <date> to add an event"),
+		
+		DELETE1_ID ("delete1_ID.png", "type: del <ID> to delete a task, ID is shown on the left."),
+		DELETE2 ("delete2.png", "That's it! Press Enter to return"),
+		
+		SET1_NONE("set1_none.png", "type: set <ID> [date] to change the deadline of a task"),
+		SET2_NONE ("set2_none.png", "use [date,date] to specify an event."),
+		SET3_DEADLINE ("set3_deadline.png", "That's it! Press Enter to return"),
+		SET4_DEADLINE("set4_deadline.png", ""),
+		SET5_NAME ("set5_name.png", ""),
+		SET6_EVENT ("set6_event.png", ""),
+		SET7_BOTH ("set7_both.png", ""),
+		
+		DONE1 ("done1.png", "type: done <ID> to move a task to the archive"),
+		DONE2 ("done2.png", "That's it! Press Enter to return"),
+		
+		SEARCH1 ("search1.png", "type: search <phrase> to search for a task"),
+		SEARCH2 ("search2.png",  "A list of tasks will be shown in Action"),
+		
+		UNDO1 ("undo1.png", "type: undo, to revert an action"),
+		UNDO2 ("undo2.png", "That's it! Press Enter to return"),
+		
+		TAG1 ("tag1.png", ""),
+		TAG2 ("tag2.png", ""),
+		
+		VIEW_BASIC ("view1_basic.png", ""),
+		VIEW_GENERAL ("view2_general.png", "type: view general, to view pending general tasks"),
+		VIEW_DEADLINE ("view3_deadlines.png", "type: view deadline, to view pending deadlines"),
+		VIEW_EVENT ("view4_events.png", "type: view events, to view pending events");
+		
+		public static EnumSet<ImageID> helpImages_All = EnumSet.range(ADD1_FLOAT, VIEW_EVENT);
+		
+		public static EnumSet<ImageID> helpImages_Add = EnumSet.range(ADD1_FLOAT, ADD4_EVENT);
+		public static EnumSet<ImageID> helpImages_Del = EnumSet.range(DELETE1_ID, DELETE2);
+		public static EnumSet<ImageID> helpImages_Set = EnumSet.range(SET1_NONE, SET7_BOTH);
+		public static EnumSet<ImageID> helpImages_Done  = EnumSet.range(DONE1, DONE2);
+		public static EnumSet<ImageID> helpImages_Search = EnumSet.range(SEARCH1, SEARCH2);
+		public static EnumSet<ImageID> helpImages_Undo = EnumSet.range(UNDO1, UNDO2);
+		public static EnumSet<ImageID> helpImages_Tag = EnumSet.range(TAG1, TAG2);
+		public static EnumSet<ImageID> helpImages_View = EnumSet.range(VIEW_BASIC, VIEW_EVENT);
+		
+		private String filename;
+		private String caption;
+		
+		private ImageID(String filename, String helpText) {
+			this.filename = filename;
+			this.caption = helpText;
+		}
+		
+		private ImageID() {
+		}
+		
+		public String getFilename() {
+			return filename;
+		}
+		
+		public String getCaption() {
+			return caption;
+		}
 	}
 	
 	// For action tab

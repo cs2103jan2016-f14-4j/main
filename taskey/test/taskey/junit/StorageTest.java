@@ -139,7 +139,7 @@ public class StorageTest {
 		static EnumSet<TaskList> taskListsFromStorage = EnumSet.range(PENDING, COMPLETED);
 		static TimeConverter timeConverter = new TimeConverter();
 
-		ArrayList<Task> tasklist;
+		private ArrayList<Task> tasklist;
 		TaskList(ArrayList<Task> list) {
 			tasklist = list;
 		}

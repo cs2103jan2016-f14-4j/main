@@ -226,7 +226,7 @@ public class ParseAdd extends ParseCommand {
 	 */
 	private ProcessedObject handleEvent(Task task, String taskName, String rawDate) {
 		long epochTime;
-		ProcessedObject processed;
+		ProcessedObject processed = null;
 		
 		String[] changeSplitter = rawDate.split(" ");
 		for(int i = 0; i < changeSplitter.length; i++) {
@@ -241,12 +241,34 @@ public class ParseAdd extends ParseCommand {
 		String[] dateList = simpString2.split(";"); 
 		String dateForPrettyParser = rawDate;
 		
-		String rawStartDate = dateList[0].trim().toLowerCase();
-		String rawEndDate = dateList[1].trim().toLowerCase(); 
+		String rawStartDate = dateList[0].trim().toLowerCase().trim();
+		String rawEndDate = dateList[1].trim().toLowerCase().trim(); 
 		long epochTimeStart = -1;
-		long epochTimeEnd = -1; 
+		long epochTimeEnd = -1;  
 		
-		/*
+		if (pm.isBothTime(rawStartDate, rawEndDate)) {
+			try {
+				long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
+				epochTimeStart = epochTimeEvent[0]; 
+				epochTimeEnd = epochTimeEvent[1]; 
+				task.setStartDate(epochTimeStart);
+				task.setEndDate(epochTimeEnd);
+				task.setTaskName(taskName);
+				task.setTaskType("EVENT");
+				processed = new ProcessedObject("ADD_EVENT",task);
+				
+				//make sure start time < end Time 
+				if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
+					return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
+				}
+				
+				return processed;
+			} catch (Error e) {
+				//do nothing
+				//ie. date format wrong or has no time in the date
+			}
+		} 
+		
 		//if time contains am or pm or morning or night, 
 		//call pretty parser to process the time.
 		epochTime = getPrettyTime(rawStartDate);
@@ -289,72 +311,12 @@ public class ParseAdd extends ParseCommand {
 			epochTime = specialDays.get(rawEndDate);
 			epochTimeEnd = epochTime; 
 			task.setEndDate(epochTime);
-		} */ 
-		
-		
-		//if date contains am or pm or morning or night, 
-		//call pretty parser to process the time and return. 
-		try {
-			//TODO: deal with from 12pm to tmr, cos tmr isnt a time. 
-			long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
-			epochTimeStart = epochTimeEvent[0]; 
-			epochTimeEnd = epochTimeEvent[1]; 
-			task.setStartDate(epochTimeStart);
-			task.setEndDate(epochTimeEnd);
-			task.setTaskName(taskName);
-			task.setTaskType("EVENT");
-			processed = new ProcessedObject("ADD_EVENT",task);
-			
-			//make sure start time < end Time 
-			if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
-				return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
-			}
-			
-			return processed;
-		} catch (Error e) {
-			//do nothing, continue to code below
-			//ie. date format wrong or has no time in the date
 		}
-		
-		//process start date/time
-		if (!specialDays.containsKey(rawStartDate.toLowerCase())) {
-			try {
-				epochTime = timeConverter.toEpochTime(rawStartDate);
-				epochTimeStart = epochTime; 
-				task.setStartDate(epochTime);
-			} catch (ParseException error) {
-				processed = super.processError(String.format(
-						ParserConstants.ERROR_DATE_FORMAT, rawStartDate)); 
-				return processed; 
-			}
-		} else {
-			//process the special day
-			epochTime = specialDays.get(rawStartDate.toLowerCase());
-			epochTimeStart = epochTime; 
-			task.setStartDate(epochTime);
-		}
-		
-		//process end date/time 
-		if (!specialDays.containsKey(rawEndDate.toLowerCase())) {
-			try {
-				epochTime = timeConverter.toEpochTime(rawEndDate);
-				epochTimeEnd = epochTime; 
-				task.setEndDate(epochTime); 	
-			} catch (ParseException error) {
-				processed = super.processError(String.format(
-						ParserConstants.ERROR_DATE_FORMAT, rawEndDate)); 
-				return processed; 
-			}
-		} else {
-			//process the special day
-			epochTime = specialDays.get(rawEndDate.toLowerCase());
-			epochTimeEnd = epochTime; 
-			task.setEndDate(epochTime);
-		} 
 		
 		task.setTaskName(taskName);
 		task.setTaskType("EVENT");
 		processed = new ProcessedObject("ADD_EVENT",task);
+		
 		
 		//check to make sure startDate < end date 
 		if (!isValidEvent(epochTimeStart, epochTimeEnd)) {

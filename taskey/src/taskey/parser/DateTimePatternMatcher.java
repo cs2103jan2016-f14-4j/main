@@ -40,8 +40,33 @@ public class DateTimePatternMatcher {
 	private String pattern9 = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; //for time
 	private String pattern10= "(morning|night)";
 	
+	/* ParseAdd: Check if Event Time includes time for both start and End s */
+	private String timeChecker = "\\d{1,2}(:|.)?\\d{0,2} ?(am|pm|h)"; 
+	
 	public DateTimePatternMatcher() {
 		
+	}
+	
+	/**
+	 * Check if both start and end times of events have times included in them.
+	 * @param startTime
+	 * @param endTime
+	 * @return true if both have times 
+	 */
+	public boolean isBothTime(String startTime, String endTime) {
+		Pattern p = Pattern.compile(timeChecker);
+		Matcher m = p.matcher(startTime);
+		Matcher m2 = p.matcher(endTime);
+		
+		while (m.find()) {
+			//System.out.println("Found a match.");
+			while (m2.find()) {
+				//System.out.println("Found a match.");
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

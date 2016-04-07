@@ -152,11 +152,9 @@ public class ParserTest {
 		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
 				+ " later than the ending time\n",
 				parser.parseInput("add mtg from 21 feb to 20 feb").toString());
-		System.out.println(p.parse("from tomorrow to 18 feb 3pm"));
-		//TODO: fix bug for this
-		//assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
-		//		+ " later than the ending time\n",
-		//		parser.parseInput("add mtg from tmr to 18 feb 3pm").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Event starting time cannot be"
+				+ " later than the ending time\n",
+				parser.parseInput("add mtg from tmr to 18 feb 3pm").toString());
 	}
 	
 	@Test
@@ -546,9 +544,11 @@ public class ParserTest {
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
 	public void testEventsHuman() {
+		System.out.println("TestEventsHuman");
+		
 		System.out.println(parser.parseInput("add meeting from today to 8 Apr"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr 2017"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr 2017"));
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
@@ -557,6 +557,8 @@ public class ParserTest {
 	 * Test human date edits
 	 */
 	public void testChangesHuman() {
+		System.out.println("TestChangesHuman");
+		
 		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
@@ -566,6 +568,8 @@ public class ParserTest {
 	 * Test human deadlines
 	 */
 	public void testDeadlineHuman() { 
+		System.out.println("TestDeadlineHuman");
+		
 		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
@@ -574,5 +578,13 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add sdasda by mon")); 
 		System.out.println(parser.parseInput("add asdsad on sat")); 
 		System.out.println(parser.parseInput("add sdasad by sat")); 
+	}
+	
+	@Test
+	/**
+	 * Test an event that contains 1 time and 1 no time
+	 */
+	public void testEventsWeirdTimes() {
+		System.out.println(parser.parseInput("add event from 12pm to tmr"));
 	}
 }

@@ -30,6 +30,9 @@ public class AutoComplete {
 	private HashMap<String, String> daysOfWeek = new HashMap<String,String>(); 
 	private HashMap<String, String> allDaysOfWeek = new HashMap<String, String>(); 
 	
+	/**
+	 * CONSTRUCTOR 
+	 */
 	public AutoComplete() {
 		
 		processCommands();
@@ -38,7 +41,6 @@ public class AutoComplete {
 		processMonths(); 
 		processDaysOfWeek();
 		processAllDaysOfWeek();
-		
 		
 	}
 
@@ -49,11 +51,11 @@ public class AutoComplete {
 		commands.add("add");
 		commands.add("view");
 		commands.add("del");
+		commands.add("setdir");
 		commands.add("set");
 		commands.add("search");
 		commands.add("done");
 		commands.add("undo");
-		commands.add("setdir");
 		commands.add("save");
 		commands.add("clear");
 		
@@ -220,6 +222,13 @@ public class AutoComplete {
 		allDaysOfWeek.put("next sunday", "sunday");
 	}
 	
+	/**
+	 * For Logic: Get a list of suggestions for the user to input 
+	 * (in case he forgets any command or misspelt them, etc... ) 
+	 * @param rawPhrase
+	 * @param tagDB
+	 * @return ProcessedAC
+	 */
 	public ProcessedAC getSuggestions(String rawPhrase, ArrayList<TagCategory> tagDB) {
 		ProcessedAC suggestions = null;
 		String phrase = rawPhrase.toLowerCase().trim();
@@ -245,6 +254,7 @@ public class AutoComplete {
 				suggestions = completeEdit(phrase);
 				break;
 				
+			/*	
 			case "del":
 			case "search":
 			case "done":
@@ -253,7 +263,7 @@ public class AutoComplete {
 			case "save":
 			case "clear": 
 				suggestions = new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-				break; 
+				break; */ 
 				
 			default:
 				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
@@ -269,7 +279,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such command exists, return null
 	 */
-	public ProcessedAC completeCommand(String phrase) {
+	private ProcessedAC completeCommand(String phrase) {
 		phrase = phrase.toLowerCase().trim(); 
 		
 		//if the command is completed, don't need to process
@@ -291,7 +301,7 @@ public class AutoComplete {
 		} else {
 			//try to check if command is misspelt
 			availCommands = correctCommandError(phrase); 
-			if (availCommands != null) {
+			if (availCommands != null && !availCommands.isEmpty()) {
 				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availCommands); 
 			}
 		}
@@ -352,62 +362,14 @@ public class AutoComplete {
 		String[] splitString = phrase.split(" ");
 		String latestWord = splitString[splitString.length - 1]; 
 		
-		/*
-		if (splitString.length >= 3) { 
-			String beforeLatestWord = splitString[splitString.length - 2]; 
-		
-			if (monthsMap.containsKey(beforeLatestWord)) {
-				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-			}
-		} */
-		
 		if (latestWord.contains("#")) {
-			latestWord = latestWord.replace("#", "").trim(); 
-			//suggest categories to the user 
-			//if empty tag, suggest anything
-			if (latestWord.equals("")) {
-				//if tagDB is empty, nth to suggest 
-				if (tagDB.size() == 0) {
-					return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
-				}
-				//else suggest something 
-				for(int i = 0; i < tagDB.size(); i++) {
-					if (i < 3) {
-						availSuggestions.add("#" + tagDB.get(i).getTagName());
-					}
-				}
-				return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
-			}
-			//if typed halfway, can suggest 
-			for(int i = 0; i < tagDB.size(); i++) {
-				String tag = tagDB.get(i).getTagName(); 
-				if (tag.contains(latestWord)) {
-					availSuggestions.add(tag); 
-				}
-			}
-			//if tag doesnt exist, maybe it's a new tag. don't highlight error
-			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+			return addSuggestTags(tagDB, availSuggestions, latestWord); 
 		} else if (latestWord.contains("!")) {
 			//suggest priorities to the user 
-			if (phrase.contains("!")) {
-				availSuggestions.add("!"); 
-				availSuggestions.add("!!");
-				availSuggestions.add("!!!");
-			} else if (phrase.contains("!!")) {
-				availSuggestions.add("!!");
-				availSuggestions.add("!!!");
-			} else if (phrase.contains("!!!")) {
-				//no need to suggest anything else 
-				return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-			} else if (phrase.contains("!!!!")) {
-				//anything more than 3 !s is an error
-				return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
-			}
+			return suggestPriority(phrase, availSuggestions); 
 		} else if (latestWord.matches(keyWords)) {
 			//suggest some dates to the user, since keywords spotted 
-			availSuggestions.add("tmr");
-			availSuggestions.add("8pm");
-			availSuggestions.add("next mon");
+			return addSuggestNonsenseDates(availSuggestions); 
 		} else if (!hasKeywords(splitString)) {
 			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 		} else {
@@ -422,6 +384,85 @@ public class AutoComplete {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions); 
 		}
 		return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+	}
+
+	/**
+	 * No date entered yet, but keywords detected, so suggest some nonsense
+	 * dates to the user 
+	 * @param availSuggestions
+	 * @return ProcessedAC
+	 */
+	private ProcessedAC addSuggestNonsenseDates(ArrayList<String> availSuggestions) {
+		availSuggestions.add("tmr");
+		availSuggestions.add("8pm");
+		availSuggestions.add("next mon");
+		return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+	}
+	
+	/**
+	 * Adding and Editing: Suggest priorities to the user 
+	 * @param phrase
+	 * @param availSuggestions
+	 * @return ProcessedAC
+	 */
+	private ProcessedAC suggestPriority(String phrase, ArrayList<String> availSuggestions) {
+		if (phrase.contains("!!!!")) {
+			//anything more than 3 !s is an error
+			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
+		} else if (phrase.contains("!!!")) {
+			//no need to suggest anything else 
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+		} else if (phrase.contains("!!")) {
+			availSuggestions.add("!!");
+			availSuggestions.add("!!!");
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+		} else {
+			//only 1 ! 
+			availSuggestions.add("!"); 
+			availSuggestions.add("!!");
+			availSuggestions.add("!!!");
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+		}
+	}
+	
+	/**
+	 * Adding: suggest tag categories to the user if the user already has 
+	 * tags in his TagDatabase
+	 * @param tagDB
+	 * @param availSuggestions
+	 * @param latestWord
+	 * @return ProcessedAC 
+	 */
+	private ProcessedAC addSuggestTags(ArrayList<TagCategory> tagDB, ArrayList<String> availSuggestions,
+			String latestWord) {
+		latestWord = latestWord.replace("#", "").trim(); 
+		//suggest categories to the user 
+		//if empty tag, suggest anything
+		if (latestWord.equals("")) {
+			//if tagDB is empty, nth to suggest 
+			if (tagDB.size() == 0) {
+				return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+			}
+			//else suggest something 
+			for(int i = 0; i < tagDB.size(); i++) {
+				if (i < 3) {
+					availSuggestions.add("#" + tagDB.get(i).getTagName());
+				}
+			}
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+		}
+		//if typed halfway, can suggest 
+		for(int i = 0; i < tagDB.size(); i++) {
+			String tag = tagDB.get(i).getTagName(); 
+			if (tag.contains(latestWord)) {
+				availSuggestions.add("#" + tag); 
+			}
+		}
+		if (!availSuggestions.isEmpty()) {
+			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+		}
+		//if tag doesnt exist, maybe it's a new tag. don't highlight error
+		return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
 	}
 
 	/**
@@ -452,19 +493,8 @@ public class AutoComplete {
 		phrase = phrase.toLowerCase();
 		phrase = phrase.replaceFirst("set", "").trim();
 		
-		if (phrase.contains("!!!!")) {
-			//anything more than 3 !s is an error
-			return new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
-		} else if (phrase.contains("!!!")) {
-			//no need to suggest anything else 
-			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
-		} else if (phrase.contains("!!")) {
-			availSuggestions.add("!!");
-			availSuggestions.add("!!!");
-		} else if (phrase.contains("!")) {
-			availSuggestions.add("!"); 
-			availSuggestions.add("!!");
-			availSuggestions.add("!!!"); 
+		if (phrase.contains("!")) {
+			return suggestPriority(phrase, availSuggestions);
 		} else if (phrase.contains("[")) {
 			//suggest a date to the user 
 			String dates; 
@@ -495,15 +525,25 @@ public class AutoComplete {
 			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
 		} else {
 			//user has not typed any changes, so suggest format 
-			availSuggestions.add("\"New Task Name\"");
-			availSuggestions.add("[New Date]");
-			availSuggestions.add("!!"); 
+			return editSuggestFormat(availSuggestions); 
 		}
 		
 		if (!availSuggestions.isEmpty()) {
 			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions); 
 		}
 		return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+	}
+	
+	/**
+	 * Editing task: to formats input yet, so suggest a format to the user 
+	 * @param availSuggestions
+	 * @return ProcessedAC
+	 */
+	private ProcessedAC editSuggestFormat(ArrayList<String> availSuggestions) {
+		availSuggestions.add("\"New Task Name\"");
+		availSuggestions.add("[New Date]");
+		availSuggestions.add("!!"); 
+		return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
 	}
 	
 	/**
@@ -530,13 +570,11 @@ public class AutoComplete {
 			}
 		}
 		
-		String[] tempArr = date.split(" ");
-		String timeBehind = tempArr[tempArr.length-1]; 
+		//String[] tempArr = date.split(" ");
+		//String timeBehind = tempArr[tempArr.length-1]; 
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			//String date2 = date.replace("pm", "");
-			//date2 = date2.replace("am", "");
 			String date2 = date.replace("h", "");
 			date2 = date2.replace("a", "");
 			date2 = date2.replace("p", "");
@@ -793,7 +831,7 @@ public class AutoComplete {
 	}
 	
 	/**
-	 * If a command has been spelt wrongly, try to correct it
+	 * If a command spelling is wrong, try to correct it
 	 * @param misSpelled
 	 * @return an array list of suggestions for the correct command spelling
 	 */
@@ -803,10 +841,6 @@ public class AutoComplete {
 		for(int i = 0; i < commands.size(); i++) {
 			String correctComm = commands.get(i); 
 			int temp = levenshteinDist(misSpelled, correctComm); 
-			if (temp == 0) {
-				//exactly the same
-				return null;  
-			}
 			if (temp <= 2) {
 				suggestions.add(correctComm); 
 			}
@@ -883,13 +917,6 @@ public class AutoComplete {
 	}
 	
 	
-	/* for testing 
-	public static void main(String[] args) {
-		AutoComplete ac = new AutoComplete(); 
-		ac.correctDateError("fbr"); 
-	} */ 
-	
-	
 	/* @@author A0107345L-unused
 	 * Decided not to use the code below as we decided to change 
 	 * what the AutoComplete should display 
@@ -902,6 +929,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
+	/*
 	private ArrayList<String> completeDelete(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
@@ -917,7 +945,7 @@ public class AutoComplete {
 			return availViews; 
 		}
 		return null; 
-	}
+	} */ 
 	
 	/**
 	 * Given a partial input that contains "done xxxx",
@@ -926,6 +954,7 @@ public class AutoComplete {
 	 * @param phrase
 	 * @return If no such list of tasks is available, return null 
 	 */
+	/*
 	private ArrayList<String> completeDone(String phrase, ArrayList<String> tasks) {
 		ArrayList<String> availViews = new ArrayList<String>();
 		phrase = phrase.toLowerCase();
@@ -941,5 +970,5 @@ public class AutoComplete {
 			return availViews; 
 		}
 		return null; 
-	}
+	} */ 
 }

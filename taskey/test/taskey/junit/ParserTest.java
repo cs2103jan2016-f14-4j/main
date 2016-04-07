@@ -483,6 +483,46 @@ public class ParserTest {
 				parser.parseInput("write oo").toString());
 	}
 	
+	@Test
+	/**
+	 * Test parsing of empty search
+	 */
+	public void testSearchEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No search phrase entered\n",
+				parser.parseInput("search ").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of empty done
+	 */
+	public void testDoneEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No task has been selected as done\n",
+				parser.parseInput("done ").toString());
+	}
+	
+	@Test
+	/**
+	 * Test parsing of empty delete
+	 */
+	public void testDeleteEmpty() {
+		assertEquals("Command: ERROR\nerror type: Error: No task has been selected for deletion\n",
+				parser.parseInput("del ").toString());
+		assertEquals("Command: ERROR\nerror type: Error: Cannot delete an empty category!\n",
+				parser.parseInput("del #").toString());
+	}
+	
+	@Test 
+	/**
+	 * Test parsing of empty views and
+	 * parsing of incorrect category
+	 */
+	public void testViewIncorrect() {
+		assertEquals("Command: ERROR\nerror type: Error: No view type selected\n",
+				parser.parseInput("view ").toString());
+		assertEquals("Command: ERROR\nerror type: Error: \"wonder\" is not a valid category\n",
+				parser.parseInput("view wonder").toString());
+	}
 	
 	/* 
 	public void testDate() {
@@ -504,9 +544,11 @@ public class ParserTest {
 	 * Tests that the methods return the correct dates for human defined events 
 	 */
 	public void testEventsHuman() {
+		System.out.println("TestEventsHuman");
+		
 		System.out.println(parser.parseInput("add meeting from today to 8 Apr"));
-		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr"));
-		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr"));
+		System.out.println(parser.parseInput("add meeting from tomorrow to 8 Apr 2017"));
+		System.out.println(parser.parseInput("add meeting from tmr to 8 Apr 2017"));
 		System.out.println(parser.parseInput("add meeting from tmr to next wed"));
 	}
 	
@@ -515,6 +557,8 @@ public class ParserTest {
 	 * Test human date edits
 	 */
 	public void testChangesHuman() {
+		System.out.println("TestChangesHuman");
+		
 		System.out.println(parser.parseInput("set 2 [tomorrow 5pm]"));
 		System.out.println(parser.parseInput("set 2 [wed 5pm, thu 7pm]"));
 	}
@@ -524,6 +568,8 @@ public class ParserTest {
 	 * Test human deadlines
 	 */
 	public void testDeadlineHuman() { 
+		System.out.println("TestDeadlineHuman");
+		
 		System.out.println(parser.parseInput("add do homework by tonight")); 
 		System.out.println(parser.parseInput("add complete essay by today")); 
 		System.out.println(parser.parseInput("add complete essay by tmr")); 
@@ -532,5 +578,13 @@ public class ParserTest {
 		System.out.println(parser.parseInput("add sdasda by mon")); 
 		System.out.println(parser.parseInput("add asdsad on sat")); 
 		System.out.println(parser.parseInput("add sdasad by sat")); 
+	}
+	
+	@Test
+	/**
+	 * Test an event that contains 1 time and 1 no time
+	 */
+	public void testEventsWeirdTimes() {
+		System.out.println(parser.parseInput("add event from 12pm to tmr"));
 	}
 }

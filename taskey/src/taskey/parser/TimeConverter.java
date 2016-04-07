@@ -347,19 +347,4 @@ public class TimeConverter {
 		
 		return days[day-1]; 
 	}
-	
-	/*
-	public static void main(String[] args) {
-		TimeConverter tc = new TimeConverter();
-		try {
-			long epochTime1 = tc.toEpochTime("11 Mar");
-			long epochTime2 = tc.toEpochTime("21 Mar"); 
-			System.out.println(tc.toHumanTime(epochTime1));
-			System.out.println(tc.isSameWeek(epochTime1, epochTime2));
-			
-			tc.get3MonthsFromNow();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	} */ 
 }

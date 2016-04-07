@@ -22,7 +22,7 @@ public class ParseCommand {
 	 * @param errorType
 	 * @return
 	 */
-	public ProcessedObject processError(String errorType) {
+	protected ProcessedObject processError(String errorType) {
 		ProcessedObject processed = new ProcessedObject("ERROR");
 		processed.setErrorType(errorType); 
 		

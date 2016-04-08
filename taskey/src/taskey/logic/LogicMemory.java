@@ -175,12 +175,12 @@ public class LogicMemory {
 			} catch (Exception e1) { //nothing should be thrown here
 				throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 			}
-			//TODO clear all but the last element in History's undo stacks (and also clear redo stacks)
 			initializeTaskLists(); //load from the new directory
 			initializeTagCategoryList();
+			//TODO clear History's stacks OR just add the newly loaded lists to history
 		} catch (InvalidPathException | NotDirectoryException e) { //can distinguish between types of invalid user input
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
-		} catch (IOException e) { //error while moving files
+		} catch (IOException e) { //IO error while moving files
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		}
 	}

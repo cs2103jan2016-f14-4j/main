@@ -254,7 +254,7 @@ public class AutoComplete {
 				suggestions = completeEdit(phrase);
 				break;
 				
-			/*	
+			
 			case "del":
 			case "search":
 			case "done":
@@ -263,7 +263,7 @@ public class AutoComplete {
 			case "save":
 			case "clear": 
 				suggestions = new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-				break; */ 
+				break; 
 				
 			default:
 				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);

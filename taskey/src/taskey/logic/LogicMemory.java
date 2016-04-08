@@ -170,7 +170,6 @@ public class LogicMemory {
 		try {
 			storage.setDirectory(pathName, true); //true to move files
 		} catch (FileAlreadyExistsException e) { //new directory contains existing tasks
-			//save(); //save the current tasks to the old directory before loading from the new one
 			try {
 				storage.setDirectory(pathName, false); //prepare Storage to load from the new directory
 			} catch (Exception e1) { //nothing should be thrown here
@@ -182,7 +181,6 @@ public class LogicMemory {
 		} catch (InvalidPathException | NotDirectoryException e) { //can distinguish between types of invalid user input
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		} catch (IOException e) { //error while moving files
-			//save(); //save now in case the files were moved halfway
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		}
 	}

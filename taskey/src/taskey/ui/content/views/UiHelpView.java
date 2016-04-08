@@ -2,7 +2,6 @@ package taskey.ui.content.views;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
 
 import javafx.geometry.HPos;
 import javafx.scene.control.Label;

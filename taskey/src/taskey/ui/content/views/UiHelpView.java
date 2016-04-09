@@ -54,11 +54,16 @@ public class UiHelpView {
 	public UiPagination getView() {
 		return currentView;
 	}
-
-	private void addMainMenu() {
+	
+	/**
+	 * @@author A0121618M
+	 * This method sets up the the main help menu and then the pages within each sub-menu.
+	 */
+	private void setUpHelpView() {
 		ArrayList<Pair<String, String>> mainMenuOptions = new ArrayList<Pair<String, String>>();
 		// In the following key-value pairs, key is the option in the main menu and value is the description
-		mainMenuOptions.add(new Pair<String, String>("Taskey Help", "Welcome to Taskey's help menu.\nUse Page Up/Down to move and Enter to select"));
+		mainMenuOptions.add(new Pair<String, String>("Help main menu", "Use Page Up/Down and Enter to select.\n"
+				+ "Press Enter in any submenu to return to the main menu"));
 		mainMenuOptions.add(new Pair<String, String>("Add", "How to add tasks"));
 		mainMenuOptions.add(new Pair<String, String>("Delete", "How to delete tasks"));
 		mainMenuOptions.add(new Pair<String, String>("Set", "How to edit tasks"));
@@ -67,7 +72,32 @@ public class UiHelpView {
 		mainMenuOptions.add(new Pair<String, String>("Undo", "How to undo your last action"));
 		mainMenuOptions.add(new Pair<String, String>("Tags", "How to add tasks with tags"));
 		mainMenuOptions.add(new Pair<String, String>("View", "How to filter pending tasks by type"));
+		addMainMenu(mainMenuOptions);
+		
+		ArrayList<EnumSet<ImageID>> helpImageSets_byCategory = new ArrayList<EnumSet<ImageID>>();
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Add());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Del());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Edit());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Done());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Search());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Undo());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_Tag());
+		helpImageSets_byCategory.add(ImageID.getHelpImageSet_View());
+		
+		for (EnumSet<ImageID> helpImageSet : helpImageSets_byCategory) {
+			ArrayList<Pair<ImageID, String>> subMenuPages = new ArrayList<Pair<ImageID, String>>();
+			for (ImageID imageID : helpImageSet) {
+				//Each page in a submenu consists of an image and its caption
+				subMenuPages.add(new Pair<ImageID, String>(imageID, imageID.getCaption()));
+			}
+			addMenu(subMenuPages);
+		}
+	}
 
+	/**
+	 * @@author A0125419H
+	 */
+	private void addMainMenu(ArrayList<Pair<String, String>> mainMenuOptions) {
 		int numCommmands = mainMenuOptions.size();
 		int totalPages = (int) Math.ceil(numCommmands/1.0/UiConstants.ENTRIES_PER_PAGE_HELP_MENU); // convert to double	
 		int entryNo = 0;
@@ -120,33 +150,7 @@ public class UiHelpView {
 		}
 		menu.initializeDisplay(totalPages); // update UI and bind call back
 	}
-
-	/**
-	 * @@author A0121618M
-	 */
-	private void setUpHelpView() {
-		addMainMenu();
-		
-		ArrayList<EnumSet<ImageID>> helpImageSets_byCategory = new ArrayList<EnumSet<ImageID>>();
-		helpImageSets_byCategory.add(ImageID.helpImages_Add);
-		helpImageSets_byCategory.add(ImageID.helpImages_Del);
-		helpImageSets_byCategory.add(ImageID.helpImages_Set);
-		helpImageSets_byCategory.add(ImageID.helpImages_Done);
-		helpImageSets_byCategory.add(ImageID.helpImages_Search);
-		helpImageSets_byCategory.add(ImageID.helpImages_Undo);
-		helpImageSets_byCategory.add(ImageID.helpImages_Tag);
-		helpImageSets_byCategory.add(ImageID.helpImages_View);
-		
-		for (EnumSet<ImageID> helpImageSet : helpImageSets_byCategory) {
-			ArrayList<Pair<ImageID, String>> helpMenuPages = new ArrayList<Pair<ImageID, String>>();
-			for (ImageID imageID : helpImageSet) {
-				helpMenuPages.add(new Pair<ImageID, String>(imageID, imageID.getCaption()));
-			}
-			addMenu(helpMenuPages);
-		}
-	}
 	
-	//@@author A0125419H
 	public void clear() {
 		for ( int i = 0 ; i < commandViews.size(); i ++ ) {
 			commandViews.get(i).clear();

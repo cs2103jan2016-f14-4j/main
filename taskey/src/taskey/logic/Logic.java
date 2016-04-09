@@ -178,6 +178,10 @@ public class Logic {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
+			if (le.getMessage().equals(LogicException.MSG_SUCCESS_LOADED_DIR)) {
+				history.clear();
+				updateHistory();
+			}
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
 		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));

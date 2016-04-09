@@ -35,7 +35,7 @@ public class Parser {
 	 * Constructor 
 	 */
 	public Parser() {
-	
+		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 1);
 	}
 	
 	/**

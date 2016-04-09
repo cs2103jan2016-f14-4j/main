@@ -15,6 +15,8 @@ public class ParseClear extends ParseCommand {
 	}
 	
 	protected ProcessedObject processClear(String command) {
+		assert(command != null);
+		
 		return new ProcessedObject(command.toUpperCase()); 
 	}
 

@@ -1,6 +1,10 @@
 package taskey.parser;
 
+import java.util.logging.Level;
+
 import taskey.constants.ParserConstants;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.messenger.ProcessedObject; 
 
 
@@ -40,13 +44,14 @@ public class Parser {
 	 * @return message to be displayed
 	 */
 	public ProcessedObject parseInput(String stringInput) {
+		assert(stringInput != null);
+		TaskeyLog.getInstance().log(LogSystems.PARSER, "Parsing input", Level.ALL);
+		
 		ProcessedObject processed = null;  
-		//stringInput = stringInput.toLowerCase(); 
 		String command = getCommand(stringInput); 
 		
-		//don't need to check date, just get "task"
-		//view, delete by index, delete by name, save, clear
 		switch(command) {
+			//don't need to check date, just get "task"
 			case "view":
 				processed = parseView.processView(stringInput); 
 				break; 
@@ -64,8 +69,6 @@ public class Parser {
 				break; 
 				
 			//need to check date: 
-			//add floating, add deadline, add event,
-			//update by index, update by name ,etc 
 			case "add":
 				processed = parseAdd.processAdd(command, stringInput); 
 				break;
@@ -88,6 +91,7 @@ public class Parser {
 				break; 
 		}
 		
+		TaskeyLog.getInstance().log(LogSystems.PARSER, "Passing PO to logic", Level.ALL);
 		return processed;   
 	}
 	

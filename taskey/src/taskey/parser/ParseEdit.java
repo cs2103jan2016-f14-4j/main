@@ -50,6 +50,8 @@ public class ParseEdit extends ParseCommand {
 	 * @return appropriate ProcessedObject
 	 */
 	protected ProcessedObject processSet(String stringInput) {
+		assert(stringInput != null); 
+		
 		String strNoCommand = removeCommand(stringInput);
 		
 		if (stringInput.split(" ").length > 1) {

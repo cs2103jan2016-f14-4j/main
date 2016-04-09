@@ -23,6 +23,8 @@ public class ParseCommand {
 	 * @return
 	 */
 	protected ProcessedObject processError(String errorType) {
+		assert(errorType != null); 
+		
 		ProcessedObject processed = new ProcessedObject("ERROR");
 		processed.setErrorType(errorType); 
 		

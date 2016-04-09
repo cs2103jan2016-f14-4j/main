@@ -47,6 +47,8 @@ public class ParseView extends ParseCommand {
 	 * @return processedStuff
 	 */
 	protected ProcessedObject processView(String stringInput) {
+		assert(stringInput != null); 
+		
 		String stringWithoutCommand = getStringWithoutCommand(stringInput);
 		
 		//empty view
@@ -54,7 +56,7 @@ public class ParseView extends ParseCommand {
 			return super.processError(ParserConstants.ERROR_VIEW_EMPTY);
 		}
 		
-		//let logic handle if the view exists or not.  
+		//note: let logic handle if the view exists or not.  
 		return getView(stringWithoutCommand); 
 	}
 	

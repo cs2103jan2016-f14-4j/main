@@ -35,7 +35,17 @@ public class Parser {
 	 * Constructor 
 	 */
 	public Parser() {
+		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 1);
+		TaskeyLog.getInstance().log(LogSystems.PARSER, "Initialised Parser", Level.ALL);
+
+	}
 	
+	/**
+	 * Overloaded Constructor: For JUnit tests, so that logs wont be run. 
+	 * @param junit
+	 */
+	public Parser(int junit) {
+		
 	}
 	
 	/**
@@ -45,7 +55,6 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		assert(stringInput != null);
-		TaskeyLog.getInstance().log(LogSystems.PARSER, "Parsing input", Level.ALL);
 		
 		ProcessedObject processed = null;  
 		String command = getCommand(stringInput); 
@@ -91,7 +100,6 @@ public class Parser {
 				break; 
 		}
 		
-		TaskeyLog.getInstance().log(LogSystems.PARSER, "Passing PO to logic", Level.ALL);
 		return processed;   
 	}
 	

@@ -63,7 +63,7 @@ public class LogicTest {
 	// "clear" command is supposed to clear all task and tag data in memory.
 	@BeforeClass
 	public static void testClear() {
-		Logic logic = new Logic();
+		Logic logic = new Logic(1);
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 		assertTrue(logic.getTagCategoryList().isEmpty());
@@ -71,8 +71,8 @@ public class LogicTest {
 	
 	@Before
 	public void setUp() {
-		logic = new Logic();
-		parser = new Parser();
+		logic = new Logic(1);
+		parser = new Parser(1); //JUnit Constructor
 		timeConverter = new TimeConverter();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 	}

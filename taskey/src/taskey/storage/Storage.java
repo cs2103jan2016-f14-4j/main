@@ -5,7 +5,9 @@ import static taskey.storage.Storage.TaskListEnum.savedLists;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
@@ -89,23 +91,13 @@ public class Storage {
 		}
 	}
 
-	/**
-	 * For testing
-	 * @throws IOException 
-	 * @throws NotDirectoryException 
-	 * @throws InvalidPathException 
-	 * @throws FileAlreadyExistsException 
-	 */
 	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-		storage.setDirectory("CON"); //throws invalid path exception
+		storage.setDirectory("prn"); //invalid
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
 
-	/**
-	 * For testing
-	 */
 	private static void print(ArrayList<ArrayList<Task>> lists) {
 		int i=1;
 		for (ArrayList<Task> list : lists) {
@@ -141,7 +133,7 @@ public class Storage {
 				createDirectory(DEFAULT_DIRECTORY);
 				directory = DEFAULT_DIRECTORY;
 			}
-		} else { //directory config file not found
+		} else { //directory config file was not found
 			createDirectory(DEFAULT_DIRECTORY);
 			directory = DEFAULT_DIRECTORY;
 		}
@@ -250,6 +242,28 @@ public class Storage {
 														InvalidPathException, NotDirectoryException {
 		setDirectory(pathname, true);
 	}
+	
+	/**
+	 * Quietly creates the full directory path of the given abstract pathname and also checks that it is valid.
+	 * @param dir directory to be created
+	 * @return true if the directory was successfully created or already exists;
+	 * 		   false if dir is not a valid abstract path;
+	 * 		   null if dir exists but is not a directory
+	 */
+	private Boolean createDirectory(File dir) {
+		if (!dir.exists()) {
+			if (dir.mkdirs() == true) {
+				directoriesCreated.add(dir);
+				return true;
+			} else { //mkdirs() failed
+				return false;
+			}
+		} else if (dir.isDirectory()) { //dir already exists && is a directory
+			return true;
+		} else { //dir exists but is not a directory
+			return null;
+		}
+	}
 
 	/**
 	 * Changes the storage directory to the given pathname string after checking that the path is valid.
@@ -258,7 +272,7 @@ public class Storage {
 	 * 
 	 * <p>Post-conditions:
 	 * <br>- Creates the directory if it does not exist yet.
-	 * <br>- If requested, moves the .taskey storage files from the existing directory to the new one, 
+	 * <br>- If requested, moves the .taskey savefiles from the existing directory to the new one, 
 	 * 		 provided the new directory does not contain a full set of pre-existing tasklist files.
 	 * <br>- The old folder will be deleted if it was created during runtime and is currently empty.
 	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
@@ -268,22 +282,24 @@ public class Storage {
 	 * @param shouldMove [true] if move operation should be performed; 
 	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
+	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters.
+	 *
+	 * @throws NotDirectoryException when the path points to a normal file and not a directory.
+	 * 
+	 * @throws AccessDeniedException if creating a new directory or moving the savefiles was denied by the Windows file system.
+	 * 
+	 * @throws FileSystemException if the path contains a reserved/illegal filename or the root directory doesn't exist.
+	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
-	 *			This will update Storage's directory and load from the new directory, without moving files from the previous one.
-	 *
-	 * @throws IOException if an I/O error occurs when moving the files.
-	 * 			This is not an atomic operation, so it is possible that some files have already been moved. 
-	 *			Logic should save everything after this to ensure that the current directory has all the savefiles.
-	 *
-	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters, 
-	 *			or is invalid for other file system specific reasons. On Windows, this could be due to: 
-	 *			illegal characters (e.g. *), reserved words (e.g. CON), or nonexistent root drive letters.
-	 *
-	 * @throws NotDirectoryException when the path points to a normal file and not a directory
+	 *			This will update Storage's directory (bypassing the FileAlreadyExistsException) and load from the new directory.
+	 * 
+	 * @throws IOException any other IO error, when creating a new directory or moving files, that is not covered above.
+	 * 			Note that moving is not an atomic operation, so it is possible that some files have already been moved.
 	 */
-	public void setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException, 
-																			InvalidPathException, NotDirectoryException {
+	public void setDirectory(String pathname, boolean shouldMove) throws InvalidPathException, NotDirectoryException,
+																		 AccessDeniedException, FileSystemException, 
+																		 FileAlreadyExistsException, IOException {
 		File newDir = new File(pathname);
 		createDirectoryLoudly(newDir);
 
@@ -306,41 +322,33 @@ public class Storage {
 	}
 	
 	/**
-	 * This method calls createDirectory and checks for its return value, 
-	 * throwing an exception when the return value indicates that it was unsuccessful. 
-	 * @param dir
-	 * @throws NotDirectoryException
-	 */
-	private void createDirectoryLoudly(File dir) throws NotDirectoryException, InvalidPathException {
-		Boolean isValidDir = createDirectory(dir);
-		if (isValidDir == null) {
-			throw new NotDirectoryException(dir.getPath()); //the abstract path newDir is a normal file and not a directory/folder
-		} else if (isValidDir == false) {
-			dir.toPath(); //this line throws InvalidPathException if dir contains illegal characters e.g. *
-			throw new InvalidPathException(dir.getPath(), "Illegal name"); //for other reasons not covered in the above line
-		}
-	}
-
-	/**
-	 * Quietly creates the full directory path of the given abstract pathname and also checks that it is valid.
+	 * This method attempts to create the full directory path of the given abstract pathname and throws exceptions when it fails.
+	 * All known exceptions are enumerated in the throws clause of this method just for documentation purposes;
+	 * except for InvalidPathException, the other exceptions are actually subclasses of IOException.
 	 * @param dir directory to be created
-	 * @return true if the directory was successfully created or already exists;
-	 * 		   false if dir is not a valid abstract path;
-	 * 		   null if dir exists but is not a directory
+	 * @throws InvalidPathException if dir contains illegal characters, e.g. * or ?
+	 * @throws NotDirectoryException if dir points to a normal file and not a folder
+	 * @throws AccessDeniedException if creation of dir was denied, e.g. trying to create a folder in c:\\program files
+	 * @throws FileSystemException if dir is an illegal filename in Windows, e.g. reserved words such as CON or PRN
+	 * @throws IOException for any other reason not covered by the above exceptions
 	 */
-	private Boolean createDirectory(File dir) {
-		if (!dir.exists()) {
-			if (dir.mkdirs() == true) {
-				directoriesCreated.add(dir);
-				return true;
-			} else { //mkdirs() failed
-				return false;
-			}
-		} else if (dir.isDirectory()) { //dir already exists && is a directory
-			return true;
-		} else { //dir exists but is not a directory
-			return null;
+	private void createDirectoryLoudly(File dir) throws InvalidPathException, NotDirectoryException, 
+														AccessDeniedException, FileSystemException,
+														IOException {
+		Path path = dir.toPath(); //throws InvalidPathException for illegal characters
+		try {
+			Files.createDirectories(path);
+		} catch (FileAlreadyExistsException e) { //dir exists but is not a directory
+			throw new NotDirectoryException(dir.getPath());
+		} catch (AccessDeniedException e) { //WindowsFileSystemProvider denied creation of dir
+			throw e;
+		} catch (FileSystemException e) { //illegal or reserved filename
+			throw e;
+		} catch (IOException e) { //whatever else
+			e.printStackTrace();
+			throw e;
 		}
+		directoriesCreated.add(dir);
 	}
 
 	/**
@@ -372,6 +380,8 @@ public class Storage {
 				try {
 					Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
 					wasMoved = true;
+				} catch (AccessDeniedException e) {
+					throw e;
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw e;

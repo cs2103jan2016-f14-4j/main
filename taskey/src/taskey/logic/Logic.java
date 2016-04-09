@@ -194,13 +194,13 @@ public class Logic {
 		try {
 			cmdExecutor.execute(cmd, logicMemory);
 		} catch (LogicException le) {
-			if (le.getMessage().equals(LogicException.MSG_SUCCESS_LOADED_DIR)) {
+			if (le.getMessage().equals(LogicException.MSG_SUCCESS_SETDIR_LOAD)) {
 				history.clear();
 				updateHistory();
 			}
 			return new LogicFeedback(getAllTaskLists(), po, le);
 		}
-		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_CHANGE_DIR));
+		return new LogicFeedback(getAllTaskLists(), po, new LogicException(LogicException.MSG_SUCCESS_SETDIR));
 	}
 	
 	private LogicFeedback executeClear(ProcessedObject po, Command cmd) {

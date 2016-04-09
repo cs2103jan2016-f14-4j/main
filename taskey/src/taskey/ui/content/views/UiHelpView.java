@@ -127,24 +127,22 @@ public class UiHelpView {
 	private void setUpHelpView() {
 		addMainMenu();
 		
-		ArrayList<EnumSet<ImageID>> helpImages_byCategory = new ArrayList<EnumSet<ImageID>>();
-		helpImages_byCategory.add(ImageID.helpImages_Add);
-		helpImages_byCategory.add(ImageID.helpImages_Del);
-		helpImages_byCategory.add(ImageID.helpImages_Set);
-		helpImages_byCategory.add(ImageID.helpImages_Done);
-		helpImages_byCategory.add(ImageID.helpImages_Search);
-		helpImages_byCategory.add(ImageID.helpImages_Undo);
-		helpImages_byCategory.add(ImageID.helpImages_Tag);
-		helpImages_byCategory.add(ImageID.helpImages_View);
+		ArrayList<EnumSet<ImageID>> helpImageSets_byCategory = new ArrayList<EnumSet<ImageID>>();
+		helpImageSets_byCategory.add(ImageID.helpImages_Add);
+		helpImageSets_byCategory.add(ImageID.helpImages_Del);
+		helpImageSets_byCategory.add(ImageID.helpImages_Set);
+		helpImageSets_byCategory.add(ImageID.helpImages_Done);
+		helpImageSets_byCategory.add(ImageID.helpImages_Search);
+		helpImageSets_byCategory.add(ImageID.helpImages_Undo);
+		helpImageSets_byCategory.add(ImageID.helpImages_Tag);
+		helpImageSets_byCategory.add(ImageID.helpImages_View);
 		
-		ArrayList<Pair<ImageID, String>> helpPages;
-		
-		for (EnumSet<ImageID> helpImageCategory : helpImages_byCategory) {
-			helpPages = new ArrayList<Pair<ImageID, String>>();
-			for (ImageID imageID : helpImageCategory) {
-				helpPages.add(new Pair<ImageID, String>(imageID, imageID.getCaption()));
+		for (EnumSet<ImageID> helpImageSet : helpImageSets_byCategory) {
+			ArrayList<Pair<ImageID, String>> helpMenuPages = new ArrayList<Pair<ImageID, String>>();
+			for (ImageID imageID : helpImageSet) {
+				helpMenuPages.add(new Pair<ImageID, String>(imageID, imageID.getCaption()));
 			}
-			addMenu(helpPages);
+			addMenu(helpMenuPages);
 		}
 	}
 	

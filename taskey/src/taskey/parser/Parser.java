@@ -35,13 +35,17 @@ public class Parser {
 	 * Constructor 
 	 */
 	public Parser() {
-<<<<<<< HEAD
-		System.out.println("EST");
-		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 5);
-=======
 		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 1);
 		TaskeyLog.getInstance().log(LogSystems.PARSER, "Initialised Parser", Level.ALL);
->>>>>>> origin/parser
+
+	}
+	
+	/**
+	 * Overloaded Constructor: For JUnit tests, so that logs wont be run. 
+	 * @param junit
+	 */
+	public Parser(int junit) {
+		
 	}
 	
 	/**

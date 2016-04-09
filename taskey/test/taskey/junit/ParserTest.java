@@ -16,13 +16,8 @@ import taskey.parser.Parser;
  *
  */
 public class ParserTest {
-	static Parser parser;
+	Parser parser = new Parser(1);
 	PrettyTimeParser p = new PrettyTimeParser();
-	
-	@BeforeClass
-	public static void init() {
-		parser = new Parser(); 
-	}
 	
 	@Test
 	/**

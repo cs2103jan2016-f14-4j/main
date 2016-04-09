@@ -35,8 +35,13 @@ public class Parser {
 	 * Constructor 
 	 */
 	public Parser() {
+<<<<<<< HEAD
 		System.out.println("EST");
 		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 5);
+=======
+		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 1);
+		TaskeyLog.getInstance().log(LogSystems.PARSER, "Initialised Parser", Level.ALL);
+>>>>>>> origin/parser
 	}
 	
 	/**
@@ -46,7 +51,6 @@ public class Parser {
 	 */
 	public ProcessedObject parseInput(String stringInput) {
 		assert(stringInput != null);
-		TaskeyLog.getInstance().log(LogSystems.PARSER, "Parsing input", Level.ALL);
 		
 		ProcessedObject processed = null;  
 		String command = getCommand(stringInput); 
@@ -92,7 +96,6 @@ public class Parser {
 				break; 
 		}
 		
-		TaskeyLog.getInstance().log(LogSystems.PARSER, "Passing PO to logic", Level.ALL);
 		return processed;   
 	}
 	

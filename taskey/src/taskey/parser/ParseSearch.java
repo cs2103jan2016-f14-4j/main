@@ -22,6 +22,8 @@ public class ParseSearch extends ParseCommand {
 	 * @return
 	 */
 	protected ProcessedObject processSearch(String command, String stringInput) {
+		assert(stringInput != null);
+		
 		ProcessedObject processed = new ProcessedObject(command.toUpperCase()); 
 		String searchPhrase = getTaskName(stringInput);
 		

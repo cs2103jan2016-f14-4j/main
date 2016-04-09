@@ -2,6 +2,7 @@ package taskey.junit;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
@@ -15,8 +16,13 @@ import taskey.parser.Parser;
  *
  */
 public class ParserTest {
-	Parser parser = new Parser(); 
+	static Parser parser;
 	PrettyTimeParser p = new PrettyTimeParser();
+	
+	@BeforeClass
+	public static void init() {
+		parser = new Parser(); 
+	}
 	
 	@Test
 	/**

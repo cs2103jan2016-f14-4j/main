@@ -148,6 +148,7 @@ public class UiHelpView {
 		}
 	}
 	
+	//@@author A0125419H
 	public void clear() {
 		for ( int i = 0 ; i < commandViews.size(); i ++ ) {
 			commandViews.get(i).clear();

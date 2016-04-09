@@ -10,9 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ImageID;
 import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiImageManager.ImageID;
 import taskey.ui.utility.UiTextBuilder;
 
 /**

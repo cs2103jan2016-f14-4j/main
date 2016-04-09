@@ -26,7 +26,6 @@ import taskey.constants.Triplet;
 import taskey.constants.UiConstants;
 import taskey.constants.UiConstants.ActionMode;
 import taskey.constants.UiConstants.ContentBox;
-import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
@@ -38,6 +37,7 @@ import taskey.messenger.Task;
 import taskey.ui.content.UiContentManager;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiImageManager.ImageID;
 import taskey.ui.utility.UiPopupManager;
 
 /**

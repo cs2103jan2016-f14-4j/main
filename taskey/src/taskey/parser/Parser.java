@@ -36,6 +36,7 @@ public class Parser {
 	 */
 	public Parser() {
 		System.out.println("EST");
+		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 5);
 	}
 	
 	/**

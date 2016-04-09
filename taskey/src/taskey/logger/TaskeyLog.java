@@ -1,6 +1,7 @@
 package taskey.logger;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -78,11 +79,13 @@ public class TaskeyLog {
 			SimpleFormatter formatter = new SimpleFormatter();
 			handler.setFormatter(formatter);
 			theLogger.addHandler(handler); // if handle
+		} catch (NoSuchFileException e) {
+			System.out.println("UiLog.txt not found");
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 		theLogger.setLevel(Level.ALL); // default to show all levels
 	}
 	

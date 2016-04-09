@@ -1,5 +1,9 @@
 package taskey.logic;
 
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -164,8 +168,19 @@ public class LogicMemory {
 	 */
 	void changeSaveDirectory(String pathName) throws LogicException {
 		try {
-			storage.setDirectory(pathName);
-		} catch (Exception e) {
+			storage.setDirectory(pathName, true); //true to move files
+		} catch (FileAlreadyExistsException e) { //new directory contains existing tasks
+			try {
+				storage.setDirectory(pathName, false); //prepare Storage to load from the new directory
+			} catch (Exception e1) { //nothing should be thrown here
+				throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+			}
+			initializeTaskLists(); //load from the new directory
+			initializeTagCategoryList();
+			//TODO clear History's stacks OR just add the newly loaded lists to history
+		} catch (InvalidPathException | NotDirectoryException e) { //can distinguish between types of invalid user input
+			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+		} catch (IOException e) { //IO error while moving files
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		}
 	}

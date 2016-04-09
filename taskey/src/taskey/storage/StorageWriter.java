@@ -26,7 +26,7 @@ class StorageWriter {
 	 */
 	private <T> void writeToFile(File dest, T object, TypeToken<T> typeToken) throws IOException {
 		FileWriter writer = new FileWriter(dest);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 		String jsonOutput = gson.toJson(object, typeToken.getType());
 		writer.write(jsonOutput);
 		writer.close();

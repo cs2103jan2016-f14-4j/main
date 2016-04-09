@@ -85,6 +85,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 	 * @param alertList
 	 */
 	private void checkTaskBounds(taskey.messenger.Task currentTask, ArrayList<UiAlert> alertList) {
+		assert(currentTask != null);
 		int secondsInOneHour = 3600;
 		long currTimeInSeconds = System.currentTimeMillis()/1000;
 		ArrayList<Integer> checkIntervals = new ArrayList<Integer>();
@@ -120,6 +121,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 	}
 
 	private String getHourString( int hours ) {
+		assert(hours >= 0);
 		// with or without the 's' at the end
 		if ( hours <= 1 ) {
 			return hours + " Hour";
@@ -129,6 +131,7 @@ public class UiUpdateService extends ScheduledService<Void> {
 	}
 	
 	private UiAlert createAlert(taskey.messenger.Task fromTask, String msg) {
+		assert(fromTask != null);
 		UiAlert myAlert = new UiAlert(fromTask);
 		myAlert.setMessage(msg);
 		return myAlert;

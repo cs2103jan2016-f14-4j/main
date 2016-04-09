@@ -1,6 +1,8 @@
 package taskey.parser;
 
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import taskey.constants.ParserConstants;
 import taskey.logger.TaskeyLog;
@@ -35,19 +37,11 @@ public class Parser {
 	 * Constructor 
 	 */
 	public Parser() {
+		TaskeyLog.getInstance().removeHandlers(LogSystems.PARSER);
 		TaskeyLog.getInstance().addHandler(LogSystems.PARSER, "ParserLog.txt", 1);
 		TaskeyLog.getInstance().log(LogSystems.PARSER, "Initialised Parser", Level.ALL);
+	}	
 
-	}
-	
-	/**
-	 * Overloaded Constructor: For JUnit tests, so that logs wont be run. 
-	 * @param junit
-	 */
-	public Parser(int junit) {
-		
-	}
-	
 	/**
 	 * Process the user's command and execute it accordingly 
 	 * @param command: string of command keyed in by user

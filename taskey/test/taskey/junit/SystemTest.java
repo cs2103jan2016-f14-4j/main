@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logger.TaskeyLog;
 import taskey.logic.Logic;
 import taskey.logic.LogicException;
 import taskey.logic.LogicMemory;
@@ -63,7 +64,7 @@ public class SystemTest {
 	// "clear" command is supposed to clear all task and tag data in memory.
 	@BeforeClass
 	public static void testClear() {
-		Logic logic = new Logic(1);
+		Logic logic = new Logic();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 		assertTrue(logic.getTagCategoryList().isEmpty());
@@ -71,8 +72,8 @@ public class SystemTest {
 	
 	@Before
 	public void setUp() {
-		logic = new Logic(1);
-		parser = new Parser(1); //JUnit Constructor
+		logic = new Logic();
+		parser = new Parser(); 
 		timeConverter = new TimeConverter();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 	}

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.logic.Logic;
 import taskey.parser.Parser;
 import taskey.storage.Storage;
@@ -94,6 +95,15 @@ public class TaskeyLog {
 		Logger theLogger = myLoggers.get(system.getIndex());
 		for ( Level l : levelOfLogging) {
 			theLogger.log(l,msg);	
+		}
+	}
+	
+	public void removeHandlers(LogSystems system) {
+		Logger theLogger = myLoggers.get(system.getIndex());
+		Handler [] handlers = theLogger.getHandlers();
+		for (Handler h : handlers) {
+			h.close();
+			theLogger.removeHandler(h);
 		}
 	}
 }

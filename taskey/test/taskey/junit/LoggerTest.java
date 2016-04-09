@@ -34,7 +34,7 @@ public class LoggerTest {
 		
 		String longString = "";
 		for ( int i = 0; i < 10000; i ++ ) { 
-			longString += "a";	
+			longString += "aaaaaaaaaaa";	
 		} 
 		/* This is a boundary case for character counter > MAX_BYTES partition */
 		TaskeyLog.getInstance().log(LogSystems.UI, longString,  Level.ALL);

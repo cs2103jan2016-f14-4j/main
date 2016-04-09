@@ -33,6 +33,19 @@ public class ParseDone extends ParseCommand {
 			return super.processError(ParserConstants.ERROR_DONE_EMPTY);
 		}
 		
+		//handle done by index/done by task name
+		processed = handleNormalDone(taskName);
+		
+		return processed; 
+	}
+
+	/**
+	 * Handle done by index/ done by task name
+	 * @param taskName
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject handleNormalDone(String taskName) {
+		ProcessedObject processed;
 		try {
 			int index = Integer.parseInt(taskName);
 			processed = new ProcessedObject(ParserConstants.DONE_BY_INDEX, index-1); 
@@ -41,8 +54,7 @@ public class ParseDone extends ParseCommand {
 			//if the done is not by index, then it's by task name. 
 			processed = new ProcessedObject(ParserConstants.DONE_BY_NAME, new Task(taskName));
 		}
-		
-		return processed; 
+		return processed;
 	}
 	
 	/**

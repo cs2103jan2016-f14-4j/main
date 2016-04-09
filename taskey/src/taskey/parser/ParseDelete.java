@@ -36,17 +36,22 @@ public class ParseDelete extends ParseCommand {
 		
 		//delete by category
 		if (taskName.contains("#")) {
-			String[] splitArr = taskName.split("#");
-			if (splitArr.length > 1) { 
-				String category = splitArr[1].trim(); 
-				processed = new ProcessedObject(ParserConstants.DELETE_BY_CATEGORY); 
-				processed.setCategory(category);
-				return processed; 
-			} else {
-				return super.processError(ParserConstants.ERROR_DEL_EMPTY_CAT); 
-			}
+			return handleDeleteByCategory(taskName);
 		}
 		
+		//handle delete by index of delete by task name
+		processed = handleSingleDelete(taskName);
+		
+		return processed; 
+	}
+	
+	/**
+	 * Handle deleting by a single index or a single task name
+	 * @param taskName
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject handleSingleDelete(String taskName) {
+		ProcessedObject processed;
 		try {
 			//delete by index
 			int index = Integer.parseInt(taskName);
@@ -56,8 +61,25 @@ public class ParseDelete extends ParseCommand {
 			//if the delete is not by index, then it's by task name. 
 			processed = new ProcessedObject(ParserConstants.DELETE_BY_NAME, new Task(taskName));
 		}
-		
-		return processed; 
+		return processed;
+	}
+
+	/**
+	 * Process the deleting by category
+	 * @param taskName
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject handleDeleteByCategory(String taskName) {
+		ProcessedObject processed;
+		String[] splitArr = taskName.split("#");
+		if (splitArr.length > 1) { 
+			String category = splitArr[1].trim(); 
+			processed = new ProcessedObject(ParserConstants.DELETE_BY_CATEGORY); 
+			processed.setCategory(category);
+			return processed; 
+		} else {
+			return super.processError(ParserConstants.ERROR_DEL_EMPTY_CAT); 
+		}
 	}
 	
 	/**

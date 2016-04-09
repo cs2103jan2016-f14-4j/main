@@ -12,10 +12,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ImageID;
 import taskey.messenger.Task;
 import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiImageManager.ImageID;
 import taskey.ui.utility.UiTextBuilder;
 
 /**

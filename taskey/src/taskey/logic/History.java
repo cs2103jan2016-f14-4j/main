@@ -132,4 +132,16 @@ public class History {
 		}
 		return true;
 	}
+	
+	/**
+	 * Clear history's stacks. This is done after Logic loads from a new directory.
+	 * Logic must call its updateHistory() method immediately after History is cleared,
+	 * to ensure that History isn't left empty.
+	 */
+	void clear() {
+		taskStack.clear();
+		tagStack.clear();
+		redoTaskStack.clear();
+		redoTagStack.clear();
+	}
 }

@@ -27,12 +27,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import taskey.constants.UiConstants;
-import taskey.constants.UiConstants.ImageID;
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
 import taskey.ui.utility.UiAnimationManager;
 import taskey.ui.utility.UiGridHelper;
 import taskey.ui.utility.UiImageManager;
+import taskey.ui.utility.UiImageManager.ImageID;
 
 /**
  * @@author A0125419H

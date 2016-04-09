@@ -165,19 +165,22 @@ public class LogicMemory {
 	 * moved from the current save directory to the new directory.
 	 * @param pathName        the new directory pathname
 	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
+	 * @@author A0121618M
 	 */
 	void changeSaveDirectory(String pathName) throws LogicException {
 		try {
 			storage.setDirectory(pathName, true); //true to move files
-		} catch (FileAlreadyExistsException e) { //new directory contains existing tasks
+		} catch (FileAlreadyExistsException fae) { //new directory contains existing tasks
 			try {
-				storage.setDirectory(pathName, false); //prepare Storage to load from the new directory
-			} catch (Exception e1) { //nothing should be thrown here
+				storage.setDirectory(pathName, false); //set Storage to load from the new directory
+			} catch (Exception e) { //nothing should be thrown here
 				throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 			}
 			initializeTaskLists(); //load from the new directory
 			initializeTagCategoryList();
-			//TODO clear History's stacks OR just add the newly loaded lists to history
+			// This exception message signals that LogicMemory has loaded pre-existing savefiles from the new directory.
+			// This is to tell Logic to clear History's stacks and add the newly loaded lists to History.
+			throw new LogicException(LogicException.MSG_SUCCESS_LOADED_DIR);
 		} catch (InvalidPathException | NotDirectoryException e) { //can distinguish between types of invalid user input
 			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
 		} catch (IOException e) { //IO error while moving files
@@ -186,6 +189,7 @@ public class LogicMemory {
 	}
 	
 	/**
+	 * @@author A0134177E
 	 * Removes an indexed task from the specified task list, and deletes all its tags from the tag category list.
 	 * @param contentBox specifies the current tab that user is in
 	 * @param taskIndex  the index of task to be deleted

@@ -20,6 +20,7 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_CLEAR = "Successfully cleared memory.";
 	public static final String MSG_SUCCESS_SAVE = "Save successful.";
 	public static final String MSG_SUCCESS_CHANGE_DIR = "Successfully changed save directory.";
+	public static final String MSG_SUCCESS_LOADED_DIR = "Successfully loaded from new directory.";
 	public static final String MSG_SUCCESS_VIEW = "Viewing \"%1$s\"";
 	public static final String MSG_SUCCESS_VIEW_TODAY = "Viewing today's tasks.";
 	public static final String MSG_SUCCESS_VIEW_TOMORROW = "Viewing tomorrow's tasks.";

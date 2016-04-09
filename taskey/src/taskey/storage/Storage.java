@@ -98,7 +98,7 @@ public class Storage {
 	 */
 	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-		System.out.println(storage.setDirectory("***")); //throws invalid path exception
+		storage.setDirectory("CON"); //throws invalid path exception
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -246,9 +246,9 @@ public class Storage {
 	/**
 	 * Has the same effect as calling setDirectory(pathname, true)
 	 */
-	public boolean setDirectory(String pathname) throws FileAlreadyExistsException, IOException, 
+	public void setDirectory(String pathname) throws FileAlreadyExistsException, IOException, 
 														InvalidPathException, NotDirectoryException {
-		return setDirectory(pathname, true);
+		setDirectory(pathname, true);
 	}
 
 	/**
@@ -268,9 +268,6 @@ public class Storage {
 	 * @param shouldMove [true] if move operation should be performed; 
 	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
 	 * 
-	 * @return <br>- True if the new directory was successfully set; otherwise,
-	 * 		   <br>- False for any other reason not covered under InvalidPathException or NotDirectoryException
-	 * 
 	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
 	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
 	 *			This will update Storage's directory and load from the new directory, without moving files from the previous one.
@@ -285,16 +282,10 @@ public class Storage {
 	 *
 	 * @throws NotDirectoryException when the path points to a normal file and not a directory
 	 */
-	public boolean setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException, 
+	public void setDirectory(String pathname, boolean shouldMove) throws FileAlreadyExistsException, IOException, 
 																			InvalidPathException, NotDirectoryException {
 		File newDir = new File(pathname);
-		Boolean isValidDir = createDirectory(newDir);
-		if (isValidDir == null) {
-			throw new NotDirectoryException(pathname); //the abstract path newDir is a normal file and not a directory/folder
-		} else if (isValidDir == false) {
-			newDir.toPath(); //this line throws InvalidPathException if newDir is invalid
-			return false; 	 //otherwise return false for whatever other reason
-		}
+		createDirectoryLoudly(newDir);
 
 		if (shouldMove) {
 			try {
@@ -312,11 +303,26 @@ public class Storage {
 
 		directory = newDir;
 		System.out.println("{Storage} Directory set | " + directory.getPath());
-		return true;
+	}
+	
+	/**
+	 * This method calls createDirectory and checks for its return value, 
+	 * throwing an exception when the return value indicates that it was unsuccessful. 
+	 * @param dir
+	 * @throws NotDirectoryException
+	 */
+	private void createDirectoryLoudly(File dir) throws NotDirectoryException, InvalidPathException {
+		Boolean isValidDir = createDirectory(dir);
+		if (isValidDir == null) {
+			throw new NotDirectoryException(dir.getPath()); //the abstract path newDir is a normal file and not a directory/folder
+		} else if (isValidDir == false) {
+			dir.toPath(); //this line throws InvalidPathException if dir contains illegal characters e.g. *
+			throw new InvalidPathException(dir.getPath(), "Illegal name"); //for other reasons not covered in the above line
+		}
 	}
 
 	/**
-	 * Creates the full directory path of the given abstract pathname and also checks that it is valid.
+	 * Quietly creates the full directory path of the given abstract pathname and also checks that it is valid.
 	 * @param dir directory to be created
 	 * @return true if the directory was successfully created or already exists;
 	 * 		   false if dir is not a valid abstract path;

@@ -252,9 +252,8 @@ public class AutoComplete {
 				
 			case "set":
 				suggestions = completeEdit(phrase);
-				break;
-				
-			/*	
+				break;		
+			
 			case "del":
 			case "search":
 			case "done":
@@ -263,7 +262,7 @@ public class AutoComplete {
 			case "save":
 			case "clear": 
 				suggestions = new ProcessedAC(ParserConstants.FINISHED_COMMAND);
-				break; */ 
+				break; 
 				
 			default:
 				suggestions = new ProcessedAC(ParserConstants.NO_SUCH_COMMAND);
@@ -431,7 +430,7 @@ public class AutoComplete {
 	 * @param tagDB
 	 * @param availSuggestions
 	 * @param latestWord
-	 * @return ProcessedAC 
+	 * @return ProcessedAC  
 	 */
 	private ProcessedAC addSuggestTags(ArrayList<TagCategory> tagDB, ArrayList<String> availSuggestions,
 			String latestWord) {
@@ -439,19 +438,22 @@ public class AutoComplete {
 		//suggest categories to the user 
 		//if empty tag, suggest anything
 		if (latestWord.equals("")) {
-			//if tagDB is empty, nth to suggest 
-			if (tagDB.size() == 0) {
-				return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
-			}
-			//else suggest something 
-			for(int i = 0; i < tagDB.size(); i++) {
-				if (i < 3) {
-					availSuggestions.add("#" + tagDB.get(i).getTagName());
-				}
-			}
-			return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
+			return addSuggestForEmptyTags(tagDB, availSuggestions);
 		}
-		//if typed halfway, can suggest 
+		//if typed halfway, can suggest tags that match 
+		return addSuggestForTags(tagDB, availSuggestions, latestWord);
+	}
+
+	/**
+	 * If the user has typed halfway, suggest tags that match,
+	 * else return finished_command as it could be a new category 
+	 * @param tagDB
+	 * @param availSuggestions
+	 * @param latestWord
+	 * @return ProcessedAC
+	 */
+	private ProcessedAC addSuggestForTags(ArrayList<TagCategory> tagDB, ArrayList<String> availSuggestions,
+			String latestWord) {
 		for(int i = 0; i < tagDB.size(); i++) {
 			String tag = tagDB.get(i).getTagName(); 
 			if (tag.contains(latestWord)) {
@@ -463,6 +465,27 @@ public class AutoComplete {
 		}
 		//if tag doesnt exist, maybe it's a new tag. don't highlight error
 		return new ProcessedAC(ParserConstants.FINISHED_COMMAND);
+	}
+	
+	/**
+	 * Suggest tags for the user to key in if his tag is empty
+	 * Return finished command if the tag database is empty 
+	 * @param tagDB
+	 * @param availSuggestions
+	 * @return ProcessedAC
+	 */
+	private ProcessedAC addSuggestForEmptyTags(ArrayList<TagCategory> tagDB, ArrayList<String> availSuggestions) {
+		//if tagDB is empty, nth to suggest 
+		if (tagDB.size() == 0) {
+			return new ProcessedAC(ParserConstants.FINISHED_COMMAND); 
+		}
+		//else suggest something 
+		for(int i = 0; i < tagDB.size(); i++) {
+			if (i < 3) {
+				availSuggestions.add("#" + tagDB.get(i).getTagName());
+			}
+		}
+		return new ProcessedAC(ParserConstants.DISPLAY_COMMAND, availSuggestions);
 	}
 
 	/**
@@ -570,45 +593,13 @@ public class AutoComplete {
 			}
 		}
 		
-		//String[] tempArr = date.split(" ");
-		//String timeBehind = tempArr[tempArr.length-1]; 
-		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			String date2 = date.replace("h", "");
-			date2 = date2.replace("a", "");
-			date2 = date2.replace("p", "");
-			try {
-				int num = Integer.parseInt(date2.trim()); 
-				if (num <= 12) {
-					availDates.add(date2.trim()+"am");
-					availDates.add(date2.trim()+"pm"); 
-				}
-				if (date2.trim().length() == 4 && num <= 2400 
-						&& num != 2016 && num != 2017) { 
-					availDates.add(date2.trim()+"h"); 
-				}
-			} catch (Exception e) {
-				//do nth 
-			}
+			suggestPossibleTime(date, availDates);
 		} else if (pm.hasCorrectTimeFormat(date.trim())) {
 			//don't suggest any time, if there's no other date format,
 			//then suggest "tomorrow"
-			String[] temp = date.split(" ");
-			String date2 = ""; 
-			for (int i = 1; i < temp.length; i++) {
-				date2 += temp[i]; 
-			}
-			if (!pm.hasFullDateAC(date2)) {
-				availDates.add("tomorrow"); 
-			} else if (pm.hasDateAC(date2)) {
-				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-				for(int i = 0; i < dateRaw.size(); i++) {
-					availDates.add(date2.trim()+ " " + dateRaw.get(i)); //dd mmm
-				}
-			} else {
-				checkIfContainsMonth(date2, availDates);
-			}
+			suggestPossibleDates(date, availDates);
 		} else {
 			//suggest a time? 
 			//availDates.add("9pm");
@@ -624,6 +615,53 @@ public class AutoComplete {
 			return availDates; 
 		}
 		return null; 
+	}
+
+	/**
+	 * Suggest Possible dates if a date format is detected
+	 * @param date
+	 * @param availDates
+	 */
+	private void suggestPossibleDates(String date, ArrayList<String> availDates) {
+		String[] temp = date.split(" ");
+		String date2 = ""; 
+		for (int i = 1; i < temp.length; i++) {
+			date2 += temp[i]; 
+		}
+		if (!pm.hasFullDateAC(date2)) {
+			availDates.add("tomorrow"); 
+		} else if (pm.hasDateAC(date2)) {
+			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+			for(int i = 0; i < dateRaw.size(); i++) {
+				availDates.add(date2.trim()+ " " + dateRaw.get(i)); //dd mmm
+			}
+		} else {
+			checkIfContainsMonth(date2, availDates);
+		}
+	}
+	
+	/**
+	 * Suggest possible times if a time format is detected
+	 * @param date
+	 * @param availDates
+	 */
+	private void suggestPossibleTime(String date, ArrayList<String> availDates) {
+		String date2 = date.replace("h", "");
+		date2 = date2.replace("a", "");
+		date2 = date2.replace("p", "");
+		try {
+			int num = Integer.parseInt(date2.trim()); 
+			if (num <= 12) {
+				availDates.add(date2.trim()+"am");
+				availDates.add(date2.trim()+"pm"); 
+			}
+			if (date2.trim().length() == 4 && num <= 2400 
+					&& num != 2016 && num != 2017) { 
+				availDates.add(date2.trim()+"h"); 
+			}
+		} catch (Exception e) {
+			//do nth 
+		}
 	}
 	
 	/**
@@ -717,7 +755,7 @@ public class AutoComplete {
 			return availDates; 
 		}
 		
-		//eg. sun... mon... 
+		//eg. sun... mon... [Unable to re-factor this part out due to structure] 
 		String parts[] = phrase.split(" "); 
 		String number = parts[parts.length-2]; //get 2nd last word
 		try {
@@ -738,71 +776,73 @@ public class AutoComplete {
 		
 		//check for possible time formats, and suggest times
 		if (pm.hasTimeAC(date.trim())) {
-			//date = date.replace("pm", "");
-			//date = date.replace("am", "");
-			date = date.replace("h", "");
-			date = date.replace("a", "");
-			date = date.replace("p", "");
-			try {
-				int num = Integer.parseInt(date.trim()); 
-				if (num <= 12) {
-					availDates.add(date.trim()+"am");
-					availDates.add(date.trim()+"pm"); 
-				}
-				if (date.trim().length() == 4 && num <= 2400 
-						&& num != 2016 && num != 2017) { 
-					availDates.add(date.trim()+"h"); 
-				}
-			} catch (Exception e) {
-				//do nth 
-			}
+			suggestPossibleTime(date.trim(), availDates);
 		}
 		
 		//check for normal date
 		if (pm.hasDateAC(date.trim())) {
-			String tempDateRaw = getDateRaw(phrase); 
-			boolean hasMonth = false; 
-			for(int i = 0; i < months.size(); i++) {
-				if (tempDateRaw.contains(months.get(i)) && !tempDateRaw.contains("from")) {
-					hasMonth = true; 
-				}
-			}
-			if (hasMonth == false) { 
-				ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
-				for(int i = 0; i < dateRaw.size(); i++) {
-					availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
-				}
-			}
+			addSuggestPossibleNormalDate(date, phrase, availDates);
 		}
 		
 		//check if month 
 		if (date.length() <= 3) {
-			if (date.length() == 3) {
-				if (monthsMap.containsKey(date.trim())) {
-					//do nth
-				} else if (pm.hasAmPm(date.trim())) {
-					//do nth 
-				} else {
-					ArrayList<String> suggestTemp = correctDateError(date.trim()); 
-					if (suggestTemp != null) {
-						for(int i = 0; i < suggestTemp.size(); i++) {
-							availDates.add(suggestTemp.get(i)); 
-						}
-					}
-				}
-			} else {
-				for(int i = 0; i < months.size(); i++) {
-					String month = months.get(i);
-					if (month.indexOf(date) == 0) {
-						availDates.add(month); 
-					}
-				}
-			}
+			addSuggestPossibleMonth(date, availDates);
 		}
 		if (!availDates.isEmpty()) {
 			return availDates; 
 		}
 		return null; 
+	}
+
+	/**
+	 * For Autocompleting ADD: suggest possible month or correct misspelling of month
+	 * @param date
+	 * @param availDates
+	 */
+	private void addSuggestPossibleMonth(String date, ArrayList<String> availDates) {
+		if (date.length() == 3) {
+			if (monthsMap.containsKey(date.trim())) {
+				//do nth
+			} else if (pm.hasAmPm(date.trim())) {
+				//do nth 
+			} else {
+				ArrayList<String> suggestTemp = correctDateError(date.trim()); 
+				if (suggestTemp != null) {
+					for(int i = 0; i < suggestTemp.size(); i++) {
+						availDates.add(suggestTemp.get(i)); 
+					}
+				}
+			}
+		} else {
+			for(int i = 0; i < months.size(); i++) {
+				String month = months.get(i);
+				if (month.indexOf(date) == 0) {
+					availDates.add(month); 
+				}
+			}
+		}
+	}
+
+	/**
+	 * For Autocompleting ADD: Suggest possible normal date
+	 * @param date
+	 * @param phrase
+	 * @param availDates
+	 */
+	private void addSuggestPossibleNormalDate(String date, String phrase, ArrayList<String> availDates) {
+		String tempDateRaw = getDateRaw(phrase); 
+		boolean hasMonth = false; 
+		for(int i = 0; i < months.size(); i++) {
+			if (tempDateRaw.contains(months.get(i)) && !tempDateRaw.contains("from")) {
+				hasMonth = true; 
+			}
+		}
+		if (hasMonth == false) { 
+			ArrayList<String> dateRaw = tc.get3MonthsFromNow(); 
+			for(int i = 0; i < dateRaw.size(); i++) {
+				availDates.add(date.trim()+ " " + dateRaw.get(i)); //dd mmm
+			}
+		}
 	}
 	
 	/**

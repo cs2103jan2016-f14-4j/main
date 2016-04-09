@@ -47,6 +47,8 @@ public class ParseAdd extends ParseCommand {
 	 * @return appropriate ProcessedObject 
 	 */
 	protected ProcessedObject processAdd(String command, String stringInput) {
+		assert(stringInput != null); 
+		
 		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
@@ -142,9 +144,9 @@ public class ParseAdd extends ParseCommand {
 		}
 		
 		rawDate = rawDate.split("!")[0].trim(); //remove priority
-		rawDate = rawDate.split("#")[0].trim();//remove tags
+		rawDate = rawDate.split("#")[0].trim(); //remove tags
 		
-		//do pattern matching on raw date here. 
+		//do pattern matching on raw date here: catch blacklisted dates
 		if (pm.hasPattern(rawDate)) {
 			processed = super.processError(String.format(
 					ParserConstants.ERROR_DATE_GRAMMAR, rawDate));
@@ -246,6 +248,7 @@ public class ParseAdd extends ParseCommand {
 		long epochTimeStart = -1;
 		long epochTimeEnd = -1;  
 		
+		//if both start and end contain time, use PrettyTime 
 		if (pm.isBothTime(rawStartDate, rawEndDate)) {
 			try {
 				long[] epochTimeEvent = getPrettyTimeEvent(dateForPrettyParser);
@@ -260,17 +263,14 @@ public class ParseAdd extends ParseCommand {
 				//make sure start time < end Time 
 				if (!isValidEvent(epochTimeStart, epochTimeEnd)) {
 					return super.processError(ParserConstants.ERROR_EVENT_TIME_INVALID); 
-				}
-				
+				}	
 				return processed;
 			} catch (Error e) {
-				//do nothing
-				//ie. date format wrong or has no time in the date
+				//do nothing, try to process below
 			}
 		} 
 		
-		//if time contains am or pm or morning or night, 
-		//call pretty parser to process the time.
+		//Start Time Handling 
 		epochTime = getPrettyTime(rawStartDate);
 		if (epochTime != -1) {
 			epochTimeStart = epochTime; 
@@ -292,6 +292,7 @@ public class ParseAdd extends ParseCommand {
 			task.setStartDate(epochTime);
 		}
 		
+		//End Time Handling
 		epochTime = getPrettyTime(rawEndDate);
 		if (epochTime != -1) {
 			epochTimeEnd = epochTime; 

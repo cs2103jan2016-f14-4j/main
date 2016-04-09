@@ -66,6 +66,9 @@ public class UiTrayModule {
 	 * @param alertStage
 	 */
 	private void registerMainControllerHandlers(Stage mainStage, Stage alertStage) {
+		assert(mainStage != null);
+		assert(alertStage != null);
+		
 		mainStage.setOnHidden(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {	

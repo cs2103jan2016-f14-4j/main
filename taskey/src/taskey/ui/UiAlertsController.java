@@ -123,6 +123,7 @@ public class UiAlertsController {
 	}	
 	
 	private void addClickHandler(StackPane thePane) {
+		assert(thePane != null);
 		thePane.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
@@ -143,6 +144,7 @@ public class UiAlertsController {
 	}
 	
 	private void addStartAnimation(StackPane thePane) {
+		assert(thePane != null);
 		// animate within the grid, hence translation coordinates are 0.0
 		TranslateTransition shift = UiAnimationManager.getInstance().createTranslateTransition(thePane, 
 				new Pair<Double,Double>(stage.getWidth(), 0.0), 
@@ -160,6 +162,7 @@ public class UiAlertsController {
 	}
 	
 	private void addEntry(UiAlert newAlert) {
+		assert(newAlert != null);
 		if ( checkAlertExisted(newAlert) == true ) {
 			return;
 		}
@@ -182,6 +185,7 @@ public class UiAlertsController {
 	}
 	
 	private boolean checkAlertExisted(UiAlert newAlert) {
+		assert(newAlert != null);
 		if ( currentAlerts.contains(newAlert)) {
 			return true;
 		} else if ( alertHistory.contains(newAlert)) {
@@ -233,6 +237,7 @@ public class UiAlertsController {
 	 * @param alertList
 	 */
 	public void setAllAlerts(ArrayList<UiAlert> alertList) { 
+		assert(alertList != null);
 		for ( int i = 0; i < UiConstants.MAX_ALERTS; i ++ ) {
 			if ( alertList.contains(currentAlerts.get(i)) == false ) { // remove old / invalid alerts
 				removeEntry(i);

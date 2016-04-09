@@ -90,6 +90,7 @@ public class UiAnimationManager {
 	 */
 	public ScaleTransition createScaleTransition(Node theNode, double scaleByX, double scaleByY, int cycleCount, 
 												 boolean autoReverse, int animDuration) {
+		assert(theNode != null);
 		ScaleTransition scale = new ScaleTransition(Duration.millis(animDuration), theNode);
 		scale.setByX(scaleByX);
 		scale.setByY(scaleByY);
@@ -111,6 +112,7 @@ public class UiAnimationManager {
 	 * @return - the timeline 
 	 */
 	public Timeline createShakeTransition(Node theNode, int xShift, int interval, int animDuration) {
+		assert(theNode != null);
 		Interpolator WEB_EASE = Interpolator.SPLINE(0.25, 0.1, 0.25, 1);
 		int numShifts = animDuration / interval; // milliseconds
 		Timeline animation = new Timeline();
@@ -140,7 +142,7 @@ public class UiAnimationManager {
 	 * @return - the timeline
 	 */
 	public Timeline createTextWrapAnimation(Label theLabel, int interval, int charsToSkip, String filler) {
-
+		assert(theLabel != null);
 		Timeline timeline = new Timeline();
 		timeline.setCycleCount(Timeline.INDEFINITE);
 		timeline.setAutoReverse(true);

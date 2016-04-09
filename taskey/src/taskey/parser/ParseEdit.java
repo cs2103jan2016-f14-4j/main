@@ -50,6 +50,8 @@ public class ParseEdit extends ParseCommand {
 	 * @return appropriate ProcessedObject
 	 */
 	protected ProcessedObject processSet(String stringInput) {
+		assert(stringInput != null); 
+		
 		String strNoCommand = removeCommand(stringInput);
 		
 		if (stringInput.split(" ").length > 1) {
@@ -93,10 +95,7 @@ public class ParseEdit extends ParseCommand {
 		
 		//changing priority only 
 		if (newPriority != 0) { 
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_PRIORITY,
-					index); 
-			processed.setNewPriority(newPriority);
-			return processed; 
+			return updatePriorityByIndex(index, newPriority); 
 		}
 		
 		//changing name only
@@ -107,37 +106,51 @@ public class ParseEdit extends ParseCommand {
 			//changing date only 
 			newDateRaw = newDateRaw.replace("tmr", "tomorrow"); //prettytime cannot accept tmr
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_DATE, index);
-			 		
-			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-				//change the task to floating
-				return updateToFloating(processed); 
-			} else if (newDateRaw.split(",").length == 2) {
-				//change the task to event
-				return updateToEvent(processed, newDateRaw); 
-			} else {
-				// change the task to deadline
-				return updateToDeadline(processed, newDateRaw);
-			}
+			return updateDate(newDateRaw, processed);
 		} else if (newDateRaw != null && newTaskName != null) {
 			//change both name and date 
 			newDateRaw = newDateRaw.replace("tmr", "tomorrow"); 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_BOTH, index);
 			processed = updateChangeName(processed, newTaskName); 
-			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-				//change the task to floating
-				return updateToFloating(processed); 
-			} else if (newDateRaw.split(",").length == 2) {
-				//change the task to event
-				return updateToEvent(processed, newDateRaw); 
-			} else {
-				// change the task to deadline
-				return updateToDeadline(processed, newDateRaw);
-			}
+			return updateDate(newDateRaw, processed);
 		} else {
 			//error: wrong format
 			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
+	}
+
+	/**
+	 * Update a date of a task by its index
+	 * @param newDateRaw
+	 * @param processed
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject updateDate(String newDateRaw, ProcessedObject processed) {
+		if (newDateRaw.toLowerCase().compareTo("none") == 0) {
+			//change the task to floating
+			return updateToFloating(processed); 
+		} else if (newDateRaw.split(",").length == 2) {
+			//change the task to event
+			return updateToEvent(processed, newDateRaw); 
+		} else {
+			// change the task to deadline
+			return updateToDeadline(processed, newDateRaw);
+		}
+	}
+
+	/**
+	 * Change the priority of a task
+	 * @param index
+	 * @param newPriority
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject updatePriorityByIndex(int index, int newPriority) {
+		ProcessedObject processed;
+		processed = new ProcessedObject(ParserConstants.UPDATE_BY_INDEX_CHANGE_PRIORITY,
+				index); 
+		processed.setNewPriority(newPriority);
+		return processed;
 	}
 	
 	/**
@@ -154,10 +167,7 @@ public class ParseEdit extends ParseCommand {
 		
 		//changing priority only 
 		if (newPriority != 0) { 
-			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_PRIORITY,
-							new Task(oldTaskName)); 
-			processed.setNewPriority(newPriority);
-			return processed; 
+			return updatePriorityByName(oldTaskName, newPriority); 
 		}
 		
 		//if changing name only
@@ -170,43 +180,39 @@ public class ParseEdit extends ParseCommand {
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_DATE, 
 					new Task(oldTaskName)); 
 			
-			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-				//change the task to floating
-				return updateToFloating(processed); 
-			} else if (newDateRaw.split(",").length == 2) {
-				//change the task to event
-				return updateToEvent(processed, newDateRaw); 
-			} else {
-				// change the task to deadline
-				return updateToDeadline(processed, newDateRaw);
-			}
+			return updateDate(newDateRaw, processed);
 		} else if (newTaskName != null && newDateRaw != null) {
 			//changing both name and date 
 			processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_BOTH,
 					new Task(oldTaskName));
 			processed = updateChangeName(processed, newTaskName); 
-			if (newDateRaw.toLowerCase().compareTo("none") == 0) {
-				//change the task to floating
-				return updateToFloating(processed); 
-			} else if (newDateRaw.split(",").length == 2) {
-				//change the task to event
-				return updateToEvent(processed, newDateRaw); 
-			} else {
-				// change the task to deadline
-				return updateToDeadline(processed, newDateRaw);
-			}
+			return updateDate(newDateRaw, processed);
 		} else {
 			//error: wrong format
 			processed = super.processError(ParserConstants.ERROR_STRING_FORMAT);
 			return processed; 
 		}
 	}
+
+	/**
+	 * Update priority of a task by its task name
+	 * @param oldTaskName
+	 * @param newPriority
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject updatePriorityByName(String oldTaskName, int newPriority) {
+		ProcessedObject processed;
+		processed = new ProcessedObject(ParserConstants.UPDATE_BY_NAME_CHANGE_PRIORITY,
+						new Task(oldTaskName)); 
+		processed.setNewPriority(newPriority);
+		return processed;
+	}
 	
 	/**
 	 * Given a task name, we want to change that task's name 
 	 * @param processed
 	 * @param taskName
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject updateChangeName(ProcessedObject processed,	String newTaskName) {
 		processed.setNewTaskName(newTaskName);
@@ -218,7 +224,7 @@ public class ParseEdit extends ParseCommand {
 	 * Given a task we want to we want to change the task type to event. 
 	 * @param processed
 	 * @param newDateRaw
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject updateToEvent(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
@@ -310,7 +316,7 @@ public class ParseEdit extends ParseCommand {
 	 * Given a task we want to update the task type to deadline
 	 * @param processed
 	 * @param newDateRaw
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject updateToDeadline(ProcessedObject processed, String newDateRaw) {
 		long epochTime; 
@@ -350,7 +356,7 @@ public class ParseEdit extends ParseCommand {
 	/**
 	 * Given a task we want to update task type to floating
 	 * @param processed
-	 * @return
+	 * @return ProcessedObject
 	 */
 	private ProcessedObject updateToFloating(ProcessedObject processed) {
 		Task changedTask = null; 

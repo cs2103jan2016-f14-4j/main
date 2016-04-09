@@ -23,7 +23,7 @@ import taskey.parser.TimeConverter;
 /**
  * @@author A0134177E
  */
-public class LogicTest {
+public class SystemTest {
 	public static final int NUM_SECONDS_1_DAY = 86400;
 	public static final int NUM_SECONDS_1_WEEK = 604800;
 	public static final int NUM_SECONDS_BUFFER_TIME = 10; // Used for safety in dealing with boundary conditions

@@ -151,7 +151,7 @@ public class StorageReader {
 	public File loadDirectoryConfigFile(String filename) {
 		File src = new File(filename);
 		try {
-			//FIXME: buggyPath will somehow always have user.dir prefixed in its absolute path
+			//FIXME: buggyPath will somehow always have user.dir prepended in its absolute path
 			File buggyPath = readFromFile(src, new TypeToken<File>() {});
 			File fixedPath = new File(buggyPath.getPath()); //kludge solution
 			return fixedPath;

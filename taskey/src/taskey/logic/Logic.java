@@ -2,7 +2,6 @@ package taskey.logic;
 
 import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
 import static taskey.constants.ParserConstants.FINISHED_COMMAND;
-import static taskey.constants.ParserConstants.NO_SUCH_COMMAND;
 
 import java.util.ArrayList;
 
@@ -300,46 +299,6 @@ public class Logic {
 	}
 	
 	public ArrayList<String> autoCompleteLine(String line, ContentBox currentContent) {
-		/*AutoComplete auto = new AutoComplete();
-		ProcessedAC pac = auto.completeCommand(line); 
-		String pacCommand = pac.getCommand(); 
-		
-		if ( pacCommand.compareTo(DISPLAY_COMMAND) == 0) { // to complete a command
-			ArrayList<String> suggestions = pac.getAvailCommands(); 
-			return suggestions;
-		} else if (pacCommand.compareTo(FINISHED_COMMAND) == 0) {
-			return new ArrayList<String>();
-		} else if (pacCommand.compareTo(NO_SUCH_COMMAND) == 0) {
-			return null;  
-		} else { // valid command
-			ProcessedObject po = parser.parseInput(line);
-			switch ( po.getCommand() ) {
-			case "ADD_FLOATING":
-			case "ADD_DEADLINE":
-			case "ADD_EVENT":
-				return new ArrayList<String>(); // valid
-			case "DELETE_BY_INDEX":
-			case "DELETE_BY_NAME":
-			case "VIEW":
-			case "SEARCH":
-			case "DONE_BY_INDEX":
-			case "DONE_BY_NAME":
-			case "UPDATE_BY_INDEX_CHANGE_NAME":
-			case "UPDATE_BY_INDEX_CHANGE_DATE":
-			case "UPDATE_BY_INDEX_CHANGE_BOTH":
-			case "UPDATE_BY_NAME_CHANGE_NAME":
-			case "UPDATE_BY_NAME_CHANGE_DATE":
-			case "UPDATE_BY_NAME_CHANGE_BOTH":
-
-			case "UNDO":
-				return new ArrayList<String>();
-				
-			case "ERROR":
-				return null;
-			default:
-				return null;
-			}
-		}*/
 		ProcessedAC pac = autoComplete.getSuggestions(line, getTagCategoryList());
 		String pacCommand = pac.getCommand();
 		

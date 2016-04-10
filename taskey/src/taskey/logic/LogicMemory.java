@@ -588,7 +588,7 @@ public class LogicMemory {
 		} else if (listIndex == INDEX_EXPIRED) {
 			return isExpired;
 		} else if (listIndex == INDEX_FLOATING) {
-			return (taskType.equals("FLOATING")); // TODO: remove magic Strings
+			return (taskType.equals("FLOATING"));
 		} else if (listIndex == INDEX_DEADLINE) {
 			return (!isExpired && taskType.equals("DEADLINE"));
 		} else if (listIndex == INDEX_EVENT) {

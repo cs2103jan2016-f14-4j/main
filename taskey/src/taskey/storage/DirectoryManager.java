@@ -3,7 +3,7 @@ package taskey.storage;
 import static taskey.storage.Storage.DEFAULT_DIRECTORY;
 import static taskey.storage.Storage.FILENAME_DIRCONFIG;
 import static taskey.storage.Storage.FILENAME_EXTENSION;
-import static taskey.storage.Storage.TaskListEnum.savedLists;
+import static taskey.storage.Storage.TasklistEnum.savedLists;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.EnumSet;
 import java.util.HashSet;
 
-import taskey.storage.Storage.TaskListEnum;
+import taskey.storage.Storage.TasklistEnum;
 
 /**
  * @@author A0121618M
@@ -212,9 +212,9 @@ class DirectoryManager {
 	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
-		EnumSet<TaskListEnum> set = EnumSet.noneOf(TaskListEnum.class);
+		EnumSet<TasklistEnum> set = EnumSet.noneOf(TasklistEnum.class);
 		for (String filename : dir.list()) {
-			TaskListEnum listType = TaskListEnum.enumOf(filename);
+			TasklistEnum listType = TasklistEnum.enumOf(filename);
 			if (savedLists.contains(listType)) { //does return false when listType == null
 				set.add(listType);
 			}

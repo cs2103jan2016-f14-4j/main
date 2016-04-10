@@ -1,6 +1,6 @@
 package taskey.storage;
 
-import static taskey.storage.Storage.TaskListEnum.savedLists;
+import static taskey.storage.Storage.TasklistEnum.savedLists;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,34 +31,34 @@ public class Storage {
 	private File directory;
 
 	static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
-	public static final String FILENAME_TAGS = "USER_TAG_DB.taskey";
-	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig";
+	public static final String FILENAME_TAGS = "TAGS.taskey";
 	public static final String FILENAME_EXTENSION = ".taskey"; //TODO use whole filename rather than just the extension
+	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig";
 	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 
 	/**
-	 * This is an enum of all the task lists that are handled by Storage.
+	 * This is an enum of all the task lists that are handled by Storage, together with their filenames.
 	 * That is, these are the task lists that need to be returned from Storage to Logic during load.
 	 * However, not all of these task lists are saved to file.
-	 * Only lists in the EnumSet savedLists are actually written to file;
-	 * the rest are derived from the PENDING list.
+	 * Only lists in the EnumSet savedLists are actually written to file; the rest are derived from the PENDING list.
+	 * The index refers to the index of each list in the list of lists (the "superlist") from Logic.
 	 */
-	public enum TaskListEnum {
+	public enum TasklistEnum {
 		// In the lists from Logic, index 0 (THIS_WEEK list) and 7 (ACTION list) are not handled by Storage
 		PENDING		("PENDING.taskey", 1),
 		EXPIRED		("EXPIRED.taskey", 2),
 		GENERAL		("GENERAL.taskey", 3),	//not saved
 		DEADLINE	("DEADLINE.taskey", 4),	//not saved
 		EVENT		("EVENT.taskey", 5),	//not saved
-		COMPLETED	("COMPLETED.taskey", 6);
+		COMPLETED	("ARCHIVE.taskey", 6);
 		
-		static final EnumSet<TaskListEnum> savedLists = EnumSet.of(PENDING, EXPIRED, COMPLETED);
-		static final int size = TaskListEnum.values().length;
+		static final EnumSet<TasklistEnum> savedLists = EnumSet.of(PENDING, EXPIRED, COMPLETED);
+		static final int size = TasklistEnum.values().length;
 		
 		private final String filename;
 		private final int index;
 
-		TaskListEnum(String filename, int index) {
+		TasklistEnum(String filename, int index) {
 			this.filename = filename;
 			this.index = index;
 		}
@@ -79,8 +79,8 @@ public class Storage {
 		 * Returns the enum type corresponding to the given filename string,
 		 * or null if the given filename does not exist in TaskListEnum.
 		 */
-		public static TaskListEnum enumOf(String fileName) {
-			for (TaskListEnum enumType : TaskListEnum.values()) {
+		public static TasklistEnum enumOf(String fileName) {
+			for (TasklistEnum enumType : TasklistEnum.values()) {
 				if (enumType.filename.equals(fileName)) {
 					return enumType;
 				}
@@ -132,14 +132,14 @@ public class Storage {
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
-		for (TaskListEnum listType : TaskListEnum.values()) {
+		for (TasklistEnum listType : TasklistEnum.values()) {
 			File src = new File(directory, listType.filename());
 			try {
 				ArrayList<Task> loadedList = storageReader.loadTasklist(src, listType);
 				superlist.add(loadedList);
 			} catch (FileNotFoundException | InvalidTaskException e) { //TODO handle invalid tasks
 				superlist.clear();
-				while (superlist.size() < TaskListEnum.size()) {
+				while (superlist.size() < TasklistEnum.size()) {
 					superlist.add(new ArrayList<Task>());
 				}
 				return superlist; //return an empty superlist if any tasklist was not found or is invalid
@@ -162,7 +162,7 @@ public class Storage {
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
-		for (TaskListEnum listType : savedLists) {
+		for (TasklistEnum listType : savedLists) {
 			File dest = new File(directory, listType.filename());
 			ArrayList<Task> listToSave = superlist.get(listType.index());
 			try {

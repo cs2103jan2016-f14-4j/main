@@ -1,6 +1,6 @@
 package taskey.storage;
 
-import static taskey.storage.Storage.TaskListEnum.PENDING;
+import static taskey.storage.Storage.TasklistEnum.PENDING;
 import static taskey.storage.StorageReader.DerivedList.DEADLINE_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.EVENT_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.GENERAL_TASKLIST;
@@ -16,7 +16,7 @@ import com.google.gson.reflect.TypeToken;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.Storage.TaskListEnum;
+import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
@@ -88,7 +88,7 @@ public class StorageReader {
 	 * @throws FileNotFoundException 
 	 * @throws InvalidTaskException 
 	 */
-	ArrayList<Task> loadTasklist(File src, TaskListEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
+	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
 		ArrayList<Task> tasklist;
 		switch (tasklistType) {
 			default: //default case is just to avoid compilation error

@@ -27,7 +27,7 @@ import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
-import taskey.storage.Storage.TaskListEnum;
+import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageReader;
 
 /**
@@ -266,7 +266,7 @@ public class StorageTest {
 		storage.saveAllTasklists(TaskList.getSuperlist());
 		ArrayList<ArrayList<Task>> loadedList = storage.loadAllTasklists();
 
-		assertEquals("Loaded tasklist must be size 6", TaskListEnum.size(), loadedList.size());
+		assertEquals("Loaded tasklist must be size 6", TasklistEnum.size(), loadedList.size());
 		assertTrue(expectedList.equals(loadedList)); //test Task.equals method
 		assertEquals(toString(expectedList), toString(loadedList)); //test Task.toString method
 

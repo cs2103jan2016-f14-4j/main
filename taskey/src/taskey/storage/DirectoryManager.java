@@ -3,7 +3,6 @@ package taskey.storage;
 import static taskey.storage.Storage.DEFAULT_DIRECTORY;
 import static taskey.storage.Storage.FILENAME_DIRCONFIG;
 import static taskey.storage.Storage.FILENAME_EXTENSION;
-import static taskey.storage.Storage.TasklistEnum.savedLists;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.EnumSet;
 import java.util.HashSet;
 
 import taskey.storage.Storage.TasklistEnum;
@@ -94,7 +92,7 @@ class DirectoryManager {
 			try {
 				moveFiles(currDir, newDir);
 			} catch (FileAlreadyExistsException e) {
-				System.out.println("{Storage} Directory contains existing tasklist files! | " + newDir.getPath());
+				System.out.println("{Storage} Loading from directory | " + newDir.getPath());
 				throw e; //signal Logic to load the existing task savefiles
 			}
 		}
@@ -207,24 +205,28 @@ class DirectoryManager {
 	}
 
 	/**
-	 * Checks if the given directory contains the full set of tasklist savefiles.
+	 * Checks if the given directory contains any task savefile.
 	 * @param dir directory to check for pre-existing tasklist files
-	 * @return true if and only if dir contains the full set of tasklist files; false otherwise
+	 * @return true if any savefile was found; false otherwise
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
-		EnumSet<TasklistEnum> set = EnumSet.noneOf(TasklistEnum.class);
+		//EnumSet<TasklistEnum> set = EnumSet.noneOf(TasklistEnum.class);
 		for (String filename : dir.list()) {
 			TasklistEnum listType = TasklistEnum.enumOf(filename);
-			if (savedLists.contains(listType)) { //does return false when listType == null
-				set.add(listType);
+			if (TasklistEnum.savedLists.contains(listType)) {
+				return true;
+				//set.add(listType);
 			}
 		}
+		return false;
 
+		/*//For checking that directory contains the FULL set of tasklists
 		if (set.equals(savedLists)) {
 			return true; //all tasklist files are present in dir
 		} else {
 			return false;//at least one tasklist file is missing
 		}
+		*/
 	}
 
 	/**

@@ -57,7 +57,7 @@ class StorageWriter {
 			throw e;
 		}
 	}
-	
+
 	/*===========*
 	 * Save tags *
 	 *===========*/
@@ -82,7 +82,7 @@ class StorageWriter {
 			throw e;
 		}
 	}
-	
+
 	/*================*
 	 * Save directory *
 	 *================*/

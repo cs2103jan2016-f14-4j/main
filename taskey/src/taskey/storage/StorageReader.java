@@ -21,6 +21,9 @@ import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
+ * This class provides methods to classes in the storage package
+ * for reading tasklists, taglists and abstract paths from their JSON files.
+ * It also performs input validation on the Task objects read from file, using the TaskVerifier class.
  */
 public class StorageReader {
 	TaskVerifier taskVerifier = new TaskVerifier();

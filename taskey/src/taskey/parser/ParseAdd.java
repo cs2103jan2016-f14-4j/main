@@ -49,30 +49,18 @@ public class ParseAdd extends ParseCommand {
 	protected ProcessedObject processAdd(String command, String stringInput) {
 		assert(stringInput != null); 
 		
-		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
 		ProcessedObject processed = null;
 		Task task = new Task(); 
-		//simpString: basically string without the command
-		String simpString = stringNoCommand(stringInput);
-		//simpString = simpString.replace("tmr", "tomorrow"); //bug fix for time handling
-		String simpString2 = simpString.split("#")[0].trim(); 
+		String simpString = stringNoCommand(stringInput); //string without command ADD
+		String simpString2 = simpString.split("#")[0].trim(); //string without tags 
 		
-		if (isEmptyAdd(simpString2)) {
-			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
-			return processed;
-		}
-		
-		if(isOnlyNumbers(simpString2)) {
-			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
+		//catch any initial format errors first
+		processed = catchBasicErrors(simpString2); 
+		if (processed != null) {
 			return processed; 
-		} 
-		
-		if (simpString2.matches(onlyPriorityPattern)) {
-			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
-			return processed;
 		}
 		
-		//process as floating, event, deadline, or error 
+		//if no basic error, process as floating, event, deadline, or error 
 		processed = processNormally(command, processed, task, simpString);
 		
 		//if there's error, don't continue to process tags
@@ -81,6 +69,40 @@ public class ParseAdd extends ParseCommand {
 		}
 		
 		//process tags now: if there are tags, add it in.
+		return processTags(processed, simpString); 
+	}
+	
+	/**
+	 * Catch any initial format errors such as empty adds, task names with 
+	 * only numbers, and task that only contains !!! 
+	 * @param simpString2
+	 * @return ProcessedObject 
+	 */
+	private ProcessedObject catchBasicErrors(String stringInput) {
+		ProcessedObject processed = null; 
+		String onlyPriorityPattern = "(!|!!|!!!|!!!!|!!!!!|!!!!!!)"; 
+		
+		if (isEmptyAdd(stringInput)) {	
+			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
+		}
+		
+		if(isOnlyNumbers(stringInput)) {
+			processed = super.processError(ParserConstants.ERROR_ONLY_NUMS);
+		} 
+		
+		if (stringInput.matches(onlyPriorityPattern)) {
+			processed = super.processError(ParserConstants.ERROR_ADD_EMPTY);
+		}
+		return processed; 
+	}
+	
+	/**
+	 * Process tags for a task if there is any
+	 * @param processed
+	 * @param simpString
+	 * @return ProcessedObject
+	 */
+	private ProcessedObject processTags(ProcessedObject processed, String simpString) {
 		if (simpString.split("#").length != 1) {
 			ArrayList<String> tags = getTagList(simpString); 
 			if (!isValidTagList(tags)) {
@@ -88,7 +110,7 @@ public class ParseAdd extends ParseCommand {
 			}
 			processed.getTask().setTaskTags(tags);
 		}
-		return processed; 
+		return processed;
 	}
 	
 	/**
@@ -126,14 +148,16 @@ public class ParseAdd extends ParseCommand {
 	 * @param simpString
 	 * @return ProcessedObject 
 	 */
-	private ProcessedObject processNormally(String command, 
-			ProcessedObject processed, Task task, String simpString) {
+	private ProcessedObject processNormally(String command, ProcessedObject processed, 
+			Task task, String simpString) {
 		String taskNameRaw; 
+		//catch incorrect input where "by/at/from/on" is used without a time 
 		try {
 			taskNameRaw = removeTimeFromName(simpString); 
 		} catch (Exception e) {
 			return super.processError(ParserConstants.ERROR_DATE_KEYWORD); 
 		}
+		
 		String taskName = taskNameRaw.substring(0, 1).toUpperCase() + taskNameRaw.substring(1);
 		String rawDate = simpString.replace(taskNameRaw, "").trim();
 		int priority = getPriority(rawDate); 

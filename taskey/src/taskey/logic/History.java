@@ -21,7 +21,7 @@ import taskey.messenger.Task;
  * it pops the previously "undone" data from the redo stack and pushes them back onto the main stack.
  * Logic can then peek at the main stack to get the data for the redo command.
  */
-public class History {
+class History {
 	// The main History stack
 	private ArrayDeque<ArrayList<ArrayList<Task>>> taskStack;
 	private ArrayDeque<ArrayList<TagCategory>> tagStack;
@@ -30,7 +30,7 @@ public class History {
 	private ArrayDeque<ArrayList<ArrayList<Task>>> redoTaskStack;
 	private ArrayDeque<ArrayList<TagCategory>> redoTagStack;
 
-	public History() {
+	History() {
 		taskStack = new ArrayDeque<ArrayList<ArrayList<Task>>>();
 		tagStack = new ArrayDeque<ArrayList<TagCategory>>();
 		
@@ -38,11 +38,11 @@ public class History {
 		redoTagStack = new ArrayDeque<ArrayList<TagCategory>>();
 	}
 
-	public boolean taskStackIsEmpty() {
+	boolean taskStackIsEmpty() {
 		return taskStack.isEmpty();
 	}
 	
-	public boolean tagStackIsEmpty() {
+	boolean tagStackIsEmpty() {
 		return tagStack.isEmpty();
 	}
 
@@ -54,7 +54,7 @@ public class History {
 	 * Pushes the given task lists to History.
 	 * @param taskLists
 	 */
-	public void addTaskLists(ArrayList<ArrayList<Task>> taskLists) {
+	void addTaskLists(ArrayList<ArrayList<Task>> taskLists) {
 		taskStack.push(taskLists);
 		redoTaskStack.clear();
 	}
@@ -63,7 +63,7 @@ public class History {
 	 * Pushes the given tag category list to History.
 	 * @param tagCategoryList
 	 */
-	public void addTagCategoryList(ArrayList<TagCategory> tagCategoryList) {
+	void addTagCategoryList(ArrayList<TagCategory> tagCategoryList) {
 		tagStack.push(tagCategoryList);
 		redoTagStack.clear();
 	}
@@ -75,7 +75,7 @@ public class History {
 	 * Peeks at the last added task lists in History.
 	 * @return
 	 */
-	public ArrayList<ArrayList<Task>> peekTaskStack() {
+	ArrayList<ArrayList<Task>> peekTaskStack() {
 		return taskStack.peek();
 	}
 
@@ -83,7 +83,7 @@ public class History {
 	 * Peeks at the last added tag category list in History.
 	 * @return
 	 */
-	public ArrayList<TagCategory> peekTagStack() {
+	ArrayList<TagCategory> peekTagStack() {
 		return tagStack.peek();
 	}
 
@@ -95,7 +95,7 @@ public class History {
 	 * Pop the last added task lists from History.
 	 * @return 
 	 */
-	public ArrayList<ArrayList<Task>> popTaskStack() {
+	ArrayList<ArrayList<Task>> popTaskStack() {
 		ArrayList<ArrayList<Task>> popped = taskStack.pop();
 		redoTaskStack.push(popped);
 		return popped;
@@ -105,7 +105,7 @@ public class History {
 	 * Pop the last added tag category list from History.
 	 * @return 
 	 */
-	public ArrayList<TagCategory> popTagStack() {
+	ArrayList<TagCategory> popTagStack() {
 		ArrayList<TagCategory> popped = tagStack.pop();
 		redoTagStack.push(popped);
 		return popped;
@@ -121,7 +121,7 @@ public class History {
 	 * Logic can then peek at the main stack to redo the previously undid command.
 	 * @return false if there is nothing to redo; true if successful
 	 */
-	public boolean redo() {	
+	boolean redo() {	
 		try {
 			ArrayList<ArrayList<Task>> undidTasks = redoTaskStack.pop();
 			ArrayList<TagCategory> undidTags = redoTagStack.pop();

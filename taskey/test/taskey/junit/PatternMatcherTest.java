@@ -8,7 +8,8 @@ import taskey.parser.DateTimePatternMatcher;
 
 /**
  * @@author A0107345L
- * Junit testing class for DateTimePatternMatcher
+ * JUnit testing class for DateTimePatternMatcher
+ * Type of test: Unit Test  
  * @author Xue Hui
  *
  */

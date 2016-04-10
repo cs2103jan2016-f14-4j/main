@@ -1,9 +1,12 @@
 package taskey.logic;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -164,27 +167,44 @@ public class LogicMemory {
 	 * Change the directory where task and tag category data are saved. If this method succeeds, all saved files are 
 	 * moved from the current save directory to the new directory.
 	 * @param pathName        the new directory pathname
-	 * @throws LogicException if the directory could not be changed, or an error occurred when transferring files
 	 * @@author A0121618M
+	 * @throws LogicException if the directory could not be created or is invalid; an error occurred while moving files; or
+	 * 						  savefiles already exist in the given directory (this is a signal for Logic to load these files)
 	 */
 	void changeSaveDirectory(String pathName) throws LogicException {
 		try {
 			storage.setDirectory(pathName, true); //true to move files
-		} catch (FileAlreadyExistsException fae) { //new directory contains existing tasks
+		} catch (FileAlreadyExistsException fae) { //new directory contains existing tasks data files
 			try {
-				storage.setDirectory(pathName, false); //set Storage to load from the new directory
-			} catch (Exception e) { //nothing should be thrown here
-				throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+				storage.setDirectory(pathName, false); //prepare Storage to load from the new directory
+			} catch (Exception e) { //pathName has already been verified at this point, so nothing should be thrown here
+				throw new LogicException(LogicException.MSG_ERROR_SETDIR);
 			}
 			initializeTaskLists(); //load from the new directory
 			initializeTagCategoryList();
-			// This exception message signals that LogicMemory has loaded pre-existing savefiles from the new directory.
+			
+			// The following exception message signals that LogicMemory has loaded from the new directory.
 			// This is to tell Logic to clear History's stacks and add the newly loaded lists to History.
-			throw new LogicException(LogicException.MSG_SUCCESS_LOADED_DIR);
-		} catch (InvalidPathException | NotDirectoryException e) { //can distinguish between types of invalid user input
-			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
-		} catch (IOException e) { //IO error while moving files
-			throw new LogicException(LogicException.MSG_ERROR_CHANGE_DIR);
+			throw new LogicException(LogicException.MSG_SUCCESS_SETDIR_LOAD);
+			
+		} catch (InvalidPathException e) { //path contains invalid characters
+			throw new LogicException(e.getMessage());
+			
+		} catch (NotDirectoryException e) { //path goes to a file and not a directory
+			throw new LogicException("The given path is not a directory: " + e.getMessage());
+			
+		} catch (AccessDeniedException e) { //access denied when creating a directory or writing a file
+			throw new LogicException("Access denied to " +
+									Paths.get((e.getOtherFile() == null) ? e.getFile() : e.getOtherFile()).getParent());
+			
+		} catch (FileSystemException e) { //reserved/illegal filename or nonexistent root drive letter
+			throw new LogicException(e.getMessage());
+			
+		} catch (IOException ioe) { //any other IO error while creating a directory or writing a file
+			throw new LogicException(ioe.getMessage());
+			
+		} catch (Exception e) { //unknown exception
+			throw new LogicException(LogicException.MSG_ERROR_SETDIR);
 		}
 	}
 	

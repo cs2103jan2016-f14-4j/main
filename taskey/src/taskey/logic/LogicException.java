@@ -19,8 +19,8 @@ public class LogicException extends Exception {
 	public static final String MSG_SUCCESS_UPDATE = "Successfully updated task.";
 	public static final String MSG_SUCCESS_CLEAR = "Successfully cleared memory.";
 	public static final String MSG_SUCCESS_SAVE = "Save successful.";
-	public static final String MSG_SUCCESS_CHANGE_DIR = "Successfully changed save directory.";
-	public static final String MSG_SUCCESS_LOADED_DIR = "Successfully loaded from new directory.";
+	public static final String MSG_SUCCESS_SETDIR = "Successfully changed save directory.";
+	public static final String MSG_SUCCESS_SETDIR_LOAD = "Successfully loaded from new directory.";
 	public static final String MSG_SUCCESS_VIEW = "Viewing \"%1$s\"";
 	public static final String MSG_SUCCESS_VIEW_TODAY = "Viewing today's tasks.";
 	public static final String MSG_SUCCESS_VIEW_TOMORROW = "Viewing tomorrow's tasks.";
@@ -39,7 +39,7 @@ public class LogicException extends Exception {
 	public static final String MSG_ERROR_TAG_NOT_FOUND = "Cannot delete a tag that does not exist!";
 	public static final String MSG_ERROR_PRIORITY_NOT_FOUND = "There are no pending/expired tasks with that priority level.";
 	public static final String MSG_ERROR_SAVE = "Error occurred during save.";
-	public static final String MSG_ERROR_CHANGE_DIR = "Error changing save directory!";
+	public static final String MSG_ERROR_SETDIR = "Error changing save directory!";
 	public static final String MSG_ERROR_VIEWTYPE = "Error: \"%1$s\" is not a valid category";
 	
     //================================================================================

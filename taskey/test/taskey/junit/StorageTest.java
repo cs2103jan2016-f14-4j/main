@@ -8,10 +8,13 @@ import static taskey.junit.StorageTest.TaskList.taskListsFromStorage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -35,91 +38,6 @@ public class StorageTest {
 	private static File testfolder = new File("Taskey savefiles\\temp_test");
 	private static File originalDirConfigFile; //to hold the existing directory config file until end of tests
 
-	/**
-	 * Load the original directory config file (if present) into memory
-	 * before the running the test as it will be overwritten.
-	 * @throws IOException
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws IOException {
-		originalDirConfigFile = new StorageReader().loadDirectoryConfigFile(Storage.FILENAME_DIRCONFIG);
-		if (originalDirConfigFile == null) {
-			System.out.println("[StorageTest] No existing directory config file");
-		}
-		storage.setDirectory(testfolder.getAbsolutePath(), false); //don't move savefiles to test folder
-	}
-
-	/**
-	 * Deletes files created during the test, the test directory, 
-	 * and reverts the directory config file back to the original one (if present).
-	 * @throws IOException
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws IOException {
-		// Delete savefiles
-		for (File file : testfolder.listFiles()) {
-			if (file.getName().endsWith(Storage.FILENAME_EXTENSION)) {
-				File testTasklist = new File(testfolder, file.getName());
-				Files.delete(testTasklist.toPath());
-			}
-		}
-		System.out.println("[StorageTest] All " + Storage.FILENAME_EXTENSION + " test files deleted");
-
-		// Revert back to previous config file
-		if (originalDirConfigFile != null) {
-			System.out.println("[StorageTest] Reverting back to original directory");
-			storage.setDirectory(originalDirConfigFile.getAbsolutePath(), false); //don't move test files to original folder
-		} else {
-			// Else if there was no pre-existing config file, delete the one created in the test
-			File testDirConfigFile = new File(Storage.FILENAME_DIRCONFIG);
-			Files.delete(testDirConfigFile.toPath());
-			System.out.println("[StorageTest] Test config file deleted");
-		}
-	}
-
-
-	/*==================*
-	 * Test directories *
-	 *==================*/
-	@Test
-	public void testSetDirectoryExceptions() throws IOException {
-		try {
-			storage.setDirectory("***");
-			fail("Expected InvalidPathException not thrown");
-		} catch (InvalidPathException e) {
-			
-		}
-		
-		try {
-			storage.setDirectory(Storage.FILENAME_DIRCONFIG);
-			fail("Expected NotDirectoryException not thrown");
-		} catch (NotDirectoryException e) {
-			
-		}
-		
-		try {
-			// Generate and save all task lists to the test directory
-			TaskList.clearAllLists();
-			TaskList.populateLists();
-			storage.saveAllTasklists(TaskList.getSuperlist());
-			
-			// Change the storage directory (without moving files from the test directory)
-			storage.setDirectory("taskey savefiles", false);
-			
-			// Change back to the test directory 
-			// (invoking the move method, which will throw FileAlreadyExistsException)
-			storage.setDirectory(testfolder.getAbsolutePath(), true);
-			
-			fail("Expected FileAlreadyExistsException not thrown");
-		} catch (FileAlreadyExistsException e) {
-			storage.setDirectory(testfolder.getAbsolutePath(), false); //revert to test folder to continue testing
-		}
-	}
-
-
-	/*================*
-	 * Test tasklists *
-	 *================*/
 	/**
 	 * Enum of all the task lists that are passed from Logic to Storage.
 	 * taskListsFromStorage is the set of lists that are returned from Storage to Logic on load.
@@ -227,7 +145,110 @@ public class StorageTest {
 			return superlist;
 		}
 	}
+	
+	/**
+	 * Load the original directory config file (if present) into memory
+	 * before the running the test as it will be overwritten.
+	 * @throws IOException
+	 */
+	@BeforeClass
+	public static void setUpBeforeClass() throws IOException {
+		originalDirConfigFile = new StorageReader().loadDirectoryConfigFile(Storage.FILENAME_DIRCONFIG);
+		if (originalDirConfigFile == null) {
+			System.out.println("[StorageTest] No existing directory config file");
+		} else {
+			System.out.println("[StorageTest] " + originalDirConfigFile);
+		}
+		storage.setDirectory(testfolder.getAbsolutePath(), false); //don't move savefiles to test folder
+	}
 
+	/**
+	 * Deletes files created during the test, the test directory, 
+	 * and reverts the directory config file back to the original one (if present).
+	 * @throws IOException
+	 */
+	@AfterClass
+	public static void tearDownAfterClass() throws IOException {
+		// Delete savefiles
+		for (File file : testfolder.listFiles()) {
+			if (file.getName().endsWith(Storage.FILENAME_EXTENSION)) {
+				File testTasklist = new File(testfolder, file.getName());
+				Files.delete(testTasklist.toPath());
+			}
+		}
+		System.out.println("[StorageTest] All " + Storage.FILENAME_EXTENSION + " test files deleted");
+
+		// Revert back to previous config file
+		if (originalDirConfigFile != null) {
+			System.out.println("[StorageTest] Reverting back to original directory");
+			storage.setDirectory(originalDirConfigFile.getAbsolutePath(), false); //don't move test files to original folder
+		} else {
+			// Else if there was no pre-existing config file, delete the one created in the test
+			File testDirConfigFile = new File(Storage.FILENAME_DIRCONFIG);
+			Files.delete(testDirConfigFile.toPath());
+			System.out.println("[StorageTest] Test config file deleted");
+		}
+	}
+
+
+	/*==================*
+	 * Test directories *
+	 *==================*/
+	@Test
+	public void testSetDirectoryExceptions() throws IOException {
+		try {
+			storage.setDirectory("\\/:*?\"<>|");
+			fail("InvalidPathException not thrown for invalid characters *");
+		} catch (InvalidPathException e) {
+		}
+		
+		try {
+			storage.setDirectory(Storage.FILENAME_DIRCONFIG); //path to a file, not a directory
+			fail("NotDirectoryException not thrown for paths that point to a file");
+		} catch (NotDirectoryException e) {
+		}
+		
+		try {
+			storage.setDirectory(System.getenv("ProgramFiles") + "\\taskey_fubar"); //e.g. c:\program files\taskey_fubar
+			fail("AccessDeniedException not thrown when creating folder in restricted directory");
+		} catch (AccessDeniedException e) {
+		}
+		
+		try {
+			storage.setDirectory(Paths.get(System.getenv("ProgramFiles")).getRoot().toString()); //e.g. c:\
+			fail("AccessDeniedException not thrown when creating files in restricted directory");
+		} catch (AccessDeniedException e) {
+		}
+		
+		try {
+			storage.setDirectory("con");
+			fail("FileSystemException not thrown for reserved filename");
+		} catch (FileSystemException e) {
+		}
+		
+		try {
+			// Generate and save all task lists to the test directory
+			TaskList.clearAllLists();
+			TaskList.populateLists();
+			storage.saveAllTasklists(TaskList.getSuperlist());
+			
+			// Change the storage directory (without moving files from the test directory)
+			storage.setDirectory("taskey savefiles", false);
+			
+			// Change back to the test directory 
+			// (invoking the move method, which will throw FileAlreadyExistsException)
+			storage.setDirectory(testfolder.getAbsolutePath(), true);
+			
+			fail("Expected FileAlreadyExistsException not thrown");
+		} catch (FileAlreadyExistsException e) {
+			storage.setDirectory(testfolder.getAbsolutePath(), false); //revert to test folder to continue testing
+		}
+	}
+
+
+	/*================*
+	 * Test tasklists *
+	 *================*/
 	/**
 	 * Tests the saving and subsequent loading of task lists
 	 * @throws IOException
@@ -257,6 +278,10 @@ public class StorageTest {
 	/*===========*
 	 * Test tags *
 	 *===========*/
+	/**
+	 * Tests the saving and subsequent loading of tags
+	 * @throws IOException
+	 */
 	@Test
 	public void saveAndLoadTags() throws IOException {
 		ArrayList<TagCategory> expectedList = createTaglist();

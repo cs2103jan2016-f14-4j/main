@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import javafx.scene.image.Image;
 import taskey.constants.UiConstants;
-import static taskey.ui.utility.UiImageManager.ImageID.*;
 
 /**
  * @@author A0125419H
@@ -142,23 +141,23 @@ public class UiImageManager {
 	public void loadImages() {
 		try {
 			myImageContainer.put(ImageID.WINDOW_ICON, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + WINDOW_ICON.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.WINDOW_ICON.filename)));
 			myImageContainer.put(ImageID.CROSS_DEFAULT, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + CROSS_DEFAULT.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.CROSS_DEFAULT.filename)));
 			myImageContainer.put(ImageID.CROSS_SELECT, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + CROSS_SELECT.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.CROSS_SELECT.filename)));
 			myImageContainer.put(ImageID.MINUS_DEFAULT, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + MINUS_DEFAULT.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.MINUS_DEFAULT.filename)));
 			myImageContainer.put(ImageID.MINUS_SELECT, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + MINUS_SELECT.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.MINUS_SELECT.filename)));
 			myImageContainer.put(ImageID.URGENT_MARK, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + URGENT_MARK.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.URGENT_MARK.filename)));
 			myImageContainer.put(ImageID.FLOATING, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + FLOATING.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.FLOATING.filename)));
 			myImageContainer.put(ImageID.DEADLINE, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + DEADLINE.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.DEADLINE.filename)));
 			myImageContainer.put(ImageID.EVENT, 
-					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + EVENT.filename)));
+					new Image(getClass().getResourceAsStream(UiConstants.UI_IMAGE_PATH_OFFSET + ImageID.EVENT.filename)));
 			
 			loadHelpMenuImages();
 			

@@ -102,7 +102,7 @@ public class Storage {
 
 		File loadedDirectory = storageReader.loadDirectoryConfigFile(FILENAME_DIRCONFIG);
 		if (loadedDirectory != null) {
-			if (directoryManager.createDirectory(loadedDirectory) == true) { //createDirectory could possibly return null
+			if (directoryManager.createDirectory(loadedDirectory) == true) {
 				directory = loadedDirectory;
 				System.out.println("{Storage} Directory loaded | " + directory.getAbsolutePath());
 			} else { //loaded directory was invalid or could not be created

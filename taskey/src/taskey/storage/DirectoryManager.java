@@ -20,6 +20,10 @@ import java.util.HashSet;
 
 import taskey.storage.Storage.TaskListEnum;
 
+/**
+ * @@author A0121618M
+ * 
+ */
 class DirectoryManager {
 	private HashSet<File> directoriesCreated = new HashSet<File>();
 	private StorageWriter storageWriter = new StorageWriter();

@@ -85,10 +85,8 @@ public class StorageReader {
 	 * @param src the source file to be read from
 	 * @param tasklistType
 	 * @return the tasklist read from file
-	 * @throws FileNotFoundException 
-	 * @throws InvalidTaskException 
 	 */
-	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
+	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) {
 		ArrayList<Task> tasklist;
 		switch (tasklistType) {
 			default: //default case is just to avoid compilation error
@@ -101,7 +99,9 @@ public class StorageReader {
 					taskVerifier.checkDates(tasklist);
 				} catch (InvalidTaskException e) {
 					System.err.println("{Storage} Invalid tasklist | " + src.getName());
-					throw e; //TODO dump file into invalid subfolder so tt its not overwritten
+					tasklist = new ArrayList<Task>();
+					//TODO dump file into invalid subfolder so tt its not overwritten
+					
 				} catch (FileNotFoundException e) {
 					tasklist = new ArrayList<Task>();
 				}

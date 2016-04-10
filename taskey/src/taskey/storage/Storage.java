@@ -15,7 +15,6 @@ import java.util.EnumSet;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
@@ -39,12 +38,12 @@ public class Storage {
 	/**
 	 * This is an enum of all the task lists that are handled by Storage, together with their filenames.
 	 * That is, these are the task lists that need to be returned from Storage to Logic during load.
-	 * However, not all of these task lists are saved to file.
+	 * However, not all of these task lists are saved to file:
 	 * Only lists in the EnumSet savedLists are actually written to file; the rest are derived from the PENDING list.
 	 * The index refers to the index of each list in the list of lists (the "superlist") from Logic.
+	 * In the superlist from Logic, index 0 (THIS_WEEK list) and 7 (ACTION list) are not handled by Storage
 	 */
 	public enum TasklistEnum {
-		// In the lists from Logic, index 0 (THIS_WEEK list) and 7 (ACTION list) are not handled by Storage
 		PENDING		("PENDING.taskey", 1),
 		EXPIRED		("EXPIRED.taskey", 2),
 		GENERAL		("GENERAL.taskey", 3),	//not saved
@@ -73,6 +72,19 @@ public class Storage {
 
 		public int index() {
 			return index;
+		}
+		
+		/**
+		 * Returns the enum type corresponding to the given index i,
+		 * or null if the given index does not appear in TaskListEnum.
+		 */
+		public static TasklistEnum enumOf(int i) {
+			for (TasklistEnum enumType : TasklistEnum.values()) {
+				if (enumType.index == i) {
+					return enumType;
+				}
+			}
+			return null;
 		}
 		
 		/**
@@ -119,45 +131,38 @@ public class Storage {
 	/*=====================*
 	 * Load/Save tasklists *
 	 *=====================*/
-	
 	/**
-	 * Returns the superlist of tasklists loaded from Storage.
-	 * Logic calls this on program startup.
+	 * Returns the list of task lists loaded from Storage.
+	 * Logic calls this on program startup, or when the user loads from a directory using the setdir command.
 	 * <p>Post-conditions:
-	 * <br>- The lists in the returned superlist are in the same order as the enum constants in StorageTaskList.
+	 * <br>- The lists in the returned superlist are in the same order as the enum constants in TasklistEnum.
 	 * <br>- These lists do not include the THIS_WEEK and ACTION list.
-	 * <br>- If any one list was not found, or is invalid, an empty superlist is returned.
-	 * @return the superlist of tasklists read from disk, or an empty superlist
+	 * <br>- If any single list was not found, or is invalid, an empty list is added in its place.
+	 * @return the list of tasklists read from disk, some or all of which may be empty
 	 */
 	public ArrayList<ArrayList<Task>> loadAllTasklists() {
 		ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
 
 		for (TasklistEnum listType : TasklistEnum.values()) {
 			File src = new File(directory, listType.filename());
-			try {
-				ArrayList<Task> loadedList = storageReader.loadTasklist(src, listType);
-				superlist.add(loadedList);
-			} catch (FileNotFoundException | InvalidTaskException e) { //TODO handle invalid tasks
-				superlist.clear();
-				while (superlist.size() < TasklistEnum.size()) {
-					superlist.add(new ArrayList<Task>());
-				}
-				return superlist; //return an empty superlist if any tasklist was not found or is invalid
-			}
+			ArrayList<Task> loadedList = storageReader.loadTasklist(src, listType);
+			superlist.add(loadedList);
 		}
 		return superlist;
 	}
 
 	/**
 	 * Saves the PENDING, EXPIRED and COMPLETED lists of the given superlist to file.
+	 * If any of the above lists are empty, instead of saving an empty list, the file will be deleted instead.
+	 * These savefiles are mutually exclusive hence any one of them can be safely deleted.
 	 * <p>Pre-conditions:
 	 * <br>- Starting from index 1, the lists in the given superlist
-	 * 		 must be in the same order as the enum constants in StorageTaskList.
+	 * 		 must be in the same order as the enum constants in TasklistEnum.
 	 * <br>- Index 0 is reserved for the THIS_WEEK list and is not saved to disk because it is time-dependent.
 	 * <br>- Index 7 is reserved for the ACTION list and is not saved to disk because it is session-dependent.
-	 * <br>- GENERAL, DEADLINE and EVENT lists are not saved to disk because they can be derived from the PENDING list.
+	 * <br>- The GENERAL, DEADLINE and EVENT lists are not saved because they can be derived from the PENDING list.
 	 * @param superlist the list of tasklists to be saved
-	 * @throws IOException
+	 * @throws IOException when FileWriter fails to write any single list to file
 	 */
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
@@ -168,8 +173,8 @@ public class Storage {
 			try {
 				storageWriter.saveTasklist(listToSave, dest);
 			} catch (FileNotFoundException e) {
-				directoryManager.createDirectory(directory); //in case user deletes their storage directory during runtime
-				storageWriter.saveTasklist(listToSave, dest); //try again
+				directoryManager.createDirectory(directory);  //in case user deletes the directory during runtime
+				storageWriter.saveTasklist(listToSave, dest); //recreate the directory and try again
 			}
 		}
 	}
@@ -178,11 +183,10 @@ public class Storage {
 	/*================*
 	 * Load/Save tags *
 	 *================*/
-	
 	/**
 	 * Returns the ArrayList of Tags loaded from Storage.
 	 * An empty ArrayList is returned if the tags file was not found.
-	 * @return the ArrayList of user-defined tags, or an empty ArrayList if the file was not found
+	 * @return the list of user-defined tags
 	 */
 	public ArrayList<TagCategory> loadTaglist() {
 		File src = new File(directory, FILENAME_TAGS);
@@ -191,8 +195,9 @@ public class Storage {
 
 	/**
 	 * Saves the given ArrayList of Tags to Storage.
+	 * If the list is empty, instead of saving an empty list, the file will be deleted instead.
 	 * @param tags the ArrayList containing the user-defined tags
-	 * @throws IOException in case Logic wants to handle the exception
+	 * @throws IOException FileWriter failed
 	 */
 	public void saveTaglist(ArrayList<TagCategory> tags) throws IOException {
 		assert (tags != null);
@@ -204,31 +209,34 @@ public class Storage {
 	/*===============*
 	 * Set Directory *
 	 *===============*/
-	
 	/**
-	 * Has the same effect as calling setDirectory(pathname, true)
+	 * Has the same effect as calling {@link #setDirectory(File, boolean) setDirectory(pathname, true)}
 	 */
 	public void setDirectory(String pathname) throws InvalidPathException, IOException {
 		setDirectory(pathname, true);
 	}
-	
-	
-	public void setDirectory(String pathname, boolean shouldMove)  throws InvalidPathException, NotDirectoryException, 
-	  																	  AccessDeniedException, FileSystemException, 
-	  																	  FileAlreadyExistsException, IOException {
+
+
+	/**
+	 * See {@link DirectoryManager#changeDirectory(File, boolean, File)}
+	 * @param pathname path of the new directory
+	 * @param shouldMove whether Storage should move files from the current directory to the new one.
+	 */
+	public void setDirectory(String pathname, boolean shouldMove) throws InvalidPathException, NotDirectoryException, 
+																		 AccessDeniedException, FileSystemException, 
+																		 FileAlreadyExistsException, IOException {
 		File newDir = new File(pathname);
 		directory = directoryManager.changeDirectory(directory, shouldMove, newDir);
 		System.out.println("{Storage} Directory set | " + directory.getPath());
 	}
-
+	
 	
 	/*=============*
 	 * For testing *
 	 *=============*/
-	
 	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-		storage.setDirectory("c:\\program files\\taskey"); //invalid
+		storage.setDirectory("con"); //invalid
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -236,7 +244,7 @@ public class Storage {
 	private static void print(ArrayList<ArrayList<Task>> lists) {
 		int i=1;
 		for (ArrayList<Task> list : lists) {
-			System.out.println(i++);
+			System.out.println(TasklistEnum.enumOf(i++) + " LIST");
 			for (Task t : list) {
 				System.out.println(t);
 			}

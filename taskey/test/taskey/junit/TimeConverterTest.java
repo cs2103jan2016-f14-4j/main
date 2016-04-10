@@ -12,6 +12,7 @@ import taskey.parser.TimeConverter;
 /**
  *  @@author A0107345L
  *  Tests the TimeConverter class
+ *  Type of test: Unit Test 
  *  @author: Xue Hui 
  **/
 public class TimeConverterTest {

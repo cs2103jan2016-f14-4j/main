@@ -14,11 +14,13 @@ import taskey.messenger.Task;
 
 /**
  * @@author A0121618M
+ * This class provides methods to classes in the storage package
+ * for writing tasklists, taglists and abstract paths to file in the JSON format.
  */
 class StorageWriter {
 	/**
 	 * Generic write method. Serializes the given object of the specified type into its equivalent JSON representation.
-	 * @param dest the JSON file to be written
+	 * @param dest the abstract path of the JSON file to be written
 	 * @param object of type T to be serialized
 	 * @param typeToken represents the generic type T of the given object; this is obtained from the Gson TypeToken class
 	 * @throws IOException thrown by FileWriter
@@ -37,9 +39,11 @@ class StorageWriter {
 	/**
 	 * Writes an ArrayList of Task objects to the File dest.
 	 * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
+	 * Only non-empty tasklists are saved.
+	 * If the given tasklist is empty, its respective file will be deleted.
 	 * @param tasks the tasklist to be saved
 	 * @param dest the destination file to be written to
-	 * @throws IOException when there is error writing to file
+	 * @throws IOException thrown by FileWriter
 	 */
 	void saveTasklist(ArrayList<Task> tasks, File dest) throws IOException {
 		try {
@@ -58,11 +62,13 @@ class StorageWriter {
 	 * Save tags *
 	 *===========*/
 	/**
-	 * Saves the given ArrayList of Tags to the File dest.
+	 * Saves the given ArrayList of tag objects to the File dest.
 	 * The file will be created if it doesn't exist; otherwise the existing file will be overwritten.
-	 * @param tags ArrayList containing the user-defined tags
+	 * Only non-empty taglists are saved.
+	 * If the given taglist is empty, its respective file will be deleted.
+	 * @param tags the taglist to be saved
 	 * @param dest the destination file to be written to
-	 * @throws IOException when there is error writing to file
+	 * @throws IOException thrown by FileWriter
 	 */
 	void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
 		try {
@@ -82,7 +88,7 @@ class StorageWriter {
 	 *================*/
 	/**
 	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
-	 * @param dir the File representing the directory to be saved
+	 * @param dir the File object representing the directory path to be saved
 	 * @param filename name of the destination file
 	 */
 	void saveDirectoryConfigFile(File dir, String filename) {

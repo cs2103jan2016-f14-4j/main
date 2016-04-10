@@ -50,10 +50,10 @@ public class Storage {
 		DEADLINE	("DEADLINE.taskey", 4),	//not saved
 		EVENT		("EVENT.taskey", 5),	//not saved
 		COMPLETED	("ARCHIVE.taskey", 6);
-		
+
 		static final EnumSet<TasklistEnum> savedLists = EnumSet.of(PENDING, EXPIRED, COMPLETED);
 		static final int size = TasklistEnum.values().length;
-		
+
 		private final String filename;
 		private final int index;
 
@@ -61,7 +61,7 @@ public class Storage {
 			this.filename = filename;
 			this.index = index;
 		}
-		
+
 		public static int size() {
 			return size;
 		}
@@ -73,7 +73,7 @@ public class Storage {
 		public int index() {
 			return index;
 		}
-		
+
 		/**
 		 * Returns the enum type corresponding to the given index i,
 		 * or null if the given index does not appear in TaskListEnum.
@@ -86,7 +86,7 @@ public class Storage {
 			}
 			return null;
 		}
-		
+
 		/**
 		 * Returns the enum type corresponding to the given filename string,
 		 * or null if the given filename does not exist in TaskListEnum.
@@ -127,7 +127,7 @@ public class Storage {
 		}
 	}
 
-	
+
 	/*=====================*
 	 * Load/Save tasklists *
 	 *=====================*/
@@ -179,7 +179,7 @@ public class Storage {
 		}
 	}
 
-	
+
 	/*================*
 	 * Load/Save tags *
 	 *================*/
@@ -205,7 +205,7 @@ public class Storage {
 		storageWriter.saveTaglist(tags, dest);
 	}
 
-	
+
 	/*===============*
 	 * Set Directory *
 	 *===============*/
@@ -229,8 +229,8 @@ public class Storage {
 		directory = directoryManager.changeDirectory(directory, shouldMove, newDir);
 		System.out.println("{Storage} Directory set | " + directory.getPath());
 	}
-	
-	
+
+
 	/*=============*
 	 * For testing *
 	 *=============*/

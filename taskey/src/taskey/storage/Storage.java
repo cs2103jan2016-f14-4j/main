@@ -93,7 +93,7 @@ public class Storage {
 
 	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
-		storage.setDirectory("prn"); //invalid
+		storage.setDirectory("c:\\program files\\taskey"); //invalid
 		ArrayList<ArrayList<Task>> loadedLists = storage.loadAllTasklists();
 		print(loadedLists);
 	}
@@ -286,7 +286,7 @@ public class Storage {
 	 *
 	 * @throws NotDirectoryException when the path points to a normal file and not a directory.
 	 * 
-	 * @throws AccessDeniedException if creating a new directory or moving the savefiles was denied by the Windows file system.
+	 * @throws AccessDeniedException if creating a new directory or writing to an existing one was denied by the Windows file system.
 	 * 
 	 * @throws FileSystemException if the path contains a reserved/illegal filename or the root directory doesn't exist.
 	 * 
@@ -302,6 +302,7 @@ public class Storage {
 																		 FileAlreadyExistsException, IOException {
 		File newDir = new File(pathname);
 		createDirectoryLoudly(newDir);
+		checkCanWriteToDirectory(newDir);
 
 		if (shouldMove) {
 			try {
@@ -337,7 +338,12 @@ public class Storage {
 														IOException {
 		Path path = dir.toPath(); //throws InvalidPathException for illegal characters
 		try {
-			Files.createDirectories(path);
+			if (!dir.exists()) {
+				Files.createDirectories(path);
+				directoriesCreated.add(dir);
+			} else {
+				Files.createDirectories(path);
+			}
 		} catch (FileAlreadyExistsException e) { //dir exists but is not a directory
 			throw new NotDirectoryException(dir.getPath());
 		} catch (AccessDeniedException e) { //WindowsFileSystemProvider denied creation of dir
@@ -348,9 +354,29 @@ public class Storage {
 			e.printStackTrace();
 			throw e;
 		}
-		directoriesCreated.add(dir);
 	}
 
+	/**
+	 * Checks whether a file can be written to the given directory.
+	 * @param dir directory in which the test file will be created
+	 * @throws AccessDeniedException if the test file cannot be created
+	 * @throws IOException test file already exists or some other reason
+	 */
+	private void checkCanWriteToDirectory(File dir) throws AccessDeniedException, IOException {
+		try {
+			File testFile = new File(dir, "DeleteMe.Taskey");
+			Files.createFile(testFile.toPath());
+			testFile.delete();
+		} catch (AccessDeniedException e) {
+			throw e;
+		} catch (FileSystemException e) { //test file already exists
+			System.err.println(e.getMessage());
+		} catch (IOException e) { //whatever else
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
 	/**
 	 * Moves the ".taskey" savefiles from the given source to destination directory.
 	 * @param srcDir the source directory

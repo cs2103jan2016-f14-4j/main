@@ -1,7 +1,6 @@
 package taskey.storage;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,9 +45,7 @@ class StorageWriter {
 		try {
 			writeToFile(dest, tasks, new TypeToken<ArrayList<Task>>() {});
 		} catch (IOException e) {
-			if (!(e instanceof FileNotFoundException)) {
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 			throw e;
 		}
 	}

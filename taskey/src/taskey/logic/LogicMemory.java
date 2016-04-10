@@ -193,14 +193,14 @@ public class LogicMemory {
 		} catch (NotDirectoryException e) { //path goes to a file and not a directory
 			throw new LogicException("The given path is not a directory: " + e.getMessage());
 			
-		} catch (AccessDeniedException e) { //access denied when creating directory or moving files
+		} catch (AccessDeniedException e) { //access denied when creating a directory or writing a file
 			throw new LogicException("Access denied to " +
 									Paths.get((e.getOtherFile() == null) ? e.getFile() : e.getOtherFile()).getParent());
 			
 		} catch (FileSystemException e) { //reserved/illegal filename or nonexistent root drive letter
 			throw new LogicException(e.getMessage());
 			
-		} catch (IOException ioe) { //any other IO error while creating directory or moving files
+		} catch (IOException ioe) { //any other IO error while creating a directory or writing a file
 			throw new LogicException(ioe.getMessage());
 			
 		} catch (Exception e) { //unknown exception

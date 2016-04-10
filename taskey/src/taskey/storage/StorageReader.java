@@ -101,14 +101,17 @@ public class StorageReader {
 					taskVerifier.checkDates(tasklist);
 				} catch (InvalidTaskException e) {
 					System.err.println("{Storage} Invalid tasklist | " + src.getName());
-					throw e;
+					throw e; //TODO dump file into invalid subfolder so tt its not overwritten
+				} catch (FileNotFoundException e) {
+					tasklist = new ArrayList<Task>();
 				}
 	
 				if (tasklistType == PENDING) {
-					getDerivedLists(tasklist); //generate the derived lists from the PENDING list
+					 // Generate the GENERAL, DEADLINE and EVENT lists from the PENDING list
+					getDerivedLists(tasklist);
 				}
 				break;
-	
+
 			case GENERAL:
 				return GENERAL_TASKLIST.get();
 			case DEADLINE:
@@ -124,7 +127,7 @@ public class StorageReader {
 	 * @param pendingList
 	 */
 	private void getDerivedLists(ArrayList<Task> pendingList) {
-		DerivedList.clearAllLists(); //erase the previous data
+		DerivedList.clearAllLists(); //erase the previous data, if any
 		for (Task task : pendingList) {
 			switch (task.getTaskType().toUpperCase()) {
 				case "FLOATING":
@@ -137,26 +140,6 @@ public class StorageReader {
 					EVENT_TASKLIST.add(task);
 					break;
 			}
-		}
-	}
-	
-	/*================*
-	 * Load directory *
-	 *================*/
-	/**
-	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
-	 * @param filename name of the config file to be read
-	 * @return the File representing the last-saved directory, or null if it was not found
-	 */
-	public File loadDirectoryConfigFile(String filename) {
-		File src = new File(filename);
-		try {
-			//FIXME: buggyPath will somehow always have user.dir prepended in its absolute path
-			File buggyPath = readFromFile(src, new TypeToken<File>() {});
-			File fixedPath = new File(buggyPath.getPath()); //kludge solution
-			return fixedPath;
-		} catch (FileNotFoundException e) {
-			return null;
 		}
 	}
 
@@ -177,5 +160,25 @@ public class StorageReader {
 			tags = new ArrayList<TagCategory>();
 		}
 		return tags;
+	}
+	
+	/*================*
+	 * Load directory *
+	 *================*/
+	/**
+	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
+	 * @param filename name of the config file to be read
+	 * @return the File representing the last-saved directory, or null if it was not found
+	 */
+	public File loadDirectoryConfigFile(String filename) {
+		File src = new File(filename);
+		try {
+			//FIXME: buggyPath will somehow always have user.dir prepended to its absolute path
+			File buggyPath = readFromFile(src, new TypeToken<File>() {});
+			File fixedPath = new File(buggyPath.getPath()); //kludge solution
+			return fixedPath;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
 	}
 }

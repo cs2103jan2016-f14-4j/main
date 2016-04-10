@@ -43,29 +43,14 @@ class StorageWriter {
 	 */
 	void saveTasklist(ArrayList<Task> tasks, File dest) throws IOException {
 		try {
-			writeToFile(dest, tasks, new TypeToken<ArrayList<Task>>() {});
+			if (!tasks.isEmpty()) {
+				writeToFile(dest, tasks, new TypeToken<ArrayList<Task>>() {});
+			} else {
+				dest.delete(); //can safely delete empty tasklist
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw e;
-		}
-	}
-
-	/*================*
-	 * Save directory *
-	 *================*/
-	/**
-	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
-	 * @param dir the File representing the directory to be saved
-	 * @param filename name of the destination file
-	 */
-	void saveDirectoryConfigFile(File dir, String filename) {
-		File dest = new File(filename);
-		try {
-			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
-			//System.out.println("{New storage directory saved}");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("{Storage} Error saving new directory");
 		}
 	}
 	
@@ -81,10 +66,32 @@ class StorageWriter {
 	 */
 	void saveTaglist(ArrayList<TagCategory> tags, File dest) throws IOException {
 		try {
-			writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
+			if (!tags.isEmpty()) {
+				writeToFile(dest, tags, new TypeToken<ArrayList<TagCategory>>() {});
+			} else { //can safely delete empty taglist
+				dest.delete();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw e;
+		}
+	}
+	
+	/*================*
+	 * Save directory *
+	 *================*/
+	/**
+	 * Writes the given abstract path to a config file located in System.getProperty("user.dir").
+	 * @param dir the File representing the directory to be saved
+	 * @param filename name of the destination file
+	 */
+	void saveDirectoryConfigFile(File dir, String filename) {
+		File dest = new File(filename);
+		try {
+			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("{Storage} Error saving new directory");
 		}
 	}
 }

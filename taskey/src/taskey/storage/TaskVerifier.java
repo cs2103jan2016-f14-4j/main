@@ -13,10 +13,10 @@ import taskey.parser.TimeConverter;
  * in case the user makes mistakes when editing them.
  * It also checks whether the date(s) in the files have been edited and sets them accordingly.
  */
-public class TaskVerifier {
+class TaskVerifier {
 	TimeConverter timeConverter = new TimeConverter();
 	
-	public TaskVerifier() {
+	TaskVerifier() {
 	}
 	
 	@SuppressWarnings("serial")

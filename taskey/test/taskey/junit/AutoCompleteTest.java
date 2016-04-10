@@ -17,6 +17,7 @@ import taskey.parser.TimeConverter;
 /**
  * @@author: A0107345L 
  * Tests the AutoComplete class
+ * Type of test: Component Test 
  * @author Xue Hui
  *
  */

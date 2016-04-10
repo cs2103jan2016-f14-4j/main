@@ -11,7 +11,8 @@ import taskey.parser.Parser;
 /**
  * @@author A0107345L
  * This class tests all the functionality of Parser to ensure 
- * it is returning the correct thing 
+ * it is returning the correct objects. 
+ * Type of test: Component Test 
  * @author Xue Hui
  *
  */

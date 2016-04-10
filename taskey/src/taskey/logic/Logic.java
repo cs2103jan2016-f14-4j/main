@@ -45,21 +45,6 @@ public class Logic {
 		updateHistory();
 	}
 	
-	//@@author A0107345L 
-	/**
-	 * Overloaded Constructor for JUnit tests, so that 
-	 * logger wont be run 
-	 * @param junit
-	 */
-	public Logic(int junit) {
-		parser = new Parser(1);
-		history = new History();
-		cmdExecutor = new CommandExecutor();
-		logicMemory = new LogicMemory();
-		autoComplete = new AutoComplete();
-		updateHistory();
-	}
-	
 	// @@author A0134177E
     //================================================================================
     // Accessors

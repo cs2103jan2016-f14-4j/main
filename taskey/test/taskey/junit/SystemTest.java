@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logger.TaskeyLog;
 import taskey.logic.Logic;
 import taskey.logic.LogicException;
 import taskey.logic.LogicMemory;
@@ -23,7 +24,7 @@ import taskey.parser.TimeConverter;
 /**
  * @@author A0134177E
  */
-public class LogicTest {
+public class SystemTest {
 	public static final int NUM_SECONDS_1_DAY = 86400;
 	public static final int NUM_SECONDS_1_WEEK = 604800;
 	public static final int NUM_SECONDS_BUFFER_TIME = 10; // Used for safety in dealing with boundary conditions
@@ -63,7 +64,7 @@ public class LogicTest {
 	// "clear" command is supposed to clear all task and tag data in memory.
 	@BeforeClass
 	public static void testClear() {
-		Logic logic = new Logic(1);
+		Logic logic = new Logic();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 		assertEquals(getEmptyLists(), logic.getAllTaskLists());
 		assertTrue(logic.getTagCategoryList().isEmpty());
@@ -71,8 +72,8 @@ public class LogicTest {
 	
 	@Before
 	public void setUp() {
-		logic = new Logic(1);
-		parser = new Parser(1); //JUnit Constructor
+		logic = new Logic();
+		parser = new Parser(); 
 		timeConverter = new TimeConverter();
 		logic.executeCommand(ContentBox.PENDING, "clear");
 	}

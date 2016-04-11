@@ -78,7 +78,7 @@ public class StorageTest {
 				listType.tasklist.clear();
 			}
 		}
-		
+
 		/**
 		 * Returns the list of tasklists currently in this enum.
 		 */
@@ -149,7 +149,7 @@ public class StorageTest {
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the original directory config file (if present) into memory before the running the test.
 	 * Otherwise, the file will be lost when overwritten during testing.
@@ -181,7 +181,7 @@ public class StorageTest {
 			}
 		}
 		System.out.println("[StorageTest] All taskey test savefiles deleted");
-		
+
 		// Delete the test directory
 		Files.deleteIfExists(testDir.toPath());
 		System.out.println("[StorageTest] Test folder deleted");
@@ -213,50 +213,50 @@ public class StorageTest {
 			fail("InvalidPathException not thrown for invalid characters *");
 		} catch (InvalidPathException e) {
 		}
-		
+
 		try {
 			storage.setDirectory(Storage.FILENAME_DIRCONFIG); //path to a file, not a directory
 			fail("NotDirectoryException not thrown for paths that point to a file");
 		} catch (NotDirectoryException e) {
 		}
-		
+
 		try {
 			storage.setDirectory(System.getenv("ProgramFiles") + "\\taskey_fubar"); //e.g. c:\program files\taskey_fubar
 			fail("AccessDeniedException not thrown when creating folder in restricted directory");
 		} catch (AccessDeniedException e) {
 		}
-		
+
 		try {
 			storage.setDirectory(Paths.get(System.getenv("ProgramFiles")).getRoot().toString()); //e.g. c:\
 			fail("AccessDeniedException not thrown when creating files in restricted directory");
 		} catch (AccessDeniedException e) {
 		}
-		
+
 		try {
 			storage.setDirectory("con");
 			fail("FileSystemException not thrown for reserved filename");
 		} catch (FileSystemException e) {
 		}
-		
+
 		try {
 			// Generate and save all task lists to the test directory
 			TaskList.clearAllLists();
 			TaskList.populateLists();
 			storage.saveAllTasklists(TaskList.getSuperlist());
-			
+
 			// Change the storage directory (without moving files from the test directory)
 			storage.setDirectory(Storage.DEFAULT_DIRECTORY.getAbsolutePath(), false);
-			
+
 			// Change back to the test directory and invoke DirectoryManager's moveFiles method, 
 			// which will throw FileAlreadyExistsException
 			storage.setDirectory(testDir.getAbsolutePath(), true);
-			
+
 			fail("FileAlreadyExistsException not thrown");
 		} catch (FileAlreadyExistsException e) {
 			storage.setDirectory(testDir.getAbsolutePath(), false); //revert back to the test directory to continue testing
 		}
 	}
-	
+
 	/**
 	 * Tests the moving of files by calling setDirectory(dest, true)
 	 * for an empty directory dest.

@@ -4,23 +4,27 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.parser.TimeConverter;
 
 /**
  * @@author A0121618M
- * This class is used by StorageReader to check the validity of the task lists read from file,
+ * This class is used by StorageReader to check the validity of the task and tag lists read from file,
  * in case the user makes mistakes while editing them.
  * It also checks whether the date(s) in the files have been edited and sets them accordingly.
  */
-class TaskVerifier {
+class StorageVerifier {
 	TimeConverter timeConverter = new TimeConverter();
 	
-	TaskVerifier() {
+	StorageVerifier() {
 	}
 	
 	@SuppressWarnings("serial")
 	class InvalidTaskException extends Exception {
+	}
+	@SuppressWarnings("serial")
+	class InvalidTagException extends Exception {
 	}
 
 	/**
@@ -29,14 +33,28 @@ class TaskVerifier {
 	 * @param tasklist the tasklist to be checked
 	 * @throws InvalidTaskException when the taskType is null or invalid
 	 */
-	void verify(ArrayList<Task> tasklist) throws InvalidTaskException {
-		for (Task t : tasklist) {
-			if (t.getTaskType() == null) {
+	void verifyTasks(ArrayList<Task> tasklist) throws InvalidTaskException {
+		for (Task task : tasklist) {
+			if (task.getTaskType() == null) {
 				throw new InvalidTaskException();
-			} else if (! (t.getTaskType().equalsIgnoreCase("FLOATING")
-					|| t.getTaskType().equalsIgnoreCase("DEADLINE") 
-					|| t.getTaskType().equalsIgnoreCase("EVENT")) ) {
+			} else if (! (task.getTaskType().equalsIgnoreCase("FLOATING")
+					|| task.getTaskType().equalsIgnoreCase("DEADLINE") 
+					|| task.getTaskType().equalsIgnoreCase("EVENT")) ) {
 				throw new InvalidTaskException();
+			}
+		}
+	}
+	
+	/**
+	 * Sanity check for when reading a taglist. Checks that all tag objects in the given list are valid.
+	 * The tag name cannot be null or it will cause UI to crash due to NullPointerException.
+	 * @param taglist the tag list to be checked
+	 * @throws InvalidTagException if any tagName field is null
+	 */
+	void verifyTags(ArrayList<TagCategory> taglist) throws InvalidTagException {
+		for (TagCategory tag : taglist) {
+			if (tag.getTagName() == null) {
+				throw new InvalidTagException();
 			}
 		}
 	}

@@ -20,7 +20,8 @@ import com.google.gson.reflect.TypeToken;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.storage.Storage.TasklistEnum;
-import taskey.storage.TaskVerifier.InvalidTaskException;
+import taskey.storage.StorageVerifier.InvalidTagException;
+import taskey.storage.StorageVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
@@ -30,7 +31,7 @@ import taskey.storage.TaskVerifier.InvalidTaskException;
  * This class is public so that it is visible to taskey.junit.StorageTest
  */
 public class StorageReader {
-	TaskVerifier taskVerifier = new TaskVerifier();
+	StorageVerifier verifier = new StorageVerifier();
 
 	/**
 	 * These three lists are derived from the PENDING list.
@@ -119,8 +120,8 @@ public class StorageReader {
 			case COMPLETED:
 				try {
 					tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-					taskVerifier.verify(tasklist);
-					taskVerifier.checkDates(tasklist);
+					verifier.verifyTasks(tasklist);
+					verifier.checkDates(tasklist);
 				} catch (InvalidTaskException | JsonParseException e) {
 					e.printStackTrace();
 					System.err.println("{Storage} Invalid tasklist: " + src.getName());
@@ -197,7 +198,8 @@ public class StorageReader {
 		ArrayList<TagCategory> tags;
 		try {
 			tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-		} catch (JsonParseException e) { //TODO invalid tag exception. JsonParseException not sufficient
+			verifier.verifyTags(tags);
+		} catch (JsonParseException | InvalidTagException e) {
 			e.printStackTrace();
 			System.err.println("{Storage} Invalid taglist: " + src.getName());
 			renameBadFile(src);

@@ -20,9 +20,13 @@ import taskey.storage.Storage.TasklistEnum;
 
 /**
  * @@author A0121618M
- * 
+ * This class provides two methods to Storage for managing its directory:
+ *  - createDirectory(File)
+ *  - changeDirectory(File, boolean, File)
  */
 class DirectoryManager {
+	// For remembering the directories created during runtime,
+	// so that DirectoryManager can delete them when they are no longer needed
 	private HashSet<File> directoriesCreated = new HashSet<File>();
 	private StorageWriter storageWriter = new StorageWriter();
 
@@ -33,7 +37,7 @@ class DirectoryManager {
 	 * Quietly creates the full directory path of the given abstract pathname and also checks that it is valid.
 	 * @param dir directory to be created
 	 * @return true if the directory was successfully created or already exists;
-	 * 		   false if dir is not a valid or dir exists but is not a directory
+	 * 		   false if mkdirs() failed or dir exists but is not a directory
 	 */
 	boolean createDirectory(File dir) {
 		if (!dir.exists()) {
@@ -51,23 +55,26 @@ class DirectoryManager {
 	}
 	
 	/**
-	 * Changes the storage directory to the given pathname string after checking that the path is valid.
-	 * If the given boolean argument is true, .taskey files in the current directory will be moved to the new one.
-	 * This method is invoked by Logic, should the end user request to change it.
+	 * <p> This method does the following in sequence:
+	 * <br>1. Checks the validity of the new directory
+	 * <br>2. If the given boolean argument is true, taskey files in the current directory will be moved to the new one.
+	 *		  However, if the new directory contains existing task file(s), this method will signal Logic to load them.
+	 * <br>3. Delete the old directory, if it is empty and was created by Taskey during runtime.
+	 * <br>4. Saves the new directory to the directory config file.
 	 * 
 	 * <p>Post-conditions:
 	 * <br>- Creates the directory if it does not exist yet.
-	 * <br>- If requested, moves the .taskey savefiles from the existing directory to the new one, 
-	 * 		 provided the new directory does not contain a full set of pre-existing tasklist files.
+	 * <br>- If requested, taskey savefiles from the current directory will be moved to the new one, 
+	 * 		 provided that the new directory does not contain pre-existing task file(s).
 	 * <br>- The old folder will be deleted if it was created during runtime and is currently empty.
-	 * <br>- Saves the new directory setting to a persistent config file in "user.dir".
-	 * <br>- Storage's directory will not be updated if the specified exceptions are thrown.
+	 * <br>- The new directory setting will be saved to a persistent config file in "user.dir".
+	 * <br>- Storage's directory will not be updated if any exceptions are thrown.
 	 * 
 	 * @param pathname can be absolute, or relative to "user.dir"
-	 * @param shouldMove [true] if move operation should be performed; 
-	 * 					 [false] to set Storage's directory without moving the files (see Throws section for use case).
+	 * @param shouldMove <code>true</code> if the move operation should be performed; 
+	 * 					 <code>false</code> to update Storage's directory without moving the files (see FileAlreadyExistsException).
 	 * 
-	 * @throws InvalidPathException when the path string cannot be converted into a Path because it contains invalid characters.
+	 * @throws InvalidPathException when the path string cannot be converted to a Path because it contains invalid characters.
 	 *
 	 * @throws NotDirectoryException when the path points to a normal file and not a directory.
 	 * 
@@ -75,12 +82,12 @@ class DirectoryManager {
 	 * 
 	 * @throws FileSystemException if the path contains a reserved/illegal filename or the root directory doesn't exist.
 	 * 
-	 * @throws FileAlreadyExistsException if the new directory already contains a full set of pre-existing tasklists.
-	 *			This is a signal for Logic to call setDirectory(pathname, false), then loadAllTasklists().
-	 *			This will update Storage's directory (bypassing the FileAlreadyExistsException) and load from the new directory.
+	 * @throws FileAlreadyExistsException if the new directory already contains at least one tasklist file.
+	 *		   This is a signal for Logic to call Storage.setDirectory(pathname, false) and then load from the new directory.
+	 *		   (Passing in false will update Storage's directory and bypass FileAlreadyExistsException.)
 	 * 
-	 * @throws IOException any other IO error, when creating a new directory or moving files, that is not covered above.
-	 * 			Note that moving is not an atomic operation, so it is possible that some files have already been moved.
+	 * @throws IOException any other IO error not covered above, when creating a new directory, writing to it, or moving files.
+	 * 		   Note that moving is not an atomic operation, so it is possible that some files will have been moved halfway.
 	 */
 	File changeDirectory(File currDir, boolean shouldMove, File newDir) throws InvalidPathException, NotDirectoryException, 
 																			   AccessDeniedException, FileSystemException, 
@@ -92,8 +99,8 @@ class DirectoryManager {
 			try {
 				moveFiles(currDir, newDir);
 			} catch (FileAlreadyExistsException e) {
-				System.out.println("{Storage} Loading from directory | " + newDir.getPath());
-				throw e; //signal Logic to load the existing task savefiles
+				System.out.println("{Storage} Load from directory | " + newDir.getPath());
+				throw e; //signal Logic to load the existing task files
 			}
 		}
 		deleteCurrDir(currDir); //delete the old folder if it's currently empty and was created by Taskey during runtime
@@ -113,7 +120,7 @@ class DirectoryManager {
 	 * @throws InvalidPathException if dir contains illegal characters, e.g. * or ?
 	 * @throws NotDirectoryException if dir points to a normal file and not a folder
 	 * @throws AccessDeniedException if creation of dir was denied, e.g. trying to create a folder in c:\\program files
-	 * @throws FileSystemException if dir is an illegal filename in Windows, e.g. reserved words such as CON or PRN
+	 * @throws FileSystemException if dir contains an illegal filename in Windows, e.g. reserved words such as CON or PRN
 	 * @throws IOException for any other reason not covered by the above exceptions
 	 */
 	private void createDirectoryLoudly(File dir) throws InvalidPathException, NotDirectoryException, 
@@ -148,11 +155,12 @@ class DirectoryManager {
 	private void checkCanWriteToDirectory(File dir) throws AccessDeniedException, IOException {
 		try {
 			File testFile = new File(dir, "DeleteMe.Taskey");
+			testFile.delete();
 			Files.createFile(testFile.toPath());
 			testFile.delete();
 		} catch (AccessDeniedException e) {
 			throw e;
-		} catch (FileSystemException e) { //test file already exists
+		} catch (FileAlreadyExistsException e) { //test file already exists
 			System.err.println(e.getMessage());
 		} catch (IOException e) { //whatever else
 			e.printStackTrace();
@@ -161,12 +169,14 @@ class DirectoryManager {
 	}
 	
 	/**
-	 * Moves the ".taskey" savefiles from the given source to destination directory.
+	 * Moves the taskey savefiles from the given source to destination directory.
+	 * This method has no effect if srcDir and destDir are the same.
+	 * Files are moved only if destDir does not contain any tasklist savefiles.
 	 * @param srcDir the source directory
 	 * @param destDir the destination diectory
 	 * @returns true if all the files were moved successfully; false if no files were moved
-	 * @throws IOException thrown by Files.move method
-	 * @throws FileAlreadyExistsException if savefiles exist in destDir
+	 * @throws IOException thrown by the Files.move method
+	 * @throws FileAlreadyExistsException if tasklist files already exist in destDir
 	 */
 	private boolean moveFiles(File srcDir, File destDir) throws IOException, FileAlreadyExistsException {
 		// Skip the move if srcDir and destDir are the same
@@ -174,10 +184,10 @@ class DirectoryManager {
 			return false;
 		}
 
-		// If destDir contains a full set of pre-existing tasklist files
+		// If destDir contains pre-existing task file(s)
 		// we do not want to inadvertently overwrite them, so we skip the move
 		if (containsExistingTaskFilesIn(destDir)) {
-			throw new FileAlreadyExistsException(null);
+			throw new FileAlreadyExistsException("Load from directory");
 		}
 
 		boolean wasMoved = false;
@@ -189,8 +199,6 @@ class DirectoryManager {
 				try {
 					Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
 					wasMoved = true;
-				} catch (AccessDeniedException e) {
-					throw e;
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw e;
@@ -205,9 +213,9 @@ class DirectoryManager {
 	}
 
 	/**
-	 * Checks if the given directory contains any task savefile.
-	 * @param dir directory to check for pre-existing tasklist files
-	 * @return true if any savefile was found; false otherwise
+	 * Checks if the given directory contains any tasklist savefile(s).
+	 * @param dir directory to check
+	 * @return true if any tasklist file was found; false otherwise
 	 */
 	private boolean containsExistingTaskFilesIn(File dir) {
 		//EnumSet<TasklistEnum> set = EnumSet.noneOf(TasklistEnum.class);
@@ -220,8 +228,8 @@ class DirectoryManager {
 		}
 		return false;
 
-		/*//For checking that directory contains the FULL set of tasklists
-		if (set.equals(savedLists)) {
+		/*//Not used - For checking that dir contains ALL tasklists
+		if (set.equals(TasklistEnum.savedLists)) {
 			return true; //all tasklist files are present in dir
 		} else {
 			return false;//at least one tasklist file is missing
@@ -231,7 +239,8 @@ class DirectoryManager {
 
 	/**
 	 * Deletes the current Storage directory if it was created during runtime and is currently empty.
-	 * This method is meant to be used only in the setDirectory method.
+	 * This method should only be used in the changeDirectory method.
+	 * @param currDir the old directory to be deleted before setting the new one
 	 */
 	private void deleteCurrDir(File currDir) {
 		if (directoriesCreated.contains(currDir) && (currDir.list().length == 0)) {
@@ -248,6 +257,7 @@ class DirectoryManager {
 	/**
 	 * Checks whether the abstract pathname given by dir should be saved to the directory config file.
 	 * @param newDir the candidate directory
+	 * @param currDir the old directory that is used for comparison
 	 * @return true if dir is different from the current directory;
 	 * 		   false if dir is the default directory or is the same as the current directory
 	 */

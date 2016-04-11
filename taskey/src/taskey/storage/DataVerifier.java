@@ -14,10 +14,10 @@ import taskey.parser.TimeConverter;
  * in case the user makes mistakes while editing them.
  * It also checks whether the date(s) in the files have been edited and sets them accordingly.
  */
-class StorageVerifier {
+class DataVerifier {
 	TimeConverter timeConverter = new TimeConverter();
 	
-	StorageVerifier() {
+	DataVerifier() {
 	}
 	
 	@SuppressWarnings("serial")
@@ -42,6 +42,7 @@ class StorageVerifier {
 					|| task.getTaskType().equalsIgnoreCase("EVENT")) ) {
 				throw new InvalidTaskException();
 			}
+			//TODO check tags
 		}
 	}
 	
@@ -56,6 +57,7 @@ class StorageVerifier {
 			if (tag.getTagName() == null) {
 				throw new InvalidTagException();
 			}
+			//TODO update tags
 		}
 	}
 

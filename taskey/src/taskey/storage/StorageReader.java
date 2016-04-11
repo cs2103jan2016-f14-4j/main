@@ -20,8 +20,8 @@ import com.google.gson.reflect.TypeToken;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.storage.Storage.TasklistEnum;
-import taskey.storage.StorageVerifier.InvalidTagException;
-import taskey.storage.StorageVerifier.InvalidTaskException;
+import taskey.storage.DataVerifier.InvalidTagException;
+import taskey.storage.DataVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
@@ -31,7 +31,7 @@ import taskey.storage.StorageVerifier.InvalidTaskException;
  * This class is public so that it is visible to taskey.junit.StorageTest
  */
 public class StorageReader {
-	StorageVerifier verifier = new StorageVerifier();
+	DataVerifier verifier = new DataVerifier();
 
 	/**
 	 * These three lists are derived from the PENDING list.

@@ -173,8 +173,8 @@ public class StorageTest {
 		// Delete savefiles
 		for (File file : testfolder.listFiles()) {
 			if (Arrays.asList(Storage.FILENAMES).contains(file.getName())) {
-				File testTasklist = new File(testfolder, file.getName());
-				Files.delete(testTasklist.toPath());
+				File testfile = new File(testfolder, file.getName());
+				Files.delete(testfile.toPath());
 			}
 		}
 		System.out.println("[StorageTest] All taskey test savefiles deleted");

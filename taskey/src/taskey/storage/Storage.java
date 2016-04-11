@@ -29,7 +29,7 @@ public class Storage {
 
 	static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
 	public static final String FILENAME_TAGS = "TAGS.taskey";
-	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig";
+	public static final String FILENAME_DIRCONFIG = "directory_setting.taskeyconfig";
 	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
 	
 	public static final String[] FILENAMES;
@@ -227,9 +227,11 @@ public class Storage {
 
 
 	/**
+	 * Changes Storage's directory to the given pathname string.
 	 * See {@link DirectoryManager#changeDirectory(File, boolean, File)}
 	 * @param pathname path of the new directory
-	 * @param shouldMove whether Storage should move files from the current directory to the new one.
+	 * @param shouldMove <code>true</code> if the move operation should be performed; 
+	 * 					 <code>false</code> to set Storage's directory without moving the files.
 	 */
 	public void setDirectory(String pathname, boolean shouldMove) throws InvalidPathException, NotDirectoryException, 
 																		 AccessDeniedException, FileSystemException, 

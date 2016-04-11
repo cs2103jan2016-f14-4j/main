@@ -1,10 +1,10 @@
 *.class
 taskey/Taskey savefiles
 Taskey savefiles
+taskey/directory_setting.taskeyconfig
 taskey/last_used_directory.taskeyconfig
 *.taskeyconfig
 javadoc
-taskey/USER_TAG_DB
 taskey/logs
 taskey/bin
 collated

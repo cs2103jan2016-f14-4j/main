@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import taskey.storage.TaskVerifier.InvalidTaskException;
  * This class provides methods to Storage for 
  * reading tasklists, taglists and abstract paths from their JSON files.
  * It also uses TaskVerifier to perform input validation on the Task objects read from file.
- * This class is public so that it is visible to taskey.junit.StorageTest.
+ * This class is public so that it is visible to taskey.junit.StorageTest
  */
 public class StorageReader {
 	TaskVerifier taskVerifier = new TaskVerifier();
@@ -70,8 +69,8 @@ public class StorageReader {
 	 * @param typeToken represents the generic type T of the desired object; 
 	 * 		  this is obtained from the Gson TypeToken class
 	 * @return An object of type T generated from the JSON file.
-	 * @throws FileNotFoundException if FileReader constructor fails due to it being
-	 *		   unable to open the file for reading (could be because access was denied).
+	 * @throws FileNotFoundException if FileReader constructor fails due to it being unable 
+	 * 		   to open the file for reading. This could be because the file doesn't exist or access was denied.
 	 * @throws JsonParseException fromJson throws JsonIOException, JsonSyntaxException
 	 */
 	private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException, 
@@ -104,10 +103,12 @@ public class StorageReader {
 	 * Returns the ArrayList of Task objects read from the File src.
 	 * The GENERAL/DEADLINE/EVENT lists are not read from file;
 	 * instead, they are derived from the PENDING list.
-	 * Pre-condition: the PENDING list must be read before the derived lists.
+	 * <p>Pre-condition:
+	 * <br>- the PENDING list must be read before the derived lists, 
+	 * 		 so that the derived lists in the enum are populated first.
 	 * @param src the source file to be read from
-	 * @param tasklistType
-	 * @return the tasklist read from file
+	 * @param tasklistType the TasklistEnum constant passed from Storage
+	 * @return the tasklist read from file or an empty tasklist if file was not found/is invalid
 	 */
 	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) {
 		ArrayList<Task> tasklist;
@@ -146,11 +147,11 @@ public class StorageReader {
 	}
 
 	/**
-	 * Renames the given malformed tasklist file 
-	 * so that it does not get overwritten the next time the user saves.
+	 * Renames the given file, which could be invalid due to a malformed JSON or invalid tasks.
 	 * This is done so that if the user makes a mistake while editing the task files,
-	 * they can still recover it, instead of losing it when it gets overwritten.
-	 * @param src abtract path of the malformed tasklist savefile
+	 * they can still recover it, instead of losing them when they get overwritten 
+	 * the next time the user saves (which happens on program close!).
+	 * @param src abstract path of the bad file
 	 */
 	private void renameBadFile(File src) {
 		try {
@@ -164,7 +165,7 @@ public class StorageReader {
 
 	/**
 	 * Derives the GENERAL, DEADLINE, and EVENT tasklists from the PENDING list.
-	 * @param pendingList
+	 * @param pendingList the PENDING list
 	 */
 	private void getDerivedLists(ArrayList<Task> pendingList) {
 		DerivedList.clearAllLists(); //erase the previous data, if any
@@ -190,13 +191,13 @@ public class StorageReader {
 	 * Returns an ArrayList of Tags read from the File src.
 	 * An empty ArrayList is returned if src was not found.
 	 * @param src source file to be read
-	 * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
+	 * @return the taglist read from file or an empty taglist if file was not found/is invalid
 	 */
 	ArrayList<TagCategory> loadTaglist(File src) {
 		ArrayList<TagCategory> tags;
 		try {
 			tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
-		} catch (JsonParseException e) {
+		} catch (JsonParseException e) { //TODO invalid tag exception. JsonParseException not sufficient
 			e.printStackTrace();
 			System.err.println("{Storage} Invalid taglist: " + src.getName());
 			renameBadFile(src);
@@ -211,7 +212,8 @@ public class StorageReader {
 	 * Load directory *
 	 *================*/
 	/**
-	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
+	 * Tries to read the last-saved directory from the config file. 
+	 * located in System.getProperty("user.dir").
 	 * @param filename name of the config file to be read
 	 * @return the File representing the last-saved directory, or null if it was not found
 	 */

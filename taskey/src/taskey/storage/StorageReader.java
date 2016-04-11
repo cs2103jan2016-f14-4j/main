@@ -1,6 +1,6 @@
 package taskey.storage;
 
-import static taskey.storage.Storage.TaskListEnum.PENDING;
+import static taskey.storage.Storage.TasklistEnum.PENDING;
 import static taskey.storage.StorageReader.DerivedList.DEADLINE_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.EVENT_TASKLIST;
 import static taskey.storage.StorageReader.DerivedList.GENERAL_TASKLIST;
@@ -9,46 +9,54 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
-import taskey.storage.Storage.TaskListEnum;
-import taskey.storage.TaskVerifier.InvalidTaskException;
+import taskey.storage.Storage.TasklistEnum;
+import taskey.storage.DataVerifier.InvalidTagException;
+import taskey.storage.DataVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
+ * This class provides methods to Storage for 
+ * reading tasklists, taglists and abstract paths from their JSON files.
+ * It also uses TaskVerifier to perform input validation on the Task objects read from file.
+ * This class is public so that it is visible to taskey.junit.StorageTest
  */
 public class StorageReader {
-	TaskVerifier taskVerifier = new TaskVerifier();
+	DataVerifier verifier = new DataVerifier();
 
 	/**
 	 * These three lists are derived from the PENDING list.
-	 * Hence, they do not need to be read/written to disk.
+	 * They are not read from, or written to, disk.
 	 */
 	enum DerivedList {
 		GENERAL_TASKLIST (new ArrayList<Task>()),
 		DEADLINE_TASKLIST (new ArrayList<Task>()),
 		EVENT_TASKLIST (new ArrayList<Task>());
 
-		ArrayList<Task> tasklist;
+		private ArrayList<Task> tasklist;
 
-		DerivedList(ArrayList<Task> list) {
+		private DerivedList(ArrayList<Task> list) {
 			tasklist = list;
 		}
 
-		void add(Task t) {
+		private void add(Task t) {
 			tasklist.add(t);
 		}
 
-		ArrayList<Task> get() {
+		private ArrayList<Task> get() {
 			return tasklist;
 		}
 
-		static void clearAllLists() {
+		private static void clearAllLists() {
 			for (DerivedList list : DerivedList.values()) {
 				list.get().clear();
 			}
@@ -56,21 +64,35 @@ public class StorageReader {
 	}
 
 	/**
-	 * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
+	 * Generic read method.
+	 * Deserializes the JSON file specified by src into an object of the specified type.
 	 * @param src JSON file to be read
 	 * @param typeToken represents the generic type T of the desired object; 
 	 * 		  this is obtained from the Gson TypeToken class
 	 * @return An object of type T generated from the JSON file.
-	 * @throws FileNotFoundException if FileReader constructor fails
+	 * @throws FileNotFoundException if FileReader constructor fails due to it being unable 
+	 * 		   to open the file for reading. This could be because the file doesn't exist or access was denied.
+	 * @throws JsonParseException fromJson throws JsonIOException, JsonSyntaxException
 	 */
-	private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException {
+	private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException, 
+																		JsonParseException {
 		FileReader reader = new FileReader(src);
 		Gson gson = new Gson();
-		T object = gson.fromJson(reader, typeToken.getType()); //TODO Handle type safety
+		T object;
 		try {
-			reader.close(); //must close the stream to allow deletion of files by StorageTest
-		} catch (IOException e) {
-			e.printStackTrace();
+			object = gson.fromJson(reader, typeToken.getType());
+		} catch (JsonParseException e) {
+			throw e;
+		} finally {
+			try {
+				reader.close(); //must close the stream to allow deleting/moving of files
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (object == null) {
+			throw new JsonParseException("fromJson returned null due to EOF i.e. file was empty");
 		}
 		return object;
 	}
@@ -80,15 +102,16 @@ public class StorageReader {
 	 *============*/
 	/**
 	 * Returns the ArrayList of Task objects read from the File src.
-	 * The GENERAL/DEADLINE/EVENT lists are not read from file; instead, they are derived from the PENDING list.
-	 * Pre-condition: the PENDING list must be read before the derived lists.
+	 * The GENERAL/DEADLINE/EVENT lists are not read from file;
+	 * instead, they are derived from the PENDING list.
+	 * <p>Pre-condition:
+	 * <br>- the PENDING list must be read before the derived lists, 
+	 * 		 so that the derived lists in the enum are populated first.
 	 * @param src the source file to be read from
-	 * @param tasklistType
-	 * @return the tasklist read from file
-	 * @throws FileNotFoundException 
-	 * @throws InvalidTaskException 
+	 * @param tasklistType the TasklistEnum constant passed from Storage
+	 * @return the tasklist read from file or an empty tasklist if file was not found/is invalid
 	 */
-	ArrayList<Task> loadTasklist(File src, TaskListEnum tasklistType) throws FileNotFoundException, InvalidTaskException {
+	ArrayList<Task> loadTasklist(File src, TasklistEnum tasklistType) {
 		ArrayList<Task> tasklist;
 		switch (tasklistType) {
 			default: //default case is just to avoid compilation error
@@ -97,18 +120,23 @@ public class StorageReader {
 			case COMPLETED:
 				try {
 					tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
-					taskVerifier.verify(tasklist);
-					taskVerifier.checkDates(tasklist);
-				} catch (InvalidTaskException e) {
-					System.err.println("{Storage} Invalid tasklist | " + src.getName());
-					throw e;
+					verifier.verifyTasks(tasklist);
+					verifier.checkDates(tasklist);
+				} catch (InvalidTaskException | JsonParseException e) {
+					e.printStackTrace();
+					System.err.println("{Storage} Invalid tasklist: " + src.getName());
+					renameBadFile(src);
+					tasklist = new ArrayList<Task>(); //return empty list
+				} catch (FileNotFoundException e) {
+					tasklist = new ArrayList<Task>();
 				}
-	
+
 				if (tasklistType == PENDING) {
-					getDerivedLists(tasklist); //generate the derived lists from the PENDING list
+					// Generate the GENERAL, DEADLINE and EVENT lists from the PENDING list
+					getDerivedLists(tasklist);
 				}
 				break;
-	
+
 			case GENERAL:
 				return GENERAL_TASKLIST.get();
 			case DEADLINE:
@@ -120,11 +148,28 @@ public class StorageReader {
 	}
 
 	/**
+	 * Renames the given file, which could be invalid due to a malformed JSON or invalid tasks.
+	 * This is done so that if the user makes a mistake while editing the task files,
+	 * they can still recover it, instead of losing them when they get overwritten 
+	 * the next time the user saves (which happens on program close!).
+	 * @param src abstract path of the bad file
+	 */
+	private void renameBadFile(File src) {
+		try {
+			Files.move(src.toPath(), src.toPath().resolveSibling("INVALID." + src.getName()), 
+					StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			System.err.println("{Storage} Could not rename bad file");
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Derives the GENERAL, DEADLINE, and EVENT tasklists from the PENDING list.
-	 * @param pendingList
+	 * @param pendingList the PENDING list
 	 */
 	private void getDerivedLists(ArrayList<Task> pendingList) {
-		DerivedList.clearAllLists(); //erase the previous data
+		DerivedList.clearAllLists(); //erase the previous data, if any
 		for (Task task : pendingList) {
 			switch (task.getTaskType().toUpperCase()) {
 				case "FLOATING":
@@ -139,26 +184,6 @@ public class StorageReader {
 			}
 		}
 	}
-	
-	/*================*
-	 * Load directory *
-	 *================*/
-	/**
-	 * Tries to read the last-saved directory from a config file located in System.getProperty("user.dir").
-	 * @param filename name of the config file to be read
-	 * @return the File representing the last-saved directory, or null if it was not found
-	 */
-	public File loadDirectoryConfigFile(String filename) {
-		File src = new File(filename);
-		try {
-			//FIXME: buggyPath will somehow always have user.dir prefixed in its absolute path
-			File buggyPath = readFromFile(src, new TypeToken<File>() {});
-			File fixedPath = new File(buggyPath.getPath()); //kludge solution
-			return fixedPath;
-		} catch (FileNotFoundException e) {
-			return null;
-		}
-	}
 
 	/*===========*
 	 * Load tags *
@@ -167,15 +192,41 @@ public class StorageReader {
 	 * Returns an ArrayList of Tags read from the File src.
 	 * An empty ArrayList is returned if src was not found.
 	 * @param src source file to be read
-	 * @return ArrayList containing the user-defined tags, or an empty ArrayList if src was not found
+	 * @return the taglist read from file or an empty taglist if file was not found/is invalid
 	 */
 	ArrayList<TagCategory> loadTaglist(File src) {
 		ArrayList<TagCategory> tags;
 		try {
 			tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
+			verifier.verifyTags(tags);
+		} catch (JsonParseException | InvalidTagException e) {
+			e.printStackTrace();
+			System.err.println("{Storage} Invalid taglist: " + src.getName());
+			renameBadFile(src);
+			tags = new ArrayList<TagCategory>(); //return empty list
 		} catch (FileNotFoundException e) {
 			tags = new ArrayList<TagCategory>();
 		}
 		return tags;
+	}
+
+	/*================*
+	 * Load directory *
+	 *================*/
+	/**
+	 * Tries to read the last-saved directory from the config file located in System.getProperty("user.dir").
+	 * @param filename name of the config file to be read
+	 * @return the File representing the last-saved directory, or null if it was not found
+	 */
+	public File loadDirectoryConfigFile(String filename) {
+		File src = new File(filename);
+		try {
+			//FIXME: buggyPath will somehow always have user.dir prepended to its absolute path
+			File buggyPath = readFromFile(src, new TypeToken<File>() {});
+			File fixedPath = new File(buggyPath.getPath()); //kludge solution
+			return fixedPath;
+		} catch (FileNotFoundException e) {
+			return null;
+		}
 	}
 }

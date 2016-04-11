@@ -62,9 +62,9 @@ public class LogicMemory {
 		TaskeyLog.getInstance().addHandler(LogSystems.LOGIC, "LogicLog.txt", 1);
 		storage = new Storage();
 		initializeTaskLists();
-		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized task lists in LogicMemory.", Level.INFO);
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized task lists in LogicMemory.", Level.ALL);
 		initializeTagCategoryList();
-		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized tag list in LogicMemory.", Level.INFO);
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized tag list in LogicMemory.", Level.ALL);
 	}
 	
     //================================================================================

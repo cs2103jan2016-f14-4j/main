@@ -5,6 +5,5 @@ taskey/last_used_directory.taskeyconfig
 *.taskeyconfig
 javadoc
 taskey/USER_TAG_DB
-taskey/logs
 taskey/bin
 collated

@@ -196,6 +196,11 @@ public class StorageReader {
 		ArrayList<TagCategory> tags;
 		try {
 			tags = readFromFile(src, new TypeToken<ArrayList<TagCategory>>() {});
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+			System.err.println("{Storage} Invalid taglist: " + src.getName());
+			renameBadFile(src);
+			tags = new ArrayList<TagCategory>(); //return empty list
 		} catch (FileNotFoundException e) {
 			tags = new ArrayList<TagCategory>();
 		}

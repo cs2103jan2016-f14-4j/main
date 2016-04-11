@@ -9,9 +9,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import taskey.messenger.TagCategory;
@@ -21,37 +25,38 @@ import taskey.storage.TaskVerifier.InvalidTaskException;
 
 /**
  * @@author A0121618M
- * This class provides methods to classes in the storage package
- * for reading tasklists, taglists and abstract paths from their JSON files.
- * It also performs input validation on the Task objects read from file, using the TaskVerifier class.
+ * This class provides methods to Storage for 
+ * reading tasklists, taglists and abstract paths from their JSON files.
+ * It also uses TaskVerifier to perform input validation on the Task objects read from file.
+ * This class is public so that it is visible to taskey.junit.StorageTest.
  */
 public class StorageReader {
 	TaskVerifier taskVerifier = new TaskVerifier();
 
 	/**
 	 * These three lists are derived from the PENDING list.
-	 * Hence, they do not need to be read/written to disk.
+	 * They are not read from, or written to, disk.
 	 */
 	enum DerivedList {
 		GENERAL_TASKLIST (new ArrayList<Task>()),
 		DEADLINE_TASKLIST (new ArrayList<Task>()),
 		EVENT_TASKLIST (new ArrayList<Task>());
 
-		ArrayList<Task> tasklist;
+		private ArrayList<Task> tasklist;
 
-		DerivedList(ArrayList<Task> list) {
+		private DerivedList(ArrayList<Task> list) {
 			tasklist = list;
 		}
 
-		void add(Task t) {
+		private void add(Task t) {
 			tasklist.add(t);
 		}
 
-		ArrayList<Task> get() {
+		private ArrayList<Task> get() {
 			return tasklist;
 		}
 
-		static void clearAllLists() {
+		private static void clearAllLists() {
 			for (DerivedList list : DerivedList.values()) {
 				list.get().clear();
 			}
@@ -59,21 +64,35 @@ public class StorageReader {
 	}
 
 	/**
-	 * Generic read method. Deserializes the JSON specified by src into an object of the specified type.
+	 * Generic read method.
+	 * Deserializes the JSON file specified by src into an object of the specified type.
 	 * @param src JSON file to be read
 	 * @param typeToken represents the generic type T of the desired object; 
 	 * 		  this is obtained from the Gson TypeToken class
 	 * @return An object of type T generated from the JSON file.
-	 * @throws FileNotFoundException if FileReader constructor fails
+	 * @throws FileNotFoundException if FileReader constructor fails due to it being
+	 *		   unable to open the file for reading (could be because access was denied).
+	 * @throws JsonParseException fromJson throws JsonIOException, JsonSyntaxException
 	 */
-	private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException {
+	private <T> T readFromFile(File src, TypeToken<T> typeToken) throws FileNotFoundException, 
+																		JsonParseException {
 		FileReader reader = new FileReader(src);
 		Gson gson = new Gson();
-		T object = gson.fromJson(reader, typeToken.getType()); //TODO Handle type safety
+		T object;
 		try {
-			reader.close(); //must close the stream to allow deletion of files by StorageTest
-		} catch (IOException e) {
-			e.printStackTrace();
+			object = gson.fromJson(reader, typeToken.getType());
+		} catch (JsonParseException e) {
+			throw e;
+		} finally {
+			try {
+				reader.close(); //must close the stream to allow deleting/moving of files
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (object == null) {
+			throw new JsonParseException("fromJson returned null due to EOF i.e. file was empty");
 		}
 		return object;
 	}
@@ -83,7 +102,8 @@ public class StorageReader {
 	 *============*/
 	/**
 	 * Returns the ArrayList of Task objects read from the File src.
-	 * The GENERAL/DEADLINE/EVENT lists are not read from file; instead, they are derived from the PENDING list.
+	 * The GENERAL/DEADLINE/EVENT lists are not read from file;
+	 * instead, they are derived from the PENDING list.
 	 * Pre-condition: the PENDING list must be read before the derived lists.
 	 * @param src the source file to be read from
 	 * @param tasklistType
@@ -100,11 +120,11 @@ public class StorageReader {
 					tasklist = readFromFile(src, new TypeToken<ArrayList<Task>>() {});
 					taskVerifier.verify(tasklist);
 					taskVerifier.checkDates(tasklist);
-				} catch (InvalidTaskException e) {
-					System.err.println("{Storage} Invalid tasklist | " + src.getName());
-					tasklist = new ArrayList<Task>();
-					//TODO dump file into invalid subfolder so tt its not overwritten
-					
+				} catch (InvalidTaskException | JsonParseException e) {
+					e.printStackTrace();
+					System.err.println("{Storage} Invalid tasklist: " + src.getName());
+					renameBadFile(src);
+					tasklist = new ArrayList<Task>(); //return empty list
 				} catch (FileNotFoundException e) {
 					tasklist = new ArrayList<Task>();
 				}
@@ -123,6 +143,23 @@ public class StorageReader {
 				return EVENT_TASKLIST.get();
 		}
 		return tasklist;
+	}
+
+	/**
+	 * Renames the given malformed tasklist file 
+	 * so that it does not get overwritten the next time the user saves.
+	 * This is done so that if the user makes a mistake while editing the task files,
+	 * they can still recover it, instead of losing it when it gets overwritten.
+	 * @param src abtract path of the malformed tasklist savefile
+	 */
+	private void renameBadFile(File src) {
+		try {
+			Files.move(src.toPath(), src.toPath().resolveSibling("INVALID_" + src.getName()), 
+					StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			System.err.println("{Storage} Could not rename bad file");
+			e.printStackTrace();
+		}
 	}
 
 	/**

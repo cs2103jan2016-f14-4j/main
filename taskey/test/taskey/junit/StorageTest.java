@@ -16,6 +16,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -171,12 +172,12 @@ public class StorageTest {
 	public static void tearDownAfterClass() throws IOException {
 		// Delete savefiles
 		for (File file : testfolder.listFiles()) {
-			if (file.getName().endsWith(Storage.FILENAME_EXTENSION)) {
+			if (Arrays.asList(Storage.FILENAMES).contains(file.getName())) {
 				File testTasklist = new File(testfolder, file.getName());
 				Files.delete(testTasklist.toPath());
 			}
 		}
-		System.out.println("[StorageTest] All " + Storage.FILENAME_EXTENSION + " test files deleted");
+		System.out.println("[StorageTest] All taskey test savefiles deleted");
 
 		// Revert back to previous config file
 		if (originalDirConfigFile != null) {

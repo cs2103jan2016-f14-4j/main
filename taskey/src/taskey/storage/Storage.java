@@ -1,7 +1,5 @@
 package taskey.storage;
 
-import static taskey.storage.Storage.TasklistEnum.savedLists;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,9 +29,19 @@ public class Storage {
 
 	static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
 	public static final String FILENAME_TAGS = "TAGS.taskey";
-	public static final String FILENAME_EXTENSION = ".taskey"; //TODO use whole filename rather than just the extension
 	public static final String FILENAME_DIRCONFIG = "last_used_directory.taskeyconfig";
 	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
+	
+	public static final String[] FILENAMES;
+	// This array contains all the savefile names used in storage
+	static {
+		FILENAMES = new String[TasklistEnum.savedLists.size() + 1];
+		int i = 0;
+		for (TasklistEnum listType : TasklistEnum.savedLists) {
+			FILENAMES[i++] = listType.filename();
+		}
+		FILENAMES[i] = FILENAME_TAGS;
+	}
 
 	/**
 	 * This is an enum of all the task lists that are handled by Storage, together with their filenames.
@@ -101,6 +109,7 @@ public class Storage {
 		}
 	}
 
+
 	/**
 	 * Storage constructor and initializer.
 	 * Attempts to load and set the last used directory.
@@ -167,7 +176,7 @@ public class Storage {
 	public void saveAllTasklists(ArrayList<ArrayList<Task>> superlist) throws IOException {
 		assert (superlist.size() == NUM_TASKLISTS_FROM_LOGIC);
 
-		for (TasklistEnum listType : savedLists) {
+		for (TasklistEnum listType : TasklistEnum.savedLists) {
 			File dest = new File(directory, listType.filename());
 			ArrayList<Task> listToSave = superlist.get(listType.index());
 			try {

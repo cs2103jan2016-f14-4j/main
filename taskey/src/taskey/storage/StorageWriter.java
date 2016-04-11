@@ -19,10 +19,12 @@ import taskey.messenger.Task;
  */
 class StorageWriter {
 	/**
-	 * Generic write method. Serializes the given object of the specified type into its equivalent JSON representation.
+	 * Generic write method.
+	 * Serializes the given object of the specified type into its equivalent JSON representation.
 	 * @param dest the abstract path of the JSON file to be written
 	 * @param object of type T to be serialized
-	 * @param typeToken represents the generic type T of the given object; this is obtained from the Gson TypeToken class
+	 * @param typeToken represents the generic type T of the given object;
+	 * 		  this is obtained from the Gson TypeToken class
 	 * @throws IOException thrown by FileWriter
 	 */
 	private <T> void writeToFile(File dest, T object, TypeToken<T> typeToken) throws IOException {

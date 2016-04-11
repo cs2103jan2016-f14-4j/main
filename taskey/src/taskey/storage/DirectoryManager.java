@@ -2,7 +2,6 @@ package taskey.storage;
 
 import static taskey.storage.Storage.DEFAULT_DIRECTORY;
 import static taskey.storage.Storage.FILENAME_DIRCONFIG;
-import static taskey.storage.Storage.FILENAME_EXTENSION;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import taskey.storage.Storage.TasklistEnum;
@@ -182,7 +182,7 @@ class DirectoryManager {
 
 		boolean wasMoved = false;
 		for (File srcFile : srcDir.listFiles()) {
-			if (srcFile.getName().endsWith(FILENAME_EXTENSION)) {
+			if (Arrays.asList(Storage.FILENAMES).contains(srcFile.getName())) {
 				Path srcPath = srcFile.toPath();
 				Path destPath = destDir.toPath().resolve(srcFile.getName());
 

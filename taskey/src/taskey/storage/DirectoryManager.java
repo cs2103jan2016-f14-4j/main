@@ -32,7 +32,7 @@ class DirectoryManager {
 
 	DirectoryManager() {
 	}
-	
+
 	/**
 	 * Quietly creates the full directory path of the given abstract pathname and also checks that it is valid.
 	 * @param dir directory to be created
@@ -53,7 +53,7 @@ class DirectoryManager {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * <p> This method does the following in sequence:
 	 * <br>1. Checks the validity of the new directory
@@ -111,7 +111,7 @@ class DirectoryManager {
 
 		return newDir;
 	}
-	
+
 	/**
 	 * This method attempts to create the full directory path of the given abstract pathname and throws exceptions when it fails.
 	 * All known exceptions are enumerated in the throws clause of this method just for documentation purposes;
@@ -167,7 +167,7 @@ class DirectoryManager {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Moves the taskey savefiles from the given source to destination directory.
 	 * This method has no effect if srcDir and destDir are the same.
@@ -256,7 +256,7 @@ class DirectoryManager {
 
 	/**
 	 * Checks whether the abstract pathname given by dir should be saved to the directory config file.
-	 * @param newDir the candidate directory
+	 * @param newDir the candidate directory to be saved
 	 * @param currDir the old directory that is used for comparison
 	 * @return true if dir is different from the current directory;
 	 * 		   false if dir is the default directory or is the same as the current directory
@@ -271,7 +271,8 @@ class DirectoryManager {
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
-				return true; //since delete failed, return true to save it
+				return false;
+				//return true; //(?)since delete failed, return true to save it(?)
 			}
 		}
 
@@ -282,5 +283,4 @@ class DirectoryManager {
 			return false;
 		}
 	}
-
 }

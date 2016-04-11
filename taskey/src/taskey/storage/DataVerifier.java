@@ -42,7 +42,7 @@ class DataVerifier {
 					|| task.getTaskType().equalsIgnoreCase("EVENT")) ) {
 				throw new InvalidTaskException();
 			}
-			//TODO check tags
+			//TODO check and count tags
 		}
 	}
 	

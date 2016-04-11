@@ -30,19 +30,21 @@ import taskey.parser.TimeConverter;
 import taskey.storage.Storage;
 import taskey.storage.Storage.TasklistEnum;
 import taskey.storage.StorageReader;
+import taskey.storage.StorageWriter;
 
 /**
  * @@author A0121618M
+ * Unit test for the Storage package/component.
  */
 public class StorageTest {
 	private static Storage storage = new Storage();
-	private static File testfolder = new File("Taskey savefiles\\temp_test");
+	private static File testDir = new File(Storage.DEFAULT_DIRECTORY, "temp_test");
 	private static File originalDirConfigFile; //to hold the existing directory config file until end of tests
 
 	/**
 	 * Enum of all the task lists that are passed from Logic to Storage.
 	 * taskListsFromStorage is the set of lists that are returned from Storage to Logic on load.
-	 * derivedLists are the lists derived from the pending list instead of being loaded from disk.
+	 * derivedLists is the set of lists that are derived from the pending list instead of being loaded from disk.
 	 */
 	enum TaskList {
 		THIS_WEEK	(new ArrayList<Task>()), //ignored by Storage
@@ -54,7 +56,7 @@ public class StorageTest {
 		COMPLETED 	(new ArrayList<Task>()), //saved to disk
 		ACTION		(new ArrayList<Task>()); //ignored by Storage
 
-		static EnumSet<TaskList> derivedLists = EnumSet.of(EVENT, DEADLINE, FLOATING);
+		//static EnumSet<TaskList> derivedLists = EnumSet.of(EVENT, DEADLINE, FLOATING);
 		static EnumSet<TaskList> taskListsFromStorage = EnumSet.range(PENDING, COMPLETED);
 		static TimeConverter timeConverter = new TimeConverter();
 
@@ -76,6 +78,17 @@ public class StorageTest {
 				listType.tasklist.clear();
 			}
 		}
+		
+		/**
+		 * Returns the list of tasklists currently in this enum.
+		 */
+		static ArrayList<ArrayList<Task>> getSuperlist() {
+			ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
+			for (TaskList tasklist : TaskList.values()) {
+				superlist.add(tasklist.get());
+			}
+			return superlist;
+		}
 
 		/**
 		 * Populate the lists in this enum with dummy task lists.
@@ -88,6 +101,7 @@ public class StorageTest {
 					case PENDING:
 						task.setTaskName("Float");
 						task.setTaskType("FLOATING");
+						task.setTaskTags(new ArrayList<String>(Arrays.asList(("tag"))));
 						FLOATING.add(task);
 						PENDING.add(task);
 						
@@ -127,29 +141,18 @@ public class StorageTest {
 						ACTION.add(task);
 						break;
 						
-					case DEADLINE:
+					case DEADLINE: //these lists have already been added
 					case EVENT:
 					case FLOATING:
 						break;
 				}
 			}
 		}
-
-		/**
-		 * Returns the full list of tasklists currently in this enum.
-		 */
-		static ArrayList<ArrayList<Task>> getSuperlist() {
-			ArrayList<ArrayList<Task>> superlist = new ArrayList<ArrayList<Task>>();
-			for (TaskList tasklist : TaskList.values()) {
-				superlist.add(tasklist.get());
-			}
-			return superlist;
-		}
 	}
 	
 	/**
-	 * Load the original directory config file (if present) into memory
-	 * before the running the test as it will be overwritten.
+	 * Load the original directory config file (if present) into memory before the running the test.
+	 * Otherwise, the file will be lost when overwritten during testing.
 	 * @throws IOException
 	 */
 	@BeforeClass
@@ -158,9 +161,9 @@ public class StorageTest {
 		if (originalDirConfigFile == null) {
 			System.out.println("[StorageTest] No existing directory config file");
 		} else {
-			System.out.println("[StorageTest] " + originalDirConfigFile);
+			System.out.println("[StorageTest] Existing directory config file found");
 		}
-		storage.setDirectory(testfolder.getAbsolutePath(), false); //don't move savefiles to test folder
+		storage.setDirectory(testDir.getAbsolutePath(), false); //don't move savefiles to the test folder
 	}
 
 	/**
@@ -171,18 +174,22 @@ public class StorageTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws IOException {
 		// Delete savefiles
-		for (File file : testfolder.listFiles()) {
+		for (File file : testDir.listFiles()) {
 			if (Arrays.asList(Storage.FILENAMES).contains(file.getName())) {
-				File testfile = new File(testfolder, file.getName());
+				File testfile = new File(testDir, file.getName());
 				Files.delete(testfile.toPath());
 			}
 		}
 		System.out.println("[StorageTest] All taskey test savefiles deleted");
+		
+		// Delete the test directory
+		Files.deleteIfExists(testDir.toPath());
+		System.out.println("[StorageTest] Test folder deleted");
 
 		// Revert back to previous config file
 		if (originalDirConfigFile != null) {
 			System.out.println("[StorageTest] Reverting back to original directory");
-			storage.setDirectory(originalDirConfigFile.getAbsolutePath(), false); //don't move test files to original folder
+			new StorageWriter().saveDirectoryConfigFile(originalDirConfigFile, Storage.FILENAME_DIRCONFIG);
 		} else {
 			// Else if there was no pre-existing config file, delete the one created in the test
 			File testDirConfigFile = new File(Storage.FILENAME_DIRCONFIG);
@@ -192,9 +199,13 @@ public class StorageTest {
 	}
 
 
-	/*==================*
-	 * Test directories *
-	 *==================*/
+	/*===========================*
+	 * Test directory management *
+	 *===========================*/
+	/**
+	 * Tests the exceptions thrown by DirectoryManager's changeDirectory method.
+	 * @throws IOException
+	 */
 	@Test
 	public void testSetDirectoryExceptions() throws IOException {
 		try {
@@ -234,18 +245,34 @@ public class StorageTest {
 			storage.saveAllTasklists(TaskList.getSuperlist());
 			
 			// Change the storage directory (without moving files from the test directory)
-			storage.setDirectory("taskey savefiles", false);
+			storage.setDirectory(Storage.DEFAULT_DIRECTORY.getAbsolutePath(), false);
 			
-			// Change back to the test directory 
-			// (invoking the move method, which will throw FileAlreadyExistsException)
-			storage.setDirectory(testfolder.getAbsolutePath(), true);
+			// Change back to the test directory and invoke DirectoryManager's moveFiles method, 
+			// which will throw FileAlreadyExistsException
+			storage.setDirectory(testDir.getAbsolutePath(), true);
 			
-			fail("Expected FileAlreadyExistsException not thrown");
+			fail("FileAlreadyExistsException not thrown");
 		} catch (FileAlreadyExistsException e) {
-			storage.setDirectory(testfolder.getAbsolutePath(), false); //revert to test folder to continue testing
+			storage.setDirectory(testDir.getAbsolutePath(), false); //revert back to the test directory to continue testing
 		}
 	}
-
+	
+	/**
+	 * Tests the moving of files by calling setDirectory(dest, true)
+	 * for an empty directory dest.
+	 * @throws IOException
+	 */
+	@Test
+	public void testMoveFiles() throws IOException {
+		File dest = new File(testDir, "moved");
+		// Move the files
+		storage.setDirectory(dest.getAbsolutePath(), true);
+		for (String filename : dest.list()) {
+			assertTrue(Arrays.asList(Storage.FILENAMES).contains(filename));
+		}
+		// Move them back
+		storage.setDirectory(testDir.getAbsolutePath(), true);
+	}
 
 	/*================*
 	 * Test tasklists *
@@ -268,8 +295,8 @@ public class StorageTest {
 		ArrayList<ArrayList<Task>> loadedList = storage.loadAllTasklists();
 
 		assertEquals("Loaded tasklist must be size 6", TasklistEnum.size(), loadedList.size());
-		assertTrue(expectedList.equals(loadedList)); //test Task.equals method
-		assertEquals(toString(expectedList), toString(loadedList)); //test Task.toString method
+		assertTrue(expectedList.equals(loadedList)); 				//test Task's equals method
+		assertEquals(toString(expectedList), toString(loadedList)); //test Task's toString method
 
 		//System.out.println("\n" + toString(expectedList));
 		//System.out.println(toString(loadedList));
@@ -303,10 +330,10 @@ public class StorageTest {
 	}
 
 
-	/*================*
-	 * Helper methods *
-	 *================*/
-	private static String toString(List<ArrayList<Task>> superlist) {
+	/*==================*
+	 * toString methods *
+	 *==================*/
+	private static String toString(List<ArrayList<Task>> superlist) { //note: type erasure
 		String str = "";
 		for (ArrayList<Task> list : superlist) {
 			for (Task task : list) {
@@ -322,16 +349,5 @@ public class StorageTest {
 			str += tag.getTagName();
 		}
 		return str;
-	}
-
-	@SuppressWarnings("unused")
-	private static <E> void print(ArrayList<ArrayList<E>> lists) {
-		int i = 0;
-		for (ArrayList<E> list : lists) {
-			System.out.println(i++);
-			for (E t : list) {
-				System.out.println(t);
-			}
-		}
 	}
 }

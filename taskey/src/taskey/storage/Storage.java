@@ -27,7 +27,7 @@ public class Storage {
 	private DirectoryManager directoryManager;
 	private File directory;
 
-	static final File DEFAULT_DIRECTORY = new File("Taskey savefiles");
+	public static final File DEFAULT_DIRECTORY = new File("Taskey savefiles"); //public for unit test
 	public static final String FILENAME_TAGS = "TAGS.taskey";
 	public static final String FILENAME_DIRCONFIG = "directory_setting.taskeyconfig";
 	public static final int NUM_TASKLISTS_FROM_LOGIC = taskey.logic.LogicMemory.NUM_TASK_LISTS;
@@ -245,6 +245,7 @@ public class Storage {
 	/*=============*
 	 * For testing *
 	 *=============*/
+	/*
 	public static void main(String args[]) throws Exception {
 		Storage storage = new Storage();
 		storage.setDirectory("con"); //invalid
@@ -262,4 +263,5 @@ public class Storage {
 		}
 		System.out.println("end print");
 	}
+	*/
 }

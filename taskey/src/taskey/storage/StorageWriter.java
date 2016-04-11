@@ -16,8 +16,9 @@ import taskey.messenger.Task;
  * @@author A0121618M
  * This class provides methods to classes in the storage package
  * for writing tasklists, taglists and abstract paths to file in the JSON format.
+ * This class is public so that it is visible to taskey.junit.StorageTest
  */
-class StorageWriter {
+public class StorageWriter {
 	/**
 	 * Generic write method.
 	 * Serializes the given object of the specified type into its equivalent JSON representation.
@@ -93,7 +94,7 @@ class StorageWriter {
 	 * @param dir the File object representing the directory path to be saved
 	 * @param filename name of the destination file
 	 */
-	void saveDirectoryConfigFile(File dir, String filename) {
+	public void saveDirectoryConfigFile(File dir, String filename) {
 		File dest = new File(filename);
 		try {
 			writeToFile(dest, dir.getCanonicalFile(), new TypeToken<File>() {});

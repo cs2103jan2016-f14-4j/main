@@ -4,8 +4,11 @@ import static taskey.constants.ParserConstants.DISPLAY_COMMAND;
 import static taskey.constants.ParserConstants.FINISHED_COMMAND;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.messenger.ProcessedAC;
 import taskey.messenger.ProcessedObject;
 import taskey.messenger.TagCategory;
@@ -43,6 +46,7 @@ public class Logic {
 		logicMemory = new LogicMemory();
 		autoComplete = new AutoComplete();
 		updateHistory();
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized Logic.", Level.INFO);
 	}
 	
 	// @@author A0134177E

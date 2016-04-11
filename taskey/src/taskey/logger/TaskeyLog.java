@@ -81,7 +81,7 @@ public class TaskeyLog {
 			handler.setFormatter(formatter);
 			theLogger.addHandler(handler); // if handle
 		} catch (NoSuchFileException e) {
-			System.out.println("UiLog.txt not found");
+			System.out.println(fileName + " not found");
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

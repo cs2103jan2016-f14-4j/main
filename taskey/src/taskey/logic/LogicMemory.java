@@ -10,8 +10,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import taskey.constants.UiConstants.ContentBox;
+import taskey.logger.TaskeyLog;
+import taskey.logger.TaskeyLog.LogSystems;
 import taskey.messenger.TagCategory;
 import taskey.messenger.Task;
 import taskey.parser.TimeConverter;
@@ -55,9 +58,13 @@ public class LogicMemory {
     //================================================================================
 	
 	LogicMemory() {
+		TaskeyLog.getInstance().removeHandlers(LogSystems.LOGIC);
+		TaskeyLog.getInstance().addHandler(LogSystems.LOGIC, "LogicLog.txt", 1);
 		storage = new Storage();
 		initializeTaskLists();
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized task lists in LogicMemory.", Level.INFO);
 		initializeTagCategoryList();
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized tag list in LogicMemory.", Level.INFO);
 	}
 	
     //================================================================================

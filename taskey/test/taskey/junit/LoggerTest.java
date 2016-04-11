@@ -3,9 +3,6 @@ package taskey.junit;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +10,13 @@ import org.junit.Test;
 
 import taskey.logger.TaskeyLog;
 import taskey.logger.TaskeyLog.LogSystems;
+
+/**
+ * @@author A0125419H
+ * 
+ * This class does some tests for TaskeyLog.
+ * @author Junwei
+ */
 
 public class LoggerTest {
 

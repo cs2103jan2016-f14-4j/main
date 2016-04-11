@@ -89,7 +89,7 @@ public class StorageReader {
 				e.printStackTrace();
 			}
 		}
-		
+
 		if (object == null) {
 			throw new JsonParseException("fromJson returned null due to EOF i.e. file was empty");
 		}
@@ -129,9 +129,9 @@ public class StorageReader {
 				} catch (FileNotFoundException e) {
 					tasklist = new ArrayList<Task>();
 				}
-	
+
 				if (tasklistType == PENDING) {
-					 // Generate the GENERAL, DEADLINE and EVENT lists from the PENDING list
+					// Generate the GENERAL, DEADLINE and EVENT lists from the PENDING list
 					getDerivedLists(tasklist);
 				}
 				break;
@@ -155,7 +155,7 @@ public class StorageReader {
 	 */
 	private void renameBadFile(File src) {
 		try {
-			Files.move(src.toPath(), src.toPath().resolveSibling("INVALID_" + src.getName()), 
+			Files.move(src.toPath(), src.toPath().resolveSibling("INVALID." + src.getName()), 
 					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			System.err.println("{Storage} Could not rename bad file");
@@ -207,13 +207,12 @@ public class StorageReader {
 		}
 		return tags;
 	}
-	
+
 	/*================*
 	 * Load directory *
 	 *================*/
 	/**
-	 * Tries to read the last-saved directory from the config file. 
-	 * located in System.getProperty("user.dir").
+	 * Tries to read the last-saved directory from the config file located in System.getProperty("user.dir").
 	 * @param filename name of the config file to be read
 	 * @return the File representing the last-saved directory, or null if it was not found
 	 */

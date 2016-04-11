@@ -10,7 +10,7 @@ import taskey.parser.TimeConverter;
 /**
  * @@author A0121618M
  * This class is used by StorageReader to check the validity of the task lists read from file,
- * in case the user makes mistakes when editing them.
+ * in case the user makes mistakes while editing them.
  * It also checks whether the date(s) in the files have been edited and sets them accordingly.
  */
 class TaskVerifier {
@@ -22,34 +22,12 @@ class TaskVerifier {
 	@SuppressWarnings("serial")
 	class InvalidTaskException extends Exception {
 	}
-	
-	/**
-	 * Temporary method to check that the generated GENERAL/DEADLINE/EVENT tasklist is equal to the savefile.
-	 * This method will be deprecated once the reduced number of savefiles are deemed stable.
-	 * @param src
-	 * @param derivedTasklist
-	 */
-//	private void jsonShouldBeEqual(File src, ArrayList<Task> derivedTasklist) {
-//		ArrayList<Task> tasklistFromFile;
-//		try {
-//			tasklistFromFile = readFromFile(src, new TypeToken<ArrayList<Task>>(){});
-//		} catch (FileNotFoundException e) {
-//			System.out.println(e.getMessage());
-//			return;
-//		}
-//		Gson gson = new Gson();
-//		String json1 = gson.toJson(derivedTasklist, new TypeToken<ArrayList<Task>>(){}.getType());
-//		String json2 = gson.toJson(tasklistFromFile, new TypeToken<ArrayList<Task>>(){}.getType());
-//		System.out.println(json1.equals(json2)); //in case assertions aren't enabled
-//		//assert (json1.equals(json2)); //disabled cuz manually editing savefiles will cause assertion to trigger
-//	}
 
 	/**
-	 * Sanity check for when reading a tasklist. Checks that all Task objects in a given list are valid;
-	 * i.e. that they follow the contract laid out in the Task class.
-	 * TODO: add more checks
-	 * @param tasklist
-	 * @throws InvalidTaskException
+	 * Sanity check for when reading a tasklist. Checks that all Task objects in a given list are valid.
+	 * The only field that needs to be checked to prevent program from crashing is the task type.
+	 * @param tasklist the tasklist to be checked
+	 * @throws InvalidTaskException when the taskType is null or invalid
 	 */
 	void verify(ArrayList<Task> tasklist) throws InvalidTaskException {
 		for (Task t : tasklist) {
@@ -66,7 +44,10 @@ class TaskVerifier {
 	/**
 	 * Checks whether any Task in the given tasklist has had their dates/times changed 
 	 * by the user editing the JSON files. If so, then the Task's epoch date(s) will be modified
-	 * to fit the human-readable time.
+	 * to match the human-readable time. This assumes that any user editing the files would be
+	 * changing the human-readable dates, and not the epoch dates.
+	 * The reason this check needs to be done is that Taskey only uses epoch time in its
+	 * internal implementation; without this check, human readable dates would be ignored.
 	 * @param tasklist the list of tasks to be checked
 	 */
 	void checkDates(ArrayList<Task> tasklist) {
@@ -141,15 +122,16 @@ class TaskVerifier {
 		try {
 			String[] tokens = humanTime.split(":"); 
 			if (tokens.length == 2) {
-				// Time was given in HH:mm format, but HH:mm:ss is needed
+				// Time was given in HH:mm format, but HH:mm:ss is needed for TimeConverter
 				convertedEpoch = timeConverter.toEpochTime(humanTime + ":00");
 			} else if (tokens.length == 3) {
-				// Time in HH:mm:ss format
+				// Time is in HH:mm:ss format
 				convertedEpoch = timeConverter.toEpochTime(humanTime);
 			} else {
-				throw new ParseException("", 0);
+				throw new ParseException("Wrong human date format", 0);
 			}
 		} catch (ParseException e) {
+			e.printStackTrace();
 			System.err.println("{Storage} Invalid user-edited date");
 			return epochTime;
 		}

@@ -27,7 +27,8 @@ import taskey.storage.DataVerifier.InvalidTaskException;
  * @@author A0121618M
  * This class provides methods to Storage for 
  * reading tasklists, taglists and abstract paths from their JSON files.
- * It also uses TaskVerifier to perform input validation on the Task objects read from file.
+ * It also uses DataVerifier to perform input validation on the Task and 
+ * TagCategory objects read from file.
  * This class is public so that it is visible to taskey.junit.StorageTest
  */
 public class StorageReader {
@@ -166,6 +167,7 @@ public class StorageReader {
 
 	/**
 	 * Derives the GENERAL, DEADLINE, and EVENT tasklists from the PENDING list.
+	 * Post-condition: the tasklists in the enum DerivedList are all populated
 	 * @param pendingList the PENDING list
 	 */
 	private void getDerivedLists(ArrayList<Task> pendingList) {

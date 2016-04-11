@@ -46,7 +46,7 @@ public class Logic {
 		logicMemory = new LogicMemory();
 		autoComplete = new AutoComplete();
 		updateHistory();
-		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized Logic.", Level.INFO);
+		TaskeyLog.getInstance().log(LogSystems.LOGIC, "Successfully initialized Logic.", Level.ALL);
 	}
 	
 	// @@author A0134177E

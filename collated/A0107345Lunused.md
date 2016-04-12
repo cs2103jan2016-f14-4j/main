@@ -1,5 +1,5 @@
 # A0107345Lunused
-###### \taskey\src\taskey\messenger\UserTagDatabase.java
+###### taskey\src\taskey\messenger\UserTagDatabase.java
 ``` java
  * Purpose of this class is to handle the storage and retrieval
  * of userTags, so that they can be displayed by Logic as 
@@ -14,7 +14,7 @@ public class UserTagDatabase {
 	Storage db; 
 	
 ```
-###### \taskey\src\taskey\messenger\UserTagDatabase.java
+###### taskey\src\taskey\messenger\UserTagDatabase.java
 ``` java
 	 * Add a new tag to the userTagDatabase
 	 * @param tag
@@ -62,7 +62,7 @@ public class UserTagDatabase {
 	}
 	
 ```
-###### \taskey\src\taskey\messenger\UserTagDatabase.java
+###### taskey\src\taskey\messenger\UserTagDatabase.java
 ``` java
 	 * For Logic: Get the entire tagList so that 
 	 * it can be displayed by the UI.
@@ -74,7 +74,7 @@ public class UserTagDatabase {
 	
 	/**
 ```
-###### \taskey\src\taskey\messenger\UserTagDatabase.java
+###### taskey\src\taskey\messenger\UserTagDatabase.java
 ``` java
      * FOR DEBUGGING
      */
@@ -106,7 +106,7 @@ public class UserTagDatabase {
 	} */ 
 }
 ```
-###### \taskey\src\taskey\parser\AutoComplete.java
+###### taskey\src\taskey\parser\AutoComplete.java
 ``` java
 	 * Decided not to use the code below as we decided to change 
 	 * what the AutoComplete should display 
